@@ -1,0 +1,57 @@
+meta {
+  name: update-build-config
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{serviceURL}}/apps/{{testBuildTrpcAppID}}/build-configs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "sourceType": "codeRepository",
+    "codeRepo": {
+      "type": "TGit",
+      "defaultBranch": "main",
+      "repoAlias": "test-repo",
+      "repoURL": "https://git.com/bkms-govern.git",
+      "sourceDir": ".",
+      "dockerfile": "Dockerfile",
+      "dockerBuildArgs": {
+        "ARG1": "value1",
+        "ARG2": "value2"
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  console.log(res.body);
+  
+  test("should update build config successfully", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('object');
+  });
+  
+  test("should return updated build config", () => {
+    expect(res.body.data.sourceType).to.equal('codeRepository');
+    expect(res.body.data.codeRepo).to.be.an('object');
+    expect(res.body.data.codeRepo.type).to.equal('TGit');
+    expect(res.body.data.codeRepo.defaultBranch).to.equal('main')
+    expect(res.body.data.codeRepo.repoAlias).to.equal('test-repo')
+    expect(res.body.data.codeRepo.repoURL).to.equal('https://git.com/bkms-govern.git');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

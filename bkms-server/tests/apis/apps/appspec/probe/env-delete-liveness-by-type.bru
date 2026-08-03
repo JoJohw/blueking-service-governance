@@ -1,0 +1,20 @@
+meta {
+  name: env-delete-liveness-by-type
+  type: http
+  seq: 17
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{probeAppID}}/envs/{{testEnv}}/app-spec/probe/liveness
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

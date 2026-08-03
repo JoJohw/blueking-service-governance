@@ -1,0 +1,36 @@
+meta {
+  name: update-environments-cluster
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{serviceURL}}/envs/{{envID}}/cluster
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "clusterID": "new-c-{{randomSuffix}}",
+    "clusterType": "virtual",
+    "namespace": "custom-{{randomSuffix}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:post-response {
+  const suffix = bru.getVar("randomSuffix");
+
+  bru.setVar("newClusterID", `new-c-${suffix}`);
+  bru.setVar("newClusterType", "virtual");
+  bru.setVar("newNamespace", `custom-${suffix}`);
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

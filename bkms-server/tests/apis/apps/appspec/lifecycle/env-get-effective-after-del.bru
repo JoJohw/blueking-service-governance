@@ -1,0 +1,31 @@
+meta {
+  name: env-get-effective-after-del
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/envs/{{testEnv}}/app-spec/lifecycle/effective
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should fall back to the default lifecycle values", () => {
+    // 环境配置被删除后，应该回退到默认配置 (set-default-http 设置的值)
+    expect(res.body.data.postStart.type).to.equal("HTTP");
+    expect(res.body.data.postStart.http.url).to.equal("http://localhost:8080/start");
+    // preStop 也应该回到默认值 (Http with url)
+    expect(res.body.data.preStop.type).to.equal("HTTP");
+    expect(res.body.data.preStop.http.url).to.equal("http://localhost:8080/stop");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

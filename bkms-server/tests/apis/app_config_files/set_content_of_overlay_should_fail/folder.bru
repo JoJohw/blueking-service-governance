@@ -1,0 +1,20 @@
+meta {
+  name: set_content_of_overlay_should_fail
+  seq: 2
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("valuesOverlayHelmAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `values-overlay-ws-${suffix}`})
+    const app = await common.createHelmApp({id: `values-overlay-app-${suffix}`, workspaceID: ws.id})
+
+    bru.setVar("valuesOverlayHelmAppID", app.id);
+  }
+}

@@ -1,0 +1,105 @@
+.bk-navigation-wrapper .navigation-container .container-content {
+  padding: 0 !important;
+}
+
+.vxe-table--tooltip-wrapper {
+  z-index: 3000 !important;
+}
+
+.bk-tab-content {
+  padding: 18px 24px !important;
+}
+
+.bk-message-content.multi .overview .tools .tool.fix.fixed {
+  /* 组件库的 fixed 被unocss的 fixed 覆盖了 */
+  position: static;
+}
+
+.bk-button:not(.is-text, .bk-button-small) {
+  min-width: 88px;
+}
+
+.content-hover {
+  .content-item {
+    display: none !important;
+  }
+}
+
+.content-hover:hover {
+  .content-item {
+    display: block !important;
+  }
+}
+
+.scrollbar-stable {
+  scrollbar-gutter: stable;
+}
+
+.bk-textarea {
+  min-height: 50px;
+}
+
+.normal-exception {
+  .bk-exception-img {
+    width: 220px !important;
+    height: 100px !important;
+  }
+}
+
+.large-exception {
+  .bk-exception-img {
+    width: 440px !important;
+    height: 200px !important;
+  }
+
+  .bk-exception-description {
+    margin-top: 11px;
+  }
+}
+
+/* 解决高度塌陷 */
+.bfc::before,
+.bfc::after {
+  display: block;
+  clear: both;
+  content: '';
+  visibility: hidden;
+  overflow: hidden;
+}
+
+/* 解决表格最后一行背景色问题 */
+.vxe-table--render-default .vxe-table--body .vxe-body--row:nth-last-child(1) {
+  .vxe-body--column {
+    background-size: 100% 0px;
+  }
+}
+
+/* 解决SearchSelect选择时空间不足时没有换行问题 */
+.bk-search-select-container .search-container-input {
+  min-width: fit-content;
+}
+
+.bk-popper {
+  border: none;
+}
+
+/* 半透明深色气泡 */
+.popover-dark-translucent {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.vxe-table--filter-wrapper {
+  min-width: unset !important;
+
+  .vxe-checkbox--label {
+    padding-left: 0px;
+  }
+
+  .vxe-table--filter-body {
+    max-height: 280px !important;
+  }
+}
+
+.no-padding-popover {
+  padding: 0 !important;
+}

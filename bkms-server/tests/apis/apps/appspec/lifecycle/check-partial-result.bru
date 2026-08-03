@@ -1,0 +1,33 @@
+meta {
+  name: check-partial-result
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/envs/{{testEnv}}/app-spec/lifecycle/effective
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the env lifecycle override", () => {
+    // lifecycle 环境配置按整块覆盖默认值，未提交的 postStart 不再继承默认值
+    expect(res.body.data.postStart).to.be.null;
+
+    // preStop 来自环境配置 (Exec with sleepSeconds, set by env-set-partial)
+    expect(res.body.data.preStop.type).to.equal("EXEC");
+    // protobuf int64 序列化为 JSON 字符串
+    expect(res.body.data.preStop.exec.sleepSeconds).to.equal("3");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

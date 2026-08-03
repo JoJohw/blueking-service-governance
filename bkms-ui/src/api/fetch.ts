@@ -1,0 +1,308 @@
+/*
+ * Tencent is pleased to support the open source community by making
+ * 蓝鲸智云PaaS平台 (BlueKing PaaS) available.
+ *
+ * Copyright (C) 2021 THL A29 Limited, a Tencent company.  All rights reserved.
+ *
+ * 蓝鲸智云PaaS平台 (BlueKing PaaS) is licensed under the MIT License.
+ *
+ * License for 蓝鲸智云PaaS平台 (BlueKing PaaS):
+ *
+ * ---------------------------------------------------
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+ * to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+ * the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+ * THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+import { Message } from 'bkui-vue';
+import { isObject, merge } from 'lodash-es';
+import { objectToQueryParams } from '~/common/util';
+
+import { type Config, fetch, interceptors } from './interceptors';
+import { appendTraceId, appendTraceIdToDetails, attachTraceId, getTraceId } from './trace-id';
+
+type HttpMethods = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
+type RequestParams = Record<string, unknown>;
+type ResponseData = Record<string, unknown> & {
+  code?: number;
+  data?: unknown;
+  error?: {
+    message?: string;
+    traceId?: string;
+  };
+  status?: number;
+  traceId?: string;
+};
+
+interceptors.response.use(
+  async (response: Response, config: Config) => {
+    // 流式响应和文件下载需要立即返回原始 Response，不能预先读取成功响应体。
+    // 错误响应仍按原逻辑解析，以便后续展示后端返回的错误详情。
+    const res =
+      config.originalResponse && response.ok
+        ? {}
+        : await resultReduction(response.clone(), config).catch((): ResponseData => ({}));
+    // Trace ID 仅用于失败提示和错误对象透传，不写入成功响应数据。
+    const traceId = getTraceId(response);
+    let resolveRes;
+    if (config.originalResponse) {
+      // 返回原生response
+      resolveRes = response;
+    } else if (config.needRes) {
+      // 返回后端完整response
+      resolveRes = res;
+    } else {
+      // 返回data字段
+      resolveRes = res.data;
+    }
+
+    // Cookie 过期
+    if (response.status === 401) {
+      window.location.href = `${window.BK_LOGIN_URL}?c_url=${window.location.href}`;
+      return Promise.reject(new Error('Unauthorized'));
+    }
+
+    // 无权限
+    if (response.status === 403) {
+      // TODO: 权限弹窗
+      Message({
+        theme: 'error',
+        message: traceId
+          ? {
+              overview: appendTraceId('无权限', traceId),
+              details: appendTraceIdToDetails({}, traceId),
+              type: 'json',
+            }
+          : '无权限',
+      });
+      return Promise.reject(attachTraceId(new Error('Forbidden'), traceId));
+    }
+
+    // 默认使用 Message 弹窗，特殊错误使用 UI 展示异常
+    if (response.status === 400) {
+      config.interceptorErr &&
+        Message({
+          theme: 'error',
+          actions: [
+            {
+              id: 'assistant',
+              disabled: true,
+            },
+          ],
+          message: {
+            code: response.status,
+            overview: appendTraceId(res?.error?.message || window.i18n.t('请求异常'), traceId),
+            suggestion: '',
+            type: 'json',
+            details: appendTraceIdToDetails(res?.error || {}, traceId),
+          },
+        });
+      // 同时透传到拒绝对象，供关闭默认拦截的页面级错误处理复用。
+      attachTraceId(res, traceId);
+      return Promise.reject(res);
+    }
+
+    // 其他异常状态
+    if (response.status < 200 || response.status >= 300) {
+      config.interceptorErr &&
+        Message({
+          theme: 'error',
+          actions: [
+            {
+              id: 'assistant',
+              disabled: true, // 不显示助手
+            },
+          ],
+          message: {
+            code: response.status,
+            overview: appendTraceId(res?.error?.message || window.i18n.t('请求异常'), traceId),
+            suggestion: '',
+            type: 'json',
+            details: appendTraceIdToDetails(res?.error || {}, traceId),
+          },
+        });
+      // 关闭默认拦截时，调用方仍可从拒绝对象中取得 Trace ID。
+      attachTraceId(res, traceId);
+      return Promise.reject(
+        config?.needStatus
+          ? {
+              ...res,
+              status: response.status,
+              statusText: response.statusText,
+            }
+          : res,
+      );
+    }
+
+    // API状态码不正确
+    if (config.validateCode && res.status !== 0 && res.code !== 0) {
+      // 优化后的Messagea
+      config.interceptorErr &&
+        Message({
+          theme: 'error',
+          message: {
+            code: res.status ?? res.code,
+            overview: appendTraceId(window.i18n.t('请求失败'), traceId),
+            suggestion: '',
+            type: 'key-value',
+            details: traceId ? appendTraceIdToDetails({}, traceId) : undefined,
+          },
+        });
+      // 业务码失败同样透传 Trace ID，供页面级错误处理复用。
+      attachTraceId(res, traceId);
+      return Promise.reject(res);
+    }
+
+    return Promise.resolve(resolveRes);
+  },
+  (error: unknown, config: Config) => {
+    // 请求被主动取消（路由切换等），静默处理
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return Promise.reject(error);
+    }
+
+    // 网络层异常（断网、DNS 解析失败、CORS 错误等），弹出提示
+    if (error instanceof TypeError) {
+      config.interceptorErr &&
+        Message({
+          theme: 'error',
+          message: window.i18n.t('网络异常，请检查网络连接后重试'),
+        });
+      return Promise.reject(error);
+    }
+
+    // 其他未知异常，弹出通用提示
+    config.interceptorErr &&
+      Message({
+        theme: 'error',
+        message: error instanceof Error ? error.message : window.i18n.t('请求异常'),
+      });
+    return Promise.reject(error);
+  },
+);
+
+export default class ConsoleFetch {
+  config: Config; // 全局配置
+
+  constructor(config: Config) {
+    this.config = merge(
+      {
+        mode: 'cors',
+        cache: 'default',
+        credentials: 'include',
+        headers: {
+          'X-Requested-With': 'fetch',
+          'Content-Type': 'application/json',
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer-when-downgrade',
+        responseType: 'json',
+        validateCode: false,
+        interceptorErr: true,
+      },
+      config,
+    );
+  }
+  delete<P, T>(url: string) {
+    return <C extends Config>(params?: P, config?: C) => this.request<T, C>('DELETE', url, params, config);
+  }
+  // P 请求参数类型 T 返回类型
+  get<P, T>(url: string) {
+    return <C extends Config>(params?: P, config?: C) => this.request<T, C>('GET', url, params, config);
+  }
+
+  // 替换URL上的变量和删除params上的变量参数
+  parseUrlAndParams(url: string, params: RequestParams = {}) {
+    const variableData: RequestParams = {};
+    let newUrl = url;
+
+    // 查找URL中的所有 {var} 格式的参数
+    const urlParams = url.match(/\{([^}]+)\}/g) || [];
+
+    urlParams.forEach(param => {
+      const key = param.slice(1, -1); // 移除 { } 获取参数名
+      if (params[key] !== undefined) {
+        variableData[key] = params[key];
+        // 替换URL中的参数
+        newUrl = newUrl.replace(param, String(params[key]));
+        // 删除已处理的参数
+        delete params[key];
+      }
+    });
+
+    return {
+      url: newUrl,
+      params,
+    };
+  }
+
+  patch<P, T>(url: string) {
+    return <C extends Config>(params?: P, config?: C) => this.request<T, C>('PATCH', url, params, config);
+  }
+
+  post<P, T>(url: string) {
+    return <C extends Config>(params?: P, config?: C) => this.request<T, C>('POST', url, params, config);
+  }
+
+  put<P, T>(url: string) {
+    return <C extends Config>(params?: P, config?: C) => this.request<T, C>('PUT', url, params, config);
+  }
+
+  async request<T, C extends Config>(method: HttpMethods, url: string, params?: unknown, config?: C) {
+    const fetchConfig = merge(
+      {},
+      this.config,
+      {
+        headers: {},
+      },
+      config || {},
+    );
+    let body: BodyInit | null | undefined;
+    const requestParams: RequestParams = isObject(params) ? (params as RequestParams) : {};
+    const parseData = this.parseUrlAndParams(`${fetchConfig.prefix}${url}`, requestParams);
+    // GET 和 DELETE 请求参数放URL，其余请求放在body里面
+    if ((method === 'GET' || method === 'DELETE') && !fetchConfig.isBodyParam) {
+      const query = objectToQueryParams(parseData.params);
+      parseData.url += query ? `?${query}` : '';
+    } else {
+      body = isObject(params) ? JSON.stringify(parseData.params || {}) : (params as BodyInit | null | undefined);
+    }
+
+    const requestConfig: Partial<Config> = {
+      method,
+      ...fetchConfig,
+      body,
+    };
+    const response = await fetch<T, C>(parseData.url, requestConfig as Partial<C>);
+
+    return response;
+  }
+}
+
+async function resultReduction(response: Response, config: Config): Promise<ResponseData> {
+  let res: ResponseData;
+  switch (config.responseType) {
+    case 'json':
+      res = (await response.json()) as ResponseData;
+      break;
+    case 'text':
+      res = (await response.text()) as unknown as ResponseData;
+      break;
+    case 'blob':
+      res = (await response.blob()) as unknown as ResponseData;
+      break;
+    default:
+      res = (await response.json()) as ResponseData;
+      break;
+  }
+  return res;
+}

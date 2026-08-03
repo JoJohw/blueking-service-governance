@@ -1,0 +1,29 @@
+# Use this patch to replace the bkms-server binary with a locally built one.
+#
+# This is useful for local API-test iterations: rebuild only the Go binary on the
+# host, then run `just up-locbin` to avoid rebuilding/pushing a full image.
+#
+# BKMS_LOCAL_BINARY must point to an executable bkms-server binary on the host.
+# By default, it uses ../build/bkms-server, which is produced by `make build-dev`
+# from the bkms-server project root. The same binary is mounted into every
+# compose service that runs the bkms-server command, so webserver, worker, and
+# migration code are tested consistently.
+#
+# 除了替换二进制外，还把仓库内的 pipeline_templates 目录挂载进容器覆盖镜像里的
+# 老版本模板，避免本地 binary 引入的模板校验规则（如 semver version）
+# 与旧镜像中 assets 不匹配导致启动失败。
+services:
+  bkms-server:
+    volumes:
+      - ${BKMS_LOCAL_BINARY:-../build/bkms-server}:/usr/bin/bkms-server:ro
+      - ../pkg/bkintegrations/bkci/assets/pipeline_templates:/app/assets/pipeline_templates:ro
+
+  bkms-worker:
+    volumes:
+      - ${BKMS_LOCAL_BINARY:-../build/bkms-server}:/usr/bin/bkms-server:ro
+      - ../pkg/bkintegrations/bkci/assets/pipeline_templates:/app/assets/pipeline_templates:ro
+
+  migration:
+    volumes:
+      - ${BKMS_LOCAL_BINARY:-../build/bkms-server}:/usr/bin/bkms-server:ro
+      - ../pkg/bkintegrations/bkci/assets/pipeline_templates:/app/assets/pipeline_templates:ro

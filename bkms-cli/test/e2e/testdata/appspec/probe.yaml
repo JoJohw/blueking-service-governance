@@ -1,0 +1,9 @@
+liveness:
+  handler:
+    type: HTTP
+    url: /healthz
+    port: 8080
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
+  periodSeconds: 10
+  failureThreshold: 3

@@ -1,0 +1,27 @@
+meta {
+  name: delete-workspace-component-env
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/components/{{testWorkspaceCompWithEnvScopeName}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete workspace component (env scope) successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

@@ -1,0 +1,379 @@
+## ------------------------------ 全局配置 ------------------------------
+
+global:
+  imageRegistry: ""
+  imagePullSecrets: [ ]
+  storageClass: ""
+  # 根域名 Scheme（http/https）
+  bkDomainScheme: http
+  # 根域名
+  bkDomain: example.com
+  # 全局配置的仓库地址, example: https://bkrepo.example.com/generic/blueking/bk-config
+  bkSharedResUrl: ""
+
+## ------------------------------ 依赖服务 ------------------------------
+
+## DB 配置（仅支持外置数据库）
+externalDatabase:
+  ## 主数据库
+  default:
+    name: bkms-server
+    host: localhost
+    port: 27017
+    user: bkms
+    password: blueking
+
+## Redis 配置（仅支持外置 redis）
+externalRedis:
+  ## 主 redis
+  default:
+    host: localhost
+    port: 6379
+    db: 0
+    password: blueking
+    dialTimeout: 5
+    readTimeout: 2
+    writeTimeout: 2
+
+## RabbitMQ 相关配置，主要用于消息队列
+externalRabbitMQ:
+  ## 主 RabbitMQ
+  default:
+    host: localhost
+    port: 5672
+    username: guest
+    password: masked
+    vhost: bkms-server
+    queue: bkms-server.worker.async-task
+    prefetch: 25
+
+## ------------------------------ 部署配置 ------------------------------
+
+## Web 服务
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+    - name: metrics
+      port: 8081
+      targetPort: metrics
+      protocol: TCP
+
+## Ingress 配置
+## 支持两种模式（但不能同时启用）：
+##   - directHost：独立域名，请求路径原样转发到后端
+##   - sharedHost：与前端共享域名，通过子路径前缀区分，
+##     前缀会被剥离后转发到后端（通过 rewrite-target: /$2 实现）
+##     例如：外部访问 /api/workspaces → 后端收到 /workspaces
+ingress:
+  # 后端 Service 端口
+  servicePort: 80
+  # Ingress Class 名称
+  ingressClass: ""
+  tlsCrt: ""
+  tlsKey: ""
+  annotations:
+    # 允许请求体最大大小，默认 10GB，适用于大文件上传场景
+    nginx.ingress.kubernetes.io/proxy-body-size: 10240m
+    # HTTP 和 HTTPS 都可以正常访问，HTTP 请求不会被强制跳转到 HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+  directHost:
+    enabled: false
+    host: ""
+    # 路径列表，支持配置多个路径
+    paths:
+      - path: /
+        # 路径匹配类型：Prefix（前缀匹配）/ Exact（精确匹配）/ ImplementationSpecific（由 Ingress Controller 决定匹配逻辑）
+        pathType: ImplementationSpecific
+  sharedHost:
+    enabled: false
+    host: ""
+    path: /api(/|$)(.*)
+    # 路径匹配类型：正则模式必须使用 ImplementationSpecific
+    pathType: ImplementationSpecific
+
+## Worker 服务
+workerService:
+  type: ClusterIP
+  ports:
+    - name: metrics
+      port: 8081
+      targetPort: metrics
+      protocol: TCP
+
+## 临时管理员自动处理 CronJob
+tempAdminCleanup:
+  enabled: true
+  schedule: "*/10 * * * *"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+## ServiceMonitor 配置（Prometheus Operator）
+serviceMonitor:
+  # 是否启用 ServiceMonitor
+  enabled: true
+  # 采集间隔
+  interval: 60s
+  # 采集路径
+  path: /debug/metrics
+  # 采集标签
+  labels:
+    # 必须带这个两个 label；原因：监控侧要求所有 ServiceMonitor 都带 release 和 app 两个 label，否则无法采集到数据。
+    release: "po"
+    app: prometheus-operator-thanos-sidecar
+
+## 工具类配置
+utility:
+  images:
+    busybox:
+      registry: docker.io
+      repository: library/busybox
+      tag: 1.34.0
+    k8sWaitFor:
+      registry: docker.io
+      repository: groundnuty/k8s-wait-for
+      tag: v1.5.1
+
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  rbac:
+    # 是否创建 Role & RoleBinding 以支持使用 k8s-wait-for
+    create: true
+
+## 副本数量
+replicaCount: 1
+
+## 资源配额
+resources:
+  requests:
+    cpu: "1"
+    memory: 512Mi
+  limits:
+    cpu: "4"
+    memory: 4Gi
+
+# 镜像信息
+image:
+  registry: hub.bktencent.com
+  repository: blueking/bkms-server
+  pullPolicy: IfNotPresent
+  tag: v1.0.0-alpha.20
+
+## 迁移 Job 配置
+migration:
+  # bkms-server 对外访问地址（含 scheme），用于 IAM 注册系统模型时回调
+  # 例如：http://bkms.example.com
+  bkmsHost: ""
+  # 执行迁移的 Pod 的资源配置
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+## ------------------------------ 业务配置 ------------------------------
+
+svcConf:
+  ## Asynq 异步任务框架配置（redis 复用主 redis，在 configmap 模板中渲染）
+  asynq:
+    concurrency: 10
+    queue: default
+    maxRetry: 10
+    retryInterval: 5
+  # ------------------------------ 蓝鲸平台接入 ------------------------------
+  # 蓝鲸应用配置（可从开发者中心获取）
+  bkApp:
+    # 应用 Code
+    code: bkms
+    # 应用 Secret
+    secret: masked
+  # Account 用户账号认证与用户 Token 获取相关配置项集合
+  account:
+    # AuthBaseURL 是 auth 服务的基础 URL，通常由蓝鲸网关服务提供，usertoken 令牌相关功能使用
+    authBaseURL: http://apigw.example.com
+    # LoginURL 是蓝鲸登录服务的基础 URL，auth 令牌认证、usertoken 拼接登录地址时会用到
+    loginURL: http://login.example.com
+    # AuthEnvName 是用户 token 使用的环境，不同环境的 token 互相隔离，默认值为 "prod"
+    # authEnvName: prod
+    # BackendType 是用户认证使用的后端类型，比如 bk_ticket 或 bk_token，默认值为 "bk_token"
+    # backendType: bk_token
+  # 蓝鲸平台地址配置
+  bkPlatUrls:
+    # 蓝鲸网关 API 地址模板
+    bkApiUrlTmpl: https://{api_name}.apigw.example.com
+    # 组件 API 基础地址
+    compApiBaseUrl: https://api.example.com
+  # 蓝鲸 API 环境配置
+  bkApiStages:
+    # BSCP
+    bscp: prod
+    # BkCI
+    bkci: prod
+    # BCS
+    bcs: prod
+    # KubeInsight
+    kubeinsight: prod
+    # 蓝鲸 cmdb
+    bkcc: prod
+    # 海垒
+    bkhcm: prod
+    # IAM 蓝鲸权限中心
+    bkiam: prod
+  # IAM 中业务系统 ID 配置
+  bkIAMSystemIDs:
+    bkms: bkms
+    bkci: bkci
+    bcs: bcs
+    bkmonitor: bkmonitor
+    bklog: bklog
+    bkrepo: bkrepo
+    bscp: bk_bscp
+    bkcc: bkcc
+  # ------------------------------ 外部依赖服务（蓝鲸 SaaS & 公司系统） ------------------------------
+  # BCS 配置
+  bcs:
+    baseUrl: https://bcs-api.example.com
+    token: masked
+  # 蓝盾配置，用于项目初始化 & 流水线模板加载
+  bkci:
+    # 流水线模板存放目录
+    pipelineTmpl:
+      baseDir: /app/assets/pipeline_templates
+      # 流水线模板使用的构建机镜像标识，为空时由 bkci 模板加载逻辑决定默认值
+      builderImageCode: "tlinux3_ci"
+      # 流水线模板使用的构建机镜像版本，为空时由 bkci 模板加载逻辑决定默认值
+      builderImageVersion: "2.*"
+  # 蓝盾制品库配置，用于项目 & 仓库初始化
+  bkrepo:
+    baseUrl: https://bkrepo.example.com
+    # 管理账号配置，需由制品库管理员提供
+    username: bkms
+    password: <masked>
+    # 仓库初始化配置
+    initRepos:
+      - name: repo
+        type: DOCKER
+        isPublic: false
+        description: "蓝鲸服务治理 docker 镜像源仓库"
+        endpointTmpl: "docker.bkrepo.example.com/%s/%s"
+      - name: helm
+        type: HELM
+        isPublic: false
+        description: "蓝鲸服务治理 helm charts 仓库"
+        endpointTmpl: "http://helm.bkrepo.example.com/api/%s/%s/charts"
+  # 蓝鲸监控 APM 配置，供 Gin/HTTP APM 上报以及绑定 APM 时向业务应用下发环境变量使用
+  bkMonitor:
+    # 旧版 bkmonitorv3 网关地址，供存量接口使用
+    endpoint: ""
+    # 新版 bk-monitor 网关地址，供新增接口（如 user group）使用
+    newGatewayEndpoint: ""
+    # bkms-server 自身上报 trace 使用的 APM Endpoint：值带 http/https scheme 时按 HTTP OTLP 处理，
+    # 否则按 gRPC OTLP 处理
+    apmEndpoint: 127.0.0.1:11800
+    # apmHttpEndpoint 仅通过环境变量下发给业务应用（BKMS_BKAPM_HTTP_API），bkms-server 自身不消费
+    apmHttpEndpoint: ""
+    # 蓝鲸监控 APM 采集 Token
+    apmToken: masked
+    # apmServiceName 为空时默认使用 bkms.${cobra 子命令名}，如 bkms.webserver、bkms.worker
+    apmServiceName: ""
+  # BSCP 服务配置，用于应用配置管理功能
+  bscp:
+    # BSCP Feed Server 地址
+    feedAddr: bscp-feed.example.com:9510
+  # ------------------------------ 服务运行时 ------------------------------
+  # 业务 HTTP Server 配置
+  httpServer:
+    # HTTP Server 监听地址
+    address: 0.0.0.0
+    # HTTP Server 监听端口，默认值与历史 HTTP 监听端口保持一致
+    port: 8080
+    # Gin 运行模式，支持 release / debug / test，默认为 release
+    mode: release
+    # 读取请求头超时时间，单位：秒
+    readHeaderTimeout: 10
+    # 读取完整请求超时时间，单位：秒
+    readTimeout: 65
+    # 写响应超时时间，单位：秒
+    writeTimeout: 65
+    # Keep-Alive 空闲连接超时时间，单位：秒
+    idleTimeout: 120
+    # 进程退出时等待 HTTP Server 优雅关闭的最长时间，单位：秒
+    shutdownTimeout: 30
+    # 是否启用 Swagger 文档访问路径（/swagger/*），仅推荐在非生产环境启用
+    enableSwaggerPath: false
+  # Prometheus Metrics Server 配置
+  metrics:
+    # Metrics HTTP Server 监听端口
+    port: 8081
+  # 日志配置
+  logging:
+    # 日志级别，支持 debug、info、warn、warning、error
+    level: info
+    # 日志格式，支持 json 和 text
+    handlerName: json
+    # 日志输出目标列表，支持 stdout、stderr、file
+    writers:
+      - writerName: stdout
+        writerConfig: { }
+    # 可按需追加 file writer，同时写入标准输出和滚动日志文件
+    # writers:
+    #   - writerName: stdout
+    #     writerConfig: {}
+    #   - writerName: file
+    #     writerConfig:
+    #       filename: /app/logs/bkms-server.log
+    #       maxSize: 100
+    #       maxBackups: 10
+    #       maxAge: 7
+    #       compress: true
+  # 加密相关配置
+  encrypt:
+    # 加密密钥（base64 编码）仅用于测试
+    secret: masked
+  # ------------------------------ 业务功能配置 ------------------------------
+  # 集群插件（Addon）配置
+  clusterAddons:
+    # 内置集群 Addon 定义文件目录路径，为空则跳过加载
+    builtinAddonDir: /app/assets/addons
+    # 定义用于存储插件 Chart 的 Helm 仓库地址，目前所有 Chart 存放在统一仓库下
+    # Helm 仓库 URL
+    helmRepoURL: http://helm.bkrepo.example.com/api/bkms/helm/charts
+    # Helm 仓库用户名
+    helmRepoUsername: bkms
+    # Helm 仓库密码
+    helmRepoPassword: <masked>
+  # Helm 相关配置
+  helm:
+    # Helm, Helmify, Kustomize 等二进制下载基础 URL（流水线中使用，需拼接具体二进制名称）
+    toolchainBaseURL: ""
+    # 内置蓝盾制品库 Helm 仓库地址模板，用于生成 HelmRepo 供 Helm SDK 下载 Chart（需拼接具体项目 ID）
+    builtinRepoURLTmpl: ""
+  # 镜像构建相关配置
+  imageBuild:
+    # 镜像构建工具链下载基础 URL（流水线中使用，需拼接具体工具名称）
+    toolchainBaseURL: ""
+  # 轮询相关配置
+  taskPoller:
+    # 部署状态
+    deployStatus:
+      # 超时时间（单位：秒）
+      timeout: 1200
+      # 轮询间隔（单位：秒）
+      interval: 15

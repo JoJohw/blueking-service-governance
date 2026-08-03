@@ -1,0 +1,37 @@
+meta {
+  name: 04-create-trpc-replicas-zero
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{serviceURL}}/apps/{{appmodelDeployFailHelmAppID}}/envs/{{appmodelDeployFailEnvName}}/trpc-deploys
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "imageTag": "1.0",
+    "replicas": 0
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject zero replicas (binding requires gte=1)", () => {
+    expect(res.body.error).to.be.an("object");
+    expect(res.body.error.code).to.equal("INVALID_REQUEST");
+    expect(res.body.error.system).to.equal("bkms");
+    expect(res.body.error.module).to.equal("bkms-server");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

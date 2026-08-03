@@ -1,0 +1,36 @@
+meta {
+  name: get-platform-workspace-temp-admin
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/plat-mgt/workspaces/{{platMgtWorkspaceID}}/admins?roleCode=admin&username={{platAdminSeedUser}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const seedUser = bru.getVar("platAdminSeedUser");
+  req.setHeader("X-Bk-Authed-User-Info", JSON.stringify({
+    userId: seedUser,
+  }));
+  req.setHeader("X-Bk-Authed-User-Credential", '{"bkTicket":"xxx"}');
+}
+
+tests {
+  test("should get target user workspace admin role status", () => {
+    expect(res.body.data).to.be.an("object");
+    expect(res.body.data.hasRole).to.equal(true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

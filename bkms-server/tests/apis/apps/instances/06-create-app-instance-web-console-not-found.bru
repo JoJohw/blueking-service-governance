@@ -1,0 +1,31 @@
+meta {
+  name: 06-create-app-instance-web-console-not-found
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{serviceURL}}/apps/not-exist-app/envs/test/instances/not-exist-pod/web-console
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {}
+}
+
+assert {
+  res.status: eq 404
+  res.body: isJson
+}
+
+tests {
+  test("should validate app existence before creating WebConsole", () => {
+    expect(res.body.error.code).to.equal("NOT_FOUND");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,55 @@
+meta {
+  name: list-regions
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/bkhcm/regions
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "filter": {
+      "op": "and",
+      "rules": [
+        {
+          "field": "vendor",
+          "op": "eq",
+          "value": "tcloud-ziyan"
+        }
+      ]
+    },
+    "page": {
+      "count": false,
+      "start": 0,
+      "limit": 10
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return regions list", () => {
+    expect(res.body.data).to.be.an('array');
+    if (res.body.data.length > 0) {
+      const region = res.body.data[0];
+      expect(region).to.have.property('id');
+      expect(region).to.have.property('vendor');
+      expect(region).to.have.property('region_id');
+      expect(region).to.have.property('region_name');
+      expect(region).to.have.property('status');
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

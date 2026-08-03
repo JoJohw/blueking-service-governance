@@ -1,0 +1,18 @@
+# Applied automatically by `just up` when the selected Kind kubeconfig points
+# at 127.0.0.1/localhost. The services use the control-plane container name
+# from the generated kubeconfig, so only Kubernetes clients need this network.
+services:
+  bkms-server:
+    networks:
+      - bkms-apitest-net
+      - kind-apiserver
+
+  bkms-worker:
+    networks:
+      - bkms-apitest-net
+      - kind-apiserver
+
+networks:
+  kind-apiserver:
+    name: ${BKMS_APITEST_KIND_NETWORK}
+    external: true

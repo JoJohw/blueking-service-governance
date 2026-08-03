@@ -1,0 +1,55 @@
+meta {
+  name: 05-list-snapshots
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/apps/{{tafLifecycleAppID}}/envs/{{tafLifecycleEnvName}}/taf-deploys/{{tafLifecycleFirstDeployID}}/resource-snapshots?page=1&pageSize=10
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  const results = res.body?.data?.results || [];
+  const preferred = results.find((row) => row.kind === "GameDeployment");
+  const target = preferred || results[0];
+  if (target) {
+    bru.setVar("tafLifecycleSnapshotID", target.id);
+    bru.setVar("tafLifecycleSnapshotKind", target.kind);
+    bru.setVar("tafLifecycleSnapshotName", target.name);
+  }
+}
+
+tests {
+  test("should list resource snapshots produced by the v1 deploy", () => {
+    expect(res.body.data).to.be.an("object");
+    // Historical deploy APIs return count as a string for compatibility.
+    expect(res.body.data.count).to.be.a("string");
+    expect(parseInt(res.body.data.count, 10)).to.be.greaterThan(0);
+
+    const results = res.body.data.results;
+    expect(results).to.be.an("array").and.not.empty;
+    results.forEach((row) => {
+      expect(row.id, "snapshot id").to.be.a("string").and.not.empty;
+      expect(row.apiVersion, "apiVersion").to.be.a("string").and.not.empty;
+      expect(row.kind, "kind").to.be.a("string").and.not.empty;
+      expect(row.name, "name").to.be.a("string").and.not.empty;
+      expect(row.manifest, "manifest should be omitted in list").to.be.undefined;
+    });
+    const kinds = results.map((row) => row.kind);
+    expect(kinds, `kinds: ${JSON.stringify(kinds)}`).to.include("GameDeployment");
+
+    expect(bru.getVar("tafLifecycleSnapshotID")).to.be.a("string").and.not.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

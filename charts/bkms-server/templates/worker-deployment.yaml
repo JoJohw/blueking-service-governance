@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bkms-server.fullname" . }}-worker
+  labels:
+    {{- include "bkms-server.workerLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "bkms-server.workerSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        values-hash: "{{ toYaml .Values | sha256sum | trunc 63 }}"
+        {{- include "bkms-server.workerSelectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.affinity.workerAffinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "bkms-server.serviceAccountName" . }}
+      initContainers:
+        - name: check-migrate
+          image: {{ include "bkms-server.utility.k8sWaitFor.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - job
+            - {{ include "bkms-server.fullname" . }}-migrate-{{ .Release.Revision }}
+          resources:
+            {{- toYaml .Values.utility.resources | nindent 12 }}
+        - name: check-migrate-iam
+          image: {{ include "bkms-server.utility.k8sWaitFor.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - job
+            - {{ include "bkms-server.fullname" . }}-migrate-iam-{{ .Release.Revision }}
+          resources:
+            {{- toYaml .Values.utility.resources | nindent 12 }}
+      containers:
+        - name: bkms-server-worker
+          image: {{ include "bkms-server.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - bkms-server
+          args:
+            - worker
+            - --srvCfg
+            - /app/etc/config.yaml
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: conf
+              mountPath: /app/etc
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.svcConf.metrics.port }}
+              protocol: TCP
+      volumes:
+        - name: conf
+          configMap:
+            name: {{ include "bkms-server.configCMName" . }}
+      {{- include "bkms-server.imagePullSecrets" . | nindent 6 }}

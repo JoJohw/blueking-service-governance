@@ -1,0 +1,42 @@
+meta {
+  name: get-resource-topology
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{topologyAppID}}/envs/{{topologyEnvName}}/resource-topology
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.data: isJson
+  res.body.data.nodes: isArray
+  res.body.data.edges: isArray
+  res.body.data.warnings: isArray
+  res.body.data.dataVersion: isString
+}
+
+tests {
+  test("should return empty topology when no resource snapshot exists", () => {
+    const data = res.body.data;
+
+    expect(data.metadata.appID).to.equal(bru.getVar("topologyAppID"));
+    expect(data.metadata.envName).to.equal(bru.getVar("topologyEnvName"));
+    expect(data.metadata.trafficLaneName).to.equal("");
+    expect(data.nodes).to.deep.equal([]);
+    expect(data.edges).to.deep.equal([]);
+    expect(data.rootID).to.equal("");
+    expect(data.isPartial).to.equal(true);
+    expect(data.warnings).to.include("no resource snapshot data found, please deploy first");
+    expect(data.dataVersion).to.equal("0");
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

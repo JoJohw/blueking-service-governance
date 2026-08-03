@@ -1,0 +1,19 @@
+meta {
+  name: env-delete
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{probeAppID}}/envs/{{testEnv}}/app-spec/probe
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

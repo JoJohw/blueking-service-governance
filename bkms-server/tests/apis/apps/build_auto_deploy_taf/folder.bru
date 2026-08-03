@@ -1,0 +1,30 @@
+meta {
+  name: build-auto-deploy-taf
+  seq: 9
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("testBuildDeployTafAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `build-deploy-taf-ws-${suffix}`})
+    const app = await common.createTafApp({id: `taf-build-deploy-app-${suffix}`, workspaceID: ws.id})
+    const env = await common.createEnvironment({
+      workspaceID: ws.id,
+      name: `bd-taf-env-${suffix}`,
+      cluster: {
+        clusterID: `cluster-taf-${suffix}`,
+        namespace: `ns-taf-${suffix}`
+      }
+    })
+
+    bru.setVar("testBuildDeployTafWorkspaceID", ws.id);
+    bru.setVar("testBuildDeployTafAppID", app.id);
+    bru.setVar("testBuildDeployTafEnvName", env.name);
+  }
+}

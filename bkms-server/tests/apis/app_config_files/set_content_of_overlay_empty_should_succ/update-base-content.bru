@@ -1,0 +1,34 @@
+meta {
+  name: update-base-content
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{serviceURL}}/apps/{{valuesOverlayHelmAppID}}/app-config-files/{{currentBaseVFileID}}/content
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "content": "base: value",
+    "versionDescription": "设置 base 内容"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the base content as compiled content", () => {
+    expect(res.body.compiledContent).to.equal('base: value');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

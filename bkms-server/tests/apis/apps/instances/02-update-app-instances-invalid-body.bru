@@ -1,0 +1,35 @@
+meta {
+  name: 02-update-app-instances-invalid-body
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{serviceURL}}/apps/invalid-app/envs/test/instances
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "trafficLaneName": "",
+    "updateStrategy": "RollingUpdate",
+    "instanceIDs": ["pod-1"]
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should validate update request body before business logic", () => {
+    expect(res.body.error.code).to.equal("INVALID_REQUEST");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

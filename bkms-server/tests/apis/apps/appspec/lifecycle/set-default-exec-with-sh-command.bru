@@ -1,0 +1,40 @@
+meta {
+  name: set-default-exec-with-sh-command
+  type: http
+  seq: 17
+}
+
+put {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/app-spec/default-lifecycle
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecLifecycle": {
+      "postStart": {
+        "type": "EXEC",
+        "exec": {
+          "shCommand": "echo post-started && touch /tmp/post-started"
+        }
+      },
+      "preStop": {
+        "type": "EXEC",
+        "exec": {
+          "shCommand": "echo pre-stopping && rm -f /tmp/post-started"
+        }
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

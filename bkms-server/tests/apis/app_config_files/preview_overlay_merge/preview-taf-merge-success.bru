@@ -1,0 +1,46 @@
+meta {
+  name: preview-taf-merge-success
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{serviceURL}}/apps/{{previewMergeAppID}}/app-config-files/{{previewTafBaseFileID}}/preview-overlay-merge
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "overlayContent": "<tars>\n    <application>\n        enableset=y\n        setdivision=sz.test.1\n        <server>\n            localip=10.0.0.1\n            <TestApp.HelloServer.HelloObj>\n                endpoint=tcp -h 10.0.0.1 -p 10001 -t 60000\n                threads=10\n            </TestApp.HelloServer.HelloObj>\n        </server>\n    </application>\n</tars>"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return merged taf content with overlay applied", () => {
+    console.log(res.body)
+    const compiledContent = res.body.data;
+    // 验证 overlay 覆盖的值已生效
+    expect(compiledContent).to.contain('enableset=y');
+    expect(compiledContent).to.contain('setdivision=sz.test.1');
+    expect(compiledContent).to.contain('localip=10.0.0.1');
+    expect(compiledContent).to.contain('endpoint=tcp -h 10.0.0.1 -p 10001 -t 60000');
+    expect(compiledContent).to.contain('threads=10');
+    // 验证基础文件的其他字段保留
+    expect(compiledContent).to.contain('app=TestApp');
+    expect(compiledContent).to.contain('server=HelloServer');
+    expect(compiledContent).to.contain('maxconns=200000');
+    expect(compiledContent).to.contain('protocol=tars');
+    expect(compiledContent).to.contain('locator=tars.tarsregistry.QueryObj@tcp -h 127.0.0.1 -p 17890');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

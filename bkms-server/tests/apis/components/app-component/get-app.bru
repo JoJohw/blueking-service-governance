@@ -1,0 +1,56 @@
+meta {
+  name: get-app
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/apps/{{componentsTrpcAppID}}
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should get app with components", () => {
+    const { data } = res.body;
+
+    expect(data).to.have.property('appModelSpec');
+    expect(data.appModelSpec).to.have.property('components');
+    expect(data.appModelSpec.components).to.be.an('array');
+    expect(data.appModelSpec.components.length).to.be.greaterThanOrEqual(2);
+
+    // 验证组件结构
+    const components = data.appModelSpec.components;
+    console.log("App components:", JSON.stringify(components, null, 2));
+
+    // 验证实例化组件（来自 ComponentDef）
+    const instCompName = bru.getVar('testAppCompName');
+    if (instCompName) {
+      const instComp = components.find(c => c.name === instCompName);
+      expect(instComp, `Instantiated component '${instCompName}' should exist`).to.not.be.undefined;
+      expect(instComp).to.have.property('type');
+      expect(instComp).to.have.property('version');
+    }
+
+    // 验证引用组件（来自 WorkspaceComponent）
+    const refCompName = bru.getVar('testAppCompRefName');
+    const refWsCompName = bru.getVar('appComponentWorkspaceCompName');
+    if (refCompName) {
+      const refComp = components.find(c => c.name === refCompName);
+      expect(refComp, `Reference component '${refCompName}' should exist`).to.not.be.undefined;
+      expect(refComp).to.have.property('refWorkspaceCompName');
+      expect(refComp.refWorkspaceCompName).to.be.equal(refWsCompName);
+      expect(refComp).to.have.property('type');
+      expect(refComp).to.have.property('version');
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

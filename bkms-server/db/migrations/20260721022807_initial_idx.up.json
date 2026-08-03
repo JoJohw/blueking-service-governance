@@ -1,0 +1,728 @@
+[
+  {
+    "createIndexes": "bkci_projects",
+    "indexes": [
+      {
+        "key": {
+          "id": 1
+        },
+        "name": "id_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "code": 1
+        },
+        "name": "code_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "workspaceID": 1
+        },
+        "name": "workspaceID_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "bkci_pipeline_templates",
+    "indexes": [
+      {
+        "key": {
+          "id": 1
+        },
+        "name": "id_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "type": 1
+        },
+        "name": "type_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "bkci_pipelines",
+    "indexes": [
+      {
+        "key": {
+          "id": 1
+        },
+        "name": "id_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "workspaceID": 1,
+          "type": 1
+        },
+        "name": "workspaceID_1_type_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "bkci_repositories",
+    "indexes": [
+      {
+        "key": {
+          "id": 1,
+          "projectCode": 1
+        },
+        "name": "id_1_projectCode_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "workspaceID": 1,
+          "alias": 1
+        },
+        "name": "workspaceID_1_alias_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "iam_grade_managers",
+    "indexes": [
+      {
+        "key": {
+          "workspaceID": 1
+        },
+        "name": "workspaceID_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "iam_roles",
+    "indexes": [
+      {
+        "key": {
+          "id": 1
+        },
+        "name": "id_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "workspaceID": 1,
+          "userGroupID": 1
+        },
+        "name": "workspaceID_1_userGroupID_1"
+      }
+    ]
+  },
+  {
+    "createIndexes": "bkrepo_projects",
+    "indexes": [
+      {
+        "key": {
+          "id": 1
+        },
+        "name": "id_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "workspaceID": 1
+        },
+        "name": "workspaceID_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "bkrepo_repositories",
+    "indexes": [
+      {
+        "key": {
+          "workspaceID": 1,
+          "type": 1
+        },
+        "name": "workspaceID_1_type_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "build_auto_deploy_records",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "buildID": 1
+        },
+        "name": "appID_1_buildID_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "appID": 1,
+          "envName": 1,
+          "trafficLaneName": 1,
+          "createdAt": -1
+        },
+        "name": "appID_1_envName_1_trafficLaneName_1_createdAt_-1"
+      },
+      {
+        "key": {
+          "appID": 1,
+          "deployID": 1
+        },
+        "name": "appID_1_deployID_1",
+        "unique": true,
+        "partialFilterExpression": {
+          "deployID": {
+            "$gt": ""
+          }
+        }
+      }
+    ]
+  },
+  {
+    "createIndexes": "helm_chart_build_records",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "buildID": 1
+        },
+        "name": "appID_1_buildID_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "build_configs",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1
+        },
+        "name": "appID_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "build_records",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "buildID": 1
+        },
+        "name": "appID_1_buildID_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "app_config_files",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "name": 1
+        },
+        "name": "appID_1_name_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "baseAppConfigFileID": 1
+        },
+        "name": "baseAppConfigFileID_1"
+      }
+    ]
+  },
+  {
+    "createIndexes": "app_config_file_versions",
+    "indexes": [
+      {
+        "key": {
+          "appConfigFileID": 1,
+          "version": 1
+        },
+        "name": "appConfigFileID_1_version_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "appConfigFileID": 1,
+          "isDeleted": 1,
+          "createdAt": -1
+        },
+        "name": "appConfigFileID_1_isDeleted_1_createdAt_-1"
+      },
+      {
+        "key": {
+          "appID": 1,
+          "envName": 1,
+          "isDeleted": 1,
+          "createdAt": -1
+        },
+        "name": "appID_1_envName_1_isDeleted_1_createdAt_-1"
+      },
+      {
+        "key": {
+          "appConfigFileID": 1,
+          "isDeleted": 1,
+          "creator": 1,
+          "createdAt": -1
+        },
+        "name": "appConfigFileID_1_isDeleted_1_creator_1_createdAt_-1"
+      }
+    ]
+  },
+  {
+    "createIndexes": "applications",
+    "indexes": [
+      {
+        "key": {
+          "id": 1
+        },
+        "name": "id_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "workspaceID": 1,
+          "name": 1
+        },
+        "name": "workspaceID_1_name_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "cluster_addon_defs",
+    "indexes": [
+      {
+        "key": {
+          "name": 1
+        },
+        "name": "name_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "environments",
+    "indexes": [
+      {
+        "key": {
+          "workspaceID": 1,
+          "name": 1
+        },
+        "name": "workspaceID_1_name_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "ownerAppID": 1
+        },
+        "name": "ownerAppID_1"
+      }
+    ]
+  },
+  {
+    "createIndexes": "workspace_components",
+    "indexes": [
+      {
+        "key": {
+          "workspaceID": 1,
+          "name": 1
+        },
+        "name": "workspaceID_1_name_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "workspaces",
+    "indexes": [
+      {
+        "key": {
+          "id": 1
+        },
+        "name": "id_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "app_model_resource_snapshots",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "deployRecordId": 1
+        },
+        "name": "appID_1_deployRecordId_1"
+      }
+    ]
+  },
+  {
+    "createIndexes": "gpa_configs",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "envName": 1
+        },
+        "name": "appID_1_envName_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "polaris_configs",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "name": 1
+        },
+        "name": "appID_1_name_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "bscpcfg_env_bindings",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "envName": 1
+        },
+        "name": "appID_1_envName_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "bscpcfg_metadata",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1
+        },
+        "name": "appID_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "helm_app_components",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "envName": 1,
+          "name": 1
+        },
+        "name": "appID_1_envName_1_name_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "appID": 1,
+          "envName": 1
+        },
+        "name": "appID_1_envName_1"
+      }
+    ]
+  },
+  {
+    "createIndexes": "component_defs",
+    "indexes": [
+      {
+        "key": {
+          "name": 1,
+          "version": 1
+        },
+        "name": "name_1_version_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "depservice_instances",
+    "indexes": [
+      {
+        "key": {
+          "workspaceID": 1,
+          "serviceName": 1,
+          "name": 1
+        },
+        "name": "workspaceID_1_serviceName_1_name_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "depservice_services",
+    "indexes": [
+      {
+        "key": {
+          "name": 1
+        },
+        "name": "name_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "operation_records",
+    "indexes": [
+      {
+        "key": {
+          "username": 1,
+          "group.workspaceID": 1,
+          "createdAt": -1
+        },
+        "name": "username_1_group.workspaceID_1_createdAt_-1"
+      },
+      {
+        "key": {
+          "username": 1,
+          "group.workspaceID": 1,
+          "group.appID": 1,
+          "createdAt": -1
+        },
+        "name": "username_1_group.workspaceID_1_group.appID_1_createdAt_-1"
+      }
+    ]
+  },
+  {
+    "createIndexes": "bkmonitor_alert_strategy",
+    "indexes": [
+      {
+        "key": {
+          "workspaceID": 1,
+          "appID": 1,
+          "enabled": 1
+        },
+        "name": "workspaceID_1_appID_1_enabled_1"
+      },
+      {
+        "key": {
+          "workspaceID": 1,
+          "appID": 1,
+          "remoteRefs.envID": 1,
+          "remoteRefs.trafficLaneName": 1
+        },
+        "name": "workspaceID_1_appID_1_remoteRefs.envID_1_remoteRefs.trafficLaneName_1"
+      }
+    ]
+  },
+  {
+    "createIndexes": "bkmonitor_apm_inst_config",
+    "indexes": [
+      {
+        "key": {
+          "apmID": 1
+        },
+        "name": "apmID_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "plat_admin_role_bindings",
+    "indexes": [
+      {
+        "key": {
+          "username": 1
+        },
+        "name": "username_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "workspace_temp_admin_records",
+    "indexes": [
+      {
+        "key": {
+          "workspaceID": 1,
+          "username": 1
+        },
+        "name": "workspaceID_1_username_1",
+        "unique": true,
+        "partialFilterExpression": {
+          "isRecycled": false
+        }
+      },
+      {
+        "key": {
+          "isRecycled": 1,
+          "expiresAt": 1
+        },
+        "name": "isRecycled_1_expiresAt_1"
+      }
+    ]
+  },
+  {
+    "createIndexes": "app_models",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1
+        },
+        "name": "appID_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "app_specs",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "envName": 1
+        },
+        "name": "appID_1_envName_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "scoped_env_vars",
+    "indexes": [
+      {
+        "key": {
+          "workspaceID": 1,
+          "scopeType": 1,
+          "scopeValue": 1,
+          "key": 1
+        },
+        "name": "workspaceID_1_scopeType_1_scopeValue_1_key_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "helm_repo_credentials",
+    "indexes": [
+      {
+        "key": {
+          "workspaceID": 1
+        },
+        "name": "workspaceID_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "image_promotions",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "repoKey": 1,
+          "tag": 1
+        },
+        "name": "idx_appID_repoKey_tag",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "image_registries",
+    "indexes": [
+      {
+        "key": {
+          "workspaceID": 1,
+          "type": 1
+        },
+        "name": "workspaceID_1_type_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "runtime_images",
+    "indexes": [
+      {
+        "key": {
+          "type": 1,
+          "name": 1
+        },
+        "name": "idx_type_name_unique",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "image_snapshots",
+    "indexes": [
+      {
+        "key": {
+          "repoKey": 1,
+          "tag": 1
+        },
+        "name": "idx_repoKey_tag",
+        "unique": true
+      },
+      {
+        "key": {
+          "repoKey": 1
+        },
+        "name": "idx_repoKey"
+      }
+    ]
+  },
+  {
+    "createIndexes": "repo_snapshot_statuses",
+    "indexes": [
+      {
+        "key": {
+          "repoKey": 1
+        },
+        "name": "idx_repoKey",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "networking_services",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "name": 1
+        },
+        "name": "appID_1_name_1",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "createIndexes": "topology_resource_snapshots",
+    "indexes": [
+      {
+        "key": {
+          "appID": 1,
+          "envName": 1,
+          "trafficLaneName": 1
+        },
+        "name": "appID_1_envName_1_trafficLaneName_1",
+        "unique": true
+      },
+      {
+        "key": {
+          "appID": 1
+        },
+        "name": "appID_1"
+      }
+    ]
+  }
+]

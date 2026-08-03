@@ -1,0 +1,28 @@
+docs {
+  它复用平台管理员目录中约定的平台管理员种子用户：
+  - `platAdminSeedUser` 用于成功用例
+  - `platAdminNonAdminUser` 用于无权限用例
+
+  当前目录覆盖平台空间列表、详情、临时管理员授权/查询/回收、状态统计，以及无权限场景。
+}
+
+meta {
+  name: platform-workspaces
+  seq: 4
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const seedUser = bru.getEnvVar("platAdminSeedUser");
+  if (!seedUser || seedUser === "__REPLACE_WITH_PLAT_ADMIN_USER__") {
+    throw new Error("env var platAdminSeedUser is required; for local runs seed a user into plat_admin_role_bindings and set this variable");
+  }
+  bru.setVar("platAdminSeedUser", seedUser);
+  bru.setVar(
+    "platAdminNonAdminUser",
+    bru.getEnvVar("platAdminNonAdminUser") || "api-test-non-platform-admin",
+  );
+}

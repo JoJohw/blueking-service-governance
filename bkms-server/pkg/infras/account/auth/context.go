@@ -1,0 +1,48 @@
+package auth
+
+import (
+	"context"
+
+	"github.com/pkg/errors"
+
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/ctxkey"
+)
+
+const (
+	// MaintenanceUserID 命令行维护任务使用的系统用户 ID
+	MaintenanceUserID = "bkms-server-maintenance"
+)
+
+// WithUser 将已认证用户写入 context
+func WithUser(ctx context.Context, user User) context.Context {
+	return context.WithValue(ctx, ctxkey.AuthUser, user)
+}
+
+// WithMaintenanceUser 将命令行维护身份写入 context
+func WithMaintenanceUser(ctx context.Context) context.Context {
+	return WithUser(ctx, User{ID: MaintenanceUserID})
+}
+
+// GetUser 获取当前登录用户。
+func GetUser(ctx context.Context) (User, error) {
+	anonymous := User{}
+
+	val := ctx.Value(ctxkey.AuthUser)
+	if val == nil {
+		return anonymous, errors.New("authed user not found")
+	}
+	user, ok := val.(User)
+	if !ok {
+		return anonymous, errors.New("authed user type error")
+	}
+	return user, nil
+}
+
+// MustGetUser 获取当前登录用户，如果失败则 panic。
+func MustGetUser(ctx context.Context) User {
+	user, err := GetUser(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return user
+}

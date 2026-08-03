@@ -1,0 +1,33 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * 手写兼容层：旧 `RenderManagerService`。请改用新版模块方法；仍以 `/bkms/v1/rendermanager` 调用。
+ */
+import type { Config } from '../interceptors';
+import Fetch from '~/api/fetch';
+
+const fetch = new Fetch({
+  prefix: `${import.meta.env.BK_API_PREFIX}`,
+});
+
+export const RenderManagerService = {
+  /**
+   * @deprecated 请改用新版模块方法；本服务仍以 `/bkms/v1/rendermanager` 旧路径调用。
+   */
+  UpdateComponent: async (params?: any, config?: Config) =>
+    await fetch.put('/bkms/v1/rendermanager/component')(params, config),
+  /**
+   * @deprecated 请改用新版模块方法；本服务仍以 `/bkms/v1/rendermanager` 旧路径调用。
+   */
+  GetComponent: async (params?: any, config?: Config) =>
+    await fetch.get('/bkms/v1/rendermanager/component')(params, config),
+  /**
+   * @deprecated 请改用新版模块方法；本服务仍以 `/bkms/v1/rendermanager` 旧路径调用。
+   */
+  ListComponent: async (params?: any, config?: Config) =>
+    await fetch.get('/bkms/v1/rendermanager/components')(params, config),
+  /**
+   * @deprecated 请改用新版模块方法；本服务仍以 `/bkms/v1/rendermanager` 旧路径调用。
+   */
+  RemoveComponent: async (params?: any, config?: Config) =>
+    await fetch.post('/bkms/v1/rendermanager/component/remove')(params, config),
+};

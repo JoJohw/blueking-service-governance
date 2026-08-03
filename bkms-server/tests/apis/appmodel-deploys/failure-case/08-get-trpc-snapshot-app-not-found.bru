@@ -1,0 +1,30 @@
+meta {
+  name: 08-get-trpc-snapshot-app-not-found
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{serviceURL}}/apps/nonexistent-trpc-deploy-app/envs/test/trpc-deploys/000000000000000000000000/resource-snapshots/000000000000000000000000
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+  res.body: isJson
+}
+
+tests {
+  test("should return not found for unknown trpc app on snapshot get", () => {
+    expect(res.body.error).to.be.an("object");
+    expect(res.body.error.code).to.equal("NOT_FOUND");
+    expect(res.body.error.system).to.equal("bkms");
+    expect(res.body.error.module).to.equal("bkms-server");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

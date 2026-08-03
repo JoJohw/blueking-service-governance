@@ -1,0 +1,39 @@
+meta {
+  name: create-service
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/apps/{{networkingHelmAppID}}/services
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "{{newServiceName}}",
+    "selector": {"foo": "bar"},
+    "ports": [{"name": "http", "port": 80, "targetPort": "8000", "protocol": "TCP"}, {"name": "metrics", "port": 5000, "targetPort": "5000", "protocol": "TCP"}],
+    "trafficLaneEnabled": true
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const suffix = bru.getVar("randomSuffix");
+  bru.setVar('newServiceName', `svc-${suffix}`);
+}
+
+script:post-response {
+  
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

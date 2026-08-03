@@ -1,0 +1,81 @@
+package statefulset
+
+import (
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
+	k8sstatus "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/kubernetes/status"
+)
+
+var _ = Describe("StatefulSet Parse", func() {
+	Context("when manifest is nil", func() {
+		It("returns Unknown", func() {
+			Expect(Parse(nil).Code).To(Equal(k8sstatus.Unknown))
+		})
+	})
+
+	Context("when Degraded condition is True", func() {
+		It("returns Degraded", func() {
+			manifest := map[string]any{
+				"status": map[string]any{
+					"conditions": []any{
+						map[string]any{
+							"type":    "Degraded",
+							"status":  "True",
+							"reason":  "TestReason",
+							"message": "test degraded",
+						},
+					},
+				},
+			}
+			result := Parse(manifest)
+			Expect(result.Code).To(Equal(k8sstatus.Degraded))
+		})
+	})
+
+	Context("when observedGeneration has not caught up", func() {
+		It("returns Progressing", func() {
+			manifest := map[string]any{
+				"metadata": map[string]any{"generation": int64(2)},
+				"status": map[string]any{
+					"observedGeneration": int64(1),
+				},
+			}
+			result := Parse(manifest)
+			Expect(result.Code).To(Equal(k8sstatus.Progressing))
+			Expect(result.Message).To(ContainSubstring("observedGeneration"))
+		})
+	})
+
+	Context("when replicas are not consistent", func() {
+		It("returns Progressing with reason", func() {
+			manifest := map[string]any{
+				"metadata": map[string]any{"generation": int64(1)},
+				"spec":     map[string]any{"replicas": int64(3)},
+				"status": map[string]any{
+					"observedGeneration": int64(1),
+					"replicas":           int64(2),
+				},
+			}
+			result := Parse(manifest)
+			Expect(result.Code).To(Equal(k8sstatus.Progressing))
+			Expect(result.Message).To(ContainSubstring("replicas are not consistent"))
+		})
+	})
+
+	Context("when all checks pass", func() {
+		It("returns Available", func() {
+			manifest := map[string]any{
+				"metadata": map[string]any{"generation": int64(1)},
+				"spec":     map[string]any{"replicas": int64(3)},
+				"status": map[string]any{
+					"observedGeneration": int64(1),
+					"replicas":           int64(3),
+					"updatedReplicas":    int64(3),
+					"readyReplicas":      int64(3),
+				},
+			}
+			Expect(Parse(manifest).Code).To(Equal(k8sstatus.Available))
+		})
+	})
+})

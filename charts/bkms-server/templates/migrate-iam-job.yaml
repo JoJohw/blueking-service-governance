@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "bkms-server.fullname" . }}-migrate-iam-{{ .Release.Revision }}
+  labels:
+    {{- include "bkms-server.labels" . | nindent 4 }}
+    app.kubernetes.io/component: migrate-iam
+spec:
+  backoffLimit: 5
+  template:
+    metadata:
+      labels:
+        {{- include "bkms-server.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: migrate-iam
+    spec:
+      serviceAccountName: {{ include "bkms-server.serviceAccountName" . }}
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate-iam
+          image: {{ include "bkms-server.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - bkms-server
+          args:
+            - migrate_iam_system_model
+            - --srvCfg
+            - /app/etc/config.yaml
+            - --bkms-host
+            - {{ required "migration.bkmsHost is required for migrate-iam job" .Values.migration.bkmsHost | quote }}
+          resources:
+            {{- toYaml .Values.migration.resources | nindent 12 }}
+          volumeMounts:
+            - name: conf
+              mountPath: /app/etc
+      volumes:
+        - name: conf
+          configMap:
+            defaultMode: 420
+            name: {{ include "bkms-server.configCMName" . }}
+      {{- include "bkms-server.imagePullSecrets" . | nindent 6 }}

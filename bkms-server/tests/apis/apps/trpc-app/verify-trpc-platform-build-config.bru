@@ -1,0 +1,42 @@
+meta {
+  name: verify-trpc-platform-build-config
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{serviceURL}}/apps/{{testTrpcPlatformBuildAppID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return platform build config", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('object');
+    expect(res.body.data.buildConfig).to.be.an('object');
+
+    const repoBuildConfig = res.body.data.buildConfig.repoBuildConfig;
+    expect(repoBuildConfig).to.be.an('object');
+    expect(repoBuildConfig.imageBuildMode).to.equal('platform');
+    expect(repoBuildConfig.platformBuildConfig).to.be.an('object');
+    expect(repoBuildConfig.platformBuildConfig.builderImage).to.equal('golang:1.24');
+    expect(repoBuildConfig.platformBuildConfig.runnerImage).to.equal('debian:12');
+    expect(repoBuildConfig.platformBuildConfig.commands.start).to.equal('./app');
+    expect(repoBuildConfig.platformBuildConfig.commands.preBuild).to.deep.equal(['go mod download']);
+    expect(repoBuildConfig.platformBuildConfig.commands.build).to.deep.equal(['go build -o app ./cmd/server']);
+    expect(repoBuildConfig.platformBuildConfig.commands.runtimeEnv).to.deep.equal([
+      'apt-get update && apt-get install -y ca-certificates'
+    ]);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

@@ -1,0 +1,35 @@
+meta {
+  name: update-default-should-fail-when-key-reserved
+  type: http
+  seq: 10
+}
+
+put {
+  url: {{serviceURL}}/apps/{{labelsAppID}}/app-spec/default-labels
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "labels": {
+      "app.kubernetes.io/name": "myapp"
+    }
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject system-reserved label key", () => {
+    expect(res.body.error.message).to.contains("reserved by the system");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,35 @@
+meta {
+  name: update-overlay-content
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{serviceURL}}/apps/{{valuesOverlayHelmAppID}}/app-config-files/{{currentVFileID}}/overlay-content
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "overlayContent": "overlay: x",
+    "versionDescription": "设置 overlay 内容"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the merged compiled content", () => {
+    expect(res.body.compiledContent).to.contains('base: value');
+    expect(res.body.compiledContent).to.contains('overlay: x');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

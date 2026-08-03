@@ -1,0 +1,34 @@
+meta {
+  name: update-content
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{serviceURL}}/apps/{{valuesOverlayHelmAppID}}/app-config-files/{{currentVFileID}}/content
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "content": "foo: bar",
+    "versionDescription": "更新内容"
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should return the error message", () => {
+    expect(res.body.error.message).to.contains('only normal app config file can set');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

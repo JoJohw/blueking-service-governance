@@ -1,0 +1,230 @@
+package snapshot
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/TencentBlueKing/gopkg/stringx"
+	"github.com/bytedance/mockey"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/pkg/errors"
+
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/database"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/registry"
+)
+
+var _ = Describe("DetailSyncer", func() {
+	var (
+		ctx    context.Context
+		store  SnapshotStore
+		syncer *DetailSyncer
+		info   *RepoKeyInfo
+	)
+
+	BeforeEach(func() {
+		ctx = context.Background()
+		var err error
+		store, err = NewSnapshotStoreMongo(database.Client(), database.Name())
+		Expect(err).NotTo(HaveOccurred())
+
+		syncer = NewDetailSyncer(store)
+		info = &RepoKeyInfo{
+			RepoKey:  "repo-key-%s" + stringx.Random(24),
+			RepoName: "fixture/sample",
+			Username: "user",
+			Password: "pass",
+		}
+		mockey.Mock(registry.New).To(func(username, password string, insecure bool) *registry.Client {
+			Expect(username).To(Equal("user"))
+			Expect(password).To(Equal("pass"))
+			Expect(insecure).To(BeTrue())
+			return &registry.Client{}
+		}).Build()
+	})
+
+	AfterEach(func() {
+		mockey.UnPatchAll()
+		Expect(store.DeleteAll(ctx)).To(Succeed())
+	})
+
+	Describe("SyncDetails", func() {
+		It("should sync details and converge status on success", func() {
+			err := store.UpsertSnapshots(ctx, info.RepoKey, []Image{
+				{Tag: TagLatest},
+				{Tag: "v1.0.0"},
+				{Tag: "v1.1.0"},
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			mockey.Mock((*registry.Client).GetTagDetail).
+				To(func(_ *registry.Client, repoName, tag string) (registry.ImageDetail, error) {
+					Expect(repoName).To(Equal(info.RepoName))
+					builtAt := time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)
+					return registry.ImageDetail{
+						Tag:     tag,
+						Digest:  fmt.Sprintf("sha256:%s", tag),
+						Size:    int64(len(tag)),
+						BuiltAt: builtAt,
+					}, nil
+				}).
+				Build()
+
+			err = syncer.SyncDetails(ctx, info)
+			Expect(err).NotTo(HaveOccurred())
+
+			snapshots, total, listErr := store.ListByRepoKey(ctx, info.RepoKey, "", 1, 10)
+			Expect(listErr).NotTo(HaveOccurred())
+			Expect(total).To(BeEquivalentTo(3))
+			Expect(snapshots).To(HaveLen(3))
+
+			snapshotsByTag := make(map[string]Image, len(snapshots))
+			for _, snapshot := range snapshots {
+				snapshotsByTag[snapshot.Tag] = snapshot
+			}
+			Expect(snapshotsByTag).To(HaveKey(TagLatest))
+			Expect(snapshotsByTag).To(HaveKey("v1.0.0"))
+			Expect(snapshotsByTag).To(HaveKey("v1.1.0"))
+			for tag, snapshot := range snapshotsByTag {
+				Expect(snapshot.Digest).To(Equal(fmt.Sprintf("sha256:%s", tag)))
+				Expect(snapshot.BuiltAt).NotTo(BeNil())
+				Expect(snapshot.Size).To(Equal(int64(len(tag))))
+			}
+
+			status, getErr := store.GetStatus(ctx, info.RepoKey)
+			Expect(getErr).NotTo(HaveOccurred())
+			Expect(status.RefreshStatus).To(Equal(RefreshStatusIdle))
+			Expect(status.LastDetailSyncedAt).NotTo(BeNil())
+			Expect(status.LastError).To(BeEmpty())
+		})
+
+		It("should keep syncing remaining tags when one detail request fails", func() {
+			err := store.UpsertSnapshots(ctx, info.RepoKey, []Image{
+				{Tag: "v1.0.0"},
+				{Tag: "v1.1.0"},
+				{Tag: "v2.0.0"},
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			mockey.Mock((*registry.Client).GetTagDetail).
+				To(func(_ *registry.Client, _, tag string) (registry.ImageDetail, error) {
+					if tag == "v1.1.0" {
+						return registry.ImageDetail{}, errors.Errorf("detail lookup failed")
+					}
+					return registry.ImageDetail{
+						Tag:     tag,
+						Digest:  fmt.Sprintf("sha256:%s", tag),
+						Size:    128,
+						BuiltAt: time.Now(),
+					}, nil
+				}).
+				Build()
+
+			err = syncer.SyncDetails(ctx, info)
+			Expect(err).NotTo(HaveOccurred())
+
+			snapshots, total, listErr := store.ListByRepoKey(ctx, info.RepoKey, "", 1, 10)
+			Expect(listErr).NotTo(HaveOccurred())
+			Expect(total).To(BeEquivalentTo(3))
+			Expect(snapshots).To(HaveLen(3))
+
+			snapshotsByTag := make(map[string]Image, len(snapshots))
+			for _, snapshot := range snapshots {
+				snapshotsByTag[snapshot.Tag] = snapshot
+			}
+			Expect(snapshotsByTag["v1.0.0"].Digest).To(Equal("sha256:v1.0.0"))
+			Expect(snapshotsByTag["v1.0.0"].BuiltAt).NotTo(BeNil())
+			Expect(snapshotsByTag["v2.0.0"].Digest).To(Equal("sha256:v2.0.0"))
+			Expect(snapshotsByTag["v2.0.0"].BuiltAt).NotTo(BeNil())
+			Expect(snapshotsByTag["v1.1.0"].Digest).To(BeEmpty())
+			Expect(snapshotsByTag["v1.1.0"].BuiltAt).To(BeNil())
+
+			status, getErr := store.GetStatus(ctx, info.RepoKey)
+			Expect(getErr).NotTo(HaveOccurred())
+			Expect(status.RefreshStatus).To(Equal(RefreshStatusIdle))
+			Expect(status.LastError).To(ContainSubstring("get detail for v1.1.0"))
+		})
+
+		It("should finish cleanly when there is no tag to sync", func() {
+			// UpsertSnapshots 不会写入 builtAt，需要额外调用 UpdateDetail 设置详情
+			err := store.UpsertSnapshots(ctx, info.RepoKey, []Image{
+				{Tag: "v0.9.0"},
+			})
+			Expect(err).NotTo(HaveOccurred())
+			builtAt := time.Now().Add(-time.Hour)
+			err = store.UpdateDetail(ctx, info.RepoKey, "v0.9.0", &registry.ImageDetail{
+				Tag:     "v0.9.0",
+				Digest:  "sha256:v0.9.0",
+				Size:    64,
+				BuiltAt: builtAt,
+			})
+			Expect(err).NotTo(HaveOccurred())
+			mockey.Mock((*registry.Client).GetTagDetail).
+				To(func(*registry.Client, string, string) (registry.ImageDetail, error) {
+					Fail("GetTagDetail should not be called")
+					return registry.ImageDetail{}, nil
+				}).
+				Build()
+
+			err = syncer.SyncDetails(ctx, info)
+			Expect(err).NotTo(HaveOccurred())
+
+			status, getErr := store.GetStatus(ctx, info.RepoKey)
+			Expect(getErr).NotTo(HaveOccurred())
+			Expect(status.RefreshStatus).To(Equal(RefreshStatusIdle))
+			Expect(status.LastDetailSyncedAt).NotTo(BeNil())
+			Expect(status.LastError).To(BeEmpty())
+		})
+
+		It("should skip sync when status is refreshing", func() {
+			// 先将状态设为 refreshing
+			err := store.UpsertStatus(ctx, &RepoSnapshotStatus{
+				RepoKey:       info.RepoKey,
+				RefreshStatus: RefreshStatusRefreshing,
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			mockey.Mock((*registry.Client).GetTagDetail).
+				To(func(*registry.Client, string, string) (registry.ImageDetail, error) {
+					Fail("GetTagDetail should not be called")
+					return registry.ImageDetail{}, nil
+				}).
+				Build()
+
+			err = syncer.SyncDetails(ctx, info)
+			Expect(err).NotTo(HaveOccurred())
+
+			// 状态不应被修改，仍为 refreshing
+			status, getErr := store.GetStatus(ctx, info.RepoKey)
+			Expect(getErr).NotTo(HaveOccurred())
+			Expect(status).NotTo(BeNil())
+			Expect(status.RefreshStatus).To(Equal(RefreshStatusRefreshing))
+		})
+
+		It("should skip sync when status is detail_syncing", func() {
+			// 先将状态设为 detail_syncing
+			err := store.UpsertStatus(ctx, &RepoSnapshotStatus{
+				RepoKey:       info.RepoKey,
+				RefreshStatus: RefreshStatusDetailSyncing,
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			mockey.Mock((*registry.Client).GetTagDetail).
+				To(func(*registry.Client, string, string) (registry.ImageDetail, error) {
+					Fail("GetTagDetail should not be called")
+					return registry.ImageDetail{}, nil
+				}).
+				Build()
+
+			err = syncer.SyncDetails(ctx, info)
+			Expect(err).NotTo(HaveOccurred())
+
+			// 状态不应被修改，仍为 detail_syncing
+			status, getErr := store.GetStatus(ctx, info.RepoKey)
+			Expect(getErr).NotTo(HaveOccurred())
+			Expect(status).NotTo(BeNil())
+			Expect(status.RefreshStatus).To(Equal(RefreshStatusDetailSyncing))
+		})
+	})
+})

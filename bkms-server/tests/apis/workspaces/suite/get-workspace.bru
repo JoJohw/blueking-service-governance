@@ -1,0 +1,41 @@
+meta {
+  name: get-workspace
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{testWorkspaceID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should get workspace", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data.bkSystems.isBoundExistedBKCIProject).to.equal(true)
+    // 从 testWorkspaceID (格式: test-ws-xxx) 提取后缀来验证 bkCIProjectID
+    const workspaceID = bru.getVar("testWorkspaceID");
+    const suffix = workspaceID.replace('test-ws-', '');
+    expect(res.body.data.bkSystems.bkCIProjectID).to.equal('test-bkci-project-id-' + suffix)
+  });
+
+  test("CMDB related fields on bkSystems", () => {
+
+    // 开源版本 txcmdb 使用 noop，相关字段可能为空，仅校验字段类型
+    expect(res.body.data.bkSystems.bkCCBizID).to.equal('100001');
+    expect(res.body.data.bkSystems.level2BizID).to.be.a('string');
+    expect(res.body.data.bkSystems.obsProductID).to.be.a('string');
+    expect(res.body.data.bkSystems.obsProductName).to.be.a('string');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

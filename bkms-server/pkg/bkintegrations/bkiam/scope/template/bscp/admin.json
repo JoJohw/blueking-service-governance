@@ -1,0 +1,57 @@
+[
+  {
+    "system": "{{ .BKBSCPSystemID }}",
+    "actions": [
+      {
+        "id": "find_business_resource"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKCCSystemID }}",
+        "type": "biz",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKCCSystemID }}",
+              "type": "biz",
+              "id": "{{ .BizID }}",
+              "name": "{{ .BizName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKBSCPSystemID }}",
+    "actions": [
+      {
+        "id": "app_view"
+      },
+      {
+        "id": "app_edit"
+      },
+      {
+        "id": "release_generate"
+      },
+      {
+        "id": "release_publish"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKBSCPSystemID }}",
+        "type": "app",
+        "paths": [
+          {{ range $i, $svc := .Services }}{{ if $i }},{{ end }}
+          [
+            {"system": "{{ $.BKCCSystemID }}", "type": "biz", "id": "{{ $.BizID }}", "name": "{{ $.BizName }}"},
+            {"system": "{{ $.BKBSCPSystemID }}", "type": "app", "id": "{{ $svc.ID }}", "name": "{{ $svc.Name }}"}
+          ]
+          {{ end }}
+        ]
+      }
+    ]
+  }
+]

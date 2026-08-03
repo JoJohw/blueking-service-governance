@@ -1,0 +1,39 @@
+meta {
+  name: update-sensitive-app-defined-env-var-to-empty
+  type: http
+  seq: 10
+}
+
+put {
+  url: {{serviceURL}}/apps/{{appDefinedEnvVarsAppID}}/env-vars/{{sensitiveAppDefinedEnvVarKey}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "updatedKey": "{{sensitiveAppDefinedEnvVarKey}}",
+    "value": "",
+    "description": "{{sensitiveAppDefinedEnvVarDescription}}",
+    "isSensitive": true
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should update a sensitive app-defined env var to an empty value", () => {
+    const ret = res.body.data;
+
+    expect(ret.key).to.equal(bru.getVar("sensitiveAppDefinedEnvVarKey"));
+    expect(ret.value).to.equal("******");
+    expect(ret.isSensitive).to.equal(true);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

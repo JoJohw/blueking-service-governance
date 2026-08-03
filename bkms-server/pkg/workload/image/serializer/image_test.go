@@ -1,0 +1,125 @@
+package serializer_test
+
+import (
+	"encoding/json"
+	"strings"
+	"time"
+
+	"github.com/gin-gonic/gin/binding"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/image/serializer"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/image/snapshot"
+)
+
+var _ = Describe("Image serializers", func() {
+	DescribeTable(
+		"AppImageTagURIInput validation",
+		func(input serializer.AppImageTagURIInput, expectedErrSubstrings []string) {
+			err := binding.Validator.ValidateStruct(input)
+			if len(expectedErrSubstrings) == 0 {
+				Expect(err).NotTo(HaveOccurred())
+				return
+			}
+
+			Expect(err).To(HaveOccurred())
+			for _, expected := range expectedErrSubstrings {
+				Expect(err.Error()).To(ContainSubstring(expected))
+			}
+		},
+		Entry("valid app and tag path", serializer.AppImageTagURIInput{
+			AppID: "app-valid-1",
+			Tag:   "v1.0.0",
+		}, nil),
+		Entry("missing tag", serializer.AppImageTagURIInput{
+			AppID: "app-valid-1",
+		}, []string{
+			"AppImageTagURIInput.Tag",
+			"failed on the 'required' tag",
+		}),
+		Entry("tag too long", serializer.AppImageTagURIInput{
+			AppID: "app-valid-1",
+			Tag:   strings.Repeat("a", 129),
+		}, []string{
+			"AppImageTagURIInput.Tag",
+			"failed on the 'max' tag",
+		}),
+		Entry("invalid app id", serializer.AppImageTagURIInput{
+			AppID: "app/test",
+			Tag:   "v1.0.0",
+		}, []string{
+			"AppImageTagURIInput.AppID",
+			"failed on the 'uri_slug' tag",
+		}),
+	)
+
+	It("marshals image count and size as strings", func() {
+		builtAt := time.Date(2026, 5, 27, 15, 0, 0, 0, time.UTC)
+		payload := serializer.ListAppImagesOutput{
+			Data: &serializer.PaginatedAppImagesOutputObjs{
+				Count: 1,
+				Results: []*serializer.AppImageOutputObj{
+					{
+						Repository: "repo/test",
+						Tag:        "v1.0.0",
+						Size:       1024,
+						BuiltAt:    &builtAt,
+					},
+				},
+				SnapshotStatus: &serializer.SnapshotStatusInfoOutputObj{
+					RefreshStatus: string(snapshot.RefreshStatusIdle),
+				},
+			},
+		}
+
+		body, err := json.Marshal(payload)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(body)).To(ContainSubstring(`"count":"1"`))
+		Expect(string(body)).To(ContainSubstring(`"size":"1024"`))
+	})
+
+	It("marshals refresh counters as strings", func() {
+		payload := serializer.RefreshAppImagesOutput{
+			Data: &serializer.RefreshResultInfoOutputObj{
+				Status:        "success",
+				Message:       "done",
+				AddedTagCnt:   2,
+				RemovedTagCnt: 1,
+			},
+		}
+
+		body, err := json.Marshal(payload)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(body)).To(ContainSubstring(`"addedTagCnt":"2"`))
+		Expect(string(body)).To(ContainSubstring(`"removedTagCnt":"1"`))
+	})
+
+	It("returns idle snapshot status when model is nil", func() {
+		output := new(serializer.SnapshotStatusInfoOutputObj).FromModel(nil)
+		Expect(output.RefreshStatus).To(Equal(string(snapshot.RefreshStatusIdle)))
+	})
+
+	It("validates deployable image tag pagination input", func() {
+		input := serializer.ListDeployableImageTagsQueryInput{
+			Keyword:  "v1",
+			Page:     1,
+			PageSize: 20,
+		}
+
+		err := binding.Validator.ValidateStruct(input)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
+	It("rejects invalid deployable image tag page size", func() {
+		input := serializer.ListDeployableImageTagsQueryInput{
+			Page:     1,
+			PageSize: 7,
+		}
+
+		err := binding.Validator.ValidateStruct(input)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("ListDeployableImageTagsQueryInput.PageSize"))
+		Expect(err.Error()).To(ContainSubstring(strings.TrimSpace("failed on the 'oneof' tag")))
+	})
+})

@@ -1,0 +1,41 @@
+meta {
+  name: update-build-repo
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{serviceURL}}/apps/{{testTrpcPipelineAppID}}/build-configs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "sourceType": "codeRepository",
+    "pipelineType": "pipeline",
+    "codeRepo": {
+      "type": "TGit",
+      "defaultBranch": "master",
+      "repoAlias": "alias",
+      "repoURL": "https://git.com/bkms-govern-pipeline-dev.git"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  console.log(res.body)
+  test("should update trpc spec successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

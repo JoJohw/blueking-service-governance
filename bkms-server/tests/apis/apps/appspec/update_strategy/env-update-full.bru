@@ -1,0 +1,30 @@
+meta {
+  name: env-update-full
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{serviceURL}}/apps/{{updateStrategyAppID}}/envs/test/app-spec/update-strategy
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecUpdateStrategy": {
+      "maxUnavailable": "20%",
+      "maxSurge": "1"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

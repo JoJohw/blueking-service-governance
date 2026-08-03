@@ -1,0 +1,38 @@
+meta {
+  name: update-workspace-component
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/components/{{testWorkspaceCompName}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "properties": {
+      "path": "/data/updated-secret",
+      "secretName": "updated-workspace-secret"
+    },
+    "scopeType": "environment",
+    "scopeEnvNames": ["prod"]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update workspace component successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

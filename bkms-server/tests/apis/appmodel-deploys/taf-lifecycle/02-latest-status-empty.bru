@@ -1,0 +1,27 @@
+meta {
+  name: 02-latest-status-empty
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/apps/{{tafLifecycleAppID}}/envs/{{tafLifecycleEnvName}}/taf-deploys/latest-status
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return null latest status when no deploy or auto-deploy exists", () => {
+    expect(res.body.data).to.be.null;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

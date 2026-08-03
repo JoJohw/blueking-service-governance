@@ -1,0 +1,53 @@
+meta {
+  name: create-environment
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/envs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "env-{{randomSuffix}}",
+    "displayName": "env-display-{{randomSuffix}}",
+    "type": "staging",
+    "description": "desc-{{randomSuffix}}",
+    "cluster": {
+      "clusterID": "c-{{randomSuffix}}",
+      "clusterType": "single",
+      "namespace": "default-{{randomSuffix}}"
+    }
+  }
+  
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const common = require("./common")
+  
+  const ws = await common.createWorkspace({id: "test-ws-"+bru.getVar('randomSuffix')});
+  bru.setVar("workspaceID", ws.id)
+  
+}
+
+script:post-response {
+  const suffix = bru.getVar("randomSuffix");
+
+  bru.setVar("createdEnvName", `env-${suffix}`);
+  bru.setVar("createdEnvDisplayName", `env-display-${suffix}`)
+  bru.setVar("createdEnvType", "staging")
+  bru.setVar("clusterID", `c-${suffix}`)
+  bru.setVar("namespace", `default-${suffix}`)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

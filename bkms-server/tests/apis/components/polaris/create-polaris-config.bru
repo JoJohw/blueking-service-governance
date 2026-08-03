@@ -1,0 +1,61 @@
+meta {
+  name: create-polaris-config
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/apps/{{componentsTrpcAppID}}/deps/polaris-configs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "createNewService": false,
+    "scopeType": "environment",
+    "scopeEnvNames": ["env-1"],
+    "instanceKey": "testPolaris",
+    "polarisName": "test-polaris-service",
+    "polarisNamespace": "Test",
+    "polarisToken": "test-polaris-token-xxx",
+    "servicePort": 8080,
+    "direct": false,
+    "keepNotReadyPod": true,
+    "enableHealthCheck": false,
+    "weight": 10,
+    "serviceLabels": {
+      "env": "test",
+      "team": "api-test"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.data.name: isString
+}
+
+script:post-response {
+  console.log("Create polaris config response:", res.body);
+  // Save polaris config name from response for later tests
+  if (res.body && res.body.data && res.body.data.name) {
+    bru.setVar('testPolarisConfigName', res.body.data.name);
+    console.log("Created polaris config name:", res.body.data.name);
+  }
+}
+
+tests {
+  test("should create polaris config successfully with environment scope", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('object');
+    expect(res.body.data.name).to.be.a('string');
+    expect(res.body.data.name).to.not.be.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

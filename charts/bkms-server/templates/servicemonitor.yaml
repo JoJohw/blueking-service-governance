@@ -1,0 +1,44 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "bkms-server.fullname" . }}-web
+  labels:
+    {{- include "bkms-server.webLabels" . | nindent 4 }}
+    {{- with .Values.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+    {{- include "bkms-server.webSelectorLabels" . | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  endpoints:
+    - port: metrics
+      interval: {{ .Values.serviceMonitor.interval | default "60s" }}
+      path: {{ .Values.serviceMonitor.path | default "/debug/metrics"}}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "bkms-server.fullname" . }}-worker
+  labels:
+    {{- include "bkms-server.workerLabels" . | nindent 4 }}
+    {{- with .Values.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "bkms-server.workerSelectorLabels" . | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  endpoints:
+    - port: metrics
+      interval: {{ .Values.serviceMonitor.interval | default "60s" }}
+      path: {{ .Values.serviceMonitor.path | default "/debug/metrics"}}
+
+{{- end }}

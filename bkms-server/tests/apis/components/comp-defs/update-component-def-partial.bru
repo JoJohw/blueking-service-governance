@@ -1,0 +1,34 @@
+meta {
+  name: update-component-def-partial
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{serviceURL}}/component-defs/{{testWsCompDefName}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "displayName": "Partially Updated Component",
+    "description": "Only displayName and description updated"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update component definition partially successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

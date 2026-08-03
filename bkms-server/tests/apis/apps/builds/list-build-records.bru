@@ -1,0 +1,64 @@
+meta {
+  name: list-build-records
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{serviceURL}}/apps/{{testBuildTrpcAppID}}/builds?page=1&pageSize=10
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  console.log(res.body);
+  
+  test("should return build records list successfully", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('object');
+  });
+  
+  test("should have pagination fields", () => {
+    expect(res.body.data).to.have.property('count');
+    expect(res.body.data).to.have.property('results');
+    expect(res.body.data.results).to.be.an('array');
+  });
+  
+  test("should contain at least one build record", () => {
+    expect(res.body.data.results.length).to.be.greaterThan(0);
+  });
+  
+  test("should contain the previously created build record", () => {
+    const testBuildID = bru.getVar('testBuildID');
+    const buildRecords = res.body.data.results;
+    
+    // Find the build record with matching buildID
+    const foundRecord = buildRecords.find(record => record.buildID === testBuildID);
+    
+    expect(foundRecord).to.not.be.undefined;
+    expect(foundRecord.buildID).to.equal(testBuildID);
+    expect(foundRecord).to.have.property('pipelineID');
+    expect(foundRecord).to.have.property('status');
+    expect(foundRecord).to.have.property('revision');
+  });
+  
+  test("should have valid build record structure", () => {
+    const firstRecord = res.body.data.results[0];
+    expect(firstRecord).to.have.property('buildID');
+    expect(firstRecord).to.have.property('pipelineID');
+    expect(firstRecord).to.have.property('status');
+    expect(firstRecord.buildID).to.be.a('string');
+    expect(firstRecord.pipelineID).to.be.a('string');
+    expect(firstRecord.status).to.be.a('string');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

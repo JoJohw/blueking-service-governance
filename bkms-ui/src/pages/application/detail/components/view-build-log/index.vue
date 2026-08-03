@@ -1,0 +1,45 @@
+<template>
+  <Sideslider
+    v-model:is-show="visible"
+    class="build-log-sideslider"
+    :width="1200"
+  >
+    <template #header>
+      <div class="flex items-center">
+        <span>{{ $t('构建日志') }}</span>
+      </div>
+    </template>
+    <template #default>
+      <BuildLogPanel
+        :active="visible"
+        :build-info="props.buildInfo"
+      />
+    </template>
+  </Sideslider>
+</template>
+
+<script lang="ts" setup>
+  import { Sideslider } from 'bkui-vue';
+
+  import BuildLogPanel from './build-log-panel.vue';
+
+  import type { ViewBuildLogProps } from './type';
+
+  const props = defineProps<ViewBuildLogProps>();
+
+  const visible = defineModel<boolean>('visible', { default: false });
+</script>
+
+<style lang="postcss" scoped>
+  .build-log-sideslider :deep(.bk-modal-content) {
+    height: calc(100% - 52px) !important;
+    overflow: hidden !important;
+    scrollbar-gutter: auto !important;
+    > div {
+      height: 100%;
+      .bk-sideslider-content {
+        height: 100%;
+      }
+    }
+  }
+</style>

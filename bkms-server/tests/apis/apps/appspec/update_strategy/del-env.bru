@@ -1,0 +1,21 @@
+meta {
+  name: del-env
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{updateStrategyAppID}}/envs/test/app-spec/update-strategy
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,127 @@
+package preview
+
+import (
+	"strings"
+
+	pkgerrors "github.com/pkg/errors"
+
+	envmodel "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env/model"
+	parserpkg "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/envvars/envfile/parser"
+	envvartypes "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/envvars/types"
+)
+
+// RecordResolution 承载单条记录的元数据解析结果。
+type RecordResolution struct {
+	// EffectiveScope 实际生效的作用域。
+	EffectiveScope envvartypes.ScopedEnvVarScope
+	// EffectStatus scope 指令的生效状态。
+	EffectStatus ImportEffectScope
+	// Messages 附加提示信息。
+	Messages []string
+}
+
+// RecordResolver 定义记录解析策略的函数签名，不同导入上下文提供不同实现。
+type RecordResolver func(record parserpkg.ParsedEnvVarRecord) (*RecordResolution, error)
+
+// ResolvePublicRecord 公共导入场景只允许 workspace 与 envType 两类 scope。
+func ResolvePublicRecord(record parserpkg.ParsedEnvVarRecord) (*RecordResolution, error) {
+	if !record.ScopeTypeSpecified() {
+		return nil, pkgerrors.New("scopeType is required in public import")
+	}
+	scope, err := parseDeclaredRecordScope(record)
+	if err != nil {
+		return nil, err
+	}
+	switch scope.ScopeType {
+	case envvartypes.ScopeTypeWorkspace, envvartypes.ScopeTypeEnvType:
+		return &RecordResolution{
+			EffectiveScope: *scope,
+			EffectStatus:   ImportEffectScopeApplied,
+		}, nil
+	default:
+		return nil, pkgerrors.Errorf(
+			"scopeType %q is not allowed in public import",
+			recordScopeType(record),
+		)
+	}
+}
+
+// NewEnvRecordResolver 返回单环境导入场景的记录解析策略。
+// 导入文件必须显式声明 env scope，且 scopeValue 必须与当前目标环境一致。
+func NewEnvRecordResolver(environment envmodel.Environment) RecordResolver {
+	scope := envvartypes.ScopeEnv(environment.Name)
+	return func(record parserpkg.ParsedEnvVarRecord) (*RecordResolution, error) {
+		if !record.ScopeTypeSpecified() {
+			return nil, pkgerrors.New("scopeType is required in env import")
+		}
+		declared, err := parseDeclaredRecordScope(record)
+		if err != nil {
+			return nil, err
+		}
+		if declared.ScopeType != envvartypes.ScopeTypeEnv {
+			return nil, pkgerrors.Errorf(
+				`scopeType %q is not allowed in env import; expected "env"`,
+				recordScopeType(record),
+			)
+		}
+		if declared.ScopeValue != environment.Name {
+			return nil, pkgerrors.Errorf(
+				`scopeValue %q must equal target environment %q`,
+				declared.ScopeValue,
+				environment.Name,
+			)
+		}
+		return &RecordResolution{
+			EffectiveScope: scope,
+			EffectStatus:   ImportEffectScopeApplied,
+		}, nil
+	}
+}
+
+// ResolveAppRecord 应用导入场景不允许声明任何 scope 元数据。
+func ResolveAppRecord(record parserpkg.ParsedEnvVarRecord) (*RecordResolution, error) {
+	if record.ScopeTypeSpecified() || record.ScopeValueSpecified() {
+		return nil, pkgerrors.New("app import does not allow scope metadata")
+	}
+	return &RecordResolution{
+		EffectStatus: ImportEffectScopeNone,
+	}, nil
+}
+
+// parseDeclaredRecordScope 只负责把输入里声明的原始 scope 字段转成结构化 scope。
+// 返回指针是为了在调用方语义上明确区分“成功解析到一个 scope”和“解析失败无有效 scope”。
+func parseDeclaredRecordScope(record parserpkg.ParsedEnvVarRecord) (*envvartypes.ScopedEnvVarScope, error) {
+	scopeType := strings.TrimSpace(recordScopeType(record))
+	scopeValue := strings.TrimSpace(recordScopeValue(record))
+
+	if !record.ScopeTypeSpecified() {
+		return nil, pkgerrors.New("scopeType is required")
+	}
+	if record.ScopeValueSpecified() &&
+		strings.EqualFold(scopeType, string(envvartypes.ScopeTypeWorkspace)) &&
+		scopeValue == "" {
+		// 对 workspace scope，显式写出空 scopeValue 会被视为“声明了不该出现的字段”，
+		// 这里和完全省略 scopeValue 做区分，便于把用户输入错误反馈清楚。
+		return nil, pkgerrors.New("scopeValue must be omitted for workspace scope")
+	}
+
+	scope, err := envvartypes.ParseScopedEnvVarScope(scopeType, scopeValue)
+	if err != nil {
+		return nil, err
+	}
+	return &scope, nil
+}
+
+func recordScopeType(record parserpkg.ParsedEnvVarRecord) string {
+	if record.DeclaredScopeType == nil {
+		return ""
+	}
+	return *record.DeclaredScopeType
+}
+
+func recordScopeValue(record parserpkg.ParsedEnvVarRecord) string {
+	if record.DeclaredScopeValue == nil {
+		return ""
+	}
+	return *record.DeclaredScopeValue
+}

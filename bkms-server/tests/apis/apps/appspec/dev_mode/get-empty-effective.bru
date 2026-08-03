@@ -1,0 +1,38 @@
+meta {
+  name: get-empty-effective
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{devModeAppID}}/envs/test/app-spec/dev-mode/effective
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const common = require("./common")
+  
+  const suffix = bru.getVar("randomSuffix");
+  const ws = await common.createWorkspace({id: `tws-dev-mode-${suffix}`})
+  bru.setVar("devModeWorkspaceID", ws.id)
+  const appID = `test-dev-mode-${suffix}`;
+  const app = await common.createTrpcApp({id: appID, name: appID, workspaceID: ws.id})
+  bru.setVar("devModeAppID", app.id)
+}
+
+tests {
+  test("should return null when env dev mode is not configured", () => {
+    expect(res.body.data).to.equal(null);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

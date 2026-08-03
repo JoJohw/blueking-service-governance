@@ -1,0 +1,37 @@
+meta {
+  name: set-taf-base-content
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{serviceURL}}/apps/{{previewMergeAppID}}/app-config-files/{{previewTafBaseFileID}}/content
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "content": "<tars>\n    <application>\n        enableset=n\n        setdivision=NULL\n        <server>\n            node=tars.tarsnode.ServerObj@tcp -h 127.0.0.1 -p 19386 -t 60000\n            app=TestApp\n            server=HelloServer\n            localip=127.0.0.1\n            local=tcp -h 127.0.0.1 -p 8080 -t 3000\n            modulename=TestApp.HelloServer\n            <TestApp.HelloServer.HelloObj>\n                allow\n                endpoint=tcp -h 127.0.0.1 -p 10001 -t 60000\n                maxconns=200000\n                protocol=tars\n                queuecap=10000\n                queuetimeout=60000\n                servant=TestApp.HelloServer.HelloObj\n                threads=5\n            </TestApp.HelloServer.HelloObj>\n        </server>\n        <client>\n            locator=tars.tarsregistry.QueryObj@tcp -h 127.0.0.1 -p 17890\n            sync-invoke-timeout=3000\n            async-invoke-timeout=5000\n            refresh-endpoint-interval=60000\n        </client>\n    </application>\n</tars>",
+    "versionDescription": "设置TAF基础文件内容"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should set taf base file content successfully", () => {
+    console.log(res.body)
+    expect(res.body.compiledContent).to.contain('<tars>');
+    expect(res.body.compiledContent).to.contain('app=TestApp');
+    expect(res.body.compiledContent).to.contain('server=HelloServer');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

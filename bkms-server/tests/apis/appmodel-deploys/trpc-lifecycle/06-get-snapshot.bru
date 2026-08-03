@@ -1,0 +1,33 @@
+meta {
+  name: 06-get-snapshot
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{serviceURL}}/apps/{{trpcLifecycleAppID}}/envs/{{trpcLifecycleEnvName}}/trpc-deploys/{{trpcLifecycleFirstDeployID}}/resource-snapshots/{{trpcLifecycleSnapshotID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the resource snapshot with manifest", () => {
+    expect(res.body.snapshot).to.be.an("object");
+    expect(res.body.snapshot.id).to.equal(bru.getVar("trpcLifecycleSnapshotID"));
+    expect(res.body.snapshot.kind).to.equal(bru.getVar("trpcLifecycleSnapshotKind"));
+    expect(res.body.snapshot.name).to.equal(bru.getVar("trpcLifecycleSnapshotName"));
+    expect(res.body.snapshot.apiVersion).to.be.a("string").and.not.empty;
+    // The detail endpoint includes the rendered manifest blob.
+    expect(res.body.snapshot.manifest).to.be.a("string").and.not.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

@@ -1,0 +1,42 @@
+meta {
+  name: get-empty-default
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{resourcesAppID}}/app-spec/default-resources
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const common = require("./common")
+  
+  const suffix = bru.getVar("randomSuffix");
+  const ws = await common.createWorkspace({id: `testws-resources-${suffix}`})
+  bru.setVar("resourcesWorkspaceID", ws.id)
+  const appID = `test-resources-${suffix}`;
+  const app = await common.createTrpcApp({id: appID, name: appID, workspaceID: ws.id})
+  bru.setVar("resourcesAppID", app.id)
+}
+
+tests {
+  test("should return the default resources data", () => {
+    expect(res.body.data.replicas).to.equal(1);
+    expect(res.body.data.cpuRequests).to.equal("1");
+    expect(res.body.data.cpuLimits).to.equal("2");
+    expect(res.body.data.memoryRequests).to.equal("2Gi");
+    expect(res.body.data.memoryLimits).to.equal("4Gi");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

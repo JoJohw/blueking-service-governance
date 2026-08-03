@@ -1,0 +1,21 @@
+meta {
+  name: builds
+  seq: 7
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("testBuildTrpcAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `build-ws-${suffix}`})
+    const app = await common.createTrpcApp({id: `trpc-app-${suffix}`, workspaceID: ws.id})
+
+    bru.setVar("workspaceID", ws.id);
+    bru.setVar("testBuildTrpcAppID", app.id);
+  }
+}

@@ -1,0 +1,22 @@
+meta {
+  name: get-overview-after-del
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/app-spec/overview
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.data.configuredEnvs: isEmpty
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

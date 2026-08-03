@@ -1,0 +1,27 @@
+meta {
+  name: 04-verify-display-name
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/apps/{{testAppID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should verify display name was updated", () => {
+    expect(res.body.data.displayName).to.equal('Updated App Name');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

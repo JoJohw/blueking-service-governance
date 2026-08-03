@@ -1,0 +1,48 @@
+meta {
+  name: 06-rollback
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{serviceURL}}/apps/{{helmLifecycleAppID}}/envs/{{helmLifecycleEnvName}}/helm-deploys/{{helmLifecycleFirstDeployID}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  // After a rollback bkms-server creates a NEW record (revision++) whose
+  // imageTag matches v1; wait for that record (excluding v2's id).
+  const helm = require("./helpers/helm");
+
+  const record = await helm.waitForDeploy({
+    appID: bru.getVar("helmLifecycleAppID"),
+    envName: bru.getVar("helmLifecycleEnvName"),
+    expectedStatus: "deployed",
+    imageTag: bru.getVar("helmLifecycleImageTag1"),
+    excludeID: bru.getVar("helmLifecycleSecondDeployID")
+  });
+  bru.setVar("helmLifecycleRollbackDeployID", record.id);
+}
+
+tests {
+  test("should roll back to v1 and create a new record", () => {
+    expect(res.body).to.deep.equal({});
+    expect(bru.getVar("helmLifecycleRollbackDeployID")).to.be.a("string").and.not.empty;
+    expect(bru.getVar("helmLifecycleRollbackDeployID")).to.not.equal(bru.getVar("helmLifecycleSecondDeployID"));
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 70000
+}

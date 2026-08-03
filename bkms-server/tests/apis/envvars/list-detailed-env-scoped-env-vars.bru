@@ -1,0 +1,56 @@
+meta {
+  name: list-detailed-env-scoped-env-vars
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{serviceURL}}/scoped-env-vars/detailed-list/{{envvarsEnvID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should list env scoped env vars with conflict info sorted by created time", () => {
+    const ret = res.body.data;
+
+    expect(ret).to.have.length(2);
+    expect(ret[0].scopedEnvVar.id).to.equal(bru.getVar("envScopedEnvVarID"));
+    expect(ret[1].scopedEnvVar.id).to.equal(bru.getVar("envScopedOrderEnvVarID"));
+
+    expect(new Date(ret[0].scopedEnvVar.createdAt).getTime()).to.be.at.most(
+      new Date(ret[1].scopedEnvVar.createdAt).getTime()
+    );
+  })
+
+  test("should include conflict info against env background vars", () => {
+    const ret = res.body.data;
+    const conflictedVar = ret[0];
+    const normalVar = ret[1];
+
+    expect(conflictedVar.scopedEnvVar.key).to.equal(bru.getVar("envTypeScopedKey"));
+    expect(conflictedVar.scopedEnvVar.scopeType).to.equal("env");
+    expect(conflictedVar.scopedEnvVar.scopeValue).to.equal(bru.getVar("envvarsEnvName"));
+    expect(conflictedVar.conflictedInfo).to.not.be.undefined;
+    expect(conflictedVar.conflictedInfo.overrideConflicted).to.equal(true);
+    expect(conflictedVar.conflictedInfo.conflictedSources).to.deep.equal([
+      {
+        source: "scopedEnvType",
+        sourceValue: "staging"
+      }
+    ]);
+    expect(conflictedVar.conflictedInfo.conflictedDetail).to.equal(`冲突值为：${bru.getVar("envTypeScopedValue")}`);
+
+    expect(normalVar.scopedEnvVar.key).to.equal(bru.getVar("envScopedOrderKey"));
+    expect(normalVar.conflictedInfo).to.be.undefined;
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

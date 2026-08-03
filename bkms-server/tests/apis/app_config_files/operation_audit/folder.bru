@@ -1,0 +1,21 @@
+meta {
+  name: operation_audit
+  seq: 4
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("appCfgAuditAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `app-cfg-audit-ws-${suffix}`})
+    const app = await common.createHelmApp({id: `app-cfg-audit-app-${suffix}`, workspaceID: ws.id})
+
+    bru.setVar("appCfgAuditWorkspaceID", ws.id);
+    bru.setVar("appCfgAuditAppID", app.id);
+  }
+}

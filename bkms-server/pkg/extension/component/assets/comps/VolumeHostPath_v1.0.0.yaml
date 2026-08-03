@@ -1,0 +1,35 @@
+name: VolumeHostPath
+version: v1.0.0
+displayName: VolumeHostPath
+description: 将节点的本地路径挂载到应用中
+scopeType: global
+isBuiltin: true
+properties:
+- name: hostPath
+  type: STRING
+  defaultValue: hostPath
+  description: 节点目录
+- name: mountPath
+  type: STRING
+  defaultValue: /data
+  description: 容器挂载路径
+- name: type
+  type: STRING
+  defaultValue: DirectoryOrCreate
+  description: 挂载类型
+patchers:
+- |-
+  spec:
+    template:
+      spec:
+        volumes:
+          - name: "{{ .name }}"
+            hostPath:
+              path: "{{ .hostPath }}"
+              type: "{{ .type }}"
+        containers:
+          - name: "{{ .bkmsContainerName }}"
+            volumeMounts:
+              - name: "{{ .name }}"
+                mountPath: "{{ .mountPath }}"
+specs: []

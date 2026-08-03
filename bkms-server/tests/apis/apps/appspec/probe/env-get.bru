@@ -1,0 +1,20 @@
+meta {
+  name: env-get
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{serviceURL}}/apps/{{probeAppID}}/envs/{{testEnv}}/app-spec/probe
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

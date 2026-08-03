@@ -1,0 +1,39 @@
+meta {
+  name: update-default-should-fail-when-requests-gt-limits
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{serviceURL}}/apps/{{resourcesAppID}}/app-spec/default-resources
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecResources": {
+      "replicas": 2,
+      "cpuRequests": "2",
+      "cpuLimits": "1",
+      "memoryRequests": "256Mi",
+      "memoryLimits": "256Mi"
+    }
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should return error when requests is larger than limits", () => {
+    expect(res.body.error.message).to.contains("resource_request_lte_limit");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

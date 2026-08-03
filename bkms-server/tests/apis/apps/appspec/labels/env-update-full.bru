@@ -1,0 +1,30 @@
+meta {
+  name: env-update-full
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{serviceURL}}/apps/{{labelsAppID}}/envs/test/app-spec/labels
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "labels": {
+      "version": "v2",
+      "region": "sh"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

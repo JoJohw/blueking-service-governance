@@ -1,0 +1,111 @@
+package envvars_test
+
+import (
+	"context"
+	"strconv"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"go.uber.org/fx"
+	"go.uber.org/fx/fxtest"
+
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/testutil/dbfactory"
+	bkmsapp "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/app"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env"
+	envmodel "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env/model"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris"
+	polarisenvvars "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris/envvars"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/component"
+	envvartypes "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/envvars/types"
+)
+
+var _ = Describe("Reader", func() {
+	var (
+		ctx         context.Context
+		diApp       *fxtest.App
+		appStore    bkmsapp.ApplicationStore
+		envService  *env.EnvService
+		store       polaris.PolarisConfigStore
+		reader      *polarisenvvars.Reader
+		app         *bkmsapp.Application
+		environment *envmodel.Environment
+	)
+
+	BeforeEach(func() {
+		ctx = context.Background()
+		diApp = fxtest.New(
+			GinkgoT(),
+			bkmsapp.FxModule,
+			env.FxModule,
+			polaris.FxModule,
+			polarisenvvars.FxModule,
+			fx.Populate(&appStore, &envService, &store, &reader),
+		)
+		diApp.RequireStart()
+
+		app = dbfactory.Application(ctx, appStore)
+		environment = dbfactory.Env(ctx, envService, app.WorkspaceID)
+		config := &polaris.PolarisConfig{
+			AppID: app.ID,
+			Properties: polaris.Properties{
+				InstanceKey:      "mypolaris",
+				PolarisName:      "test-service",
+				PolarisNamespace: "Test",
+				PolarisToken:     "test-token-12345",
+				ServicePort:      8080,
+			},
+			ScopeType:     component.ScopeTypeEnvironment,
+			ScopeEnvNames: []string{environment.Name},
+		}
+		Expect(store.Create(ctx, config)).To(Succeed())
+	})
+
+	AfterEach(func() {
+		Expect(store.DeleteByApp(ctx, app.ID)).To(Succeed())
+		diApp.RequireStop()
+	})
+
+	It("lists sensitive token and service port variables for a matching environment", func() {
+		list, err := reader.ListEnvVarsForApp(ctx, *environment, app)
+		Expect(err).NotTo(HaveOccurred())
+
+		byKey := make(map[string]envvartypes.EnvVariableObj, len(list.Vars))
+		for _, item := range list.Vars {
+			byKey[item.Obj.Key] = item.Obj
+			Expect(item.Source.Source).To(Equal(envvartypes.EnvVarSourcePolaris))
+		}
+		Expect(byKey).To(HaveKey("mypolaris_polarisToken"))
+		Expect(byKey["mypolaris_polarisToken"].Value).To(Equal("test-token-12345"))
+		Expect(byKey["mypolaris_polarisToken"].IsSensitive).To(BeTrue())
+		Expect(byKey).To(HaveKey("mypolaris_serviceport"))
+		Expect(byKey["mypolaris_serviceport"].Value).To(Equal(strconv.Itoa(8080)))
+		Expect(byKey["mypolaris_serviceport"].IsSensitive).To(BeFalse())
+	})
+
+	It("returns no variables when the config is outside the environment scope", func() {
+		otherEnv := *environment
+		otherEnv.Name = "another-env"
+
+		list, err := reader.ListEnvVarsForApp(ctx, otherEnv, app)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(list.Vars).To(BeEmpty())
+	})
+
+	It("includes all app configs when listing variables for conflicts", func() {
+		list, err := reader.ListAppVarsForConflicts(ctx, app.WorkspaceID, app)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(list.Vars).To(HaveLen(2))
+	})
+
+	It("returns no variables for a nil application", func() {
+		list, err := reader.ListEnvVarsForApp(ctx, *environment, nil)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(list.Vars).To(BeEmpty())
+	})
+
+	It("returns no conflict variables for a nil application", func() {
+		list, err := reader.ListAppVarsForConflicts(ctx, app.WorkspaceID, nil)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(list.Vars).To(BeEmpty())
+	})
+})

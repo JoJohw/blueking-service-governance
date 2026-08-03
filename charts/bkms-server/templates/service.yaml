@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "bkms-server.fullname" . }}-web
+  labels:
+    release: "po" # 必须带这个label；原因：监控侧要求所有 Service 都带 release label，否则无法采集到数据。
+    {{- include "bkms-server.webLabels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "bkms-server.webSelectorLabels" . | nindent 4 }}
+  type: {{ .Values.service.type }}
+  ports:
+    {{- toYaml .Values.service.ports | nindent 2 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "bkms-server.fullname" . }}-worker
+  labels:
+    release: "po" # 必须带这个label；原因：监控侧要求所有 Service 都带 release label，否则无法采集到数据。
+    {{- include "bkms-server.workerLabels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "bkms-server.workerSelectorLabels" . | nindent 4 }}
+  type: {{ .Values.workerService.type }}
+  ports:
+    {{- toYaml .Values.workerService.ports | nindent 2 }}

@@ -1,0 +1,205 @@
+package polaris
+
+import (
+	"context"
+	"fmt"
+	"strings"
+
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/intstr"
+
+	bkmsapp "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/app"
+	envmodel "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env/model"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/render"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/envvarrefs"
+)
+
+const (
+	polarisConfigCRKind       = "PolarisConfig"
+	polarisConfigCRAPIVersion = "tkex.tencent.com/v1"
+)
+
+// WorkloadResult contains the updated pod spec and Polaris extra resources.
+type WorkloadResult struct {
+	PodSpec      corev1.PodSpec
+	ExtraObjects []unstructured.Unstructured
+}
+
+// WorkloadBuilder applies environment-specific Polaris configs to a workload payload.
+type WorkloadBuilder struct {
+	store PolarisConfigStore
+}
+
+// NewWorkloadBuilder creates a Polaris workload builder.
+func NewWorkloadBuilder(store PolarisConfigStore) *WorkloadBuilder {
+	return &WorkloadBuilder{store: store}
+}
+
+// Build injects Polaris ports into the main container and builds the related extra resources.
+// Only ServiceLabels participate in env-var rendering and undefined-reference collection.
+func (b *WorkloadBuilder) Build(
+	ctx context.Context,
+	app *bkmsapp.Application,
+	env *envmodel.Environment,
+	vars map[string]string,
+	podSpec corev1.PodSpec,
+	mainContainerName string,
+	collector *envvarrefs.Collector,
+) (*WorkloadResult, error) {
+	configs, err := b.store.ListByEnv(ctx, app.ID, env.Name)
+	if err != nil {
+		return nil, fmt.Errorf("list polaris configs: %w", err)
+	}
+
+	result := &WorkloadResult{
+		PodSpec:      *podSpec.DeepCopy(),
+		ExtraObjects: make([]unstructured.Unstructured, 0, len(configs)*2),
+	}
+	for _, cfg := range configs {
+		objects, buildErr := buildExtraResources(app, env, cfg, vars, collector)
+		if buildErr != nil {
+			return nil, fmt.Errorf("build resources for polaris config %s: %w", cfg.Name, buildErr)
+		}
+		result.ExtraObjects = append(result.ExtraObjects, objects...)
+	}
+
+	for idx := range result.PodSpec.Containers {
+		if result.PodSpec.Containers[idx].Name == mainContainerName {
+			injectContainerPorts(configs, &result.PodSpec.Containers[idx])
+			break
+		}
+	}
+	return result, nil
+}
+
+// BuildExtraResources 构造单个 PolarisConfig 对应的额外 K8s 资源（PolarisConfig CR + Service）
+// Args:
+// - app: 目标应用
+// - env: 目标环境
+// - cfg: 北极星配置
+// - vars: 渲染 serviceLabels 时的变量上下文
+// - collector: 收集未定义环境变量引用，可为 nil
+// Returns:
+// - []unstructured.Unstructured: 额外资源列表（PolarisConfig CR + Service）
+// - error: 错误
+func buildExtraResources(
+	app *bkmsapp.Application,
+	env *envmodel.Environment,
+	cfg *PolarisConfig,
+	vars map[string]string,
+	collector *envvarrefs.Collector,
+) ([]unstructured.Unstructured, error) {
+	baseName := strings.ToLower(fmt.Sprintf("%s-%s", app.Name, cfg.Name))
+	crName := baseName + "-polaris"
+	serviceName := baseName + "-polaris-service"
+
+	serviceSpec := map[string]any{
+		"name":              serviceName,
+		"namespace":         env.Cluster.Namespace,
+		"port":              int64(cfg.ServicePort),
+		"direct":            cfg.Direct,
+		"keepNotReadyPod":   cfg.KeepNotReadyPod,
+		"enableHealthCheck": cfg.EnableHealthCheck,
+		"weight":            int64(cfg.Weight),
+	}
+	if len(cfg.ServiceLabels) > 0 {
+		extraMeta, err := renderServiceLabels(cfg.Name, cfg.ServiceLabels, vars, collector)
+		if err != nil {
+			return nil, fmt.Errorf("render service labels for polaris config %s: %w", cfg.Name, err)
+		}
+		serviceSpec["extraMeta"] = extraMeta
+	}
+
+	crMap := map[string]any{
+		"apiVersion": polarisConfigCRAPIVersion,
+		"kind":       polarisConfigCRKind,
+		"metadata": map[string]any{
+			"name": crName,
+		},
+		"spec": map[string]any{
+			"polaris": map[string]any{
+				"name":      cfg.PolarisName,
+				"namespace": cfg.PolarisNamespace,
+				"token":     cfg.PolarisToken,
+			},
+			"services": []any{serviceSpec},
+		},
+	}
+
+	crConverted, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&crMap)
+	if err != nil {
+		return nil, fmt.Errorf("convert polaris config CR to unstructured: %w", err)
+	}
+
+	service := corev1.Service{
+		TypeMeta: metav1.TypeMeta{APIVersion: "v1", Kind: "Service"},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: serviceName,
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: map[string]string{"app.kubernetes.io/name": app.Name},
+			Ports: []corev1.ServicePort{{
+				Protocol:   corev1.ProtocolTCP,
+				Port:       cfg.ServicePort,
+				TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: cfg.ServicePort},
+			}},
+		},
+	}
+	serviceMap, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&service)
+	if err != nil {
+		return nil, fmt.Errorf("convert polaris service to unstructured: %w", err)
+	}
+
+	return []unstructured.Unstructured{
+		{Object: crConverted},
+		{Object: serviceMap},
+	}, nil
+}
+
+// injectContainerPorts injects Polaris service ports using the same merge key as the old component patch.
+func injectContainerPorts(configs []*PolarisConfig, container *corev1.Container) {
+	for _, cfg := range configs {
+		upsertContainerPort(&container.Ports, corev1.ContainerPort{
+			Name:          fmt.Sprintf("polaris-%d", cfg.ServicePort),
+			ContainerPort: cfg.ServicePort,
+			Protocol:      corev1.ProtocolTCP,
+		})
+	}
+}
+
+func upsertContainerPort(items *[]corev1.ContainerPort, value corev1.ContainerPort) {
+	for idx := range *items {
+		if (*items)[idx].ContainerPort == value.ContainerPort {
+			(*items)[idx] = value
+			return
+		}
+	}
+	*items = append(*items, value)
+}
+
+// renderServiceLabels 渲染 serviceLabels 中的 ${{env.X}} 变量，并收集未定义的环境变量引用。
+func renderServiceLabels(
+	sourceName string,
+	labels, vars map[string]string,
+	collector *envvarrefs.Collector,
+) (map[string]any, error) {
+	renderer := render.New(render.SetEnvContext(vars))
+	result := make(map[string]any, len(labels))
+	for key, value := range labels {
+		if err := collector.Collect(value, envvarrefs.Source{
+			Type: envvarrefs.SourcePolaris,
+			Name: sourceName,
+		}); err != nil {
+			return nil, fmt.Errorf("collect env vars from service label %s: %w", key, err)
+		}
+		rendered, err := renderer.Render(value)
+		if err != nil {
+			return nil, fmt.Errorf("render service label %s: %w", key, err)
+		}
+		result[key] = rendered
+	}
+	return result, nil
+}

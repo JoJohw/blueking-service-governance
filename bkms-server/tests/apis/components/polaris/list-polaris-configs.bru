@@ -1,0 +1,77 @@
+meta {
+  name: list-polaris-configs
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/apps/{{componentsTrpcAppID}}/deps/polaris-configs
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should list polaris configs successfully", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('array');
+    expect(res.body.data.length).to.be.equal(2);
+  });
+
+  test("should verify patch updates on first config (testPolaris)", () => {
+    const configs = res.body.data;
+    const patchedConfig = configs.find(c => c.name === bru.getVar('testPolarisConfigName'));
+    console.log(patchedConfig)
+
+    expect(patchedConfig).to.not.be.undefined;
+    // Verify patched values
+    expect(patchedConfig.instanceKey).to.equal("test-key-new");
+    expect(patchedConfig.servicePort).to.equal(8888);
+    expect(patchedConfig.direct).to.equal(true);
+    expect(patchedConfig.keepNotReadyPod).to.equal(false);
+    expect(patchedConfig.enableHealthCheck).to.equal(true);
+    expect(patchedConfig.weight).to.equal(20);
+    expect(patchedConfig.scopeType).to.equal("environment")
+    // Verify updated polarisToken
+    expect(patchedConfig.polarisToken).to.equal("updated-polaris-token-xxx");
+    // Verify updated serviceLabels
+    expect(patchedConfig.serviceLabels).to.deep.include({ updated: "true" });
+  });
+
+  test("should have second config unchanged (testPolarisEnv)", () => {
+    const configs = res.body.data;
+    const envConfig = configs.find(c => c.name === bru.getVar('testPolarisEnvConfigName'));
+    console.log(envConfig)
+
+    expect(envConfig).to.not.be.undefined;
+    // Verify original values unchanged
+    expect(envConfig.servicePort).to.equal(9090);
+    expect(envConfig.direct).to.equal(true);
+    expect(envConfig.weight).to.equal(50);
+  });
+
+  test("should expose pending-create env states before deployment", () => {
+    const configs = res.body.data;
+    const envConfig = configs.find(c => c.name === bru.getVar('testPolarisEnvConfigName'));
+    expect(envConfig).to.not.be.undefined;
+    expect(envConfig.envStates).to.be.an('object');
+    expect(Object.keys(envConfig.envStates).sort()).to.deep.equal(["staging", "test"]);
+
+    Object.values(envConfig.envStates).forEach(state => {
+      expect(state.status).to.equal("pendingCreate");
+      expect(state.appliedFields).to.equal(null);
+      expect(state.polarisTokenChanged).to.equal(false);
+      expect(state.lastError).to.equal("");
+      expect(state.updatedAt).to.equal("");
+    });
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

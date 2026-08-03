@@ -1,0 +1,30 @@
+meta {
+  name: 06-delete-nonexistent-app
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{serviceURL}}/apps/nonexistent-helm-deploy-app/envs/test/helm-deploys/deploy-id
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+  res.body: isJson
+}
+
+tests {
+  test("should return not found without uninstalling Helm release", () => {
+    expect(res.body.error).to.be.an("object");
+    expect(res.body.error.code).to.equal("NOT_FOUND");
+    expect(res.body.error.system).to.equal("bkms");
+    expect(res.body.error.module).to.equal("bkms-server");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

@@ -1,0 +1,35 @@
+meta {
+  name: update-workspace-info
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{serviceURL}}/workspaces/{{imageRegistryWsID}}/info
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "displayName": "updated displayName",
+    "description": "updated description"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  console.log(res.body)
+  test("should update workspace info successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

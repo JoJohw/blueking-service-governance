@@ -1,0 +1,41 @@
+meta {
+  name: 07-list-app-helm-charts
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{serviceURL}}/apps/{{helmChartRepoAppID}}/charts?page=1&pageSize=5
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return paginated helm charts", () => {
+    expect(res.body.data.count).to.be.a('string');
+    expect(res.body.data.results).to.be.an('array');
+  });
+
+  test("should return chart artifact fields when results exist", () => {
+    if (res.body.data.results.length > 0) {
+      const first = res.body.data.results[0];
+      expect(first.chartVersion).to.be.a('string');
+      expect(first.createdAt).to.be.a('string');
+      expect(first.digest).to.be.a('string');
+      if (first.deployedEnvs !== null) {
+        expect(first.deployedEnvs).to.be.an('array');
+      }
+      bru.setVar('readableChartVersion', first.chartVersion);
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 30000
+}

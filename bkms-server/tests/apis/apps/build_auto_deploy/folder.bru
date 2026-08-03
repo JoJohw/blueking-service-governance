@@ -1,0 +1,30 @@
+meta {
+  name: build-auto-deploy
+  seq: 8
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("testBuildDeployTrpcAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `build-deploy-ws-${suffix}`})
+    const app = await common.createTrpcApp({id: `trpc-build-deploy-app-${suffix}`, workspaceID: ws.id})
+    const env = await common.createEnvironment({
+      workspaceID: ws.id,
+      name: `bd-env-${suffix}`,
+      cluster: {
+        clusterID: `cluster-${suffix}`,
+        namespace: `ns-${suffix}`
+      }
+    })
+
+    bru.setVar("testBuildDeployWorkspaceID", ws.id);
+    bru.setVar("testBuildDeployTrpcAppID", app.id);
+    bru.setVar("testBuildDeployEnvName", env.name);
+  }
+}

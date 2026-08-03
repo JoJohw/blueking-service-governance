@@ -1,0 +1,36 @@
+meta {
+  name: clean
+  seq: 4
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("componentsTrpcAppID") || !bru.getVar("componentsWorkspaceID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `components-ws-${suffix}`})
+    const app = await common.createTrpcApp({id: `components-trpc-app-${suffix}`, workspaceID: ws.id})
+
+    bru.setVar("componentsWorkspaceID", ws.id);
+    bru.setVar("componentsTrpcAppID", app.id);
+  }
+
+  const workspaceID = bru.getVar("componentsWorkspaceID");
+  bru.setVar("workspaceID", workspaceID);
+
+  if (!bru.getVar("cleanWorkspaceSetupDone")) {
+    const globalComp = await common.ensureGlobalVolumeSecretWorkspaceComponent({
+      workspaceID,
+      resultVar: "appComponentWorkspaceCompName"
+    });
+    bru.setVar("testWorkspaceCompName", globalComp.name);
+
+    await common.ensureEnvVolumeSecretWorkspaceComponent({
+      workspaceID,
+      resultVar: "testWorkspaceCompWithEnvScopeName",
+      name: `test-comp-env-${bru.getVar("randomSuffix")}`
+    });
+
+    bru.setVar("cleanWorkspaceSetupDone", true);
+  }
+}

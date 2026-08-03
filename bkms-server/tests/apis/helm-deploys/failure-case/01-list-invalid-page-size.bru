@@ -1,0 +1,30 @@
+meta {
+  name: 01-list-invalid-page-size
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/nonexistent-helm-deploy-app/envs/test/helm-deploys?page=1&pageSize=7
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject unsupported page size before side effects", () => {
+    expect(res.body.error).to.be.an("object");
+    expect(res.body.error.code).to.equal("INVALID_REQUEST");
+    expect(res.body.error.system).to.equal("bkms");
+    expect(res.body.error.module).to.equal("bkms-server");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

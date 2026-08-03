@@ -1,0 +1,65 @@
+meta {
+  name: bg_env_vars
+  seq: 9
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  // Create workspace for testing
+  if (!bru.getVar("bgEnvVarsWorkspaceID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `bgev-ws-${suffix}`})
+
+    bru.setVar("bgEnvVarsWorkspaceID", ws.id);
+  }
+
+  // Create environment for testing
+  if (!bru.getVar("bgEnvVarsEnvName")) {
+    const suffix = bru.getVar("randomSuffix");
+    const envName = `bgev-env-${suffix}`;
+    const env = await common.createEnvironment({
+      workspaceID: bru.getVar("bgEnvVarsWorkspaceID"),
+      name: envName,
+      displayName: envName,
+      type: "development",
+      description: `bg envvars api test env ${suffix}`,
+      cluster: {
+        clusterID: `c-bg-${suffix}`,
+        clusterType: "single",
+        namespace: `ns-bg-${suffix}`
+      }
+    })
+
+    bru.setVar("bgEnvVarsEnvID", env.id);
+    bru.setVar("bgEnvVarsEnvName", env.name);
+  }
+
+  // Create a trpc app for testing (needed by the app bg_env_vars endpoint)
+  if (!bru.getVar("bgEnvVarsAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const app = await common.createTrpcApp({
+      id: `bgev-app-${suffix}`,
+      workspaceID: bru.getVar("bgEnvVarsWorkspaceID"),
+    })
+
+    bru.setVar("bgEnvVarsAppID", app.id);
+    bru.setVar("bgEnvVarsAppName", app.name);
+  }
+
+  if (!bru.getVar("bgTestDedupKey")) {
+    const suffix = bru.getVar("randomSuffix");
+    bru.setVar("bgTestDedupKey", `BG_DEDUP_KEY_${suffix}`);
+    bru.setVar("bgTestDedupWorkspaceValue", `bg-dedup-workspace-value-${suffix}`);
+    bru.setVar("bgTestDedupEnvTypeValue", `bg-dedup-envtype-value-${suffix}`);
+    bru.setVar("bgTestDedupEnvValue", `bg-dedup-env-value-${suffix}`);
+  }
+
+  if (!bru.getVar("bgEnvVarsEnvBgVarCount")) {
+    bru.setVar("bgEnvVarsEnvBgVarCount", 0);
+  }
+}

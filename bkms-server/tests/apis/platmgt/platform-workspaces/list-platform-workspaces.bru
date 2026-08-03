@@ -1,0 +1,61 @@
+meta {
+  name: list-platform-workspaces
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/plat-mgt/workspaces?page=1&pageSize=10
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const seedUser = bru.getVar("platAdminSeedUser");
+  req.setHeader("X-Bk-Authed-User-Info", JSON.stringify({
+    userId: seedUser,
+  }));
+  req.setHeader("X-Bk-Authed-User-Credential", '{"bkTicket":"xxx"}');
+}
+
+script:post-response {
+  const firstWorkspaceID = res.body?.data?.results?.[0]?.id;
+  if (firstWorkspaceID) {
+    bru.setVar("platMgtWorkspaceID", firstWorkspaceID);
+  }
+
+  const totalCount = res.body?.data?.count;
+  if (totalCount !== undefined) {
+    bru.setVar("platMgtWorkspaceTotalCount", totalCount);
+  }
+}
+
+tests {
+  test("should list platform workspaces with aggregate fields", () => {
+    expect(res.body.data).to.be.an("object");
+    expect(Number(res.body.data.count)).to.be.greaterThan(0);
+    expect(res.body.data.results).to.be.an("array");
+    expect(res.body.data.results.length).to.be.greaterThan(0);
+
+    const item = res.body.data.results[0];
+    expect(item).to.have.property("id");
+    expect(item).to.have.property("displayName");
+    expect(item).to.have.property("description");
+    expect(item).to.have.property("state");
+    expect(item).to.have.property("creator");
+    expect(item).to.have.property("updater");
+    expect(item).to.have.property("updatedAt");
+    expect(item).to.have.property("appCount");
+    expect(item).to.have.property("envCount");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,43 @@
+meta {
+  name: create-overlay-file
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{serviceURL}}/apps/{{appCfgAuditAppID}}/app-config-files
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "audit-overlay-{{randomSuffix}}",
+    "type": "overlay",
+    "contentSourceType": "local",
+    "baseAppConfigFileID": "{{appCfgAuditBaseFileID}}",
+    "fileFormat": "yaml",
+    "versionDescription": "初始版本"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  bru.setVar("appCfgAuditOverlayFileID", res.body.item.id);
+  bru.setVar("appCfgAuditOverlayFileName", res.body.item.name);
+}
+
+tests {
+  test("should create overlay app config file", () => {
+    expect(res.body.item.type).to.equal("overlay");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

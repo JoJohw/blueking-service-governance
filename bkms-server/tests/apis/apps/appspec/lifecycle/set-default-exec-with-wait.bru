@@ -1,0 +1,34 @@
+meta {
+  name: set-default-exec-with-wait
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/app-spec/default-lifecycle
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecLifecycle": {
+      "preStop": {
+        "type": "EXEC",
+        "exec": {
+          "sleepSeconds": 5
+        }
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

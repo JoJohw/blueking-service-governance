@@ -1,0 +1,37 @@
+meta {
+  name: get-current-platform-role
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/users/me/role
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const nonAdminUser = bru.getVar("platAdminNonAdminUser");
+  req.setHeader("X-Bk-Authed-User-Info", JSON.stringify({
+    userId: nonAdminUser,
+  }));
+  req.setHeader("X-Bk-Authed-User-Credential", '{"bkTicket":"xxx"}');
+}
+
+tests {
+  test("should return null platform role code for default non-platform-admin test user", () => {
+    expect(res.body.data).to.be.an("object");
+    expect(res.body.data.username).to.equal(bru.getVar("platAdminNonAdminUser"));
+    expect(res.body.data.platRoleCode).to.equal(null);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

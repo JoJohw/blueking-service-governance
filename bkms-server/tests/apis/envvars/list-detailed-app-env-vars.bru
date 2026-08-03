@@ -1,0 +1,112 @@
+meta {
+  name: list-detailed-app-env-vars
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{serviceURL}}/apps/{{envvarsDetailedAppID}}/env-vars/detailed-list
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("envvarsDetailedAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const appID = `envvars-app-${suffix}`;
+    const conflictedKey = bru.getVar("envTypeScopedKey");
+    const appOnlyKey = `APP_ONLY_KEY_${suffix}`;
+    const builtinKey = "BKMS_APP_NAME";
+
+    const app = await common.createTrpcApp({
+      id: appID,
+      workspaceID: bru.getVar("envvarsWorkspaceID"),
+      appModelSpec: {
+        trpcSpec: {
+          language: "go",
+          fileName: "trpc_go.yaml",
+          filePath: "/usr/local/trpc/bin/",
+          fileContent: "dGVzdAo="
+        },
+        command: [],
+        args: [],
+        envVars: [
+          {
+            key: conflictedKey,
+            value: `app-conflicted-value-${suffix}`,
+            description: `app conflicted env var ${suffix}`
+          },
+          {
+            key: appOnlyKey,
+            value: `app-only-value-${suffix}`,
+            description: `app only env var ${suffix}`
+          },
+          {
+            key: builtinKey,
+            value: `custom-app-name-${suffix}`,
+            description: `override app name ${suffix}`
+          }
+        ]
+      }
+    });
+
+    bru.setVar("envvarsDetailedAppID", app.id);
+    bru.setVar("envvarsDetailedAppName", app.name);
+    bru.setVar("envvarsDetailedAppConflictedKey", conflictedKey);
+    bru.setVar("envvarsDetailedAppOnlyKey", appOnlyKey);
+    bru.setVar("envvarsDetailedAppBuiltinKey", builtinKey);
+  }
+}
+
+tests {
+  test("should list app env vars with conflict info", () => {
+    const ret = res.body.data;
+
+    expect(ret).to.have.length(3);
+
+    const conflictedVar = ret[0];
+    expect(conflictedVar.appEnvVar.key).to.equal(bru.getVar("envvarsDetailedAppConflictedKey"));
+    expect(conflictedVar.appEnvVar.value).to.contain("app-conflicted-value");
+    expect(new Date(conflictedVar.appEnvVar.createdAt).toString()).to.not.equal("Invalid Date");
+    expect(new Date(conflictedVar.appEnvVar.updatedAt).getTime()).to.equal(
+      new Date(conflictedVar.appEnvVar.createdAt).getTime()
+    );
+    expect(conflictedVar.conflictedInfo).to.not.be.undefined;
+    expect(conflictedVar.conflictedInfo.overrideConflicted).to.equal(true);
+    expect(conflictedVar.conflictedInfo.conflictedSources).to.deep.equal([
+      {
+        source: "scopedEnvType",
+        sourceValue: "staging"
+      },
+      {
+        source: "scopedEnv",
+        sourceValue: bru.getVar("envvarsEnvName")
+      }
+    ]);
+    expect(conflictedVar.conflictedInfo.conflictedDetail).to.equal(
+      `冲突值为：${bru.getVar("envTypeScopedValue")}, ${bru.getVar("envScopedValue")}`
+    );
+
+    const appOnlyVar = ret[1];
+    expect(appOnlyVar.appEnvVar.key).to.equal(bru.getVar("envvarsDetailedAppOnlyKey"));
+    expect(appOnlyVar.conflictedInfo).to.be.undefined;
+
+    const builtinVar = ret[2];
+    expect(builtinVar.appEnvVar.key).to.equal(bru.getVar("envvarsDetailedAppBuiltinKey"));
+    expect(builtinVar.conflictedInfo).to.not.be.undefined;
+    expect(builtinVar.conflictedInfo.conflictedSources).to.have.length(1);
+    expect(builtinVar.conflictedInfo.conflictedSources[0].source).to.equal("builtin");
+    expect(builtinVar.conflictedInfo.conflictedDetail).to.equal(`冲突值为：${bru.getVar("envvarsDetailedAppName")}`);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

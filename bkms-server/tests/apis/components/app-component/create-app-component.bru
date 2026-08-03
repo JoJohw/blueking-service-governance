@@ -1,0 +1,47 @@
+meta {
+  name: create-app-component
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/apps/{{componentsTrpcAppID}}/components
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "type": "VolumeSecret",
+    "version": "v1.0.0",
+    "properties": {
+      "path": "/data/app-secret",
+      "secretName": "app-secret"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  console.log(res.body)
+  // Save component name for later tests
+  if (res.body && res.body.data && res.body.data.name) {
+    bru.setVar('testAppCompName', res.body.data.name);
+    console.log("Created app component name:", res.body.data.name);
+  } 
+}
+
+tests {
+  test("should create app component successfully (instantiate from ComponentDef)", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

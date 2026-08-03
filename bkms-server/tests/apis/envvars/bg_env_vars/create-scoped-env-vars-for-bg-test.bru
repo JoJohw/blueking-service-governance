@@ -1,0 +1,47 @@
+meta {
+  name: create-scoped-env-vars-for-bg-test
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{bgEnvVarsWorkspaceID}}/scoped-env-vars
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "scopeType": "workspace",
+    "scopeValue": "",
+    "key": "{{bgTestWorkspaceKey}}",
+    "value": "{{bgTestWorkspaceValue}}",
+    "description": "workspace scoped var for bg test",
+    "isSensitive": false
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const suffix = bru.getVar("randomSuffix");
+  bru.setVar("bgTestWorkspaceKey", `BG_WS_KEY_${suffix}`);
+  bru.setVar("bgTestWorkspaceValue", `bg-ws-value-${suffix}`);
+}
+
+tests {
+  test("should create workspace scoped env var", () => {
+    const ret = res.body.data;
+    expect(ret.scopeType).to.equal("workspace");
+    expect(ret.scopeValue).to.equal("");
+    expect(ret.key).to.equal(bru.getVar("bgTestWorkspaceKey"));
+    expect(ret.value).to.equal(bru.getVar("bgTestWorkspaceValue"));
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

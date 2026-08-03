@@ -1,0 +1,38 @@
+meta {
+  name: get-empty-default
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{annotationsAppID}}/app-spec/default-annotations
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  const suffix = bru.getVar("randomSuffix");
+  const ws = await common.createWorkspace({id: `testws-annos-${suffix}`})
+  bru.setVar("annotationsWorkspaceID", ws.id)
+  const appID = `test-annotations-${suffix}`;
+  const app = await common.createTrpcApp({id: appID, name: appID, workspaceID: ws.id})
+  bru.setVar("annotationsAppID", app.id)
+}
+
+tests {
+  test("should return empty default annotations", () => {
+    expect(res.body.data == null || res.body.data.annotations == null || Object.keys(res.body.data.annotations).length === 0).to.equal(true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

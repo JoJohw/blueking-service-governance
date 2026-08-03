@@ -1,0 +1,20 @@
+meta {
+  name: delete-env-type-scoped-env-var
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{serviceURL}}/workspaces/{{envvarsWorkspaceID}}/scoped-env-vars/{{envTypeScopedEnvVarID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

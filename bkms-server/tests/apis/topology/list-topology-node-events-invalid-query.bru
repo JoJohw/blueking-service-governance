@@ -1,0 +1,36 @@
+meta {
+  name: list-topology-node-events-invalid-query
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/apps/{{topologyAppID}}/envs/{{topologyEnvName}}/resource-topology/nodes/node-1/events?page=1&pageSize=7
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 1
+  pageSize: 7
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject unsupported page size", () => {
+    expect(res.body.error.code).to.equal("INVALID_REQUEST");
+    expect(res.body.error.system).to.equal("bkms");
+    expect(res.body.error.module).to.equal("bkms-server");
+    expect(res.body.error.message).to.contain("ListTopologyNodeEventsQueryInput.PageSize");
+    expect(res.body.error.message).to.contain("failed on the 'oneof' tag");
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,49 @@
+{{- $db := fromYaml (include "bkms-server.database.default" .) -}}
+{{- $redis := fromYaml (include "bkms-server.redis.default" .) -}}
+{{- $mq := fromYaml (include "bkms-server.rabbitmq.default" .) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "bkms-server.configCMName" . }}
+  labels:
+    {{- include "bkms-server.labels" . | nindent 4 }}
+data:
+  config.yaml: |-
+    # 数据库相关配置
+    mongo:
+      username: {{ $db.user }}
+      password: {{ $db.password }}
+      host: {{ $db.host }}
+      port: {{ $db.port }}
+      database: {{ $db.name }}
+    # redis 相关配置
+    redis:
+      host: {{ $redis.host }}
+      port: {{ $redis.port }}
+      db: {{ $redis.db }}
+      password: {{ $redis.password }}
+      dialTimeout: {{ $redis.dialTimeout }}
+      readTimeout: {{ $redis.readTimeout }}
+      writeTimeout: {{ $redis.writeTimeout }}
+    # asynq 相关配置
+    asynq:
+      redis:
+        host: {{ $redis.host }}
+        port: {{ $redis.port }}
+        db: {{ $redis.db }}
+        password: {{ $redis.password }}
+      concurrency: {{ .Values.svcConf.asynq.concurrency }}
+      queue: {{ .Values.svcConf.asynq.queue }}
+      maxRetry: {{ .Values.svcConf.asynq.maxRetry }}
+      retryInterval: {{ .Values.svcConf.asynq.retryInterval }}
+    # rabbitmq 相关配置
+    rabbitmq:
+      host: {{ $mq.host }}
+      port: {{ $mq.port }}
+      username: {{ $mq.username }}
+      password: {{ $mq.password }}
+      vhost: {{ $mq.vhost }}
+      queue: {{ $mq.queue }}
+      prefetch: {{ $mq.prefetch }}
+    # 业务相关配置
+    {{- toYaml (omit .Values.svcConf "asynq") | nindent 4 }}

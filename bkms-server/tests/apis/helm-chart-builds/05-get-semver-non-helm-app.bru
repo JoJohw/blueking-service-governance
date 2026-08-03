@@ -1,0 +1,42 @@
+meta {
+  name: 05-get-semver-non-helm-app
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/apps/{{testNonHelmAppID}}/charts/semver
+  body: none
+  auth: inherit
+}
+
+script:pre-request {
+  const apiCommon = require("./common")
+
+  if (!bru.getVar("testNonHelmAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const workspaceID = bru.getVar("helmChartWorkspaceID");
+    if (!workspaceID) {
+      throw new Error("helmChartWorkspaceID not found, ensure folder setup has run first");
+    }
+    const app = await apiCommon.createTrpcApp({id: `trpc-app-semver-${suffix}`, workspaceID: workspaceID});
+    bru.setVar("testNonHelmAppID", app.id);
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should return Gin error for non-helm app", () => {
+    expect(res.body.error.code).to.equal("INVALID_ARGUMENT");
+    expect(res.body.error.message).to.contain("app type is not helm based");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

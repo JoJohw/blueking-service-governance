@@ -1,0 +1,101 @@
+name: ImportPolaris
+version: v1.0.0
+displayName: ImportPolaris
+description: 绑定应用到已有的北极星服务，并在应用中注入相关环境变量。
+scopeType: global
+isBuiltin: true
+invisible: true
+properties:
+- name: instanceKey
+  type: STRING
+  defaultValue: instanceKey
+  description: 组件实例标识，会用于环境变量拼接，只能包含字母、数字、下划线。如果一个应用有多个实例，需要指定不同的 instanceKey
+- name: polarisName
+  type: STRING
+  defaultValue: polaris
+  description: 北极星实例名称
+- name: polarisNamespace
+  type: STRING
+  defaultValue: Test
+  description: 北极星环境，可选值(Test\Production\Development)
+- name: polarisToken
+  type: STRING
+  defaultValue: xxx
+  description: 北极星Token
+- name: servicePort
+  type: INT
+  defaultValue: 80
+  description: 服务端口
+- name: direct
+  type: BOOL
+  defaultValue: false
+  description: 是否为直连(注册PodIP到北极星)
+- name: keepNotReadyPod
+  type: BOOL
+  defaultValue: true
+  description: 是否保留未就绪的Pod在北极星
+- name: enableHealthCheck
+  type: BOOL
+  defaultValue: false
+  description: 是否启用健康检查
+- name: weight
+  type: INT
+  defaultValue: 10
+  description: 服务权重
+- name: serviceLabels
+  type: MAP
+  defaultValue: '{"env": "test"}'
+  description: 服务标签
+patchers:
+- |-
+  spec:
+    template:
+      spec:
+        containers:
+          - name: "{{ .bkmsContainerName }}"
+            env:
+              - name: "{{ .instanceKey }}_polarisToken"
+                value: {{ .polarisToken }}
+              - name: "{{ .instanceKey }}_serviceport"
+                value: "{{ .servicePort }}"
+            ports:
+              - containerPort: {{ .servicePort }}
+                protocol: "TCP"
+                name: "polaris-{{ .servicePort }}"
+specs:
+- |-
+  apiVersion: tkex.tencent.com/v1
+  kind: PolarisConfig
+  metadata:
+    name: "{{ .name }}-polaris"
+  spec:
+    polaris:
+      name: {{ .polarisName }}
+      namespace: {{ .polarisNamespace }}
+      token: {{ .polarisToken }}
+    services:
+      - name: "{{ .name }}-polaris-service"
+        namespace: {{ .bkmsEnvNamespace }}
+        port: {{ .servicePort }}
+        direct: {{ .direct }}
+        keepNotReadyPod: {{ .keepNotReadyPod }}
+        enableHealthCheck: {{ .enableHealthCheck }}
+        weight: {{.weight}}
+        {{- if .serviceLabels }}
+        extraMeta:
+        {{- range $key, $value := .serviceLabels }}
+          {{ $key }}: "{{ $value }}"
+        {{- end }}
+        {{- end }}
+- |-
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: "{{ .name }}-polaris-service"
+  spec:
+    selector:
+      app.kubernetes.io/name: {{ .bkmsAppName }}
+    ports:
+      - protocol: TCP
+        port: {{ .servicePort }}
+        targetPort: {{ .servicePort }}

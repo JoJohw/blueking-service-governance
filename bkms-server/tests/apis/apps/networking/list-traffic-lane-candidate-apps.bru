@@ -1,0 +1,31 @@
+meta {
+  name: list-traffic-lane-candidate-apps
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/traffic-lanes/candidate-apps
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return the right response", () => {
+    const ret = res.body.data[0]
+    
+    expect(ret.appName).to.equal(bru.getVar("networkingHelmAppName"))
+    
+    expect(ret.services[0].name).to.equal(bru.getVar("newServiceName"))
+    expect(ret.services[0].trafficLaneEnabled).to.equal(true)
+    })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

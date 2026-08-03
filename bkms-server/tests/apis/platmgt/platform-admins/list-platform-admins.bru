@@ -1,0 +1,50 @@
+meta {
+  name: list-role-bindings
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{serviceURL}}/plat-mgt/admins
+  body: none
+  auth: inherit
+}
+
+params:query {
+  keyword: {{platAdminSeedUser}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const seedUser = bru.getVar("platAdminSeedUser");
+  req.setHeader("X-Bk-Authed-User-Info", JSON.stringify({
+    userId: seedUser,
+  }));
+  req.setHeader("X-Bk-Authed-User-Credential", '{"bkTicket":"xxx"}');
+}
+
+tests {
+  test("should list the seeded platform administrator role binding", () => {
+    expect(res.body.data).to.be.an("array");
+    expect(res.body.data.length).to.be.greaterThan(0);
+
+    const usernames = res.body.data.map((item) => item.username);
+    expect(usernames).to.include(bru.getVar("platAdminSeedUser"));
+
+    const seeded = res.body.data.find((item) => item.username === bru.getVar("platAdminSeedUser"));
+    expect(seeded).to.have.property("roleCode", "admin");
+    expect(seeded).to.have.property("createdAt");
+    expect(seeded).to.have.property("creator");
+    expect(seeded).to.have.property("updatedAt");
+    expect(seeded).to.have.property("updater");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

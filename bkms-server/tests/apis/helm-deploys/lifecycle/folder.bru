@@ -1,0 +1,122 @@
+meta {
+  name: lifecycle
+  seq: 1
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  // The Helm deploy lifecycle suite drives a real chart against a kind
+  // cluster, so it is gated behind RUN_HELM_DEPLOY_API_TESTS to keep the
+  // default `bru run` invocation cheap. When the env var is unset, every
+  // request in this folder is cancelled (Bruno reports them as skipped).
+  if (!bru.getProcessEnv("RUN_HELM_DEPLOY_API_TESTS")) {
+    console.log("helm lifecycle skipped: RUN_HELM_DEPLOY_API_TESTS not set");
+    bru.runner.skipRequest();
+    return;
+  }
+
+  // Bootstrap the workspace / env / app / values-file once for the whole
+  // lifecycle suite. Bruno runs scripts sequentially within a folder, and
+  // bru.setVar persists across requests, so the `helmLifecycleReady` guard
+  // makes this idempotent if the folder is replayed.
+  const common = require("./common");
+
+  function valuesContent(imageRepository, imageTag) {
+    return [
+      "replicaCount: 1",
+      "image:",
+      `  repository: ${imageRepository}`,
+      `  tag: "${imageTag}"`,
+      "  pullPolicy: IfNotPresent",
+      "service:",
+      "  type: ClusterIP",
+      "  port: 80",
+      "resources: {}",
+      ""
+    ].join("\n");
+  }
+
+  if (!bru.getVar("helmLifecycleReady")) {
+    const suffix = bru.getVar("randomSuffix");
+    const workspaceID = `hdeploy-ws-${suffix}`;
+    const appID = `hdeploy-app-${suffix}`;
+    const envName = `hdeploy-env-${suffix}`;
+    const chartVersion = "0.1.0";
+    const chartName = "sample-app";
+    const helmRegistryUrl = "http://chartmuseum:8080";
+    // BKMS_APITEST_WORKLOAD_IMAGE is the image *repository* without a tag,
+    // formatted as `<registry>/<name>` (e.g. `example.com/bkms/apitest-workload`).
+    // The lifecycle suite rolls v1 -> v2 by switching tags, so the registry
+    // must host both `<repo>:1.0.0` and `<repo>:2.0.0` ahead of time. Each
+    // image must contain `sleep` since the deployment is launched as
+    // `sleep 3600` to keep the pod alive.
+    const imageRepository = bru.getProcessEnv("BKMS_APITEST_WORKLOAD_IMAGE");
+    if (!imageRepository) {
+      throw new Error("BKMS_APITEST_WORKLOAD_IMAGE is required for helm lifecycle tests");
+    }
+    if (imageRepository.includes(":")) {
+      throw new Error(`BKMS_APITEST_WORKLOAD_IMAGE must be a tag-less <registry>/<name>, got: ${imageRepository}`);
+    }
+    const slashIdx = imageRepository.lastIndexOf("/");
+    if (slashIdx <= 0 || slashIdx === imageRepository.length - 1) {
+      throw new Error(`BKMS_APITEST_WORKLOAD_IMAGE must be in <registry>/<name> form, got: ${imageRepository}`);
+    }
+    const registry = imageRepository.slice(0, slashIdx);
+    const imageName = imageRepository.slice(slashIdx + 1);
+    const imageTag1 = "1.0.0";
+    const imageTag2 = "2.0.0";
+
+    const ws = await common.createWorkspace({id: workspaceID});
+    await common.createEnvironment({
+      name: envName,
+      workspaceID: ws.id,
+      type: "test",
+      description: "Helm deploy v2 lifecycle suite",
+      cluster: {
+        clusterID: "BCS-K8S-00001",
+        clusterType: "single",
+        namespace: "default"
+      }
+    });
+    const app = await common.createHelmApp({
+      id: appID,
+      name: appID,
+      workspaceID: ws.id,
+      helmRepoConfig: {
+        repoURL: helmRegistryUrl,
+        chartName: chartName
+      },
+      buildConfig: {
+        sourceType: "imageRegistry",
+        pipelineType: "123",
+        imageBuildConfig: {
+          name: imageName
+        }
+      }
+    });
+    const valuesFile = await common.createAppConfigFile({
+      appID: app.id,
+      name: `hvals-${suffix}`,
+      cacheKey: "helmLifecycleValuesFileID"
+    });
+    await common.updateAppConfigFileContent({
+      appID: app.id,
+      fileID: valuesFile.id,
+      content: valuesContent(imageRepository, imageTag1),
+      versionDescription: "Initial Helm deploy values"
+    });
+
+    bru.setVar("helmLifecycleWorkspaceID", ws.id);
+    bru.setVar("helmLifecycleAppID", app.id);
+    bru.setVar("helmLifecycleEnvName", envName);
+    bru.setVar("helmLifecycleChartVersion", chartVersion);
+    bru.setVar("helmLifecycleImageRepository", imageRepository);
+    bru.setVar("helmLifecycleImageTag1", imageTag1);
+    bru.setVar("helmLifecycleImageTag2", imageTag2);
+    bru.setVar("helmLifecycleValuesFileID", valuesFile.id);
+    bru.setVar("helmLifecycleReady", true);
+  }
+}

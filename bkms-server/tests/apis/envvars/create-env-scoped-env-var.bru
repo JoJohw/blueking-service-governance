@@ -1,0 +1,56 @@
+meta {
+  name: create-env-scoped-env-var
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{envvarsWorkspaceID}}/scoped-env-vars
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "scopeType": "env",
+    "scopeValue": "{{envvarsEnvName}}",
+    "key": "{{envScopedKey}}",
+    "value": "{{envScopedValue}}",
+    "description": "{{envScopedDescription}}",
+    "isSensitive": false
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const suffix = bru.getVar("randomSuffix");
+  bru.setVar("envScopedKey", bru.getVar("envTypeScopedKey"));
+  bru.setVar("envScopedValue", `env-scoped-value-${suffix}`);
+  bru.setVar("envScopedDescription", `env-scoped-description-${suffix}`);
+}
+
+script:post-response {
+  bru.setVar("envScopedEnvVarID", res.body.data.id);
+}
+
+tests {
+  test("should create an env scoped env var", () => {
+    const ret = res.body.data;
+
+    expect(ret.workspaceID).to.equal(bru.getVar("envvarsWorkspaceID"));
+    expect(ret.scopeType).to.equal("env");
+    expect(ret.scopeValue).to.equal(bru.getVar("envvarsEnvName"));
+    expect(ret.key).to.equal(bru.getVar("envScopedKey"));
+    expect(ret.value).to.equal(bru.getVar("envScopedValue"));
+    expect(ret.description).to.equal(bru.getVar("envScopedDescription"));
+    expect(ret.isSensitive).to.equal(false);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

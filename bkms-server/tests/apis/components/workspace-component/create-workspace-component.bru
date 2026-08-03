@@ -1,0 +1,47 @@
+meta {
+  name: create-workspace-component
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/components
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "type": "VolumeSecret",
+    "properties": {
+      "path": "/data/secret",
+      "secretName": "workspace-secret"
+    },
+    "scopeType": "global",
+    "scopeEnvNames": []
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  // Save component name for later tests
+  console.log(res.body)
+  const compName = res.body.data.name;
+  bru.setVar('testWorkspaceCompName', compName);
+  console.log("Created workspace component name:", compName);
+}
+
+tests {
+  test("should create workspace component successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

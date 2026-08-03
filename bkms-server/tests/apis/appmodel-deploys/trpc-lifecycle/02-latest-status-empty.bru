@@ -1,0 +1,28 @@
+meta {
+  name: 02-latest-status-empty
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/apps/{{trpcLifecycleAppID}}/envs/{{trpcLifecycleEnvName}}/trpc-deploys/latest-status
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return null latest status when no deploy or auto-deploy exists", () => {
+    // latestAppModelDeployStatus 在两种来源都为空时返回 nil，序列化为 null。
+    expect(res.body.data).to.be.null;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

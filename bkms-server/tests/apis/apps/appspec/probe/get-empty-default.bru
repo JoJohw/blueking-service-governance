@@ -1,0 +1,46 @@
+meta {
+  name: get-empty-default
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{probeAppID}}/app-spec/default-probe
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const common = require("./common")
+  
+  const suffix = bru.getVar("randomSuffix");
+  const ws = await common.createWorkspace({id: `testws-probe-${suffix}`})
+  bru.setVar("probeWorkspaceID", ws.id)
+  const appID = `test-probe-${suffix}`;
+  const app = await common.createTrpcApp({id: appID, name: appID, workspaceID: ws.id})
+  bru.setVar("probeAppID", app.id)
+  
+  // Create an environment for env-related tests
+  const envName = `test-env-${suffix}`;
+  const env = await common.createEnvironment({
+    workspaceID: ws.id,
+    name: envName,
+    type: 'test',
+    cluster: {
+      clusterID: 'BCS-K8S-12345',
+      clusterType: 'single',
+      namespace: 'default'
+    }
+  })
+  bru.setVar("testEnv", envName)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

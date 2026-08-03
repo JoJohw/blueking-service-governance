@@ -1,0 +1,116 @@
+[
+  {
+    "system": "{{ .BKLogSystemID }}",
+    "actions": [
+      {
+        "id": "view_business_v2"
+      },
+      {
+        "id": "create_indices_v2"
+      },
+      {
+        "id": "create_collection_v2"
+      },
+      {
+        "id": "create_es_source_v2"
+      },
+      {
+        "id": "manage_extract_config_v2"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKMonitorSystemID }}",
+        "type": "space",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMonitorSystemID }}",
+              "type": "space",
+              "id": "{{ .SpaceID }}",
+              "name": "{{ .SpaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKLogSystemID }}",
+    "actions": [
+      {
+        "id": "search_log_v2"
+      },
+      {
+        "id": "manage_indices_v2"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKLogSystemID }}",
+        "type": "indices",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMonitorSystemID }}",
+              "type": "space",
+              "id": "{{ .SpaceID }}",
+              "name": "{{ .SpaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKLogSystemID }}",
+    "actions": [
+      {
+        "id": "view_collection_v2"
+      },
+      {
+        "id": "manage_collection_v2"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKLogSystemID }}",
+        "type": "collection",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMonitorSystemID }}",
+              "type": "space",
+              "id": "{{ .SpaceID }}",
+              "name": "{{ .SpaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKLogSystemID }}",
+    "actions": [
+      {
+        "id": "manage_es_source_v2"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKLogSystemID }}",
+        "type": "es_source",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMonitorSystemID }}",
+              "type": "space",
+              "id": "{{ .SpaceID }}",
+              "name": "{{ .SpaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  }
+]

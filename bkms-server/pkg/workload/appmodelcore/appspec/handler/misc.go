@@ -1,0 +1,49 @@
+package handler
+
+import (
+	"github.com/gin-gonic/gin"
+
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/bkerrs"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/ginutils"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/ginutils/perm"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/appspec/serializer"
+)
+
+// GetAppSpecOverview 获取应用配置概况。
+//
+//	@ID			GetAppSpecOverview
+//	@Summary	获取应用 AppSpec 配置概况
+//	@Tags		app-spec
+//	@Produce	json
+//	@Security	BkUserInfo
+//	@Security	BkUserCredential
+//	@Param		appID	path		string	true	"应用 ID"
+//	@Success	200		{object}	serializer.GetAppSpecOverviewOutput
+//	@Failure	400		{object}	bkerrs.GinErrorOutput
+//	@Failure	404		{object}	bkerrs.GinErrorOutput
+//	@Router		/apps/{appID}/app-spec/overview [get]
+func (h *Handler) GetAppSpecOverview(c *gin.Context) {
+	var uriInput serializer.AppURIInput
+	if err := ginutils.BindURI(c, &uriInput); err != nil {
+		bkerrs.AbortWithErr(c, err)
+		return
+	}
+
+	ctx := c.Request.Context()
+	app, err := perm.ValidateAppByID(ctx, h.registry, uriInput.AppID, perm.TypeView)
+	if err != nil {
+		bkerrs.AbortWithErr(c, err)
+		return
+	}
+
+	envNames, err := h.registry.AppSpecStore.ListEnvNamesByApp(ctx, app.ID)
+	if err != nil {
+		bkerrs.AbortWithErr(c, bkerrs.Wrap(err, bkerrs.ErrCodeInternalServerError, "list app spec overview"))
+		return
+	}
+	ginutils.OK(c, serializer.GetAppSpecOverviewOutput{
+		Data: &serializer.AppSpecOverviewOutput{
+			ConfiguredEnvs: envNames,
+		},
+	})
+}

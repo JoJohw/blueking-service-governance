@@ -1,0 +1,47 @@
+meta {
+  name: create-workspace-component-env-scope
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/components
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "test-comp-env-{{randomSuffix}}",
+    "type": "VolumeSecret",
+    "properties": {
+      "path": "/data/env-secret",
+      "secretName": "workspace-env-secret"
+    },
+    "scopeType": "environment",
+    "scopeEnvNames": ["dev", "test"]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  // Save component name for later tests
+  const compName = res.body.data.name;
+  bru.setVar('testWorkspaceCompWithEnvScopeName', compName);
+  console.log("Created workspace component (env scope) name:", compName);
+}
+
+tests {
+  test("should create workspace component with environment scope successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

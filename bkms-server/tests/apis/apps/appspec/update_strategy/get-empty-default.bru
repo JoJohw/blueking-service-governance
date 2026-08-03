@@ -1,0 +1,39 @@
+meta {
+  name: get-empty-default
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{updateStrategyAppID}}/app-spec/default-update-strategy
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const common = require("./common")
+  
+  const suffix = bru.getVar("randomSuffix");
+  const ws = await common.createWorkspace({id: `tws-upd-str-${suffix}`})
+  bru.setVar("updateStrategyWorkspaceID", ws.id)
+  const appID = `test-update-strategy-${suffix}`;
+  const app = await common.createTrpcApp({id: appID, name: appID, workspaceID: ws.id})
+  bru.setVar("updateStrategyAppID", app.id)
+}
+
+tests {
+  test("should return the default update strategy data", () => {
+    expect(res.body.data.maxUnavailable).to.equal("25%");
+    expect(res.body.data.maxSurge).to.equal("25%");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

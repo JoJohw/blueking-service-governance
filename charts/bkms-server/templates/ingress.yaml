@@ -1,0 +1,81 @@
+{{- /* 独立 host 模式 */}}
+{{- if .Values.ingress.directHost.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  labels:
+    {{- include "bkms-server.webLabels" . | nindent 4 }}
+  annotations:
+    {{- if eq "true" (include "common.ingress.supportsIngressClassname" .) }}
+    {{- $filtered := omit .Values.ingress.annotations "kubernetes.io/ingress.class" }}
+    {{- toYaml $filtered | nindent 4 }}
+    {{- else }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- end }}
+  name: {{ include "bkms-server.fullname" . }}-web-router
+spec:
+  {{- if eq "true" (include "common.ingress.supportsIngressClassname" .) }}
+  ingressClassName: {{ .Values.ingress.ingressClass }}
+  {{- end }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.directHost.host }}
+      secretName: {{ include "bkms-server.fullname" . }}-certificate
+  rules:
+    - host: {{ .Values.ingress.directHost.host }}
+      http:
+        paths:
+          {{- range .Values.ingress.directHost.paths }}
+          - backend:
+              {{- include "common.ingress.backend" (dict "serviceName" (printf "%s-web" (include "bkms-server.fullname" $)) "servicePort" ($.Values.ingress.servicePort | int) "context" $) | nindent 14 }}
+            path: {{ .path }}
+            {{- if eq "true" (include "common.ingress.supportsPathType" $) }}
+            pathType: {{ .pathType }}
+            {{- end }}
+          {{- end }}
+{{- end }}
+---
+{{- /* 共享 host */}}
+{{- if .Values.ingress.sharedHost.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  labels:
+    {{- include "bkms-server.webLabels" . | nindent 4 }}
+  annotations:
+    {{- if eq "true" (include "common.ingress.supportsIngressClassname" .) }}
+    {{- $filtered := omit .Values.ingress.annotations "kubernetes.io/ingress.class" }}
+    {{- toYaml $filtered | nindent 4 }}
+    {{- else }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- end }}
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  name: {{ include "bkms-server.fullname" . }}-web-router-subpath
+spec:
+  {{- if eq "true" (include "common.ingress.supportsIngressClassname" .) }}
+  ingressClassName: {{ .Values.ingress.ingressClass }}
+  {{- end }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.sharedHost.host }}
+      secretName: {{ include "bkms-server.fullname" . }}-certificate
+  rules:
+    - host: {{ .Values.ingress.sharedHost.host }}
+      http:
+        paths:
+          - backend:
+              {{- include "common.ingress.backend" (dict "serviceName" (printf "%s-web" (include "bkms-server.fullname" .)) "servicePort" (.Values.ingress.servicePort | int) "context" $) | nindent 14 }}
+            path: {{ .Values.ingress.sharedHost.path }}
+            {{- if eq "true" (include "common.ingress.supportsPathType" .) }}
+            pathType: {{ .Values.ingress.sharedHost.pathType }}
+            {{- end }}
+{{- end }}
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: {{ include "bkms-server.fullname" . }}-certificate
+data:
+  tls.crt: "{{ .Values.ingress.tlsCrt }}"
+  tls.key: "{{ .Values.ingress.tlsKey }}"

@@ -1,0 +1,122 @@
+package serializer_test
+
+import (
+	"encoding/json"
+	"time"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"go.mongodb.org/mongo-driver/v2/bson"
+
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/build/autodeploy"
+	deploypkg "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/deploy"
+	appmodeldeploy "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/deploy/appmodel"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/deploy/serializer"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/envvarrefs"
+)
+
+var _ = Describe("AppModel deploy serializers", func() {
+	Describe("EnvVarPreCheckOutput", func() {
+		It("converts undefined vars and their sources", func() {
+			output := new(serializer.EnvVarPreCheckOutput).FromModel(&deploypkg.EnvVarPreCheckResult{
+				UndefinedVars: []envvarrefs.UndefinedEnvVar{
+					{
+						Key: "DB_HOST",
+						Sources: []envvarrefs.Source{
+							{Type: envvarrefs.SourceAppConfigFile, Name: "production"},
+							{Type: envvarrefs.SourceComponent, Name: "redis-config"},
+						},
+					},
+				},
+			})
+
+			Expect(output).To(Equal(&serializer.EnvVarPreCheckOutput{
+				UndefinedVars: []serializer.UndefinedEnvVarOutput{
+					{
+						Key: "DB_HOST",
+						Sources: []serializer.EnvVarReferenceSourceOutput{
+							{Type: "appConfigFile", Name: "production"},
+							{Type: "component", Name: "redis-config"},
+						},
+					},
+				},
+			}))
+		})
+
+		It("serializes empty undefined vars as an empty array", func() {
+			output := new(serializer.EnvVarPreCheckOutput).FromModel(&deploypkg.EnvVarPreCheckResult{})
+
+			Expect(output.UndefinedVars).To(BeEmpty())
+			Expect(output.UndefinedVars).NotTo(BeNil())
+			payload, err := json.Marshal(output)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(payload).To(MatchJSON(`{"undefinedVars":[]}`))
+		})
+	})
+
+	Describe("LatestDeployStatus conversions", func() {
+		It("preserves source-specific fields for build auto deploy and direct deploy", func() {
+			startedAt := time.Date(2026, 6, 1, 11, 0, 0, 0, time.UTC)
+			buildStatus := new(serializer.LatestDeployStatus).FromBuildAutoDeployRecord(&autodeploy.Record{
+				Stage:      autodeploy.StageBuild,
+				Status:     "success",
+				BuildID:    "build-1",
+				DeployID:   "deploy-1",
+				Branch:     "main",
+				ImageTag:   "v2.0.0",
+				Operator:   "builder",
+				PipelineID: "pipeline-1",
+				StartedAt:  startedAt,
+				EndedAt:    startedAt.Add(2 * time.Minute),
+			})
+
+			Expect(buildStatus.Stage).To(Equal(string(autodeploy.StageBuild)))
+			Expect(buildStatus.IsBuildAutoDeploy).To(BeTrue())
+			Expect(buildStatus.BuildID).To(Equal("build-1"))
+			Expect(buildStatus.DeployID).To(Equal("deploy-1"))
+			Expect(buildStatus.Branch).To(Equal("main"))
+			Expect(buildStatus.ImageTag).To(Equal("v2.0.0"))
+			Expect(buildStatus.Operator).To(Equal("builder"))
+			Expect(buildStatus.PipelineID).To(Equal("pipeline-1"))
+
+			recordID := bson.NewObjectID()
+			directStatus := new(serializer.LatestDeployStatus).FromDeployRecord(&appmodeldeploy.Record{
+				ID:        recordID,
+				Status:    appmodeldeploy.StatusDeployed,
+				Message:   "deploy finished",
+				StartedAt: startedAt,
+				EndedAt:   startedAt.Add(time.Minute),
+			})
+
+			Expect(directStatus.Stage).To(Equal(string(autodeploy.StageDeploy)))
+			Expect(directStatus.IsBuildAutoDeploy).To(BeFalse())
+			Expect(directStatus.DeployID).To(Equal(recordID.Hex()))
+			Expect(directStatus.BuildID).To(BeEmpty())
+			Expect(directStatus.ImageTag).To(BeEmpty())
+		})
+	})
+
+	Describe("AppModelResourceSnapshot FromModel", func() {
+		It("only includes manifest for detail output", func() {
+			snapshot := appmodeldeploy.ResourceSnapshot{
+				ID:          bson.NewObjectID(),
+				APIVersion:  "apps/v1",
+				Kind:        "Deployment",
+				Name:        "bk-app",
+				Manifest:    "kind: Deployment",
+				IsTruncated: true,
+				CreatedAt:   time.Date(2026, 6, 1, 13, 0, 0, 0, time.UTC),
+			}
+
+			listOutput := new(serializer.AppModelResourceSnapshot).FromModel(snapshot, false)
+			listPayload, err := json.Marshal(listOutput)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(listOutput.Manifest).To(BeNil())
+			Expect(string(listPayload)).NotTo(ContainSubstring("manifest"))
+
+			detailOutput := new(serializer.AppModelResourceSnapshot).FromModel(snapshot, true)
+			Expect(detailOutput.Manifest).NotTo(BeNil())
+			Expect(*detailOutput.Manifest).To(Equal("kind: Deployment"))
+		})
+	})
+})

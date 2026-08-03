@@ -1,0 +1,32 @@
+meta {
+  name: list-apps-nonexistent-name
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/apps?appName=nonexistent-app
+  body: none
+  auth: inherit
+}
+
+params:query {
+  appName: nonexistent-app
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return empty list when no apps match filter", () => {
+    expect(res.body.data).to.be.an('array');
+    expect(res.body.data.length).to.equal(0);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

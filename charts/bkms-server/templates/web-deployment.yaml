@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bkms-server.fullname" . }}-web
+  labels:
+    {{- include "bkms-server.webLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "bkms-server.webSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        values-hash: "{{ toYaml .Values | sha256sum | trunc 63 }}"
+        {{- include "bkms-server.webSelectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.affinity.webAffinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "bkms-server.serviceAccountName" . }}
+      initContainers:
+        - name: check-migrate
+          image: {{ include "bkms-server.utility.k8sWaitFor.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - job
+            - {{ include "bkms-server.fullname" . }}-migrate-{{ .Release.Revision }}
+          resources:
+            {{- toYaml .Values.utility.resources | nindent 12 }}
+        - name: check-migrate-iam
+          image: {{ include "bkms-server.utility.k8sWaitFor.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - job
+            - {{ include "bkms-server.fullname" . }}-migrate-iam-{{ .Release.Revision }}
+          resources:
+            {{- toYaml .Values.utility.resources | nindent 12 }}
+      containers:
+        - name: bkms-server-web
+          image: {{ include "bkms-server.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - bkms-server
+          args:
+            - webserver
+            - --srvCfg
+            - /app/etc/config.yaml
+          ports:
+            - name: http
+              containerPort: {{ .Values.svcConf.httpServer.port }}
+              protocol: TCP
+            - name: metrics
+              containerPort: {{ .Values.svcConf.metrics.port }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.svcConf.httpServer.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+            successThreshold: 1
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.svcConf.httpServer.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 5
+            successThreshold: 1
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: conf
+              mountPath: /app/etc
+      volumes:
+        - name: conf
+          configMap:
+            name: {{ include "bkms-server.configCMName" . }}
+      {{- include "bkms-server.imagePullSecrets" . | nindent 6 }}

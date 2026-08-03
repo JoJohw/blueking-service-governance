@@ -1,0 +1,30 @@
+meta {
+  name: env-get-effective
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{serviceURL}}/apps/{{annotationsAppID}}/envs/test/app-spec/annotations/effective
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return key-level merged effective annotations", () => {
+    // default {desc:..., version:v1} merged with env {version:v2, region:sh}
+    expect(res.body.data.annotations.version).to.equal("v2");
+    expect(res.body.data.annotations.region).to.equal("sh");
+    expect(res.body.data.annotations.desc).to.contains("@#$%^&*");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,68 @@
+meta {
+  name: create-build
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{serviceURL}}/apps/{{testBuildTrpcAppID}}/builds
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "branch": "main",
+    "imageTag": "v1.0.0"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  // Save build ID and pipeline ID for later tests
+  if (res.body && res.body.data) {
+    if (res.body.data.buildID) {
+      bru.setVar('testBuildID', res.body.data.buildID);
+      console.log("Created build ID:", res.body.data.buildID);
+    }
+    if (res.body.data.pipelineID) {
+      bru.setVar('testPipelineID', res.body.data.pipelineID);
+      console.log("Created pipeline ID:", res.body.data.pipelineID);
+    }
+  }
+}
+
+tests {
+  console.log(res.body);
+  
+  test("should create build successfully", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('object');
+  });
+  
+  test("should return build record with required fields", () => {
+    expect(res.body.data.pipelineID).to.be.a('string');
+    expect(res.body.data.buildID).to.be.a('string');
+    expect(res.body.data.status).to.be.a('string');
+    expect(res.body.data.params).to.be.a('object');
+  });
+  
+  test("should have valid build record structure", () => {
+    const buildRecord = res.body.data;
+    expect(buildRecord).to.have.property('pipelineID');
+    expect(buildRecord).to.have.property('buildID');
+    expect(buildRecord).to.have.property('status');
+    expect(buildRecord).to.have.property('revision');
+    expect(buildRecord.params.BKMS_IMAGE_TAG).to.equal('v1.0.0')
+    expect(buildRecord.revision).to.equal('main');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

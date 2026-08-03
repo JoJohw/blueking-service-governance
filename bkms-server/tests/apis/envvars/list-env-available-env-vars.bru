@@ -1,0 +1,65 @@
+meta {
+  name: list-env-available-env-vars
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{serviceURL}}/envs/{{envvarsEnvID}}/available-env-vars
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should list deduplicated available env vars for the environment", () => {
+    const ret = res.body.data;
+
+    expect(ret).to.be.an("array");
+    expect(ret.length).to.be.greaterThan(0);
+
+    // This endpoint returns the effective variable set for creating apps without
+    // an app context, so every key should appear only once after priority-based
+    // deduplication.
+    const keys = ret.map((item) => item.key);
+    expect(new Set(keys).size).to.equal(keys.length);
+  })
+
+  test("should include builtin, public scoped, and env scoped vars", () => {
+    const ret = res.body.data;
+
+    // Builtin vars come from the environment itself.
+    expect(ret.find((item) => item.key === "BKMS_ENV_NAME").value).to.equal(bru.getVar("envvarsEnvName"));
+
+    // Public scoped vars include workspace/envType scoped variables.
+    expect(ret.find((item) => item.key === bru.getVar("updatedWorkspaceScopedKey")).value).to.equal(
+      bru.getVar("updatedWorkspaceScopedValue")
+    );
+
+    // Env scoped vars are also available because this API targets a concrete env.
+    expect(ret.find((item) => item.key === bru.getVar("envScopedOrderKey")).value).to.equal(
+      bru.getVar("envScopedOrderValue")
+    );
+  })
+
+  test("should keep only the higher priority env scoped value for duplicated keys", () => {
+    const ret = res.body.data;
+
+    // create-env-scoped-env-var intentionally reuses envTypeScopedKey. The env
+    // scoped value has higher priority than the envType scoped value, so only the
+    // env scoped value should remain in the deduplicated response.
+    const conflictedVars = ret.filter((item) => item.key === bru.getVar("envTypeScopedKey"));
+
+    expect(conflictedVars).to.have.length(1);
+    expect(conflictedVars[0].value).to.equal(bru.getVar("envScopedValue"));
+    expect(conflictedVars[0].description).to.equal(bru.getVar("envScopedDescription"));
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,41 @@
+meta {
+  name: create-app-component-ref-workspace
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{serviceURL}}/apps/{{componentsTrpcAppID}}/components
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "refWorkspaceCompName": "{{appComponentWorkspaceCompName}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  // Save component name for later tests
+  if (res.body.data.name) {
+    bru.setVar('testAppCompRefName', res.body.data.name);
+  }
+}
+
+tests {
+  test("should create app component successfully (reference workspace component)", () => {
+    console.log(res.body)
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

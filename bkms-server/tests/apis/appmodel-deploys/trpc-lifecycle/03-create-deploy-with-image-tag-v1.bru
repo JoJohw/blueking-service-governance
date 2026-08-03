@@ -1,0 +1,57 @@
+meta {
+  name: 03-create-deploy-with-image-tag-v1
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{serviceURL}}/apps/{{trpcLifecycleAppID}}/envs/{{trpcLifecycleEnvName}}/trpc-deploys
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "imageTag": "{{trpcLifecycleImageTag1}}",
+    "replicas": 1
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  if (res.status !== 200) {
+    return;
+  }
+
+  // Wait until the v1 GameDeployment converges to a terminal state. We expect
+  // `deployed` here, but the helper recognises `failed`/`uninstalled` as
+  // terminal too so the assertion below can fail fast on a regression.
+  const appmodel = require("./helpers/appmodel");
+
+  const record = await appmodel.waitForAppModelDeployTerminal({
+    kind: "trpc",
+    appID: bru.getVar("trpcLifecycleAppID"),
+    envName: bru.getVar("trpcLifecycleEnvName"),
+    expectedStatus: "deployed",
+    imageTag: bru.getVar("trpcLifecycleImageTag1")
+  });
+  bru.setVar("trpcLifecycleFirstDeployID", record.id);
+  bru.setVar("trpcLifecycleFirstDeployStatus", record.status);
+}
+
+tests {
+  test("should create the v1 trpc-deploy and converge to deployed", () => {
+    expect(res.body).to.deep.equal({});
+    expect(bru.getVar("trpcLifecycleFirstDeployID")).to.be.a("string").and.not.empty;
+    expect(bru.getVar("trpcLifecycleFirstDeployStatus")).to.equal("deployed");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 70000
+}

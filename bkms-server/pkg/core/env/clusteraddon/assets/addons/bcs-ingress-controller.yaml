@@ -1,0 +1,21 @@
+name: bcs-ingress-controller
+displayName: bcs-ingress-controller
+description: 蓝鲸容器服务扩展 Ingress，多云环境下为 GameServer 提供灵活的流量接入方式
+chartInfo:
+  chartName: bcsingresscontroller
+  releaseName: bcsingresscontroller
+  defaultNamespace: bcs-system
+  exampleValues: |
+    # tencent cloud region, set as k8s cluster region
+    tencentcloudRegion: ap-shenzhen
+    # tencent cloud AccessID after Base64 encoding.
+    # echo -n "<SECRET_ID>" | base64
+    tencentcloudSecretID: xxx
+    # tencent cloud AccessKeyafter Base64 encoding.
+    # echo -n "<SECRET_ID>" | base64
+    tencentcloudSecretKey: xxx
+requiredForAppTypes: 
+  - agones
+optionalForAppTypes:
+  - trpc
+  - taf

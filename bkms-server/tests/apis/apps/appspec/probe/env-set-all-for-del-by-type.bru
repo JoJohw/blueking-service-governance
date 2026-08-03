@@ -1,0 +1,50 @@
+meta {
+  name: env-set-all-for-del-by-type
+  type: http
+  seq: 14
+}
+
+put {
+  url: {{serviceURL}}/apps/{{probeAppID}}/envs/{{testEnv}}/app-spec/probe
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecProbe": {
+      "liveness": {
+        "probeHandler": {
+          "type": "HTTP",
+          "url": "http://localhost/env-health",
+          "port": 8080
+        },
+        "periodSeconds": 15
+      },
+      "readiness": {
+        "probeHandler": {
+          "type": "EXEC",
+          "command": ["test", "-f", "/tmp/ready"]
+        },
+        "timeoutSeconds": 5
+      },
+      "startup": {
+        "probeHandler": {
+          "type": "TCP",
+          "port": 3306
+        },
+        "failureThreshold": 30
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

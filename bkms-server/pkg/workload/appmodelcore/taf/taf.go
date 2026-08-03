@@ -1,0 +1,166 @@
+// Package taf converts TAF application inputs into application models and specifications.
+package taf
+
+import (
+	"context"
+
+	"github.com/jinzhu/copier"
+	"github.com/pkg/errors"
+
+	bkmsapp "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/app"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/app/appcfg"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/appmodel"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/appspec"
+)
+
+// CreateParams 创建 TAF 应用的参数
+type CreateParams struct {
+	// Command 容器启动命令
+	Command []string
+	// Args 容器启动参数
+	Args []string
+	// EnvVars 容器环境变量
+	EnvVars []appmodel.Variable
+	// TafConfig TAF 特有配置
+	TafConfig *TafConfigParams
+}
+
+// TafConfigParams TAF 配置参数
+type TafConfigParams struct {
+	// FileName 配置文件名
+	FileName string
+	// FilePath 配置文件路径
+	FilePath string
+	// FileContent 配置文件内容
+	FileContent string
+}
+
+// UpdateParams 更新 TAF 应用的参数
+type UpdateParams struct {
+	// Command 容器启动命令
+	Command []string
+	// Args 容器启动参数
+	Args []string
+	// TafConfig TAF 特有配置
+	TafConfig *TafConfigParams
+}
+
+// Service TAF 应用服务
+type Service struct {
+	appModelStore        appmodel.AppModelStore
+	appStore             bkmsapp.ApplicationStore
+	appConfigFileService *appcfg.AppConfigFileService
+}
+
+// NewService 创建服务实例
+func NewService(
+	appModelStore appmodel.AppModelStore,
+	appConfigFileStore appcfg.AppConfigFileStore,
+	appConfigFileVersionStore appcfg.AppConfigFileVersionStore,
+	appStore bkmsapp.ApplicationStore,
+) *Service {
+	return &Service{
+		appModelStore:        appModelStore,
+		appStore:             appStore,
+		appConfigFileService: appcfg.NewAppConfigFileService(appConfigFileStore, appConfigFileVersionStore),
+	}
+}
+
+// Create 创建 TAF 应用资源（AppModel + AppConfigFile + App）
+func (s *Service) Create(ctx context.Context, app *bkmsapp.Application, params *CreateParams) error {
+	// 设置配置文件内容
+	var fileContent *string
+	if params.TafConfig != nil && params.TafConfig.FileContent != "" {
+		fileContent = &params.TafConfig.FileContent
+	}
+
+	if _, err := s.appConfigFileService.Create(
+		ctx,
+		appcfg.CreateCfgFileParams{
+			AppID:             app.ID,
+			EnvName:           appcfg.EnvNameDefault,
+			Name:              appcfg.DefaultAppConfigFileName,
+			Type:              appcfg.AppConfigFileTypeNormal,
+			ContentSourceType: appcfg.ContentSourceTypeLocal,
+			Format:            appcfg.FileFormatTAF,
+			Content:           fileContent,
+			Creator:           appcfg.CfgSystemUser,
+			Description:       appcfg.CfgSystemVersionDescription,
+		},
+	); err != nil {
+		return errors.Wrap(err, "create default config file")
+	}
+
+	// 初始化 AppModel
+	appModel := &appmodel.AppModel{
+		AppID: app.ID,
+		Workload: appmodel.Workload{
+			Name:    app.Name,
+			Type:    appmodel.WorkloadTypeTaf,
+			Command: params.Command,
+			Args:    params.Args,
+			EnvVars: params.EnvVars,
+		},
+	}
+
+	// 设置 TAF 配置
+	if params.TafConfig != nil {
+		appModel.Workload.TafConfig = appmodel.TafConfig{
+			FileName: params.TafConfig.FileName,
+			FilePath: params.TafConfig.FilePath,
+		}
+	}
+
+	// 设置默认值
+	appspec.ResetAppModelToDefaultValues(appModel)
+
+	// 创建 AppModel
+	if err := s.appModelStore.CreateAppModel(ctx, appModel); err != nil {
+		return errors.Wrapf(err, "create app(%s) model", app.Name)
+	}
+
+	// 创建应用基础数据
+	if err := s.appStore.CreateApp(ctx, app); err != nil {
+		return errors.Wrap(err, "create app")
+	}
+
+	return nil
+}
+
+// Update 更新 TAF 应用配置，返回 oldModel 和 newModel 供 handler 层进行审计
+func (s *Service) Update(
+	ctx context.Context,
+	app *bkmsapp.Application,
+	params *UpdateParams,
+) (*appmodel.AppModel, *appmodel.AppModel, error) {
+	// 获取应用模型
+	appModel, err := s.appModelStore.GetAppModel(ctx, app.ID)
+	if err != nil {
+		return nil, nil, errors.Wrapf(err, "get app(%s) model", app.Name)
+	}
+
+	// 保存旧模型副本用于审计
+	var oldAppModel appmodel.AppModel
+	if copyErr := copier.Copy(&oldAppModel, appModel); copyErr != nil {
+		return nil, nil, errors.Wrap(copyErr, "copying app model")
+	}
+
+	// 更新 TAF 配置
+	if params.TafConfig != nil {
+		appModel.Workload.TafConfig = appmodel.TafConfig{
+			FileName: params.TafConfig.FileName,
+			FilePath: params.TafConfig.FilePath,
+		}
+	}
+
+	// 更新通用配置
+	appModel.Workload.Command = params.Command
+	appModel.Workload.Args = params.Args
+
+	// 保存更新
+	if err = s.appModelStore.UpdateAppModel(ctx, appModel); err != nil {
+		return nil, nil, errors.Wrapf(err, "update app(%s) model", app.Name)
+	}
+
+	return &oldAppModel, appModel, nil
+}

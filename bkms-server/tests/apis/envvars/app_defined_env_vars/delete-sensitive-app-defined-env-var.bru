@@ -1,0 +1,20 @@
+meta {
+  name: delete-sensitive-app-defined-env-var
+  type: http
+  seq: 12
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{appDefinedEnvVarsAppID}}/env-vars/{{sensitiveAppDefinedEnvVarKey}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

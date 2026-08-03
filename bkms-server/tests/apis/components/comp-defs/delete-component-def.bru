@@ -1,0 +1,27 @@
+meta {
+  name: delete-component-def
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{serviceURL}}/component-defs/{{testCompDefName}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete component definition successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

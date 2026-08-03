@@ -1,0 +1,21 @@
+.DS_Store
+.vite-ssg-dist
+.vite-ssg-temp
+*.local
+dist
+dist-ssr
+node_modules
+.idea/
+*.log
+cypress/downloads
+
+# E2E：playwright-bdd 生成 spec、Playwright 运行产物（trace 等）
+.features-gen/
+test-results/
+.auth/
+mocks.json
+
+pre-*-bkcodeai
+.env.development
+.env.test
+tsconfig.tsbuildinfo

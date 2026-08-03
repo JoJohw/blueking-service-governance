@@ -1,0 +1,54 @@
+meta {
+  name: list-apps-after-create
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/apps
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should list all apps in workspace", () => {
+    expect(res.body.data).to.be.an('array');
+    expect(res.body.data.length).to.be.greaterThanOrEqual(2);
+    
+    // Check that all apps belong to the correct workspace
+    const expectedWorkspaceID = bru.getVar('appsListWorkspaceID');
+    res.body.data.forEach(app => {
+      expect(app.workspaceID).to.equal(expectedWorkspaceID);
+      expect(app).to.have.property('id');
+      expect(app).to.have.property('name');
+      expect(app).to.have.property('type');
+      expect(app).to.have.property('displayName');
+      expect(app).to.have.property('creator')
+    });
+    
+    // Verify the Helm app we created is in the list
+    const helmApp = res.body.data.find(app => app.name === bru.getVar('newHelmAppName'));
+    expect(helmApp).to.not.be.undefined;
+    expect(helmApp.type).to.equal('helm');
+    
+    // Verify the tRPC app we created is in the list
+    const trpcApp = res.body.data.find(app => app.name === bru.getVar('newTrpcAppName'));
+    expect(trpcApp).to.not.be.undefined;
+    expect(trpcApp.type).to.equal('trpc');
+    
+    // Verify we have different types of apps
+    const appTypes = [...new Set(res.body.data.map(app => app.type))];
+    expect(appTypes).to.include('helm');
+    expect(appTypes).to.include('trpc');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

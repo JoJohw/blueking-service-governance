@@ -1,0 +1,25 @@
+# A test component 
+name: MemLimits
+version: v1.0.0
+displayName: 内存限制
+description: 限制容器对内存的使用上限
+properties:
+- name: memoryLimit
+  type: STRING
+  defaultValue: 2Gi
+- name: memoryRequest
+  type: STRING
+  defaultValue: 1Gi
+patchers:
+- |-
+  spec:
+    template:
+      spec:
+        containers:
+          - name: web
+            resources:
+              requests:
+                memory: "{{ .memoryRequest }}"
+              limits:
+                memory: "{{ .memoryLimit }}"
+specs: []

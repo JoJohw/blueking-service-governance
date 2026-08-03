@@ -1,0 +1,27 @@
+meta {
+  name: delete-component-def-workspace
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{serviceURL}}/component-defs/{{testWsCompDefName}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete workspace-scoped component definition successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

@@ -1,0 +1,28 @@
+meta {
+  name: get-default-after-update
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/apps/{{annotationsAppID}}/app-spec/default-annotations
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the updated default annotations", () => {
+    expect(res.body.data.annotations.version).to.equal("v1");
+    expect(res.body.data.annotations.desc).to.contains("@#$%^&*");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

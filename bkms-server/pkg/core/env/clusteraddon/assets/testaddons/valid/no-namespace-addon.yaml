@@ -1,0 +1,5 @@
+name: no-namespace-addon
+chartInfo:
+  chartName: no-namespace-chart
+requiredForAppTypes: []
+optionalForAppTypes: []

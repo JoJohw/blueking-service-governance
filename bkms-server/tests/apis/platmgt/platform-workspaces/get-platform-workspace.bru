@@ -1,0 +1,43 @@
+meta {
+  name: get-platform-workspace
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/plat-mgt/workspaces/{{platMgtWorkspaceID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const seedUser = bru.getVar("platAdminSeedUser");
+  req.setHeader("X-Bk-Authed-User-Info", JSON.stringify({
+    userId: seedUser,
+  }));
+  req.setHeader("X-Bk-Authed-User-Credential", '{"bkTicket":"xxx"}');
+}
+
+tests {
+  test("should get one platform workspace detail", () => {
+    expect(res.body.data).to.be.an("object");
+    expect(res.body.data.id).to.equal(bru.getVar("platMgtWorkspaceID"));
+    expect(res.body.data).to.have.property("displayName");
+    expect(res.body.data).to.have.property("description");
+    expect(res.body.data).to.have.property("state");
+    expect(res.body.data).to.have.property("creator");
+    expect(res.body.data).to.have.property("createdAt");
+    expect(res.body.data).to.have.property("updater");
+    expect(res.body.data).to.have.property("updatedAt");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

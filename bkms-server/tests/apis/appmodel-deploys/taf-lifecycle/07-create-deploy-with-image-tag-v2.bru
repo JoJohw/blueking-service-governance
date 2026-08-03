@@ -1,0 +1,60 @@
+meta {
+  name: 07-create-deploy-with-image-tag-v2
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{serviceURL}}/apps/{{tafLifecycleAppID}}/envs/{{tafLifecycleEnvName}}/taf-deploys
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "imageTag": "{{tafLifecycleImageTag2}}",
+    "replicas": 2
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  if (res.status !== 200) {
+    return;
+  }
+
+  const appmodel = require("./helpers/appmodel");
+
+  const record = await appmodel.waitForAppModelDeployTerminal({
+    kind: "taf",
+    appID: bru.getVar("tafLifecycleAppID"),
+    envName: bru.getVar("tafLifecycleEnvName"),
+    expectedStatus: "deployed",
+    imageTag: bru.getVar("tafLifecycleImageTag2"),
+    excludeID: bru.getVar("tafLifecycleFirstDeployID")
+  });
+  bru.setVar("tafLifecycleSecondDeployID", record.id);
+  bru.setVar("tafLifecycleSecondDeployStatus", record.status);
+  bru.setVar("tafLifecycleSecondDeployReplicas", record.replicas);
+}
+
+tests {
+  test("should create the v2 taf-deploy distinct from v1 and converge to deployed", () => {
+    expect(res.body).to.deep.equal({});
+    const v1 = bru.getVar("tafLifecycleFirstDeployID");
+    const v2 = bru.getVar("tafLifecycleSecondDeployID");
+    expect(v2).to.be.a("string").and.not.empty;
+    expect(v2).to.not.equal(v1);
+    expect(bru.getVar("tafLifecycleSecondDeployStatus")).to.equal("deployed");
+    expect(parseInt(bru.getVar("tafLifecycleSecondDeployReplicas"), 10)).to.equal(2);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 70000
+}

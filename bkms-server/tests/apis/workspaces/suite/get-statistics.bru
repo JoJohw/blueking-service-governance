@@ -1,0 +1,33 @@
+meta {
+  name: get-statistics
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/user-statistics
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.data.workspaceCount: isNotEmpty
+  res.body.data.appCount: isNotEmpty
+  res.body.data.workspaceStatistics.length: gt 0
+  res.body.data.workspaceStatistics[0].workspaceID: neq ""
+  res.body.data.workspaceStatistics[0].appCount: isNotEmpty
+  res.body.data.workspaceStatistics[0].envCount: isNotEmpty
+}
+
+tests {
+  console.log(res.body)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+  followRedirects: true
+  maxRedirects: 5
+}

@@ -1,0 +1,26 @@
+meta {
+  name: version
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{rootURL}}/version
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.data: isJson
+  res.body.data.version: isString
+  res.body.data.gitHash: isString
+  res.body.data.buildTime: isString
+  res.body.data.goVersion: isString
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

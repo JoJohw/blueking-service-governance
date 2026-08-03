@@ -1,0 +1,42 @@
+meta {
+  name: create-base-file
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/apps/{{previewMergeAppID}}/app-config-files
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "base-values-{{randomSuffix}}",
+    "type": "normal",
+    "contentSourceType": "local",
+    "fileFormat": "yaml",
+    "versionDescription": "初始版本"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  bru.setVar('previewBaseFileID', res.body.item.id);
+}
+
+tests {
+  test("should create normal app config file", () => {
+    expect(res.body.item.type).to.equal('normal');
+    expect(res.body.item.contentSourceType).to.equal('local');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

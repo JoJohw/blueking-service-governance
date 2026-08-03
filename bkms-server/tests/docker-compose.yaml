@@ -1,0 +1,282 @@
+# Self-contained docker-compose stack for the Bruno API tests.
+#
+# Highlights:
+#   - Drives the entire E2E flow including helm-deploy lifecycle (single stack).
+#   - Independent compose project name is supplied by `docker-compose -p bkms-apitest`,
+#     with network `bkms-apitest-net` and host port 32402 so it never clashes
+#     with the unit-test deps stacks (`tests/utdeps/`, `tests/utdeps_db/`).
+#   - Reuses `tests/configs/config.yaml` unchanged. The host kubeconfig is
+#     mounted at `/app/etc/kubeconfig` (referenced by
+#     `development.stubKubeConfigPath`) and `kubernetes.default` is routed to
+#     the host gateway via `extra_hosts`, so the bkms-server / worker
+#     containers can reach the kind apiserver running on the host.
+#
+# Required / tunable env vars (defaults applied below):
+#   BKMS_SERVER_IMAGE           bkms-server image under test (default: bkms-server:latest)
+#   BKMS_APITEST_KUBECONFIG     absolute path to the host kubeconfig
+#                                (just up defaults to ${HOME}/.kube/config)
+#   BKMS_APITEST_WORKLOAD_IMAGE required when RUN_HELM_DEPLOY_API_TESTS,
+#                                RUN_TRPC_DEPLOY_API_TESTS or
+#                                RUN_TAF_DEPLOY_API_TESTS is set; the value
+#                                must be the *tag-less* image repository
+#                                `<registry>/<name>` (e.g.
+#                                `example.com/bkms/apitest-workload`). The
+#                                target K8s cluster must be able to pull the
+#                                `<repo>:1.0.0` and `<repo>:2.0.0` tags, and
+#                                each image must contain the `sleep` command
+#
+# K8s reachability: the apiserver referenced by the kubeconfig must be
+# reachable from inside the compose network. `kubernetes.default` is mapped to
+# `host-gateway` via `extra_hosts`, so the apiserver only needs to be bound to
+# a host interface the docker bridge can reach (e.g. `0.0.0.0:<port>` or any
+# non-loopback host IP).
+#
+# Additionally, `just up` (Docker mode) best-effort detects a standard Kind
+# cluster whose kubeconfig server is only on host loopback
+# (127.0.0.1/localhost): it rewrites a runtime kubeconfig to the control-plane
+# container (`https://<cluster>-control-plane:6443`) and overlays
+# `docker-compose.kind-loopback.yaml` so bkms-server/worker join the Kind
+# Docker network. See `justfile` `_up` and `scripts/kind-loopback-adapter.sh`.
+
+x-bkms-server-volumes: &bkms-server-volumes
+  - ./configs/config.yaml:/app/etc/config.yaml:ro
+  - ${BKMS_APITEST_KUBECONFIG:-/root/.kube/config.ctx_bkms_apitest}:/app/etc/kubeconfig:ro
+
+x-bkms-server-extra-hosts: &bkms-server-extra-hosts
+  - "kubernetes.default:${BKMS_APITEST_KUBERNETES_HOST:-host-gateway}"
+
+services:
+  ##############################################################################
+  # bkms-server (under test)
+  ##############################################################################
+  bkms-server:
+    #
+    # 说明：在本地开发环境中构建包含最新代码变更的 bkms-server 镜像；
+    # 创建 `.env` 文件并设置 BKMS_SERVER_IMAGE 变量，例如：
+    #
+    #  BKMS_SERVER_IMAGE=bkms-server:0.0.1-my-dev-alpha.1
+    #
+    image: ${BKMS_SERVER_IMAGE:-bkms-server:latest}
+    command:
+      - bkms-server
+      - webserver
+      - --srvCfg
+      - /app/etc/config.yaml
+    volumes: *bkms-server-volumes
+    extra_hosts: *bkms-server-extra-hosts
+    depends_on:
+      mongo:
+        condition: service_healthy
+      mongo-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      chartmuseum-init:
+        condition: service_completed_successfully
+      migration:
+        condition: service_completed_successfully
+      chartmuseum:
+        condition: service_healthy
+    ports:
+      - "32402:32402"
+    networks:
+      - bkms-apitest-net
+
+  bkms-worker:
+    image: ${BKMS_SERVER_IMAGE:-bkms-server:latest}
+    command:
+      - bkms-server
+      - worker
+      - --srvCfg
+      - /app/etc/config.yaml
+    volumes: *bkms-server-volumes
+    extra_hosts: *bkms-server-extra-hosts
+    depends_on:
+      mongo:
+        condition: service_healthy
+      mongo-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+      chartmuseum:
+        condition: service_healthy
+    networks:
+      - bkms-apitest-net
+
+  ################################################
+  # 数据迁移服务：加载内置组件定义
+  # 在 bkms-server 启动前执行一次
+  ################################################
+  migration:
+    image: ${BKMS_SERVER_IMAGE:-bkms-server:latest}
+    command:
+      - bkms-server
+      - load_builtin_component
+      - --srvCfg
+      - /app/etc/config.yaml
+      - --folderPath
+      - /app/assets/comps
+    volumes:
+      - ./configs/config.yaml:/app/etc/config.yaml:ro
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - bkms-apitest-net
+
+  ################################################
+  # Bruno E2E 测试服务：对 bkms-server 执行接口测试
+  ################################################
+  e2e:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bkms-server-e2e:latest
+    environment:
+      RUN_HELM_DEPLOY_API_TESTS: "${RUN_HELM_DEPLOY_API_TESTS:-}"
+      RUN_TRPC_DEPLOY_API_TESTS: "${RUN_TRPC_DEPLOY_API_TESTS:-}"
+      RUN_TAF_DEPLOY_API_TESTS: "${RUN_TAF_DEPLOY_API_TESTS:-}"
+      BKMS_APITEST_WORKLOAD_IMAGE: "${BKMS_APITEST_WORKLOAD_IMAGE:-}"
+    networks:
+      - bkms-apitest-net
+    depends_on:
+      bkms-server:
+        condition: service_started
+      bkms-worker:
+        condition: service_started
+      mongo-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./apis:/app/apis
+    stop_grace_period: 3s
+
+  #####################
+  # 依赖服务
+  #####################
+  # 为方便起见，所有服务的密码统一设置为 "bkms_svr_e2e"。
+
+  mongo:
+    image: "mongo:8.0.9"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: bkms_svr_e2e
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --quiet 'mongodb://root:bkms_svr_e2e@localhost:27017/admin?authSource=admin' --eval 'db.adminCommand({ ping: 1 }).ok' | grep 1",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - bkms-apitest-net
+  mongo-init:
+    image: "mongo:8.0.9"
+    restart: "no"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - bkms-apitest-net
+    volumes:
+      - ./utdeps/mongo/mongo-init.js:/opt/init/mongo-init.js:ro
+    entrypoint:
+      - mongosh
+      - mongodb://root:bkms_svr_e2e@mongo:27017/admin?authSource=admin
+      - /opt/init/mongo-init.js
+  redis:
+    image: "redis:7.4.5"
+    command: redis-server --requirepass bkms_svr_e2e
+    networks:
+      - bkms-apitest-net
+
+  rabbitmq:
+    image: "rabbitmq:3.13.7-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: bkms_svr_e2e
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "rabbitmq-diagnostics -q ping && rabbitmq-diagnostics -q listeners | grep -q 'port: 5672'",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - bkms-apitest-net
+
+  ##############################################################################
+  # Helm chart repository (chartmuseum)
+  #   chartmuseum-init packages the API-test fixture chart into the named volume
+  #   `bkms-apitest-charts` and runs `helm repo index` so chartmuseum serves a
+  #   complete repo without depending on a host-installed `helm` CLI.
+  #
+  #   Packages multiple versions (0.1.0 / 0.2.0 / 1.0.0) of the same `sample-app`
+  #   chart so the helm-chart-builds API tests can list/download chart artifacts
+  #   without depending on an external repo (e.g. bitnami) which is flaky in CI.
+  #   NOTE: 0.1.0 must remain available — the helm-deploys lifecycle suite
+  #   hard-codes that version.
+  ##############################################################################
+  chartmuseum-init:
+    image: alpine/helm:3.14.4
+    restart: "no"
+    entrypoint: [ "/bin/sh", "-c" ]
+    command:
+      - |
+        set -eu
+        rm -f /charts/*.tgz /charts/index.yaml
+        for v in 0.1.0 0.2.0 1.0.0; do
+          src=/tmp/sample-app-$$v
+          rm -rf "$$src"
+          cp -r /seed/sample-app "$$src"
+          sed -i "s/^version:.*/version: $$v/" "$$src/Chart.yaml"
+          helm package "$$src" --destination /charts
+        done
+        helm repo index /charts
+        ls -la /charts
+    volumes:
+      - ./apis/fixtures/charts:/seed:ro
+      - apitest-charts:/charts
+    networks:
+      - bkms-apitest-net
+
+  chartmuseum:
+    image: ghcr.io/helm/chartmuseum:v0.15.0
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      STORAGE: local
+      STORAGE_LOCAL_ROOTDIR: /charts
+      DISABLE_API: "false"
+    volumes:
+      - apitest-charts:/charts:ro
+    depends_on:
+      chartmuseum-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8080/health || exit 1" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - bkms-apitest-net
+
+networks:
+  bkms-apitest-net:
+    name: bkms-apitest-net
+    driver: bridge
+
+volumes:
+  apitest-charts:
+    name: bkms-apitest-charts

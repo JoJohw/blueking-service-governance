@@ -1,0 +1,54 @@
+meta {
+  name: set-default-sh-command-empty-should-fail
+  type: http
+  seq: 23
+}
+
+put {
+  url: {{serviceURL}}/apps/{{probeAppID}}/app-spec/default-probe
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecProbe": {
+      "liveness": {
+        "probeHandler": {
+          "type": "EXEC",
+          "shCommand": ""
+        },
+        "initialDelaySeconds": 1
+      },
+      "readiness": {
+        "probeHandler": {
+          "type": "EXEC",
+          "command": ["true"]
+        }
+      },
+      "startup": {
+        "probeHandler": {
+          "type": "TCP",
+          "port": 3306
+        }
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should return structured error", () => {
+    expect(res.body.error).to.be.an("object");
+    expect(res.body.error.message).to.be.a("string").that.is.not.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

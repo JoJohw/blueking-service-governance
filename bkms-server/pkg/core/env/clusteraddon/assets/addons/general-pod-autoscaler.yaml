@@ -1,0 +1,21 @@
+name: general-pod-autoscaler
+displayName: general-pod-autoscaler
+description: GeneralPodAutoscaler 支持更多模式自动扩缩副本数
+chartInfo:
+  chartName: bcs-general-pod-autoscaler
+  # 和 BCS 组件库命名保持一致
+  releaseName: general-pod-autoscaler
+  defaultNamespace: bcs-system
+  exampleValues: |
+    timezone: Asia/Shanghai
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 2048Mi
+      requests:
+        cpu: 500m
+        memory: 512Mi
+requiredForAppTypes: []
+optionalForAppTypes:
+  - trpc
+  - taf

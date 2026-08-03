@@ -1,0 +1,27 @@
+meta {
+  name: delete-workspace-component
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/components/{{testWorkspaceCompName}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete workspace component successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

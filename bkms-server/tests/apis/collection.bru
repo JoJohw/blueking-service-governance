@@ -1,0 +1,9 @@
+script:pre-request {
+  // Set the auth header to force authenticated as "api-test-user"
+  req.setHeader('X-Bk-Authed-User-Info', '{"userId":"api-test-user"}')
+  req.setHeader('X-Bk-Authed-User-Credential', '{"bkTicket": "xxx"}')
+  
+  // Create a random suffix to avoid conflicts when creating the resources
+  const randomSuffix = Math.random().toString(36).substring(2, 8);
+  bru.setVar('randomSuffix', randomSuffix);
+}

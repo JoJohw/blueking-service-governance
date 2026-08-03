@@ -1,0 +1,21 @@
+{
+  "system_id": "{{ .BKMSSystemID }}",
+  "enabled": true,
+  "operations": [
+    {
+      "operation": "upsert_system",
+      "data": {
+        "id": "{{ .BKMSSystemID }}",
+        "name": "服务治理平台",
+        "name_en": "BKMS",
+        "description": "服务治理平台",
+        "description_en": "bkms",
+        "clients": "{{ .APP_CODE }}",
+        "provider_config": {
+          "host": "{{ .BKMS_HOST }}",
+          "auth": "basic"
+        }
+      }
+    }
+  ]
+}

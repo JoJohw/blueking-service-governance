@@ -1,0 +1,143 @@
+---
+# Source: awesome-store/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: awesome-store-config
+  labels:
+    app.kubernetes.io/name: awesome-store
+    app.kubernetes.io/component: web
+data:
+  app.conf: |
+    server.port=8080
+    server.host=0.0.0.0
+---
+# Source: awesome-store/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: awesome-store-secret
+  labels:
+    app.kubernetes.io/name: awesome-store
+    app.kubernetes.io/component: web
+type: Opaque
+data:
+  db-password: ""
+---
+# Source: awesome-store/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: awesome-store-web
+  labels:
+    app.kubernetes.io/name: awesome-store
+    app.kubernetes.io/component: web
+---
+# Source: awesome-store/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: awesome-store-web
+  labels:
+    app.kubernetes.io/name: awesome-store
+    app.kubernetes.io/component: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: awesome-store
+      app.kubernetes.io/component: web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: awesome-store
+        app.kubernetes.io/component: web
+    spec:
+      serviceAccountName: awesome-store-web
+      containers:
+        - name: web
+          image: nginx:1.25
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: awesome-store-secret
+                  key: db-password
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/awesome-store
+            - name: secret-volume
+              mountPath: /etc/awesome-store-secret
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: awesome-store-config
+        - name: secret-volume
+          secret:
+            secretName: awesome-store-secret
+---
+# Source: awesome-store/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: awesome-store-web
+  labels:
+    app.kubernetes.io/name: awesome-store
+    app.kubernetes.io/component: web
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: awesome-store
+    app.kubernetes.io/component: web
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+---
+# Source: awesome-store/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: awesome-store-web
+  labels:
+    app.kubernetes.io/name: awesome-store
+    app.kubernetes.io/component: web
+spec:
+  rules:
+    - host: awesome-store.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: awesome-store-web
+                port:
+                  number: 80
+---
+# Source: awesome-store/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: awesome-store-web
+  labels:
+    app.kubernetes.io/name: awesome-store
+    app.kubernetes.io/component: web
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: awesome-store-web
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80

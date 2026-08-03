@@ -1,0 +1,29 @@
+meta {
+  name: list-services-1
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/apps/{{networkingHelmAppID}}/services
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return the right response", () => {
+    const ret = res.body.data[0]
+    
+    expect(ret.selector.app).to.equal(bru.getVar("networkingHelmAppID"));
+    expect(ret.ports[0].name).to.equal("api")
+    })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

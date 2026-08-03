@@ -1,0 +1,47 @@
+package instance
+
+import "github.com/gin-gonic/gin"
+
+// Handler contains views required by app instance Gin routes.
+type Handler interface {
+	ListAppInstances(c *gin.Context)
+	UpdateAppInstances(c *gin.Context)
+	ScaleAppInstances(c *gin.Context)
+	BatchDeleteAppInstances(c *gin.Context)
+	UpdateAppInstancePolaris(c *gin.Context)
+	CreateAppInstanceWebConsole(c *gin.Context)
+	ListAppInstanceLogs(c *gin.Context)
+	ListEvents(c *gin.Context)
+	ListTrpcAdminCmds(c *gin.Context)
+	ExecuteTrpcAdminCmd(c *gin.Context)
+	ExecuteTafAdminCmd(c *gin.Context)
+	PortForward(c *gin.Context)
+}
+
+// Register 注册应用实例相关 Gin 路由。
+func Register(rg *gin.RouterGroup, h Handler) {
+	// 获取应用实例列表
+	rg.GET("/apps/:appID/envs/:envName/instances", h.ListAppInstances)
+	// 更新应用实例（支持单/多/全量实例更新）
+	rg.PUT("/apps/:appID/envs/:envName/instances", h.UpdateAppInstances)
+	// 扩缩容应用实例数量
+	rg.PUT("/apps/:appID/envs/:envName/instances/operations/scale", h.ScaleAppInstances)
+	// 批量删除指定的应用实例，同时缩容副本数量
+	rg.POST("/apps/:appID/envs/:envName/instances/operations/batch_delete", h.BatchDeleteAppInstances)
+	// 更新应用实例的北极星注解（权重 / 隔离）
+	rg.PUT("/apps/:appID/envs/:envName/instances/operations/polaris", h.UpdateAppInstancePolaris)
+	// 创建应用运行实例（Pod）WebConsole
+	rg.POST("/apps/:appID/envs/:envName/instances/:instanceID/web-console", h.CreateAppInstanceWebConsole)
+	// 获取应用运行实例（Pod）日志
+	rg.GET("/apps/:appID/envs/:envName/instances/:instanceID/logs", h.ListAppInstanceLogs)
+	// 获取指定环境的事件列表
+	rg.GET("/apps/:appID/envs/:envName/events", h.ListEvents)
+	// 查询 Trpc 管理命令
+	rg.GET("/apps/:appID/envs/:envName/instances/admin-cmds", h.ListTrpcAdminCmds)
+	// 执行 Trpc 管理命令
+	rg.POST("/apps/:appID/envs/:envName/instances/admin-cmds", h.ExecuteTrpcAdminCmd)
+	// 执行 TAF 管理命令
+	rg.POST("/apps/:appID/envs/:envName/instances/taf-admin-cmds", h.ExecuteTafAdminCmd)
+	// 应用实例端口转发
+	rg.GET("/apps/:appID/envs/:envName/instances/:instanceID/port-forward/connect", h.PortForward)
+}

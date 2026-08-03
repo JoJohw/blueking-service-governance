@@ -1,0 +1,56 @@
+{{- if .Values.tempAdminCleanup.enabled }}
+{{- $cronJobName := printf "%s-%s" (include "bkms-server.fullname" .) "workspace-temp-admin-cleanup" | trunc 63 | trimSuffix "-" }}
+apiVersion: {{ include "common.capabilities.cronjob.apiVersion" . }}
+kind: CronJob
+metadata:
+  name: {{ $cronJobName }}
+  labels:
+    {{- include "bkms-server.labels" . | nindent 4 }}
+    app.kubernetes.io/component: workspace-temp-admin-cleanup
+spec:
+  schedule: {{ .Values.tempAdminCleanup.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  startingDeadlineSeconds: 300
+  suspend: false
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels:
+            values-hash: "{{ toYaml .Values | sha256sum | trunc 63 }}"
+            {{- include "bkms-server.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: workspace-temp-admin-cleanup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: workspace-temp-admin-cleanup
+              image: {{ include "bkms-server.image" . }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command:
+                - bkms-server
+              args:
+                - cleanup_expired_workspace_temp_admins
+                - --srvCfg
+                - /app/etc/config.yaml
+              env:
+                - name: POD_IP
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: status.podIP
+                - name: SERVER_NAME
+                  value: "workspace-temp-admin-cleanup"
+              resources:
+                {{- toYaml .Values.tempAdminCleanup.resources | nindent 16 }}
+              volumeMounts:
+                - name: conf
+                  mountPath: /app/etc
+          volumes:
+            - name: conf
+              configMap:
+                name: {{ include "bkms-server.configCMName" . }}
+          {{- include "bkms-server.imagePullSecrets" . | nindent 10 }}
+{{- end }}

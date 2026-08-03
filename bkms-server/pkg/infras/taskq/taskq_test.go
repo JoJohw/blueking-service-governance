@@ -1,0 +1,131 @@
+package taskq
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"time"
+
+	"github.com/hibiken/asynq"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/samber/lo"
+)
+
+type sampleArgs struct {
+	ID   string `json:"id"`
+	Step int    `json:"step"`
+}
+
+var _ = Describe("Test taskq TaskType handler", func() {
+	It("decodes payload into typed args when executed", func() {
+		var got sampleArgs
+		task := NewTaskType[sampleArgs]("decode", func(_ context.Context, a sampleArgs) error {
+			got = a
+			return nil
+		})
+		payload, _ := json.Marshal(sampleArgs{ID: "x", Step: 3})
+		err := task.Handler()(context.Background(), asynq.NewTask("decode", payload))
+		Expect(err).NotTo(HaveOccurred())
+		Expect(got.ID).To(Equal("x"))
+		Expect(got.Step).To(Equal(3))
+	})
+
+	It("wraps StopRetry on bad args payload", func() {
+		task := NewTaskType[sampleArgs]("bad", func(_ context.Context, _ sampleArgs) error { return nil })
+		err := task.Handler()(context.Background(), asynq.NewTask("bad", []byte("not-json")))
+		Expect(err).To(HaveOccurred())
+		// 反序列化失败应停止重试。
+		Expect(errors.Is(err, asynq.SkipRetry)).To(BeTrue())
+	})
+
+	It("wraps StopRetry when handler returns ErrStopRetry", func() {
+		task := NewTaskType[sampleArgs]("skip", func(_ context.Context, _ sampleArgs) error {
+			return fmt.Errorf("bad arg: %w", ErrStopRetry)
+		})
+		payload := lo.Must(json.Marshal(sampleArgs{ID: "a"}))
+		err := task.Handler()(context.Background(), asynq.NewTask("skip", payload))
+		Expect(errors.Is(err, asynq.SkipRetry)).To(BeTrue())
+	})
+
+	It("returns error as-is for retryable failures", func() {
+		task := NewTaskType[sampleArgs]("retry", func(_ context.Context, _ sampleArgs) error {
+			return fmt.Errorf("still running: %w", ErrFixedRetry)
+		})
+		payload := lo.Must(json.Marshal(sampleArgs{ID: "a"}))
+		err := task.Handler()(context.Background(), asynq.NewTask("retry", payload))
+		Expect(err).To(HaveOccurred())
+		// 非 StopRetry, 交由重试策略处理。
+		Expect(errors.Is(err, asynq.SkipRetry)).To(BeFalse())
+		Expect(errors.Is(err, ErrFixedRetry)).To(BeTrue())
+	})
+})
+
+var _ = Describe("Test taskq retry semantics", func() {
+	It("returns fixed interval when error wraps ErrFixedRetry", func() {
+		fn := retryDelayFunc(30 * time.Second)
+		err := fmt.Errorf("still running: %w", ErrFixedRetry)
+		Expect(fn(1, err, asynq.NewTask("x", nil))).To(Equal(30 * time.Second))
+	})
+
+	It("uses default backoff for non-fixed errors", func() {
+		interval := 5 * time.Second
+		fn := retryDelayFunc(interval)
+		// 非 ErrFixedRetry 走默认退避
+		Expect(fn(1, errors.New("transient"), asynq.NewTask("x", nil))).NotTo(Equal(interval))
+	})
+
+	It("wrapStopRetry makes error match asynq.SkipRetry", func() {
+		base := errors.New("terminal")
+		err := wrapStopRetry(base)
+		Expect(errors.Is(err, asynq.SkipRetry)).To(BeTrue())
+		Expect(errors.Is(err, base)).To(BeTrue())
+	})
+})
+
+var _ = Describe("Test taskq NewTask and Enqueue", func() {
+	It("NewTask produces a Task with correct name and serialized payload", func() {
+		tt := NewTaskType[sampleArgs]("test.newtask", func(_ context.Context, _ sampleArgs) error {
+			return nil
+		})
+		task := tt.NewTask(sampleArgs{ID: "abc", Step: 7})
+		Expect(task).NotTo(BeNil())
+		Expect(task.name).To(Equal("test.newtask"))
+		Expect(task.payload).To(ContainSubstring(`"id":"abc"`))
+		Expect(task.payload).To(ContainSubstring(`"step":7`))
+	})
+
+	It("NewTask returns nil for non-serializable args", func() {
+		type bad struct {
+			Ch chan int `json:"ch"`
+		}
+		tt := NewTaskType[bad]("test.bad", func(_ context.Context, _ bad) error {
+			return nil
+		})
+		task := tt.NewTask(bad{Ch: make(chan int)})
+		Expect(task).To(BeNil())
+	})
+
+	It("Enqueue returns error for nil task", func() {
+		err := Enqueue(context.Background(), nil)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("task is nil"))
+	})
+
+	It("Enqueue returns error when client is not initialized", func() {
+		origClient := client
+		client = nil
+		defer func() { client = origClient }()
+
+		tt := NewTaskType[sampleArgs]("test.noclient", func(_ context.Context, _ sampleArgs) error {
+			return nil
+		})
+		task := tt.NewTask(sampleArgs{ID: "x"})
+		Expect(task).NotTo(BeNil())
+
+		err := Enqueue(context.Background(), task)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("client not initialized"))
+	})
+})

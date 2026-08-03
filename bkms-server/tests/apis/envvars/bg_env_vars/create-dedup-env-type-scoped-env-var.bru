@@ -1,0 +1,41 @@
+meta {
+  name: create-dedup-env-type-scoped-env-var
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{bgEnvVarsWorkspaceID}}/scoped-env-vars
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "scopeType": "envType",
+    "scopeValue": "development",
+    "key": "{{bgTestDedupKey}}",
+    "value": "{{bgTestDedupEnvTypeValue}}",
+    "description": "envType scoped duplicated var for bg dedup test",
+    "isSensitive": false
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should create envType scoped duplicated env var", () => {
+    const ret = res.body.data;
+    expect(ret.scopeType).to.equal("envType");
+    expect(ret.scopeValue).to.equal("development");
+    expect(ret.key).to.equal(bru.getVar("bgTestDedupKey"));
+    expect(ret.value).to.equal(bru.getVar("bgTestDedupEnvTypeValue"));
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,38 @@
+meta {
+  name: get-empty-default
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{labelsAppID}}/app-spec/default-labels
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  const suffix = bru.getVar("randomSuffix");
+  const ws = await common.createWorkspace({id: `testws-labels-${suffix}`})
+  bru.setVar("labelsWorkspaceID", ws.id)
+  const appID = `test-labels-${suffix}`;
+  const app = await common.createTrpcApp({id: appID, name: appID, workspaceID: ws.id})
+  bru.setVar("labelsAppID", app.id)
+}
+
+tests {
+  test("should return empty default labels", () => {
+    expect(res.body.data == null || res.body.data.labels == null || Object.keys(res.body.data.labels).length === 0).to.equal(true);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

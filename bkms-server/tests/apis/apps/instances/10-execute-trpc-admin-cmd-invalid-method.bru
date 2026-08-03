@@ -1,0 +1,37 @@
+meta {
+  name: 10-execute-trpc-admin-cmd-invalid-method
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{serviceURL}}/apps/invalid-app/envs/test/instances/admin-cmds
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "instanceIDs": ["pod-1"],
+    "method": "DELETE",
+    "url": "/cmds/loglevel",
+    "params": {},
+    "body": ""
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should restrict Trpc admin command method", () => {
+    expect(res.body.error.code).to.equal("INVALID_REQUEST");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

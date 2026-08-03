@@ -1,0 +1,31 @@
+meta {
+  name: 07-list-app-instance-logs-invalid-tail-lines
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{serviceURL}}/apps/invalid-app/envs/test/instances/pod-1/logs?tailLines=99
+  body: none
+  auth: inherit
+}
+
+params:query {
+  tailLines: 99
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject tailLines below the minimum", () => {
+    expect(res.body.error.code).to.equal("INVALID_REQUEST");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

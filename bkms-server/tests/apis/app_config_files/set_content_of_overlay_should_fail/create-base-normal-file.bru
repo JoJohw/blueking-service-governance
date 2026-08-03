@@ -1,0 +1,41 @@
+meta {
+  name: create-base-normal-file
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/apps/{{valuesOverlayHelmAppID}}/app-config-files
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "vfile-nor-{{randomSuffix}}",
+    "type": "normal",
+    "contentSourceType": "local",
+    "fileFormat": "yaml",
+    "versionDescription": "初始版本"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  bru.setVar('currentBaseVFileID', res.body.item.id);
+}
+
+tests {
+  test("should return the right response", () => {
+    expect(res.body.item.type).to.equal('normal');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

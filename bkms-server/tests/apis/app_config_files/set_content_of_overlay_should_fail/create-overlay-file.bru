@@ -1,0 +1,42 @@
+meta {
+  name: create-overlay-file
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{serviceURL}}/apps/{{valuesOverlayHelmAppID}}/app-config-files
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "vfile-nor-{{randomSuffix}}",
+    "type": "overlay",
+    "contentSourceType": "local",
+    "baseAppConfigFileID": "{{currentBaseVFileID}}",
+    "fileFormat": "yaml",
+    "versionDescription": "初始版本"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  bru.setVar('currentVFileID', res.body.item.id);
+}
+
+tests {
+  test("should return the right response", () => {
+    expect(res.body.item.type).to.equal('overlay');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

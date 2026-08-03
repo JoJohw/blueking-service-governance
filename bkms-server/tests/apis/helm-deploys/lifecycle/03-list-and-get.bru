@@ -1,0 +1,39 @@
+meta {
+  name: 03-list-and-get
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{serviceURL}}/apps/{{helmLifecycleAppID}}/envs/{{helmLifecycleEnvName}}/helm-deploys?page=1&pageSize=10
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should list helm-deploys with the v1 record on top", () => {
+    expect(res.body.data).to.be.an("object");
+    // Historical deploy APIs keep count as a string for compatibility with legacy clients.
+    expect(res.body.data.count).to.be.a("string");
+    expect(parseInt(res.body.data.count, 10)).to.be.greaterThan(0);
+    expect(res.body.data.results).to.be.an("array").and.not.empty;
+
+    const latest = res.body.data.results[0];
+    expect(latest.id).to.equal(bru.getVar("helmLifecycleFirstDeployID"));
+    expect(latest.envName).to.equal(bru.getVar("helmLifecycleEnvName"));
+    expect(latest.chartName).to.equal("sample-app");
+    expect(latest.chartVersion).to.equal(bru.getVar("helmLifecycleChartVersion"));
+    expect(latest.imageTag).to.equal(bru.getVar("helmLifecycleImageTag1"));
+    expect(latest.status).to.equal("deployed");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

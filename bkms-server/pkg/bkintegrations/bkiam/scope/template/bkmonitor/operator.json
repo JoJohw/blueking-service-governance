@@ -1,0 +1,86 @@
+[
+  {
+    "system": "{{ .BKMonitorSystemID }}",
+    "actions": [
+      {
+        "id": "view_business_v2"
+      },
+      {
+        "id": "view_event_v2"
+      },
+      {
+        "id": "view_rule_v2"
+      },
+      {
+        "id": "view_notify_team_v2"
+      },
+      {
+        "id": "view_downtime_v2"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKMonitorSystemID }}",
+        "type": "space",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMonitorSystemID }}",
+              "type": "space",
+              "id": "{{ .SpaceID }}",
+              "name": "{{ .SpaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKMonitorSystemID }}",
+    "actions": [
+      {
+        "id": "view_single_dashboard"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKMonitorSystemID }}",
+        "type": "grafana_dashboard",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMonitorSystemID }}",
+              "type": "space",
+              "id": "{{ .SpaceID }}",
+              "name": "{{ .SpaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKMonitorSystemID }}",
+    "actions": [
+      {
+        "id": "view_apm_application_v2"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKMonitorSystemID }}",
+        "type": "apm_application",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMonitorSystemID }}",
+              "type": "space",
+              "id": "{{ .SpaceID }}",
+              "name": "{{ .SpaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  }
+]

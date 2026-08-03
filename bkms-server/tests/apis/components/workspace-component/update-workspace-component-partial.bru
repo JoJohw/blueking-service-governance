@@ -1,0 +1,35 @@
+meta {
+  name: update-workspace-component-partial
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/components/{{testWorkspaceCompWithEnvScopeName}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "properties": {
+      "weight": 200
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update workspace component partially successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

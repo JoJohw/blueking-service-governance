@@ -1,0 +1,30 @@
+meta {
+  name: 02-get-helm-app
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/apps/{{testAppID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should get app details successfully", () => {
+    expect(res.body.data.name).to.equal(bru.getVar('testAppName'));
+    expect(res.body.data.type).to.equal('helm');
+    expect(res.body.data.helmSpec).to.not.be.undefined;
+    expect(res.body.data.helmSpec.helmSource.helmRepoConfig.chartName).to.equal('test-chart');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

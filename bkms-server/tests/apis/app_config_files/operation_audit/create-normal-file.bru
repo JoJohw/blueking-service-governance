@@ -1,0 +1,42 @@
+meta {
+  name: create-normal-file
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/apps/{{appCfgAuditAppID}}/app-config-files
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "audit-normal-{{randomSuffix}}",
+    "type": "normal",
+    "contentSourceType": "local",
+    "fileFormat": "yaml",
+    "versionDescription": "初始版本"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  bru.setVar("appCfgAuditNormalFileID", res.body.item.id);
+  bru.setVar("appCfgAuditNormalFileName", res.body.item.name);
+}
+
+tests {
+  test("should create normal app config file", () => {
+    expect(res.body.item.type).to.equal("normal");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

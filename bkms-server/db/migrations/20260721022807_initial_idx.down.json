@@ -1,0 +1,233 @@
+[
+  {
+    "dropIndexes": "bkci_projects",
+    "index": [
+      "id_1",
+      "code_1",
+      "workspaceID_1"
+    ]
+  },
+  {
+    "dropIndexes": "bkci_pipeline_templates",
+    "index": [
+      "id_1",
+      "type_1"
+    ]
+  },
+  {
+    "dropIndexes": "bkci_pipelines",
+    "index": [
+      "id_1",
+      "workspaceID_1_type_1"
+    ]
+  },
+  {
+    "dropIndexes": "bkci_repositories",
+    "index": [
+      "id_1_projectCode_1",
+      "workspaceID_1_alias_1"
+    ]
+  },
+  {
+    "dropIndexes": "iam_grade_managers",
+    "index": "workspaceID_1"
+  },
+  {
+    "dropIndexes": "iam_roles",
+    "index": [
+      "id_1",
+      "workspaceID_1_userGroupID_1"
+    ]
+  },
+  {
+    "dropIndexes": "bkrepo_projects",
+    "index": [
+      "id_1",
+      "workspaceID_1"
+    ]
+  },
+  {
+    "dropIndexes": "bkrepo_repositories",
+    "index": "workspaceID_1_type_1"
+  },
+  {
+    "dropIndexes": "build_auto_deploy_records",
+    "index": [
+      "appID_1_buildID_1",
+      "appID_1_envName_1_trafficLaneName_1_createdAt_-1",
+      "appID_1_deployID_1"
+    ]
+  },
+  {
+    "dropIndexes": "helm_chart_build_records",
+    "index": "appID_1_buildID_1"
+  },
+  {
+    "dropIndexes": "build_configs",
+    "index": "appID_1"
+  },
+  {
+    "dropIndexes": "build_records",
+    "index": "appID_1_buildID_1"
+  },
+  {
+    "dropIndexes": "app_config_files",
+    "index": [
+      "appID_1_name_1",
+      "baseAppConfigFileID_1"
+    ]
+  },
+  {
+    "dropIndexes": "app_config_file_versions",
+    "index": [
+      "appConfigFileID_1_version_1",
+      "appConfigFileID_1_isDeleted_1_createdAt_-1",
+      "appID_1_envName_1_isDeleted_1_createdAt_-1",
+      "appConfigFileID_1_isDeleted_1_creator_1_createdAt_-1"
+    ]
+  },
+  {
+    "dropIndexes": "applications",
+    "index": [
+      "id_1",
+      "workspaceID_1_name_1"
+    ]
+  },
+  {
+    "dropIndexes": "cluster_addon_defs",
+    "index": "name_1"
+  },
+  {
+    "dropIndexes": "environments",
+    "index": [
+      "workspaceID_1_name_1",
+      "ownerAppID_1"
+    ]
+  },
+  {
+    "dropIndexes": "workspace_components",
+    "index": "workspaceID_1_name_1"
+  },
+  {
+    "dropIndexes": "workspaces",
+    "index": "id_1"
+  },
+  {
+    "dropIndexes": "app_model_resource_snapshots",
+    "index": "appID_1_deployRecordId_1"
+  },
+  {
+    "dropIndexes": "gpa_configs",
+    "index": "appID_1_envName_1"
+  },
+  {
+    "dropIndexes": "polaris_configs",
+    "index": "appID_1_name_1"
+  },
+  {
+    "dropIndexes": "bscpcfg_env_bindings",
+    "index": "appID_1_envName_1"
+  },
+  {
+    "dropIndexes": "bscpcfg_metadata",
+    "index": "appID_1"
+  },
+  {
+    "dropIndexes": "helm_app_components",
+    "index": [
+      "appID_1_envName_1_name_1",
+      "appID_1_envName_1"
+    ]
+  },
+  {
+    "dropIndexes": "component_defs",
+    "index": "name_1_version_1"
+  },
+  {
+    "dropIndexes": "depservice_instances",
+    "index": "workspaceID_1_serviceName_1_name_1"
+  },
+  {
+    "dropIndexes": "depservice_services",
+    "index": "name_1"
+  },
+  {
+    "dropIndexes": "operation_records",
+    "index": [
+      "username_1_group.workspaceID_1_createdAt_-1",
+      "username_1_group.workspaceID_1_group.appID_1_createdAt_-1"
+    ]
+  },
+  {
+    "dropIndexes": "bkmonitor_alert_strategy",
+    "index": [
+      "workspaceID_1_appID_1_enabled_1",
+      "workspaceID_1_appID_1_remoteRefs.envID_1_remoteRefs.trafficLaneName_1"
+    ]
+  },
+  {
+    "dropIndexes": "bkmonitor_apm_inst_config",
+    "index": "apmID_1"
+  },
+  {
+    "dropIndexes": "plat_admin_role_bindings",
+    "index": "username_1"
+  },
+  {
+    "dropIndexes": "workspace_temp_admin_records",
+    "index": [
+      "workspaceID_1_username_1",
+      "isRecycled_1_expiresAt_1"
+    ]
+  },
+  {
+    "dropIndexes": "app_models",
+    "index": "appID_1"
+  },
+  {
+    "dropIndexes": "app_specs",
+    "index": "appID_1_envName_1"
+  },
+  {
+    "dropIndexes": "scoped_env_vars",
+    "index": "workspaceID_1_scopeType_1_scopeValue_1_key_1"
+  },
+  {
+    "dropIndexes": "helm_repo_credentials",
+    "index": "workspaceID_1"
+  },
+  {
+    "dropIndexes": "image_promotions",
+    "index": "idx_appID_repoKey_tag"
+  },
+  {
+    "dropIndexes": "image_registries",
+    "index": "workspaceID_1_type_1"
+  },
+  {
+    "dropIndexes": "runtime_images",
+    "index": "idx_type_name_unique"
+  },
+  {
+    "dropIndexes": "image_snapshots",
+    "index": [
+      "idx_repoKey_tag",
+      "idx_repoKey"
+    ]
+  },
+  {
+    "dropIndexes": "repo_snapshot_statuses",
+    "index": "idx_repoKey"
+  },
+  {
+    "dropIndexes": "networking_services",
+    "index": "appID_1_name_1"
+  },
+  {
+    "dropIndexes": "topology_resource_snapshots",
+    "index": [
+      "appID_1_envName_1_trafficLaneName_1",
+      "appID_1"
+    ]
+  }
+]

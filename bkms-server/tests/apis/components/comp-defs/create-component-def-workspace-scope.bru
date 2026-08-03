@@ -1,0 +1,64 @@
+meta {
+  name: create-component-def-workspace-scope
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{serviceURL}}/component-defs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "compDefName": "test-ws-comp-{{randomSuffix}}",
+    "displayName": "Test Workspace Component",
+    "description": "API test workspace-scoped component definition",
+    "properties": [
+      {
+        "name": "storageType",
+        "type": "STRING",
+        "defaultValue": "local",
+        "description": "Storage type"
+      },
+      {
+        "name": "capacity",
+        "type": "INT",
+        "defaultValue": 10,
+        "description": "Storage capacity in GB"
+      }
+    ],
+    "patchers": [
+      "spec:\n  template:\n    spec:\n      containers:\n        - name: \"{{ .bkmsContainerName }}\"\n          volumeMounts:\n            - name: \"{{ .name }}-storage\"\n              mountPath: /data\n      volumes:\n        - name: \"{{ .name }}-storage\"\n          persistentVolumeClaim:\n            claimName: \"{{ .name }}-pvc\""
+    ],
+    "specs": [
+      "apiVersion: v1\nkind: PersistentVolumeClaim\nmetadata:\n  name: \"{{ .name }}-pvc\"\nspec:\n  storageClassName: \"{{ .storageType }}\"\n  accessModes:\n    - ReadWriteOnce\n  resources:\n    requests:\n      storage: \"{{ .capacity }}Gi\""
+    ],
+    "scopeType": "workspace",
+    "scopeWorkspaceIDs": ["{{workspaceID}}"]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  // Save component def name for later tests
+  const compDefName = `test-ws-comp-${bru.getVar('randomSuffix')}`;
+  bru.setVar('testWsCompDefName', compDefName);
+  console.log("Created workspace-scoped component def name:", compDefName);
+}
+
+tests {
+  test("should create workspace-scoped component definition successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

@@ -1,0 +1,77 @@
+meta {
+  name: create-component-def
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/component-defs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "compDefName": "test-comp-{{randomSuffix}}",
+    "displayName": "Test Component",
+    "description": "API test component definition",
+    "properties": [
+      {
+        "name": "instanceKey",
+        "type": "STRING",
+        "defaultValue": "instanceKey",
+        "description": "Instance key for identification"
+      },
+      {
+        "name": "serviceName",
+        "type": "STRING",
+        "defaultValue": "my-service",
+        "description": "Service name"
+      },
+      {
+        "name": "servicePort",
+        "type": "INT",
+        "defaultValue": 8080,
+        "description": "Service port"
+      },
+      {
+        "name": "enabled",
+        "type": "BOOL",
+        "defaultValue": true,
+        "description": "Enable flag"
+      }
+    ],
+    "patchers": [
+      "spec:\n  template:\n    spec:\n      containers:\n        - name: \"{{ .bkmsContainerName }}\"\n          env:\n            - name: \"{{ .instanceKey }}_SERVICE_NAME\"\n              value: \"{{ .serviceName }}\"\n            - name: \"{{ .instanceKey }}_SERVICE_PORT\"\n              value: \"{{ .servicePort }}\""
+    ],
+    "specs": [
+      "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: \"{{ .name }}-config\"\ndata:\n  instanceKey: \"{{ .instanceKey }}\"\n  serviceName: \"{{ .serviceName }}\"\n  servicePort: \"{{ .servicePort }}\"\n  enabled: \"{{ .enabled }}\""
+    ],
+    "scopeType": "global",
+    "scopeWorkspaceIDs": []
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  // Save component def name for later tests
+  const compDefName = `test-comp-${bru.getVar('randomSuffix')}`;
+  bru.setVar('testCompDefName', compDefName);
+  console.log("Created component def name:", compDefName);
+}
+
+tests {
+  test("should create component definition successfully", () => {
+    console.log(res.body)
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

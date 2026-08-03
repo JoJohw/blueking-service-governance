@@ -1,0 +1,39 @@
+meta {
+  name: check-partial-result
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/apps/{{probeAppID}}/envs/{{testEnv}}/app-spec/probe/effective
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the merged probe config", () => {
+    // liveness 来自默认值 (Http)
+    expect(res.body.data.liveness.probeHandler.type).to.equal("HTTP");
+    expect(res.body.data.liveness.probeHandler.url).to.include("localhost");
+    expect(res.body.data.liveness.timeoutSeconds).to.equal(2);
+    
+    // readiness 被环境配置覆盖 (Exec with custom timeout)
+    expect(res.body.data.readiness.probeHandler.type).to.equal("EXEC");
+    expect(res.body.data.readiness.probeHandler.command).to.include("test");
+    expect(res.body.data.readiness.timeoutSeconds).to.equal(5);
+    
+    // startup 来自默认值 (Tcp)
+    expect(res.body.data.startup.probeHandler.type).to.equal("TCP");
+    expect(res.body.data.startup.probeHandler.port).to.equal(3306);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

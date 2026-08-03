@@ -1,0 +1,36 @@
+meta {
+  name: update-default-should-fail-when-value-invalid
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{serviceURL}}/apps/{{updateStrategyAppID}}/app-spec/default-update-strategy
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecUpdateStrategy": {
+      "maxUnavailable": "-1",
+      "maxSurge": "1"
+    }
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should return error when maxUnavailable is invalid", () => {
+    expect(res.body.error.message).to.contains("int_or_percent_gte0");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

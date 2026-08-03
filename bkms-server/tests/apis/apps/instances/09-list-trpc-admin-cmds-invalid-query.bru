@@ -1,0 +1,27 @@
+meta {
+  name: 09-list-trpc-admin-cmds-invalid-query
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{serviceURL}}/apps/invalid-app/envs/test/instances/admin-cmds
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should require instanceIDs query for listing Trpc admin commands", () => {
+    expect(res.body.error.code).to.equal("INVALID_REQUEST");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,25 @@
+{
+  "extends": ["@blueking/bkui-lint/bk-biome.json"],
+  "root": true,
+  "overrides": [
+    {
+      "includes": [
+        "src/api/modules/bkmsserver.ts",
+        "src/api/modules/cimanager.ts",
+        "src/api/modules/deploymanager.ts",
+        "src/api/modules/devspacemanager.ts",
+        "src/api/modules/logmanager.ts",
+        "src/api/modules/rendermanager.ts",
+        "src/api/modules/trafficmanager.ts",
+        "src/api/modules/workflowmanager.ts"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    }
+  ]
+}

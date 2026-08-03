@@ -1,0 +1,52 @@
+meta {
+  name: update-scoped-env-var
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{serviceURL}}/workspaces/{{envvarsWorkspaceID}}/scoped-env-vars/{{workspaceScopedEnvVarID}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "key": "{{updatedWorkspaceScopedKey}}",
+    "value": "{{updatedWorkspaceScopedValue}}",
+    "description": "{{updatedWorkspaceScopedDescription}}",
+    "isSensitive": false
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const suffix = bru.getVar("randomSuffix");
+  bru.setVar("updatedWorkspaceScopedKey", `SCOPED_KEY_UPDATED_${suffix}`);
+  bru.setVar("updatedWorkspaceScopedValue", `scoped-value-updated-${suffix}`);
+  bru.setVar("updatedWorkspaceScopedDescription", `scoped-description-updated-${suffix}`);
+}
+
+tests {
+  test("should return the updated scoped env var", () => {
+    const ret = res.body.data;
+
+    expect(ret.id).to.equal(bru.getVar("workspaceScopedEnvVarID"));
+    expect(ret.workspaceID).to.equal(bru.getVar("envvarsWorkspaceID"));
+    expect(ret.scopeType).to.equal("workspace");
+    expect(ret.key).to.equal(bru.getVar("updatedWorkspaceScopedKey"));
+    // isSensitive has been modified the the original value should return
+    expect(ret.value).to.equal(bru.getVar("updatedWorkspaceScopedValue"));
+    expect(ret.description).to.equal(bru.getVar("updatedWorkspaceScopedDescription"));
+    expect(ret.isSensitive).to.equal(false);
+    expect(ret.updatedAt).to.not.equal(ret.createdAt);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

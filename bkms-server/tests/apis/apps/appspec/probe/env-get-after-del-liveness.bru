@@ -1,0 +1,29 @@
+meta {
+  name: env-get-after-del-liveness
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{serviceURL}}/apps/{{probeAppID}}/envs/{{testEnv}}/app-spec/probe
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should have only readiness probe", () => {
+    expect(res.body.data.liveness).to.be.null;
+    expect(res.body.data.readiness).to.not.be.null;
+    expect(res.body.data.readiness.probeHandler.type).to.equal("EXEC");
+    expect(res.body.data.startup).to.be.null;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

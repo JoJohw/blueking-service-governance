@@ -1,0 +1,26 @@
+meta {
+  name: env-get-after-del
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/envs/{{testEnv}}/app-spec/lifecycle
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+  res.body: isJson
+}
+
+tests {
+  test("should return not found after deleting env lifecycle override", () => {
+    expect(res.body.error.message).to.contains("lifecycle not found");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

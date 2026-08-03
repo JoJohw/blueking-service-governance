@@ -1,0 +1,80 @@
+[
+  {
+    "system": "{{ .BCSSystemID }}",
+    "actions": [
+      {
+        "id": "project_view"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BCSSystemID }}",
+        "type": "project",
+        "paths": [
+          [
+            {
+              "system": "{{ .BCSSystemID }}",
+              "type": "project",
+              "id": "{{ .ProjectID }}",
+              "name": "{{ .ProjectName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BCSSystemID }}",
+    "actions": [
+      {
+        "id": "cluster_view"
+      },
+      {
+        "id": "cluster_scoped_view"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BCSSystemID }}",
+        "type": "cluster",
+        "paths": [
+          [
+            {
+              "system": "{{ .BCSSystemID }}",
+              "type": "project",
+              "id": "{{ .ProjectID }}",
+              "name": "{{ .ProjectName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BCSSystemID }}",
+    "actions": [
+      {
+        "id": "namespace_view"
+      },
+      {
+        "id": "namespace_scoped_view"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BCSSystemID }}",
+        "type": "namespace",
+        "paths": [
+          [
+            {
+              "system": "{{ .BCSSystemID }}",
+              "type": "project",
+              "id": "{{ .ProjectID }}",
+              "name": "{{ .ProjectName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  }
+]

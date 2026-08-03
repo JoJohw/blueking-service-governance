@@ -1,0 +1,52 @@
+meta {
+  name: create-workspace-with-biz-id
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{serviceURL}}/workspaces
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "test-ws-{{randomSuffix}}",
+    "displayName": "测试工作空间 {{randomSuffix}}",
+    "description": "这是一个API测试创建的工作空间",
+    "bkCCBizID": 100001
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  // 创建已存在容器项目的 workspace
+  test("should create workspace successfully", () => {
+    expect(res.body.data).to.be.an('object');
+    expect(res.body.data.id).to.contain('test-ws-');
+    expect(res.body.data.displayName).to.contain('测试工作空间');
+    expect(res.body.data.description).to.equal('这是一个API测试创建的工作空间');
+    expect(res.body.data.state).to.be.a('string');
+    expect(res.body.data.creator).to.be.a('string');
+    expect(res.body.data.createdAt).to.be.a('string');
+  });
+
+  test("CMDB related fields on bkSystems", () => {
+
+    // 开源版本 txcmdb 使用 noop，相关字段可能为空，仅校验字段类型
+    expect(res.body.data.bkSystems.bkCCBizID).to.equal('100001');
+    expect(res.body.data.bkSystems.level2BizID).to.be.a('string');
+    expect(res.body.data.bkSystems.obsProductID).to.be.a('string');
+    expect(res.body.data.bkSystems.obsProductName).to.be.a('string');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

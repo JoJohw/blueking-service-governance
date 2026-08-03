@@ -1,0 +1,38 @@
+meta {
+  name: update-normal-file
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{serviceURL}}/apps/{{appCfgAuditAppID}}/app-config-files/{{appCfgAuditNormalFileID}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "audit-nor-r-{{randomSuffix}}",
+    "versionDescription": "更新配置文件名称"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  bru.setVar("appCfgAuditUpdatedNormalFileName", res.body.item.name);
+}
+
+tests {
+  test("should update normal app config file name", () => {
+    expect(res.body.item.name).to.equal(`audit-nor-r-${bru.getVar("randomSuffix")}`);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,28 @@
+meta {
+  name: env-get
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{serviceURL}}/apps/{{updateStrategyAppID}}/envs/test/app-spec/update-strategy
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the updated raw env values", () => {
+    expect(res.body.data.maxUnavailable).to.equal("20%");
+    expect(res.body.data.maxSurge).to.equal("1");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

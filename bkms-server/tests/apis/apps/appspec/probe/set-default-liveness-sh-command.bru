@@ -1,0 +1,50 @@
+meta {
+  name: set-default-liveness-sh-command
+  type: http
+  seq: 21
+}
+
+put {
+  url: {{serviceURL}}/apps/{{probeAppID}}/app-spec/default-probe
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecProbe": {
+      "liveness": {
+        "probeHandler": {
+          "type": "EXEC",
+          "shCommand": "curl -sf http://127.0.0.1:8080/health >/dev/null || exit 1"
+        },
+        "initialDelaySeconds": 3,
+        "timeoutSeconds": 2
+      },
+      "readiness": {
+        "probeHandler": {
+          "type": "EXEC",
+          "command": ["sh", "-c", "test -f /tmp/ready"]
+        },
+        "initialDelaySeconds": 5
+      },
+      "startup": {
+        "probeHandler": {
+          "type": "TCP",
+          "port": 3306
+        },
+        "failureThreshold": 30
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

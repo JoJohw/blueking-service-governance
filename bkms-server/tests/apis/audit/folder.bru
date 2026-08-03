@@ -1,0 +1,18 @@
+meta {
+  name: audit
+  seq: 3
+}
+
+script:pre-request {
+  const common = require('./common');
+
+  if (!bru.getVar('auditWorkspaceID')) {
+    const suffix = bru.getVar('randomSuffix');
+    const ws = await common.createWorkspace({ id: `audit-ws-${suffix}` });
+    bru.setVar('auditWorkspaceID', ws.id);
+  }
+}
+
+auth {
+  mode: inherit
+}

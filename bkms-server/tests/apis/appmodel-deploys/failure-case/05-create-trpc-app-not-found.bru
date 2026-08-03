@@ -1,0 +1,37 @@
+meta {
+  name: 05-create-trpc-app-not-found
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{serviceURL}}/apps/nonexistent-trpc-deploy-app/envs/test/trpc-deploys
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "imageTag": "1.0",
+    "replicas": 1
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body: isJson
+}
+
+tests {
+  test("should return not found for unknown trpc app on create", () => {
+    expect(res.body.error).to.be.an("object");
+    expect(res.body.error.code).to.equal("NOT_FOUND");
+    expect(res.body.error.system).to.equal("bkms");
+    expect(res.body.error.module).to.equal("bkms-server");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

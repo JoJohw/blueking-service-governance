@@ -1,0 +1,67 @@
+package instance
+
+import (
+	"context"
+	"log/slog"
+	"strconv"
+
+	"github.com/pkg/errors"
+	"github.com/samber/lo"
+
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/client"
+)
+
+// ListInstancesOptions 查询实例列表参数。
+type ListInstancesOptions struct {
+	// Status 按实例状态过滤，如 Running。
+	Status string
+}
+
+// ListInstances 获取应用在指定环境下的全部实例，并自动处理分页。
+func ListInstances(
+	ctx context.Context,
+	cli client.Client,
+	appID, envName string,
+	opts ListInstancesOptions,
+) ([]client.Instance, error) {
+	var instances []client.Instance
+
+	for page := 1; ; page++ {
+		listOpts := client.ListAppInstancesOptions{
+			Page:     page,
+			PageSize: client.DefaultListAppInstancesPageSize,
+		}
+
+		resp, err := cli.ListAppInstances(ctx, appID, envName, listOpts)
+		if err != nil {
+			return nil, errors.Wrap(err, "list app instances")
+		}
+		if resp == nil {
+			return nil, errors.Errorf("empty app instances for app %s env %s", appID, envName)
+		}
+
+		slog.Debug(
+			"fetched app instances page",
+			"appID", appID,
+			"envName", envName,
+			"page", listOpts.Page,
+			"pageSize", listOpts.PageSize,
+			"statusFilter", opts.Status,
+			"resultsCount", len(resp.Results),
+			"totalCount", resp.Count,
+		)
+
+		instances = append(instances, resp.Results...)
+		if len(resp.Results) == 0 || len(instances) >= lo.Must(strconv.Atoi(resp.Count)) {
+			break
+		}
+	}
+
+	if opts.Status != "" {
+		instances = lo.Filter(instances, func(instance client.Instance, _ int) bool {
+			return instance.Status == opts.Status
+		})
+	}
+
+	return instances, nil
+}

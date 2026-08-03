@@ -1,0 +1,101 @@
+[
+  {
+    "system": "{{ .BKRepoSystemID }}",
+    "actions": [
+      {
+        "id": "project_view"
+      },
+      {
+        "id": "repo_create"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKRepoSystemID }}",
+        "type": "project",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKRepoSystemID }}",
+              "type": "project",
+              "id": "{{ .ProjectID }}",
+              "name": "{{ .ProjectName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKRepoSystemID }}",
+    "actions": [
+      {
+        "id": "repo_manage"
+      },
+      {
+        "id": "repo_view"
+      },
+      {
+        "id": "repo_edit"
+      },
+      {
+        "id": "repo_delete"
+      },
+      {
+        "id": "node_create"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKRepoSystemID }}",
+        "type": "repo",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKRepoSystemID }}",
+              "type": "project",
+              "id": "{{ .ProjectID }}",
+              "name": "{{ .ProjectName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKRepoSystemID }}",
+    "actions": [
+      {
+        "id": "node_write"
+      },
+      {
+        "id": "node_view"
+      },
+      {
+        "id": "node_download"
+      },
+      {
+        "id": "node_edit"
+      },
+      {
+        "id": "node_delete"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKRepoSystemID }}",
+        "type": "node",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKRepoSystemID }}",
+              "type": "project",
+              "id": "{{ .ProjectID }}",
+              "name": "{{ .ProjectName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  }
+]

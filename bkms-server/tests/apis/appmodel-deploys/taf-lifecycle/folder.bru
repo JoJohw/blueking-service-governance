@@ -1,0 +1,108 @@
+meta {
+  name: taf-lifecycle
+  seq: 2
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  // The TAF deploy lifecycle suite drives a real GameDeployment workload
+  // against the kind cluster, so it is gated behind RUN_TAF_DEPLOY_API_TESTS
+  // to keep the default `bru run` invocation cheap. When the env var is
+  // unset, every request in this folder is cancelled (Bruno reports them as
+  // skipped without affecting the overall exit code).
+  if (!bru.getProcessEnv("RUN_TAF_DEPLOY_API_TESTS")) {
+    console.log("taf lifecycle skipped: RUN_TAF_DEPLOY_API_TESTS not set");
+    bru.runner.skipRequest();
+    return;
+  }
+
+  const common = require("./common");
+
+  if (!bru.getVar("tafLifecycleReady")) {
+    const suffix = bru.getVar("randomSuffix");
+    const workspaceID = `tafdeploy-ws-${suffix}`;
+    const appID = `tafdeploy-app-${suffix}`;
+    const envName = `tafdeploy-env-${suffix}`;
+    // BKMS_APITEST_WORKLOAD_IMAGE is the image *repository* without a tag,
+    // formatted as `<registry>/<name>`. The registry must host both
+    // `<repo>:1.0.0` and `<repo>:2.0.0`, each containing `sleep`, because the
+    // workload is started as `sleep 3600` and v2 switches the tag to 2.0.0.
+    const imageRepository = bru.getProcessEnv("BKMS_APITEST_WORKLOAD_IMAGE");
+    if (!imageRepository) {
+      throw new Error("BKMS_APITEST_WORKLOAD_IMAGE is required for taf lifecycle tests");
+    }
+    if (imageRepository.includes(":")) {
+      throw new Error(`BKMS_APITEST_WORKLOAD_IMAGE must be a tag-less <registry>/<name>, got: ${imageRepository}`);
+    }
+    const slashIdx = imageRepository.lastIndexOf("/");
+    if (slashIdx <= 0 || slashIdx === imageRepository.length - 1) {
+      throw new Error(`BKMS_APITEST_WORKLOAD_IMAGE must be in <registry>/<name> form, got: ${imageRepository}`);
+    }
+    const registry = imageRepository.slice(0, slashIdx);
+    const imageName = imageRepository.slice(slashIdx + 1);
+    const appName = imageName;
+    const imageTag1 = "1.0.0";
+    const imageTag2 = "2.0.0";
+
+    const ws = await common.createWorkspace({
+      id: workspaceID,
+      imageRegistry: {
+        registry,
+        username: "registry-user",
+        password: "registry-foo-password"
+      }
+    });
+    await common.createEnvironment({
+      name: envName,
+      workspaceID: ws.id,
+      type: "test",
+      description: "TAF deploy v2 lifecycle suite",
+      cluster: {
+        clusterID: "BCS-K8S-00001",
+        clusterType: "single",
+        namespace: "default"
+      }
+    });
+    const app = await common.createTafApp({
+      id: appID,
+      name: appName,
+      workspaceID: ws.id,
+      appModelSpec: {
+        tafSpec: {
+          fileName: "taf_config.conf",
+          filePath: "/tmp/",
+          fileContent: "dGVzdAo="
+        },
+        command: ["sleep"],
+        args: ["3600"],
+        envVars: []
+      },
+      buildConfig: {
+        sourceType: "imageRegistry",
+        imageBuildConfig: {name: imageName}
+      }
+    });
+    // Keep resource requests low so the real GameDeployment pods can be
+    // scheduled reliably in the single-node kind API-test cluster.
+    await common.updateDefaultAppSpecResources({
+      appID: app.id,
+      resources: {
+        replicas: 1,
+        cpuRequests: "100m",
+        cpuLimits: "200m",
+        memoryRequests: "128Mi",
+        memoryLimits: "256Mi"
+      }
+    });
+
+    bru.setVar("tafLifecycleWorkspaceID", ws.id);
+    bru.setVar("tafLifecycleAppID", app.id);
+    bru.setVar("tafLifecycleEnvName", envName);
+    bru.setVar("tafLifecycleImageTag1", imageTag1);
+    bru.setVar("tafLifecycleImageTag2", imageTag2);
+    bru.setVar("tafLifecycleReady", true);
+  }
+}

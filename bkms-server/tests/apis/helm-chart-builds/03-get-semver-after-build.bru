@@ -1,0 +1,50 @@
+meta {
+  name: 03-get-semver-after-build
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{serviceURL}}/apps/{{helmChartBuildAppID}}/charts/semver?bumpType=patch
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return incremented semver after build", () => {
+    expect(res.body.data.latest.major).to.equal("0");
+    expect(res.body.data.latest.minor).to.equal("0");
+    expect(Number(res.body.data.latest.patch)).to.be.at.least(1);
+  });
+
+  test("should return consistent version string", () => {
+    const expectedVersion = `${res.body.data.latest.major}.${res.body.data.latest.minor}.${res.body.data.latest.patch}`;
+    expect(res.body.data.latest.version).to.equal(expectedVersion);
+  });
+
+  test("should match chart version from build response", () => {
+    const chartVersion = bru.getVar('testChartVersion');
+    if (chartVersion) {
+      expect(res.body.data.latest.version).to.equal(chartVersion);
+    }
+  });
+
+  test("should return next when bumpType is provided in request", () => {
+    expect(res.body.data.next).to.be.an('object');
+    expect(res.body.data.next.major).to.equal(res.body.data.latest.major);
+    expect(res.body.data.next.minor).to.equal(res.body.data.latest.minor);
+    expect(Number(res.body.data.next.patch)).to.equal(Number(res.body.data.latest.patch) + 1);
+    const expectedNextVersion = `${res.body.data.next.major}.${res.body.data.next.minor}.${res.body.data.next.patch}`;
+    expect(res.body.data.next.version).to.equal(expectedNextVersion);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

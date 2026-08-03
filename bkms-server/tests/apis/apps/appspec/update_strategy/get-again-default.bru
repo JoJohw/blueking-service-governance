@@ -1,0 +1,28 @@
+meta {
+  name: get-again-default
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/apps/{{updateStrategyAppID}}/app-spec/default-update-strategy
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the updated values", () => {
+    expect(res.body.data.maxUnavailable).to.equal("88%");
+    expect(res.body.data.maxSurge).to.equal("3");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

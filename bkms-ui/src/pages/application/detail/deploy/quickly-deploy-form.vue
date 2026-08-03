@@ -1,0 +1,212 @@
+<template>
+  <Form
+    ref="formRef"
+    form-type="vertical"
+    :model="formModel"
+  >
+    <Form.FormItem
+      :label="$t('实例数')"
+      property="replicas"
+      required
+    >
+      <Input
+        v-model.number="formModel.replicas"
+        :min="1"
+        :precision="0"
+        type="number"
+      />
+    </Form.FormItem>
+
+    <Form.FormItem
+      :label="$t('镜像来源')"
+      required
+    >
+      <Button.ButtonGroup class="flex items-center">
+        <Button
+          class="flex-1"
+          :selected="imageSource === 'image'"
+          @click="handleChangeImageSource('image')"
+        >
+          {{ $t('已构建镜像') }}
+        </Button>
+        <Button
+          v-bk-tooltips="{
+            content: $t('生产类型环境只能部署已经晋级的镜像 Tag'),
+            disabled: !isProdEnv,
+          }"
+          class="flex-1"
+          :disabled="isProdEnv"
+          :selected="imageSource === 'code'"
+          @click="handleChangeImageSource('code')"
+        >
+          {{ $t('从源码构建') }}
+        </Button>
+      </Button.ButtonGroup>
+    </Form.FormItem>
+    <template v-if="imageSource === 'code'">
+      <Form.FormItem
+        :label="$t('代码分支')"
+        property="branch"
+        required
+      >
+        <Input v-model.trim="formModel.branch" />
+      </Form.FormItem>
+    </template>
+    <Form.FormItem
+      :label="$t('镜像 Tag')"
+      property="imageTag"
+      required
+    >
+      <Input
+        v-if="imageSource === 'code'"
+        v-model.trim="formModel.imageTag"
+      />
+      <ImageSelect
+        v-else
+        ref="imageSelectRef"
+        v-model:value="formModel.imageTag"
+        :env-name="envName"
+        :env-type="envType"
+      />
+    </Form.FormItem>
+  </Form>
+</template>
+
+<script lang="ts" setup>
+  import { computed, reactive, ref } from 'vue';
+
+  import { Button, Form, Input } from 'bkui-vue';
+  import useLeaveConfirm from '~/composables/use-leave-confirm';
+  import { useRecommendTag } from '~/composables/use-recommend-tag';
+  import { useAppDetail } from '~/stores/app-detail';
+  import { useTrpcDeployStore } from '~/stores/trpc-deploy';
+
+  import ImageSelect from '../../components/image-select.vue';
+  import { type DeployableAppType, type DeployParams, useDeployAPIs } from './use-deploy';
+
+  // 镜像来源类型：从源码构建 / 已构建镜像
+  type ImageSourceType = 'code' | 'image';
+
+  const props = defineProps<{
+    effectiveReplicas?: number; // 当前生效的实例数，用于重置表单时回填
+    envName?: string;
+    envType?: string;
+    isProdEnv?: boolean;
+  }>();
+
+  const trpcDeployStore = useTrpcDeployStore();
+  const appDetailStore = useAppDetail();
+
+  // 当前选择的镜像来源
+  const imageSource = ref<ImageSourceType>('image');
+  const formRef = ref();
+  const imageSelectRef = ref();
+  // 表单数据模型
+  const formModel = reactive<{
+    branch: string;
+    imageTag: string;
+    replicas: number;
+  }>({
+    replicas: 1,
+    imageTag: '',
+    branch: '',
+  });
+
+  // 环境名称：优先取 props，其次取 store 中当前选中环境
+  const envName = computed(() => props.envName || trpcDeployStore.curEnvItem?.name || '');
+  const envType = computed(() => props.envType || trpcDeployStore.curEnvItem?.type || '');
+  // 是否为生产环境：props 优先，否则按 envType 判断
+  const isProdEnv = computed(() => props.isProdEnv ?? envType.value === 'production');
+
+  // 推荐镜像 Tag：源码构建模式下自动推荐
+  const { getDefaultBranch, fetchRecommendTag } = useRecommendTag(() => formModel.branch, {
+    onRecommend: tag => {
+      if (imageSource.value === 'code') {
+        formModel.imageTag = tag;
+      }
+    },
+  });
+  // 离开确认：表单有变更时提示用户
+  const { confirmBox, forceCleanDirtyTag, withPausedWatch } = useLeaveConfirm(formModel);
+
+  // 清除表单校验结果
+  function clearValidate() {
+    formRef.value?.clearValidate?.();
+  }
+
+  // 关闭镜像选择下拉框
+  function closeDropdown() {
+    imageSelectRef.value?.closeDropdown?.();
+  }
+
+  function confirmLeave() {
+    return confirmBox();
+  }
+
+  // 执行部署：根据镜像来源调用直接部署或构建+部署接口
+  async function deploy(targetEnvName: string) {
+    const deployAPIs = useDeployAPIs(appDetailStore.appType as DeployableAppType);
+    const params: DeployParams = {
+      appID: appDetailStore.appID,
+      envName: targetEnvName,
+      imageTag: formModel.imageTag,
+      replicas: Number(formModel.replicas),
+    };
+    if (imageSource.value === 'image') {
+      await deployAPIs.createDeployDirectly!(params);
+    } else {
+      params.branch = formModel.branch;
+      await deployAPIs.buildAndCreateDeploy!(params);
+    }
+  }
+
+  // 切换镜像来源：源码模式自动填充默认分支并推荐 Tag，镜像模式则清空分支与 Tag
+  function handleChangeImageSource(source: ImageSourceType) {
+    imageSource.value = source;
+    if (source === 'code') {
+      const branch = getDefaultBranch();
+      formModel.branch = branch;
+      fetchRecommendTag(branch);
+    } else {
+      formModel.branch = '';
+      formModel.imageTag = '';
+    }
+  }
+
+  // 重置表单：回填实例数，其余字段清空，并统一清理内部 UI 状态
+  function reset(replicas = props.effectiveReplicas || 1) {
+    withPausedWatch(() => {
+      formModel.replicas = replicas;
+      formModel.imageTag = '';
+      formModel.branch = '';
+      imageSource.value = 'image';
+    });
+    forceCleanDirtyTag(() => {
+      clearValidate();
+      closeDropdown();
+    });
+  }
+
+  // 提交部署：内部完成校验、部署和脏标记清理
+  async function submit(targetEnvName: string) {
+    const valid = await validate();
+    if (!valid) return false;
+
+    await deploy(targetEnvName);
+    forceCleanDirtyTag();
+    return true;
+  }
+
+  // 校验表单
+  async function validate() {
+    return await formRef.value?.validate?.().catch(() => false);
+  }
+
+  // 暴露业务级方法供父组件调用
+  defineExpose({
+    confirmLeave,
+    reset,
+    submit,
+    validate,
+  });
+</script>

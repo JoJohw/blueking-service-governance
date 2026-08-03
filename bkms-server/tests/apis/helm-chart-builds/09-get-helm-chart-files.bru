@@ -1,0 +1,30 @@
+meta {
+  name: 09-get-helm-chart-files
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{serviceURL}}/apps/{{helmChartRepoAppID}}/charts/{{readableChartVersion}}/files
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return chart file tree", () => {
+    expect(res.body.data.chartName).to.equal("sample-app");
+    expect(res.body.data.chartVersion).to.equal(bru.getVar('readableChartVersion'));
+    expect(res.body.data.root).to.be.an('object');
+    expect(res.body.data.root.children).to.be.an('array');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 30000
+}

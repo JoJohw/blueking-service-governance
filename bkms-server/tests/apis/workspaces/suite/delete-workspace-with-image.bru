@@ -1,0 +1,27 @@
+meta {
+  name: delete-workspace-with-image
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{serviceURL}}/workspaces/{{imageRegistryWsID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete workspace with image registry", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

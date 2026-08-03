@@ -1,0 +1,28 @@
+meta {
+  name: delete-app-component-ref
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{componentsTrpcAppID}}/components/{{testAppCompRefName}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete app component (ref workspace) successfully", () => {
+    console.log(res.body)
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

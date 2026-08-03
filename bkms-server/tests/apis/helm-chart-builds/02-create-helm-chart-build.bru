@@ -1,0 +1,59 @@
+meta {
+  name: 02-create-helm-chart-build
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{serviceURL}}/apps/{{helmChartBuildAppID}}/charts/builds
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "bumpType": "patch",
+    "branch": "master"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  if (res.body && res.body.data) {
+    if (res.body.data.chartVersion) {
+      bru.setVar('testChartVersion', res.body.data.chartVersion);
+      console.log("Created chart version:", res.body.data.chartVersion);
+    }
+    if (res.body.data.buildID) {
+      bru.setVar('testHelmChartBuildID', res.body.data.buildID);
+      console.log("Created build ID:", res.body.data.buildID);
+    }
+  }
+}
+
+tests {
+  test("should create helm chart build successfully", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('object');
+  });
+
+  test("should return chart version and build ID", () => {
+    expect(res.body.data.chartVersion).to.be.a('string');
+    expect(res.body.data.buildID).to.be.a('string');
+  });
+
+  test("should return valid semver format for chart version", () => {
+    const chartVersion = res.body.data.chartVersion;
+    const semverPattern = /^\d+\.\d+\.\d+$/;
+    expect(semverPattern.test(chartVersion)).to.be.true;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 15000
+}

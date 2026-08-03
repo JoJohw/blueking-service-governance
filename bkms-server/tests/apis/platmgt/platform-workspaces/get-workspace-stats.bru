@@ -1,0 +1,54 @@
+meta {
+  name: get-workspace-stats
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/plat-mgt/workspaces/statistics
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const seedUser = bru.getVar("platAdminSeedUser");
+  req.setHeader("X-Bk-Authed-User-Info", JSON.stringify({
+    userId: seedUser,
+  }));
+  req.setHeader("X-Bk-Authed-User-Credential", '{"bkTicket":"xxx"}');
+}
+
+tests {
+  test("should return aggregated workspace state statistics", () => {
+    expect(res.body.data).to.be.an("object");
+    expect(res.body.data).to.have.property("readyCount");
+    expect(res.body.data).to.have.property("processingCount");
+    expect(res.body.data).to.have.property("disabledCount");
+    expect(res.body.data).to.have.property("totalCount");
+
+    const readyCount = Number(res.body.data.readyCount);
+    const processingCount = Number(res.body.data.processingCount);
+    const disabledCount = Number(res.body.data.disabledCount);
+    const totalCount = Number(res.body.data.totalCount);
+    const expectedTotalCount = Number(bru.getVar("platMgtWorkspaceTotalCount"));
+
+    expect(readyCount).to.be.at.least(0);
+    expect(processingCount).to.be.at.least(0);
+    expect(disabledCount).to.be.at.least(0);
+    expect(totalCount).to.equal(readyCount + processingCount + disabledCount);
+
+    if (!Number.isNaN(expectedTotalCount)) {
+      expect(totalCount).to.equal(expectedTotalCount);
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

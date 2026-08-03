@@ -1,0 +1,32 @@
+meta {
+  name: 08-list-events-invalid-pagination
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{serviceURL}}/apps/invalid-app/envs/test/events?page=0&pageSize=5
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 0
+  pageSize: 5
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject invalid event pagination", () => {
+    expect(res.body.error.code).to.equal("INVALID_REQUEST");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,32 @@
+meta {
+  name: 06-get-snapshot
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{serviceURL}}/apps/{{tafLifecycleAppID}}/envs/{{tafLifecycleEnvName}}/taf-deploys/{{tafLifecycleFirstDeployID}}/resource-snapshots/{{tafLifecycleSnapshotID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the resource snapshot with manifest", () => {
+    expect(res.body.snapshot).to.be.an("object");
+    expect(res.body.snapshot.id).to.equal(bru.getVar("tafLifecycleSnapshotID"));
+    expect(res.body.snapshot.kind).to.equal(bru.getVar("tafLifecycleSnapshotKind"));
+    expect(res.body.snapshot.name).to.equal(bru.getVar("tafLifecycleSnapshotName"));
+    expect(res.body.snapshot.apiVersion).to.be.a("string").and.not.empty;
+    expect(res.body.snapshot.manifest).to.be.a("string").and.not.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

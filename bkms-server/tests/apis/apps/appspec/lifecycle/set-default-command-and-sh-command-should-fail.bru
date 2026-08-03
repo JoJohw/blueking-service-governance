@@ -1,0 +1,42 @@
+meta {
+  name: set-default-command-and-sh-command-should-fail
+  type: http
+  seq: 19
+}
+
+put {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/app-spec/default-lifecycle
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecLifecycle": {
+      "postStart": {
+        "type": "EXEC",
+        "exec": {
+          "command": ["sh", "-c", "echo started"],
+          "shCommand": "echo started"
+        }
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should return structured error when command and shCommand are both set", () => {
+    expect(res.body.error).to.be.an("object");
+    expect(res.body.error.message).to.be.a("string").that.is.not.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

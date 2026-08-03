@@ -1,0 +1,20 @@
+meta {
+  name: preview_overlay_merge
+  seq: 3
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("previewMergeAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `preview-merge-ws-${suffix}`})
+    const app = await common.createHelmApp({id: `preview-merge-app-${suffix}`, workspaceID: ws.id})
+
+    bru.setVar("previewMergeAppID", app.id);
+  }
+}

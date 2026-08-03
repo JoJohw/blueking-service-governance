@@ -1,0 +1,44 @@
+meta {
+  name: update-taf-spec
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{serviceURL}}/apps/{{testTafAppID}}/taf-spec
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appModelSpec": {
+      "envVars": [
+        {
+          "key": "IGNORED_TAF_VAR",
+          "value": "should-not-be-stored"
+        }
+      ],
+      "tafSpec": {
+        "fileName": "updated_taf_config.conf",
+        "filePath": "/usr/local/taf/updated/"
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update taf spec successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

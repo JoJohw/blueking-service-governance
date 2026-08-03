@@ -1,0 +1,28 @@
+meta {
+  name: list-component-defs-by-keyword
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{serviceURL}}/component-defs?keyword=test
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should list component definitions by keyword successfully", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('array');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

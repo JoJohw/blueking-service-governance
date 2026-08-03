@@ -1,0 +1,33 @@
+meta {
+  name: env-set
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/envs/{{testEnv}}/app-spec/lifecycle
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecLifecycle": {
+      "postStart": {
+        "type": "EXEC",
+        "exec": {
+          "command": ["sh", "-c", "echo env-started"]
+        }
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

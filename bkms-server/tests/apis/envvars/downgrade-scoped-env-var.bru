@@ -1,0 +1,35 @@
+meta {
+  name: downgrade-scoped-env-var
+  type: http
+  seq: 13
+}
+
+put {
+  url: {{serviceURL}}/workspaces/{{envvarsWorkspaceID}}/scoped-env-vars/{{sensitiveScopedEnvVarID}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "key": "{{sensitiveScopedKey}}",
+    "value": "plaintext-after-downgrade",
+    "description": "{{sensitiveScopedDescription}}",
+    "isSensitive": false
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+tests {
+  test("should reject downgrading a sensitive scoped env var to non-sensitive", () => {
+    expect(res.status).to.equal(400);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,54 @@
+meta {
+  name: update-build-config-platform-build-should-fail-when-dockerfile-set
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{serviceURL}}/apps/{{testBuildTrpcAppID}}/build-configs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "sourceType": "codeRepository",
+    "codeRepo": {
+      "type": "TGit",
+      "defaultBranch": "main",
+      "repoAlias": "test-repo",
+      "repoURL": "https://git.com/bkms-govern.git",
+      "sourceDir": ".",
+      "dockerfile": "build/Dockerfile",
+      "imageBuildMode": "platform",
+      "platformBuildConfig": {
+        "builderImage": "golang:1.24",
+        "runnerImage": "debian:12",
+        "commands": {
+          "build": [
+            "go build -o app ./cmd/server"
+          ],
+          "start": "./app"
+        }
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject platform build mode when dockerfile field is not empty", () => {
+    expect(res.body.error.message).to.contains(
+      "buildConfig.repoBuildConfig.dockerfile must be empty when imageBuildMode is platform"
+    );
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

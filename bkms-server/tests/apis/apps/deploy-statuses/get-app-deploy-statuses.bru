@@ -1,0 +1,59 @@
+meta {
+  name: get-app-deploy-statuses
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{deployStatusesAppID}}/deploy-statuses
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("deployStatusesAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const workspaceID = `deploy-statuses-ws-${suffix}`;
+    const appID = `deploy-statuses-app-${suffix}`;
+
+    await common.createWorkspace({ id: workspaceID });
+    const app = await common.createTrpcApp({
+      id: appID,
+      name: appID,
+      workspaceID,
+    });
+
+    bru.setVar("deployStatusesWorkspaceID", workspaceID);
+    bru.setVar("deployStatusesAppID", app.id);
+  }
+}
+
+tests {
+  test("should get app deploy statuses", () => {
+    expect(res.body.data).to.be.an("array");
+
+    // currently this is meaningless, because we don't have any deploy statuses
+    // it is currently impossible to create a deploy in api test environment
+
+    res.body.data.forEach((item) => {
+      expect(item).to.have.property("id");
+      expect(item).to.have.property("name");
+      expect(item).to.have.property("displayName");
+      expect(item).to.have.property("type");
+      expect(item).to.have.property("trafficLaneName");
+      expect(item).to.have.property("deployStatus");
+    });
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

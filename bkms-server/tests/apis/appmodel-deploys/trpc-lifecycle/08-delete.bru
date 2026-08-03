@@ -1,0 +1,50 @@
+meta {
+  name: 08-delete
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{trpcLifecycleAppID}}/envs/{{trpcLifecycleEnvName}}/trpc-deploys
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  if (res.status !== 200) {
+    return;
+  }
+
+  // Uninstall transitions the latest record to `uninstalled` (no new record
+  // is created). Wait until that observation lands before asserting.
+  const appmodel = require("./helpers/appmodel");
+
+  const record = await appmodel.waitForAppModelDeployTerminal({
+    kind: "trpc",
+    appID: bru.getVar("trpcLifecycleAppID"),
+    envName: bru.getVar("trpcLifecycleEnvName"),
+    expectedStatus: "uninstalled",
+    imageTag: bru.getVar("trpcLifecycleImageTag2")
+  });
+  bru.setVar("trpcLifecycleUninstalledDeployID", record.id);
+  bru.setVar("trpcLifecycleUninstalledDeployStatus", record.status);
+}
+
+tests {
+  test("should uninstall the latest trpc-deploy in place", () => {
+    expect(res.body).to.deep.equal({});
+    expect(bru.getVar("trpcLifecycleUninstalledDeployID"))
+      .to.equal(bru.getVar("trpcLifecycleSecondDeployID"));
+    expect(bru.getVar("trpcLifecycleUninstalledDeployStatus")).to.equal("uninstalled");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 70000
+}

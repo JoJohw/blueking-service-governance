@@ -1,0 +1,41 @@
+meta {
+  name: list-bkci-pipelines
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/bkci-pipelines?page=1&pageSize=10
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  if (res.body && res.body.data && Array.isArray(res.body.data.results) && res.body.data.results.length > 0) {
+    bru.setVar("bkciPipelineID", res.body.data.results[0].id);
+    bru.setVar("bkciPipelineName", res.body.data.results[0].name);
+  }
+}
+
+tests {
+  test("should list bkci pipelines and save first pipeline", () => {
+    expect(res.body.data).to.be.an('object');
+    expect(res.body.data.results).to.be.an('array');
+    expect(res.body.data.results.length).to.be.greaterThan(0);
+
+    const firstPipeline = res.body.data.results[0];
+    expect(firstPipeline).to.have.property('id');
+    expect(firstPipeline).to.have.property('name');
+    expect(firstPipeline.id).to.equal(bru.getVar('bkciPipelineID'));
+    expect(firstPipeline.name).to.equal(bru.getVar('bkciPipelineName'));
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

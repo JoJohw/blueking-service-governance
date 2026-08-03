@@ -1,0 +1,35 @@
+meta {
+  name: update-app-component-partial
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{serviceURL}}/apps/{{componentsTrpcAppID}}/components/{{testAppCompName}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "properties": {
+      "weight": 200
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update app component with partial properties successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

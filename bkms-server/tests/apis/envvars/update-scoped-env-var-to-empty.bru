@@ -1,0 +1,41 @@
+meta {
+  name: update-scoped-env-var-to-empty
+  type: http
+  seq: 14
+}
+
+put {
+  url: {{serviceURL}}/workspaces/{{envvarsWorkspaceID}}/scoped-env-vars/{{workspaceScopedEnvVarID}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "key": "{{updatedWorkspaceScopedKey}}",
+    "value": "",
+    "description": "{{updatedWorkspaceScopedDescription}}",
+    "isSensitive": false
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should update a scoped env var value to empty", () => {
+    const ret = res.body.data;
+
+    expect(ret.id).to.equal(bru.getVar("workspaceScopedEnvVarID"));
+    expect(ret.key).to.equal(bru.getVar("updatedWorkspaceScopedKey"));
+    expect(ret.value).to.equal("");
+    expect(ret.description).to.equal(bru.getVar("updatedWorkspaceScopedDescription"));
+    expect(ret.isSensitive).to.equal(false);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

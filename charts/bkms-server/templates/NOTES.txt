@@ -1,0 +1,26 @@
+==========================================================================
+|                                                                        |
+|       __    __                                                         |
+|      / /_  / /______ ___  _____      ________  ______   _____  _____   |
+|     / __ \/ //_/ __ `__ \/ ___/_____/ ___/ _ \/ ___/ | / / _ \/ ___/   |
+|    / /_/ / ,< / / / / / (__  )_____(__  )  __/ /   | |/ /  __/ /       |
+|   /_.___/_/|_/_/ /_/ /_/____/     /____/\___/_/    |___/\___/_/        |
+|                                                                        |
+|                                                                        |
+==========================================================================
+
+Welcome to deploy bkms-server!
+
+** Please be patient while the chart is being deployed **
+
+0. use commands as followed to check deploy status:
+
+    helm status {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+    helm get all {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+1. To uninstall helm chart, execute commands as followed:
+
+    helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+    kubectl delete pvc -l app.kubernetes.io/instance={{ .Release.Name }} -n {{ .Release.Namespace }}

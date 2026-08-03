@@ -1,0 +1,29 @@
+meta {
+  name: env-get-effective-after-del
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{serviceURL}}/apps/{{labelsAppID}}/envs/test/app-spec/labels/effective
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should fall back to default labels after env override deleted", () => {
+    expect(res.body.data.labels.team).to.equal("sre");
+    expect(res.body.data.labels.version).to.equal("v1");
+    expect(res.body.data.labels.region).to.equal(undefined);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

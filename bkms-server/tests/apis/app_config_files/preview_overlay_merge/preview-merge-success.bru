@@ -1,0 +1,41 @@
+meta {
+  name: preview-merge-success
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{serviceURL}}/apps/{{previewMergeAppID}}/app-config-files/{{previewBaseFileID}}/preview-overlay-merge
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "overlayContent": "global:\n    image: myapp:v2.0\n    env: production"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return merged content with overlay applied", () => {
+    console.log(res.body)
+    const compiledContent = res.body.data;
+    // 验证 overlay 的修改已生效
+    expect(compiledContent).to.contain('image: myapp:v2.0');
+    expect(compiledContent).to.contain('env: production');
+    // 验证基础文件的其他字段保留
+    expect(compiledContent).to.contain('replicas: 3');
+    expect(compiledContent).to.contain('service:');
+    expect(compiledContent).to.contain('port: 8080');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

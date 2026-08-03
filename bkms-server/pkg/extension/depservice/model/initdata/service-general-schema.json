@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "service-general",
+  "description": "A schema for defining general service definitions",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The unique identifier for the service type"
+      },
+      "category": {
+        "type": "string",
+        "description": "The category of the service, e.g., Storage"
+      },
+      "displayName": {
+        "type": "string",
+        "description": "The human-readable name for display purposes"
+      },
+      "description": {
+        "type": "string",
+        "description": "A detailed description of the service"
+      },
+      "plans": {
+        "type": "array",
+        "description": "Available plans for the service",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the plan"
+            },
+            "providerType": {
+              "type": "string",
+              "description": "The type of the provider"
+            },
+            "config": {
+              "type": "object",
+              "description": "Configuration options for the plan. A key-value map for flexible settings.",
+              "additionalProperties": {
+                "type": [
+                  "string",
+                  "number",
+                  "integer",
+                  "boolean",
+                  "object",
+                  "array",
+                  "null"
+                ]
+              }
+            }
+          },
+          "required": [
+            "name",
+            "providerType",
+            "config"
+          ]
+        }
+      }
+    },
+    "required": [
+      "name",
+      "category",
+      "displayName",
+      "description",
+      "plans"
+    ]
+  }
+}

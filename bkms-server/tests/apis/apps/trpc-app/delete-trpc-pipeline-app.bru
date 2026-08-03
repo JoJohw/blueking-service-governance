@@ -1,0 +1,27 @@
+meta {
+  name: delete-trpc-pipeline-app
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{testTrpcPipelineAppID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete trpc pipeline app successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

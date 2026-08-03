@@ -1,0 +1,78 @@
+meta {
+  name: audit-records
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{valuesNormalWorkspaceID}}/operation-records?page=1&pageSize=100&appID={{valuesNormalHelmAppID}}&resourceType=app&username=api-test-user
+  body: none
+  auth: inherit
+}
+
+script:pre-request {
+  await new Promise((resolve) => setTimeout(resolve, 4000));
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  const records = res.body?.data?.results ?? [];
+
+  test("should contain app config file create audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "create" &&
+      item.attribute === "appModel"
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after &&
+        after.id === bru.getVar("currentVFileID") &&
+        after.type === "normal";
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should contain app config file content update audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "update" &&
+      item.attribute === "appModel"
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after &&
+        after.id === bru.getVar("currentVFileID") &&
+        after.content === "foo: bar" &&
+        after.type === "normal";
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should not create audit record for preview-only content", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "update" &&
+      item.attribute === "appModel"
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after &&
+        after.id === bru.getVar("currentVFileID") &&
+        after.content === "foo: preview-only";
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.not.exist;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

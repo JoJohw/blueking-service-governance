@@ -1,0 +1,47 @@
+meta {
+  name: create-feature-env
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/apps/{{featureEnvAppID}}/feat-envs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "displayName": "{{featureEnvDisplayName}}",
+    "sourceEnvID": "{{featureEnvSourceEnvID}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  bru.setVar("createdFeatureEnvID", res.body.data.id);
+  bru.setVar("createdFeatureEnvName", res.body.data.name);
+}
+
+tests {
+  test("should create feature env successfully", () => {
+    const data = res.body.data;
+
+    expect(data.id).to.be.a("string").and.not.empty;
+    expect(data.name).to.match(/^feat-/);
+    expect(data.displayName).to.equal(bru.getVar("featureEnvDisplayName"));
+    expect(data.kind).to.equal("feature");
+    expect(data.ownerAppID).to.equal(bru.getVar("featureEnvAppID"));
+    expect(data.sourceEnvID).to.equal(bru.getVar("featureEnvSourceEnvID"));
+    expect(data.cluster.namespace).to.equal(data.name);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

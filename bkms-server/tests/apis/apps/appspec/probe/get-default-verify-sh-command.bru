@@ -1,0 +1,36 @@
+meta {
+  name: get-default-verify-sh-command
+  type: http
+  seq: 22
+}
+
+get {
+  url: {{serviceURL}}/apps/{{probeAppID}}/app-spec/default-probe
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("liveness should be EXEC with sh command script", () => {
+    const h = res.body.data.liveness.probeHandler;
+    expect(h.type).to.equal("EXEC");
+    expect(h.shCommand).to.equal("curl -sf http://127.0.0.1:8080/health >/dev/null || exit 1");
+    expect(h.command || []).to.have.lengthOf(0);
+  });
+  test("readiness EXEC command and startup TCP unchanged", () => {
+    expect(res.body.data.readiness.probeHandler.type).to.equal("EXEC");
+    expect(res.body.data.readiness.probeHandler.command).to.include("sh");
+    expect(res.body.data.startup.probeHandler.type).to.equal("TCP");
+    expect(res.body.data.startup.probeHandler.port).to.equal(3306);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

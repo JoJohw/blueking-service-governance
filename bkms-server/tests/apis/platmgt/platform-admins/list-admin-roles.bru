@@ -1,0 +1,40 @@
+meta {
+  name: list-admin-roles
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{serviceURL}}/plat-mgt/admins/roles
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const seedUser = bru.getVar("platAdminSeedUser");
+  req.setHeader("X-Bk-Authed-User-Info", JSON.stringify({
+    userId: seedUser,
+  }));
+  req.setHeader("X-Bk-Authed-User-Credential", '{"bkTicket":"xxx"}');
+}
+
+tests {
+  test("should list available platform administrator roles", () => {
+    expect(res.body.data).to.be.an("array");
+    expect(res.body.data.length).to.be.greaterThan(0);
+
+    const adminRole = res.body.data.find((item) => item.roleCode === "admin");
+    expect(adminRole).to.be.an("object");
+    expect(adminRole.name).to.equal("平台管理员");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,56 @@
+meta {
+  name: create-workspace-with-image-registry
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{serviceURL}}/workspaces
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "test-ws-img-{{randomSuffix}}",
+    "displayName": "测试工作空间(带镜像仓库) {{randomSuffix}}",
+    "description": "测试创建带镜像仓库配置的工作空间",
+    "bkCIProjectID": "",
+    "bkCCBizID": 100001,
+    "imageRegistry": {
+      "registry": "docker.io",
+      "username": "testuser",
+      "password": "testpass123"
+    }
+  }
+}
+
+vars:post-response {
+  imageRegistryWsID: res.body.data.id
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  // Save workspace ID for later tests
+  if (res.body && res.body.data && res.body.data.id) {
+    bru.setVar('imageRegistryWsID', res.body.data.id);
+    console.log("Created workspace with image registry ID:", res.body.data.id);
+  }
+}
+
+tests {
+  test("should create workspace with image registry", () => {
+    expect(res.body.data).to.be.an('object');
+    expect(res.body.data.id).to.contain('test-ws-img-');
+    expect(res.body.data.imageRegistryType).to.be.a('string');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

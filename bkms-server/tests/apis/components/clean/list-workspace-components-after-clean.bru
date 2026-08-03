@@ -1,0 +1,28 @@
+meta {
+  name: list-workspace-components-after-clean
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/components
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return empty workspace components", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('array');
+    expect(res.body.data.length).to.be.equal(0);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

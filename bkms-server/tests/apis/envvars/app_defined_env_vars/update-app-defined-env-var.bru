@@ -1,0 +1,58 @@
+meta {
+  name: update-app-defined-env-var
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{serviceURL}}/apps/{{appDefinedEnvVarsAppID}}/env-vars/{{appDefinedEnvVarKey}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "updatedKey": "{{updatedAppDefinedEnvVarKey}}",
+    "value": "{{updatedAppDefinedEnvVarValue}}",
+    "description": "{{updatedAppDefinedEnvVarDescription}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const suffix = bru.getVar("randomSuffix");
+  bru.setVar("updatedAppDefinedEnvVarKey", `APP_DEFINED_KEY_UPDATED_${suffix}`);
+  bru.setVar("updatedAppDefinedEnvVarValue", `app-defined-value-updated-${suffix}`);
+  bru.setVar("updatedAppDefinedEnvVarDescription", `app-defined-description-updated-${suffix}`);
+}
+
+script:post-response {
+  bru.setVar("appDefinedEnvVarKey", bru.getVar("updatedAppDefinedEnvVarKey"));
+  bru.setVar("appDefinedEnvVarValue", bru.getVar("updatedAppDefinedEnvVarValue"));
+  bru.setVar("appDefinedEnvVarDescription", bru.getVar("updatedAppDefinedEnvVarDescription"));
+  bru.setVar("appDefinedEnvVarUpdatedAt", res.body.data.updatedAt);
+}
+
+tests {
+  test("should update and rename the app-defined env var", () => {
+    const ret = res.body.data;
+
+    expect(ret.key).to.equal(bru.getVar("updatedAppDefinedEnvVarKey"));
+    expect(ret.value).to.equal(bru.getVar("updatedAppDefinedEnvVarValue"));
+    expect(ret.description).to.equal(bru.getVar("updatedAppDefinedEnvVarDescription"));
+    expect(new Date(ret.createdAt).getTime()).to.equal(
+      new Date(bru.getVar("appDefinedEnvVarCreatedAt")).getTime()
+    );
+    expect(new Date(ret.updatedAt).getTime()).to.be.greaterThan(
+      new Date(bru.getVar("appDefinedEnvVarInitialUpdatedAt")).getTime()
+    );
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

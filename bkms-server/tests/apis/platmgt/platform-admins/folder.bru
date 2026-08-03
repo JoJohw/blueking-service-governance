@@ -1,0 +1,43 @@
+docs {
+  这组平台管理员角色 API 用例当前接入的是 v1 Bruno 环境变量与 v1 服务路由，覆盖：
+  - 当前用户的平台角色查询
+  - 平台管理员角色列表查询
+  - 平台管理员角色绑定的查询 / 授予 / 撤销
+
+  在 E2E docker-compose 环境中，`mongo-init` 会自动向 `plat_admin_role_bindings`
+  集合预置 `api-test-platform-admin` 的平台管理员角色绑定，可直接配合 `e2e.bru` 运行。
+
+  本地手工运行时，请先在测试库的 `plat_admin_role_bindings` 集合中插入一个平台管理员角色绑定，
+  然后把环境变量 `platAdminSeedUser` 改成该用户名。
+
+  本目录中的权限类用例会覆盖 collection 里默认的 `api-test-user` 请求头，
+  平台管理员场景统一改用 `api-test-platform-admin`，
+  默认改用未写入 `plat_admin_role_bindings` 的 `api-test-non-platform-admin`。
+  如需自定义，可通过环境变量 `platAdminNonAdminUser` 覆盖。
+}
+
+meta {
+  name: platform-admins
+  seq: 3
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const seedUser = bru.getEnvVar("platAdminSeedUser");
+  if (!seedUser || seedUser === "__REPLACE_WITH_PLAT_ADMIN_USER__") {
+    throw new Error("env var platAdminSeedUser is required; for local runs seed a platform admin role binding into plat_admin_role_bindings and set this variable");
+  }
+  bru.setVar("platAdminSeedUser", seedUser);
+  bru.setVar(
+    "platAdminNonAdminUser",
+    bru.getEnvVar("platAdminNonAdminUser") || "api-test-non-platform-admin",
+  );
+
+  if (!bru.getVar("platAdminCreatedUsername")) {
+    const suffix = bru.getVar("randomSuffix");
+    bru.setVar("platAdminCreatedUsername", `plat-admin-${suffix}`);
+  }
+}

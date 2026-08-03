@@ -1,0 +1,30 @@
+meta {
+  name: 05-preview-rollback
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/apps/{{helmLifecycleAppID}}/envs/{{helmLifecycleEnvName}}/helm-deploys/{{helmLifecycleFirstDeployID}}/preview
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should preview rollback from v2 back to v1", () => {
+    expect(res.body.current).to.be.a("string").and.not.empty;
+    expect(res.body.target).to.be.a("string").and.not.empty;
+    expect(res.body.current).to.contain(`${bru.getVar("helmLifecycleImageRepository")}:${bru.getVar("helmLifecycleImageTag2")}`);
+    expect(res.body.target).to.contain(`${bru.getVar("helmLifecycleImageRepository")}:${bru.getVar("helmLifecycleImageTag1")}`);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 30000
+}

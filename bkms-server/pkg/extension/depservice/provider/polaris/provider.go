@@ -1,0 +1,224 @@
+package polaris
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"io"
+	"net/http"
+	"time"
+
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
+
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/httpcli"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/depservice/provider/types"
+)
+
+// Provider implements ServiceProvider for Polaris
+type Provider struct {
+	httpCli *http.Client
+	config  *Config
+}
+
+// Config represents the Polaris provider configuration
+type Config struct {
+	BaseURL string `mapstructure:"baseUrl"`
+}
+
+// parseConfig parses the plan config into Polaris Config
+func parseConfig(planConfig map[string]any) (*Config, error) {
+	cfg := new(Config)
+	if err := mapstructure.Decode(planConfig, cfg); err != nil {
+		return nil, errors.Wrap(err, "decode polaris config")
+	}
+	if cfg.BaseURL == "" {
+		return nil, errors.New("baseUrl is required")
+	}
+	return cfg, nil
+}
+
+// NewProvider creates a new Polaris provider
+func NewProvider(planConfig map[string]any) (*Provider, error) {
+	cfg, err := parseConfig(planConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Provider{
+		httpCli: &http.Client{
+			Timeout:   30 * time.Second,
+			Transport: httpcli.NewTransport(),
+		},
+		config: cfg,
+	}, nil
+}
+
+// CreateInstance creates a Polaris service instance
+func (p *Provider) CreateInstance(
+	ctx context.Context,
+	config *types.ServicePlanConfig,
+	params types.ProvisionParams,
+) (*types.CreateInstanceResult, error) {
+	createParams, ok := params.(*CreateParams)
+	if !ok {
+		return nil, errors.New("invalid params type, expected *polaris.CreateParams")
+	}
+	if err := createParams.Validate(); err != nil {
+		return nil, errors.Wrap(err, "validate polaris create params")
+	}
+
+	token, err := p.createService(
+		ctx,
+		createParams.PolarisName,
+		createParams.PolarisNamespace,
+		createParams.Owners,
+	)
+	if err != nil {
+		return nil, errors.Wrap(err, "create polaris service")
+	}
+
+	instConfig := &InstConfig{
+		PolarisName:      createParams.PolarisName,
+		PolarisNamespace: createParams.PolarisNamespace,
+		Token:            token,
+	}
+	instConfigMap, err := types.ToMap(instConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "marshal inst config")
+	}
+
+	credentials := &Credentials{Token: token}
+	credentialsMap, err := types.ToMap(credentials)
+	if err != nil {
+		return nil, errors.Wrap(err, "marshal credentials")
+	}
+
+	return &types.CreateInstanceResult{
+		InstConfig:  instConfigMap,
+		Credentials: credentialsMap,
+	}, nil
+}
+
+// QueryInstance queries a Polaris service instance
+func (p *Provider) QueryInstance(
+	ctx context.Context,
+	config *types.ServicePlanConfig,
+	instConfig map[string]any,
+) (*types.QueryInstanceResult, error) {
+	instCfg, err := ParseInstConfig(instConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "parse polaris inst config")
+	}
+	if err = instCfg.Validate(); err != nil {
+		return nil, errors.Wrap(err, "validate polaris inst config")
+	}
+
+	credentials := &Credentials{Token: instCfg.Token}
+	credentialsMap, err := types.ToMap(credentials)
+	if err != nil {
+		return nil, errors.Wrap(err, "marshal credentials")
+	}
+
+	return &types.QueryInstanceResult{
+		Status:      types.AvailableStatus,
+		Credentials: credentialsMap,
+	}, nil
+}
+
+// DeleteInstance deletes a Polaris service instance
+func (p *Provider) DeleteInstance(
+	ctx context.Context,
+	config *types.ServicePlanConfig,
+	instConfig map[string]any,
+) error {
+	instCfg, err := ParseInstConfig(instConfig)
+	if err != nil {
+		return errors.Wrap(err, "parse polaris inst config")
+	}
+
+	if err = instCfg.Validate(); err != nil {
+		return errors.Wrap(err, "validate polaris inst config")
+	}
+
+	return p.deleteService(ctx, instCfg.PolarisName, instCfg.PolarisNamespace, instCfg.Token)
+}
+
+// createService calls Polaris API to create a service
+func (p *Provider) createService(ctx context.Context, name, namespace, owners string) (string, error) {
+	reqBody := []map[string]any{
+		{
+			"name":      name,
+			"namespace": namespace,
+			"owners":    owners,
+		},
+	}
+
+	respBody, err := p.doRequest(ctx, http.MethodPost, "/naming/v1/services", reqBody)
+	if err != nil {
+		return "", err
+	}
+
+	tokenField := gjson.GetBytes(respBody, "responses.0.service.token")
+	if !tokenField.Exists() {
+		return "", errors.New("token not found in response")
+	}
+
+	return tokenField.String(), nil
+}
+
+// deleteService calls Polaris API to delete a service
+func (p *Provider) deleteService(ctx context.Context, name, namespace, token string) error {
+	reqBody := []map[string]any{
+		{
+			"name":      name,
+			"namespace": namespace,
+			"token":     token,
+		},
+	}
+
+	_, err := p.doRequest(ctx, http.MethodPost, "/naming/v1/services/delete", reqBody)
+	return err
+}
+
+// doRequest performs HTTP request to Polaris API
+func (p *Provider) doRequest(ctx context.Context, method, path string, body any) ([]byte, error) {
+	var reqBody io.Reader
+	if body != nil {
+		jsonBody, err := json.Marshal(body)
+		if err != nil {
+			return nil, errors.Wrap(err, "marshal request body")
+		}
+		reqBody = bytes.NewBuffer(jsonBody)
+	}
+
+	url := p.config.BaseURL + path
+	req, err := http.NewRequestWithContext(ctx, method, url, reqBody)
+	if err != nil {
+		return nil, errors.Wrap(err, "create request")
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := p.httpCli.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close() // nolint
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "read response body")
+	}
+
+	// 非 200 状态码，尝试从 info 字段获取错误信息
+	if resp.StatusCode != http.StatusOK {
+		if info := gjson.GetBytes(respBody, "info"); info.Exists() && info.String() != "" {
+			return nil, errors.Errorf("polaris api error: %s", info.String())
+		}
+		return nil, errors.Errorf("polaris api error: status %d, body: %s", resp.StatusCode, string(respBody))
+	}
+
+	return respBody, nil
+}

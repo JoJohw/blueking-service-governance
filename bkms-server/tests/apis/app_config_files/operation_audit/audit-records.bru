@@ -1,0 +1,115 @@
+meta {
+  name: audit-records
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{appCfgAuditWorkspaceID}}/operation-records?page=1&pageSize=100&appID={{appCfgAuditAppID}}&resourceType=app&username=api-test-user
+  body: none
+  auth: inherit
+}
+
+script:pre-request {
+  await new Promise((resolve) => setTimeout(resolve, 4000));
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  const records = res.body?.data?.results ?? [];
+
+  test("should contain normal file create audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "create" &&
+      item.attribute === "appModel"
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after &&
+        after.id === bru.getVar("appCfgAuditNormalFileID") &&
+        after.name === bru.getVar("appCfgAuditNormalFileName");
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should contain normal file metadata update audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "update" &&
+      item.attribute === "appModel"
+    );
+
+    const record = candidates.find((item) => {
+      const before = item.data?.before ? JSON.parse(item.data.before) : null;
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return before && after &&
+        before.id === bru.getVar("appCfgAuditNormalFileID") &&
+        before.name === bru.getVar("appCfgAuditNormalFileName") &&
+        after.id === bru.getVar("appCfgAuditNormalFileID") &&
+        after.name === bru.getVar("appCfgAuditUpdatedNormalFileName");
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should contain normal file delete audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "delete" &&
+      item.attribute === "appModel"
+    );
+
+    const record = candidates.find((item) => {
+      const before = item.data?.before ? JSON.parse(item.data.before) : null;
+      return before &&
+        before.id === bru.getVar("appCfgAuditNormalFileID") &&
+        before.name === bru.getVar("appCfgAuditUpdatedNormalFileName") &&
+        !item.data?.after;
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should contain overlay file create audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "create" &&
+      item.attribute === "appModel"
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after &&
+        after.id === bru.getVar("appCfgAuditOverlayFileID") &&
+        after.name === bru.getVar("appCfgAuditOverlayFileName") &&
+        after.type === "overlay" &&
+        after.baseAppConfigFileID === bru.getVar("appCfgAuditBaseFileID");
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should contain overlay content update audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "update" &&
+      item.attribute === "appModel"
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after &&
+        after.id === bru.getVar("appCfgAuditOverlayFileID") &&
+        after.overlayContent === "foo: overlay";
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

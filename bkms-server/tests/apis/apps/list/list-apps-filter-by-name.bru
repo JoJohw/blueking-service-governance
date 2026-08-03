@@ -1,0 +1,36 @@
+meta {
+  name: list-apps-filter-by-name
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/apps?appName={{newHelmAppName}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  appName: {{newHelmAppName}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should filter apps by name", () => {
+    expect(res.body.data).to.be.an('array');
+    expect(res.body.data.length).to.equal(1);
+    
+    const app = res.body.data[0];
+    expect(app.name).to.equal(bru.getVar('newHelmAppName'));
+    expect(app.type).to.equal('helm');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

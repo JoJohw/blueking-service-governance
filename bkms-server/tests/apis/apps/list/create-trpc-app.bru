@@ -1,0 +1,65 @@
+meta {
+  name: create-trpc-app
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/apps
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "api-test-app-trpc-{{randomSuffix}}",
+    "id": "api-test-app-trpc-{{randomSuffix}}-id",
+    "type": "trpc",
+    "displayName": "TRPC App Test",
+    "appModelSpec": {
+      "trpcSpec": {
+        "language": "go",
+        "fileName": "trpc_go.yaml",
+        "filePath": "/usr/local/trpc/bin/",
+        "fileContent": "dGVzdAo="
+      }
+    },
+    "buildConfig": {
+      "sourceType": "codeRepository",
+      "repoBuildConfig": {
+        "type": "TGit",
+        "repoAlias": "test",
+        "repoURL": "https://git.com/bkms-govern.git",
+        "defaultBranch": "main",
+        "sourceDir": ".",
+        "dockerfile": "Dockerfile",
+        "dockerBuildArgs": {
+          "ARG1": "value1",
+          "ARG2": "value2"
+        }
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  bru.setVar('newTrpcAppID', res.body.data.id);
+  bru.setVar('newTrpcAppName', res.body.data.name);
+}
+
+tests {
+  test("should create trpc app successfully", () => {
+    expect(res.body.data.type).to.equal('trpc');
+    expect(res.body.data.name).to.contain('api-test-app-trpc');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

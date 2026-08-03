@@ -1,0 +1,56 @@
+// Package polaris provides polaris list command
+package polaris
+
+import (
+	"fmt"
+
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/client"
+	cmdutil "github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/cmd"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/output"
+)
+
+// NewListCmd returns a Command instance for 'app polaris list' sub command
+func NewListCmd() *cobra.Command {
+	var appID, outputFormat string
+
+	cmd := &cobra.Command{
+		Use:   "list",
+		Short: "List polaris configs for an application",
+		Long: `List all polaris configs for the specified application.
+
+Polaris configs define how the application registers services with the Polaris
+service mesh. Each config specifies the polaris service name, namespace, port,
+and environment scope.`,
+		Example: `  # List polaris configs for an application
+  bkms-cli app polaris list --app my-app
+
+  # Output in JSON format
+  bkms-cli app polaris list --app my-app -o json
+
+  # Output in YAML format
+  bkms-cli app polaris list --app my-app -o yaml`,
+		PreRun: cmdutil.CommonPreRun,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			configs, err := client.New().ListAppPolarisConfigs(cmd.Context(), appID)
+			if err != nil {
+				return errors.Wrap(err, "list app polaris configs")
+			}
+			formatted, err := output.FormatData(cmd.Context(), configs, outputFormat)
+			if err != nil {
+				return errors.Wrap(err, "format output")
+			}
+			fmt.Println(formatted)
+			return nil
+		},
+	}
+
+	cmd.Flags().StringVar(&appID, "app", "", "application ID")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "", output.FlagUsage)
+
+	_ = cmd.MarkFlagRequired("app")
+
+	return cmd
+}

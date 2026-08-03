@@ -1,0 +1,45 @@
+meta {
+  name: topology
+  seq: 8
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("topologyAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const workspaceID = `topology-ws-${suffix}`;
+    const appID = `topology-app-${suffix}`;
+    const envName = `topology-env-${suffix}`;
+
+    await common.createWorkspace({ id: workspaceID });
+    const app = await common.createTrpcApp({
+      id: appID,
+      name: appID,
+      workspaceID,
+    });
+    const env = await common.createEnvironment({
+      workspaceID,
+      name: envName,
+      displayName: envName,
+      type: "development",
+      description: `topology api test env ${suffix}`,
+      cluster: {
+        clusterID: `topology-cluster-${suffix}`,
+        clusterType: "single",
+        namespace: `topology-ns-${suffix}`,
+      },
+    });
+
+    const nodeID = Buffer.from("Deployment/default/topology-web").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+    bru.setVar("topologyWorkspaceID", workspaceID);
+    bru.setVar("topologyAppID", app.id);
+    bru.setVar("topologyEnvName", env.name);
+    bru.setVar("topologyNodeID", nodeID);
+  }
+}

@@ -1,0 +1,32 @@
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "bkms-ui.fullname" . }}
+  labels:
+    {{- include "bkms-ui.labels" . | nindent 4 }}
+  annotations:
+    {{- if eq "true" (include "common.ingress.supportsIngressClassname" .) }}
+    {{- $filtered := omit .Values.ingress.annotations "kubernetes.io/ingress.class" }}
+    {{- toYaml $filtered | nindent 4 }}
+    {{- else }}
+    {{- if .Values.ingress.ingressClass }}
+    kubernetes.io/ingress.class: {{ .Values.ingress.ingressClass | quote }}
+    {{- end }}
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- end }}
+spec:
+  {{- if eq "true" (include "common.ingress.supportsIngressClassname" .) }}
+  ingressClassName: {{ .Values.ingress.ingressClass }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - backend:
+              {{- include "common.ingress.backend" (dict "serviceName" (include "bkms-ui.fullname" .) "servicePort" (.Values.service.port | int) "context" $) | nindent 14 }}
+            path: {{ .Values.ingress.path }}
+            {{- if eq "true" (include "common.ingress.supportsPathType" .) }}
+            pathType: {{ .Values.ingress.pathType }}
+            {{- end }}

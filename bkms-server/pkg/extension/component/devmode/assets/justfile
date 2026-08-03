@@ -1,0 +1,40 @@
+set shell := ["bash", "-euo", "pipefail", "-c"]
+
+image := env_var_or_default("BKMS_DEVMODE_ASSETS_TEST_IMAGE", "bkms-devmode-assets-test:local")
+workspace := justfile_directory()
+
+default:
+    @just --list
+
+# Build the docker image used by the bash unit-test toolchain.
+docker-build:
+    docker build --tag {{image}} --file {{workspace}}/tests/docker/Dockerfile {{workspace}}
+
+# Run shellcheck against the bash test scaffolding itself.
+lint:
+    @just docker-build
+    docker run --rm \
+      --volume {{workspace}}:/workspace \
+      --workdir /workspace \
+      --entrypoint bash \
+      {{image}} \
+      -lc 'shellcheck tests/helpers/*.bash'
+
+# Run bats test suites inside a linux container.
+test target="tests/unit":
+    @just docker-build
+    docker run --rm \
+      --volume {{workspace}}:/workspace \
+      --workdir /workspace \
+      --entrypoint bash \
+      {{image}} \
+      -lc 'bats --recursive "{{target}}"'
+
+# Open an interactive shell inside the test container for debugging.
+shell:
+    @just docker-build
+    docker run --rm -it \
+      --volume {{workspace}}:/workspace \
+      --workdir /workspace \
+      --entrypoint bash \
+      {{image}}

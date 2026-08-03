@@ -1,0 +1,80 @@
+meta {
+  name: audit-records
+  type: http
+  seq: 22
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{probeWorkspaceID}}/operation-records?page=1&pageSize=100&appID={{probeAppID}}&resourceType=app&username=api-test-user
+  body: none
+  auth: inherit
+}
+
+script:pre-request {
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  const records = res.body?.data?.results ?? [];
+
+  test("should contain env probe update audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "update" &&
+      item.attribute === "appModel" &&
+      item.group.envName === bru.getVar("testEnv")
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after && after.Liveness && after.Liveness.Handler &&
+        after.Liveness.Handler.URL === "http://localhost/env-health";
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should contain env probe delete audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "delete" &&
+      item.attribute === "appModel" &&
+      item.group.envName === bru.getVar("testEnv")
+    );
+
+    const record = candidates.find((item) => {
+      const before = item.data?.before ? JSON.parse(item.data.before) : null;
+      return before && before.Liveness && before.Liveness.Handler &&
+        before.Liveness.Handler.URL === "http://localhost/env-health" &&
+        !item.data?.after;
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should only record one startup probe removal audit after repeated no-op delete", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "update" &&
+      item.attribute === "appModel" &&
+      item.group.envName === bru.getVar("testEnv")
+    );
+
+    const matched = candidates.filter((item) => {
+      const before = item.data?.before ? JSON.parse(item.data.before) : null;
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return before && before.Startup && before.Startup.Handler &&
+        before.Startup.Handler.Port === 3306 &&
+        (!after || !after.Startup);
+    });
+
+    expect(matched.length, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.equal(1);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

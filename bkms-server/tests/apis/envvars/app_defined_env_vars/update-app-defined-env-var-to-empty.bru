@@ -1,0 +1,42 @@
+meta {
+  name: update-app-defined-env-var-to-empty
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{serviceURL}}/apps/{{appDefinedEnvVarsAppID}}/env-vars/{{appDefinedEnvVarKey}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "updatedKey": "{{appDefinedEnvVarKey}}",
+    "value": "",
+    "description": "{{appDefinedEnvVarDescription}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:post-response {
+  bru.setVar("appDefinedEnvVarValue", "");
+}
+
+tests {
+  test("should update an app-defined env var value to empty", () => {
+    const ret = res.body.data;
+
+    expect(ret.key).to.equal(bru.getVar("appDefinedEnvVarKey"));
+    expect(ret.value).to.equal("");
+    expect(ret.description).to.equal(bru.getVar("appDefinedEnvVarDescription"));
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

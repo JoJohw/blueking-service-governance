@@ -1,0 +1,267 @@
+help:
+    @echo "Just commands for managing bkms-server tests environment"
+    @echo ""
+    @echo "  just up                Start the API test stack (compose up -d)"
+    @echo "  just up-locbin         Start the stack with a locally built bkms-server binary"
+    @echo "  just up-podman         Start the API test stack with Podman overrides"
+    @echo "  just up-podman-locbin  Start the Podman stack with a locally built bkms-server binary"
+    @echo "  just down              Stop the stack (compose down -v --remove-orphans)"
+    @echo "  just down-podman       Stop the Podman stack (compose down -v --remove-orphans)"
+    @echo "  just stop              Stop containers without removing them"
+    @echo "  just restart-bkms      Restart the bkms-server container"
+    @echo "  just bkms-logs         Show bkms-server logs"
+    @echo "  just bkms-logs-f       Follow bkms-server logs"
+    @echo "  just e2e-logs          Show bruno e2e logs"
+    @echo "  just e2e-logs-tail [N] Show last N lines of bruno e2e logs (default 100)"
+    @echo "  just e2e-logs-failures Show failed bruno e2e requests with assertion reasons"
+    @echo "  just dump-logs [N]     Dump tail logs of bkms-server/worker/migration/chartmuseum (default 200)"
+
+COMPOSE := "docker-compose -p bkms-apitest"
+PODMAN_COMPOSE := "podman compose -p bkms-apitest"
+
+###############################################################################
+# Self-contained API test stack.
+#
+# Prereqs (provided by the caller, NOT by `just up`):
+#   - A reachable K8s apiserver from inside the compose network. The compose
+#     file routes `kubernetes.default` to `host-gateway`, so the apiserver
+#     just needs to be bound to a host IP the docker bridge can reach (e.g.
+#     `0.0.0.0:<port>`, or any host interface other than the loopback).
+#   - A kubeconfig whose `server` field points at the apiserver via that same
+#     hostname/port (e.g. `https://kubernetes.default:42099`).
+#
+# Tunable env vars (all optional unless noted):
+#   BKMS_APITEST_KUBECONFIG     absolute kubeconfig path (default ~/.kube/config)
+#   BKMS_SERVER_IMAGE           bkms-server image under test (default bkms-server:latest)
+#   BKMS_LOCAL_BINARY           absolute path to a locally built bkms-server binary;
+#                               only used by `just up-locbin`, mounted read-only
+#                               into bkms-server, bkms-worker, and migration
+#                               to avoid rebuilding the image during local loops
+#   BKMS_APITEST_WORKLOAD_IMAGE required when RUN_HELM_DEPLOY_API_TESTS,
+#                               RUN_TRPC_DEPLOY_API_TESTS or
+#                               RUN_TAF_DEPLOY_API_TESTS is set; the value
+#                               must be the *tag-less* image repository
+#                               `<registry>/<name>` (e.g.
+#                               `example.com/bkms/apitest-workload`). The
+#                               target K8s cluster must be able to pull the
+#                               `<repo>:1.0.0` and `<repo>:2.0.0` tags, and
+#                               each image must contain the `sleep` command
+###############################################################################
+
+# Bring up the API test stack.
+up:
+    @just _up normal "{{COMPOSE}}" "" ""
+
+# Bring up the API test stack with a locally built bkms-server binary.
+#
+# Set BKMS_LOCAL_BINARY to the host path of the executable binary. By default,
+# this uses ../build/bkms-server, which is produced by `make build-dev` from the
+# bkms-server project root. The compose patch mounts it read-only into
+# bkms-server, bkms-worker, and migration so all backend services run the same
+# local code without rebuilding the image.
+up-locbin:
+    @just _up locbin "{{COMPOSE}}" "-f docker-compose.yaml" ""
+
+# Bring up the API test stack with Podman-specific compatibility overrides.
+up-podman:
+    @just _up normal "{{PODMAN_COMPOSE}}" "-f docker-compose.yaml -f docker-compose.podman.yaml" "host.containers.internal"
+
+# Bring up the Podman API test stack with a locally built bkms-server binary.
+up-podman-locbin:
+    @just _up locbin "{{PODMAN_COMPOSE}}" "-f docker-compose.yaml -f docker-compose.podman.yaml" "host.containers.internal"
+
+_up mode compose_cmd compose_files kubernetes_host:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    : "${BKMS_APITEST_KUBECONFIG:=${HOME}/.kube/config}"
+    if [ ! -f "${BKMS_APITEST_KUBECONFIG}" ]; then
+        echo "ERROR: BKMS_APITEST_KUBECONFIG=${BKMS_APITEST_KUBECONFIG} does not exist" >&2
+        exit 1
+    fi
+    if [ -n "${RUN_HELM_DEPLOY_API_TESTS:-}" ] || [ -n "${RUN_TRPC_DEPLOY_API_TESTS:-}" ] || [ -n "${RUN_TAF_DEPLOY_API_TESTS:-}" ]; then
+        if [ -z "${BKMS_APITEST_WORKLOAD_IMAGE:-}" ]; then
+            echo "ERROR: BKMS_APITEST_WORKLOAD_IMAGE is required when deploy API tests are enabled" >&2
+            exit 1
+        fi
+    fi
+
+    # 由调用方传入 compose 命令和额外 compose 文件，以复用 Docker / Podman 的启动逻辑。
+    compose_args=( {{compose_files}} )
+    env_args=()
+
+    # Docker 模式下尽力适配仅暴露在宿主 loopback 的标准 Kind 集群。
+    if [ -z "{{kubernetes_host}}" ]; then
+        adapter_output="$(bash scripts/kind-loopback-adapter.sh prepare "${BKMS_APITEST_KUBECONFIG}" || true)"
+        if [ -n "${adapter_output}" ]; then
+            IFS=$'\t' read -r BKMS_APITEST_KUBECONFIG kind_network kube_server control_plane <<< "${adapter_output}"
+            if [ "${#compose_args[@]}" -eq 0 ]; then
+                compose_args+=("-f" "docker-compose.yaml")
+            fi
+            compose_args+=("-f" "docker-compose.kind-loopback.yaml")
+            env_args+=("BKMS_APITEST_KIND_NETWORK=${kind_network}")
+            echo "Kind loopback adapter: ${kube_server} -> https://${control_plane}:6443 via Docker network ${kind_network}"
+        fi
+    fi
+
+    env_args+=("BKMS_APITEST_KUBECONFIG=${BKMS_APITEST_KUBECONFIG}")
+
+    # Podman 模式下使用 host.containers.internal 访问宿主机上的 K8s apiserver。
+    if [ -n "{{kubernetes_host}}" ]; then
+        env_args+=("BKMS_APITEST_KUBERNETES_HOST={{kubernetes_host}}")
+    fi
+
+    if [ "{{mode}}" = "locbin" ]; then
+        : "${BKMS_LOCAL_BINARY:=../build/bkms-server}"
+        if [ ! -x "${BKMS_LOCAL_BINARY}" ]; then
+            echo "ERROR: BKMS_LOCAL_BINARY=${BKMS_LOCAL_BINARY} does not exist or is not executable" >&2
+            exit 1
+        fi
+
+        # locbin 模式额外挂载本地二进制，避免每次本地代码改动都重新构建镜像。
+        env_args+=("BKMS_LOCAL_BINARY=${BKMS_LOCAL_BINARY}")
+        compose_args+=("-f" "compose-replace-binary.yaml")
+    fi
+
+    # 使用 env 数组传递环境变量，避免覆盖调用方 shell 中的其他环境。
+    env "${env_args[@]}" {{compose_cmd}} "${compose_args[@]}" up -d --build
+
+# Tear down the API test stack (containers + volumes + orphans).
+down:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    {{COMPOSE}} down -v --remove-orphans
+    bash scripts/kind-loopback-adapter.sh clean
+
+# Tear down the Podman API test stack (containers + volumes + orphans).
+down-podman:
+    {{PODMAN_COMPOSE}} -f docker-compose.yaml -f docker-compose.podman.yaml down -v --remove-orphans
+
+# Stop services without removing containers (logs preserved).
+stop:
+    {{COMPOSE}} stop
+
+# Restart the bkms-server service.
+restart-bkms:
+    {{COMPOSE}} restart bkms-server
+
+# Show bkms-server logs (full history).
+bkms-logs:
+    {{COMPOSE}} logs bkms-server
+
+# Follow bkms-server logs (tail -f).
+bkms-logs-f:
+    {{COMPOSE}} logs -f bkms-server
+
+# Show bruno e2e logs (full history).
+e2e-logs:
+    {{COMPOSE}} logs e2e
+
+# Show last N lines of bruno e2e logs (default 100).
+e2e-logs-tail lines="100":
+    {{COMPOSE}} logs e2e --tail {{lines}}
+
+# Show failed bruno e2e requests with assertion reasons.
+e2e-logs-failures:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    {{COMPOSE}} logs e2e | awk '
+    function strip_prefix(line) {
+        sub(/^[^|]*\|[[:space:]]?/, "", line)
+        sub(/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]:[0-9][0-9][0-9] :[[:space:]]*/, "", line)
+        sub(/^##\[error\][[:space:]]?/, "", line)
+        return line
+    }
+
+    function reset_failure() {
+        failed = 0
+        details = ""
+        pending_reason = 0
+    }
+
+    function ensure_request() {
+        if (request == "") {
+            request = "unmatched bruno failure"
+        }
+    }
+
+    function append_detail(line) {
+        failed = 1
+        ensure_request()
+        details = details line "\n"
+    }
+
+    function flush_failure() {
+        if (!failed || request == "") {
+            return
+        }
+        if (count > 0) {
+            print ""
+        }
+        print "=== " request " ==="
+        printf "%s", details
+        count++
+    }
+
+    {
+        line = strip_prefix($0)
+        if (line ~ /^[^[:space:]].* \([0-9][0-9][0-9] [^)]+\) - [0-9]+ ms$/) {
+            flush_failure()
+            request = line
+            reset_failure()
+            next
+        }
+
+        if (line ~ /^\[Function: AssertionError\]$/) {
+            append_detail(line)
+            pending_reason = 1
+            next
+        }
+
+        if (line ~ /^(AssertionError|Error|TypeError|ReferenceError|SyntaxError):/) {
+            append_detail(line)
+            pending_reason = 1
+            next
+        }
+
+        if (line ~ /(Post-response script execution error|originalError: Error|Request failed|Script error|[Tt]imed out|polling-timeout|ECONN|ENOTFOUND|Error response:)/) {
+            append_detail(line)
+            pending_reason = 1
+            next
+        }
+
+        if (line ~ /^[[:space:]]*✕ /) {
+            append_detail(line)
+            pending_reason = 1
+            next
+        }
+
+        if (pending_reason) {
+            if (line ~ /^[[:space:]]*script: /) {
+                pending_reason = 0
+            } else if (line ~ /^[[:space:]]+/ && line !~ /^[[:space:]]*$/ && line !~ /^[[:space:]]*[✓✕]/) {
+                details = details line "\n"
+            } else {
+                pending_reason = 0
+            }
+        }
+    }
+
+    END {
+        flush_failure()
+        if (count == 0) {
+            print "No failed e2e requests found in e2e logs."
+        }
+    }
+    '
+
+# Dump tail logs of all backend service containers; useful in CI when e2e fails.
+# 参数 lines 控制每个服务输出的最后多少行（默认 200）。
+dump-logs lines="200":
+    #!/usr/bin/env bash
+    set -u
+    for svc in bkms-server bkms-worker migration chartmuseum chartmuseum-init; do
+        echo "=========================================="
+        echo "=== docker-compose logs ${svc} (tail {{lines}}) ==="
+        echo "=========================================="
+        {{COMPOSE}} logs --tail={{lines}} "${svc}" || true
+    done

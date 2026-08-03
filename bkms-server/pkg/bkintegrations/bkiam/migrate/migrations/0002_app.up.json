@@ -1,0 +1,157 @@
+{
+  "system_id": "{{ .BKMSSystemID }}",
+  "enabled": true,
+  "operations": [
+    {
+      "operation": "upsert_resource_type",
+      "data": {
+        "id": "app",
+        "name": "应用",
+        "name_en": "app",
+        "description": "应用",
+        "description_en": "app",
+        "provider_config": {
+          "path": "/xxx/apps/"
+        },
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_instance_selection",
+      "data": {
+        "id": "app_list",
+        "name": "应用列表",
+        "name_en": "apps",
+        "resource_type_chain": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "workspace"
+          },
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "app"
+          }
+        ]
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "create_app",
+        "name": "创建应用",
+        "name_en": "create app",
+        "description": "用户创建应用",
+        "description_en": "user create app",
+        "type": "create",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "workspace",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "workspace_list"
+              }
+            ]
+          }
+        ],
+        "related_actions": [
+          "view_workspace"
+        ],
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "view_app",
+        "name": "查看应用",
+        "name_en": "view app",
+        "description": "用户查看应用",
+        "description_en": "user view app",
+        "type": "view",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "app",
+            "name_alias": "",
+            "name_alias_en": "",
+            "selection_mode": "instance",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "app_list"
+              }
+            ]
+          }
+        ],
+        "related_actions": [
+          "view_workspace"
+        ],
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "edit_app",
+        "name": "编辑应用",
+        "name_en": "edit app",
+        "description": "用户编辑应用",
+        "description_en": "user edit app",
+        "type": "edit",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "app",
+            "name_alias": "",
+            "name_alias_en": "",
+            "selection_mode": "instance",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "app_list"
+              }
+            ]
+          }
+        ],
+        "related_actions": [
+          "view_workspace",
+          "view_app"
+        ],
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "delete_app",
+        "name": "删除应用",
+        "name_en": "delete app",
+        "description": "用户删除应用",
+        "description_en": "user delete app",
+        "type": "delete",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "app",
+            "name_alias": "",
+            "name_alias_en": "",
+            "selection_mode": "instance",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "app_list"
+              }
+            ]
+          }
+        ],
+        "related_actions": [
+          "view_workspace",
+          "view_app"
+        ],
+        "version": 1
+      }
+    }
+  ]
+}

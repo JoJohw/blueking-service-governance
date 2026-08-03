@@ -1,0 +1,37 @@
+meta {
+  name: list-role-bindings-without-permission
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/plat-mgt/admins
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 403
+  res.body: isJson
+}
+
+script:pre-request {
+  const nonAdminUser = bru.getVar("platAdminNonAdminUser");
+  req.setHeader("X-Bk-Authed-User-Info", JSON.stringify({
+    userId: nonAdminUser,
+  }));
+  req.setHeader("X-Bk-Authed-User-Credential", '{"bkTicket":"xxx"}');
+}
+
+tests {
+  test("should reject listing platform administrator role bindings for non-platform-admin user", () => {
+    expect(res.body.error).to.be.an("object");
+    expect(res.body.error.code).to.equal("NO_PERMISSION");
+    expect(res.body.error.message).to.equal("platform administrator permission required");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

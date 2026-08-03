@@ -1,0 +1,30 @@
+meta {
+  name: env-get-after-del-startup
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{serviceURL}}/apps/{{probeAppID}}/envs/{{testEnv}}/app-spec/probe
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should have liveness and readiness but not startup", () => {
+    expect(res.body.data.liveness).to.not.be.null;
+    expect(res.body.data.liveness.probeHandler.type).to.equal("HTTP");
+    expect(res.body.data.readiness).to.not.be.null;
+    expect(res.body.data.readiness.probeHandler.type).to.equal("EXEC");
+    expect(res.body.data.startup).to.be.null;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

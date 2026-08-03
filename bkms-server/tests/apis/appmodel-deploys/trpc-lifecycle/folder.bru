@@ -1,0 +1,112 @@
+meta {
+  name: trpc-lifecycle
+  seq: 1
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  // The Trpc deploy lifecycle suite drives a real GameDeployment workload
+  // against the kind cluster, so it is gated behind RUN_TRPC_DEPLOY_API_TESTS
+  // to keep the default `bru run` invocation cheap. When the env var is
+  // unset, every request in this folder is cancelled (Bruno reports them as
+  // skipped without affecting the overall exit code).
+  if (!bru.getProcessEnv("RUN_TRPC_DEPLOY_API_TESTS")) {
+    console.log("trpc lifecycle skipped: RUN_TRPC_DEPLOY_API_TESTS not set");
+    bru.runner.skipRequest();
+    return;
+  }
+
+  // Bootstrap workspace / env / trpc app
+  // exactly once for the suite. `trpcLifecycleReady` makes this idempotent
+  // when the folder is replayed.
+  const common = require("./common");
+
+  if (!bru.getVar("trpcLifecycleReady")) {
+    const suffix = bru.getVar("randomSuffix");
+    const workspaceID = `tdeploy-ws-${suffix}`;
+    const appID = `tdeploy-app-${suffix}`;
+    const envName = `tdeploy-env-${suffix}`;
+    // BKMS_APITEST_WORKLOAD_IMAGE is the image *repository* without a tag,
+    // formatted as `<registry>/<name>`. The registry must host both
+    // `<repo>:1.0.0` and `<repo>:2.0.0`, each containing `sleep`, because the
+    // workload is started as `sleep 3600` and v2 switches the tag to 2.0.0.
+    const imageRepository = bru.getProcessEnv("BKMS_APITEST_WORKLOAD_IMAGE");
+    if (!imageRepository) {
+      throw new Error("BKMS_APITEST_WORKLOAD_IMAGE is required for trpc lifecycle tests");
+    }
+    if (imageRepository.includes(":")) {
+      throw new Error(`BKMS_APITEST_WORKLOAD_IMAGE must be a tag-less <registry>/<name>, got: ${imageRepository}`);
+    }
+    const slashIdx = imageRepository.lastIndexOf("/");
+    if (slashIdx <= 0 || slashIdx === imageRepository.length - 1) {
+      throw new Error(`BKMS_APITEST_WORKLOAD_IMAGE must be in <registry>/<name> form, got: ${imageRepository}`);
+    }
+    const registry = imageRepository.slice(0, slashIdx);
+    const imageName = imageRepository.slice(slashIdx + 1);
+    const appName = imageName;
+    const imageTag1 = "1.0.0";
+    const imageTag2 = "2.0.0";
+
+    const ws = await common.createWorkspace({
+      id: workspaceID,
+      imageRegistry: {
+        registry,
+        username: "registry-user",
+        password: "registry-foo-password"
+      }
+    });
+    await common.createEnvironment({
+      name: envName,
+      workspaceID: ws.id,
+      type: "test",
+      description: "Trpc deploy v2 lifecycle suite",
+      cluster: {
+        clusterID: "BCS-K8S-00001",
+        clusterType: "single",
+        namespace: "default"
+      }
+    });
+    const app = await common.createTrpcApp({
+      id: appID,
+      name: appName,
+      workspaceID: ws.id,
+      appModelSpec: {
+        trpcSpec: {
+          language: "go",
+          fileName: "trpc_go.yaml",
+          filePath: "/tmp/",
+          fileContent: "dGVzdAo="
+        },
+        command: ["sleep"],
+        args: ["3600"],
+        envVars: []
+      },
+      buildConfig: {
+        sourceType: "imageRegistry",
+        imageBuildConfig: {name: imageName}
+      }
+    });
+    // Keep resource requests low so the real GameDeployment pods can be
+    // scheduled reliably in the single-node kind API-test cluster.
+    await common.updateDefaultAppSpecResources({
+      appID: app.id,
+      resources: {
+        replicas: 1,
+        cpuRequests: "100m",
+        cpuLimits: "200m",
+        memoryRequests: "128Mi",
+        memoryLimits: "256Mi"
+      }
+    });
+
+    bru.setVar("trpcLifecycleWorkspaceID", ws.id);
+    bru.setVar("trpcLifecycleAppID", app.id);
+    bru.setVar("trpcLifecycleEnvName", envName);
+    bru.setVar("trpcLifecycleImageTag1", imageTag1);
+    bru.setVar("trpcLifecycleImageTag2", imageTag2);
+    bru.setVar("trpcLifecycleReady", true);
+  }
+}

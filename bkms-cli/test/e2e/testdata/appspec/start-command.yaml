@@ -1,0 +1,5 @@
+command:
+  - /usr/local/trpc/bin/container-start.sh
+args:
+  - -conf
+  - /usr/local/trpc/bin/trpc-go.yaml

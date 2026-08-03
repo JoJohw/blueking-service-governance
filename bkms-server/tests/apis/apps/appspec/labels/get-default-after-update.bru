@@ -1,0 +1,28 @@
+meta {
+  name: get-default-after-update
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/apps/{{labelsAppID}}/app-spec/default-labels
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the updated default labels", () => {
+    expect(res.body.data.labels.team).to.equal("sre");
+    expect(res.body.data.labels.version).to.equal("v1");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

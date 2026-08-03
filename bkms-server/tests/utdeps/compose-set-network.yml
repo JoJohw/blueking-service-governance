@@ -1,0 +1,12 @@
+services:
+  # Remove all port mappings
+  git:
+    ports: []
+  chartmuseum:
+    ports: []
+  registry:
+    ports: []
+networks:
+  default:
+    name: ${NETWORK_NAME}
+    external: true

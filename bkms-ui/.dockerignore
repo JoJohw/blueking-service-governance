@@ -1,0 +1,36 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Editor and OS files
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+tmp/
+temp/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Dependencies and build outputs
+node_modules
+dist
+coverage
+.cache
+.turbo
+.vite
+
+# Test reports
+playwright-report
+test-results
+junit.xml

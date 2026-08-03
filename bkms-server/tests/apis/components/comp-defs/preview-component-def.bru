@@ -1,0 +1,53 @@
+meta {
+  name: preview-component-def
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/component-defs/preview
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "compDefName": "api-preview-demo",
+    "properties": [
+      {
+        "name": "demoLabel",
+        "type": "STRING",
+        "defaultValue": "hello-from-api-test",
+        "description": "label for preview assert"
+      }
+    ],
+    "patchers": [],
+    "specs": [
+      "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: \"{{ .name }}-cm\"\n  namespace: \"{{ .bkmsEnvNamespace }}\"\ndata:\n  label: \"{{ .demoLabel }}\"\n  envName: \"{{ .bkmsEnvName }}\"\n"
+    ]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return resources and patch preview for component def preview", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.resources).to.be.an("array");
+    expect(res.body.resources.length).to.be.greaterThan(0);
+    expect(res.body.resources[0].kind).to.equal("ConfigMap");
+    expect(res.body.resources[0].manifest).to.include("hello-from-api-test");
+    expect(res.body.resources[0].manifest).to.include("preview-env-name");
+    expect(res.body.patchPreview).to.be.an("array");
+    expect(res.body.patchPreview.length).to.be.greaterThan(0);
+    expect(res.body.patchPreview[0].targetKind).to.equal("GameDeployment");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

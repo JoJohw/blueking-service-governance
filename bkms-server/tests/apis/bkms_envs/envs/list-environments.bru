@@ -1,0 +1,53 @@
+meta {
+  name: list-environments
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/envs
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:post-response {
+  bru.setVar("envID", res.body.data[0].id)
+}
+
+tests {
+  test("should return the right response", () => {
+    const ret = res.body.data[0]
+    
+    expect(ret.name).to.equal(bru.getVar("createdEnvName"));
+    expect(ret.displayName).to.equal(bru.getVar("createdEnvDisplayName"))
+    expect(ret.type).to.equal(bru.getVar("createdEnvType"))
+    expect(ret.createdAt).to.not.equal("1970-01-01T00:00:00Z")
+    expect(ret.updatedAt).to.not.equal("1970-01-01T00:00:00Z")
+    expect(ret.status).to.equal("Ready")
+  });
+
+  test("should include canonical default standard environments", () => {
+    const envs = res.body.data;
+    const defaults = [
+      {name: "test", displayName: "测试环境", type: "test"},
+      {name: "staging", displayName: "预发布环境", type: "staging"},
+      {name: "production", displayName: "正式环境", type: "production"}
+    ];
+
+    defaults.forEach((item) => {
+      const matched = envs.find((env) => env.name === item.name);
+      expect(Boolean(matched)).to.equal(true);
+      expect(matched.displayName).to.equal(item.displayName);
+      expect(matched.type).to.equal(item.type);
+    });
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

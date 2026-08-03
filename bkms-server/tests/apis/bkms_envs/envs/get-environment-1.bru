@@ -1,0 +1,35 @@
+meta {
+  name: get-environment-1
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/envs/{{envID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return the right response", () => {
+    const ret = res.body.data
+    
+    expect(ret.name).to.equal(bru.getVar("createdEnvName"));
+    expect(ret.displayName).to.equal(bru.getVar("newEnvDisplayName"));
+    expect(ret.type).to.equal(bru.getVar("newEnvType"));
+    expect(ret.createdAt).to.not.equal("1970-01-01T00:00:00Z")
+    expect(ret.updatedAt).to.not.equal("1970-01-01T00:00:00Z")
+    
+    expect(ret.cluster.clusterID).to.equal(bru.getVar("clusterID"))
+    expect(ret.cluster.namespace).to.equal(bru.getVar("namespace"))
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

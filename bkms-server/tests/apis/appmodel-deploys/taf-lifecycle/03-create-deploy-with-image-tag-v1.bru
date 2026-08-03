@@ -1,0 +1,54 @@
+meta {
+  name: 03-create-deploy-with-image-tag-v1
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{serviceURL}}/apps/{{tafLifecycleAppID}}/envs/{{tafLifecycleEnvName}}/taf-deploys
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "imageTag": "{{tafLifecycleImageTag1}}",
+    "replicas": 1
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  if (res.status !== 200) {
+    return;
+  }
+
+  const appmodel = require("./helpers/appmodel");
+
+  const record = await appmodel.waitForAppModelDeployTerminal({
+    kind: "taf",
+    appID: bru.getVar("tafLifecycleAppID"),
+    envName: bru.getVar("tafLifecycleEnvName"),
+    expectedStatus: "deployed",
+    imageTag: bru.getVar("tafLifecycleImageTag1")
+  });
+  bru.setVar("tafLifecycleFirstDeployID", record.id);
+  bru.setVar("tafLifecycleFirstDeployStatus", record.status);
+}
+
+tests {
+  test("should create the v1 taf-deploy and converge to deployed", () => {
+    expect(res.body).to.deep.equal({});
+    expect(bru.getVar("tafLifecycleFirstDeployID")).to.be.a("string").and.not.empty;
+    expect(bru.getVar("tafLifecycleFirstDeployStatus")).to.equal("deployed");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 70000
+}

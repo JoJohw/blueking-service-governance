@@ -1,0 +1,36 @@
+meta {
+  name: update-default
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{serviceURL}}/apps/{{annotationsAppID}}/app-spec/default-annotations
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "annotations": {
+      "desc": "this is a very long annotation value with spaces, symbols @#$%^&* and far more than sixty-three characters, which is allowed for annotations",
+      "version": "v1"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should accept annotation value without length/format limit", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

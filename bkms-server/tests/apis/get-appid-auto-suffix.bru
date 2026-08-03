@@ -1,0 +1,28 @@
+meta {
+  name: get-appid-auto-suffix
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/apps/auto-id-suffix
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the right response", () => {
+    expect(res.body.suffix).to.be.a('string');
+    expect(res.body.suffix).to.match(/^-\w+/);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

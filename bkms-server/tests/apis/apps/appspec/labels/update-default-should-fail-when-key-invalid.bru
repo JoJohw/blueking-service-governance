@@ -1,0 +1,35 @@
+meta {
+  name: update-default-should-fail-when-key-invalid
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{serviceURL}}/apps/{{labelsAppID}}/app-spec/default-labels
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "labels": {
+      "invalid key!": "value"
+    }
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject invalid label key", () => {
+    expect(res.body.error.message).to.contains("is invalid");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

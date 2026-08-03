@@ -1,0 +1,47 @@
+meta {
+  name: helm-chart-builds
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("helmChartBuildAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `helm-chart-ws-${suffix}`})
+    const app = await common.createHelmApp({
+      id: `helm-chart-app-${suffix}`,
+      workspaceID: ws.id,
+      helmSourceRepoType: 'GitRepo',
+      gitRepoConfig: {
+        type: 'TGit',
+        repoAlias: 'test-helm-chart-repo',
+        repoURL: 'https://git.example.com/charts/test-app.git',
+        revision: 'main',
+        sourceDir: 'charts'
+      }
+    })
+
+    bru.setVar("helmChartWorkspaceID", ws.id);
+    bru.setVar("helmChartBuildAppID", app.id);
+  }
+
+  if (!bru.getVar("helmChartRepoAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const workspaceID = bru.getVar("helmChartWorkspaceID");
+    const app = await common.createHelmApp({
+      id: `helm-chart-repo-app-${suffix}`,
+      workspaceID: workspaceID,
+      helmSourceRepoType: 'HelmRepo',
+      helmRepoConfig: {
+        repoURL: 'http://chartmuseum:8080',
+        chartName: 'sample-app'
+      }
+    })
+
+    bru.setVar("helmChartRepoAppID", app.id);
+  }
+}

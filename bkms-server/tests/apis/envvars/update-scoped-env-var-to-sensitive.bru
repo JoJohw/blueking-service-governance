@@ -1,0 +1,48 @@
+meta {
+  name: update-scoped-env-var-to-sensitive
+  type: http
+  seq: 11
+}
+
+put {
+  url: {{serviceURL}}/workspaces/{{envvarsWorkspaceID}}/scoped-env-vars/{{nonSensitiveScopedEnvVarID}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "key": "{{nonSensitiveScopedKey}}",
+    "value": "{{toSensitiveScopedValue}}",
+    "description": "{{nonSensitiveScopedDescription}}",
+    "isSensitive": true
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const suffix = bru.getVar("randomSuffix");
+  bru.setVar("toSensitiveScopedValue", `to-sensitive-value-${suffix}`);
+}
+
+tests {
+  test("should update a non-sensitive scoped env var to sensitive and mask its value", () => {
+    const ret = res.body.data;
+
+    expect(ret.id).to.equal(bru.getVar("nonSensitiveScopedEnvVarID"));
+    expect(ret.key).to.equal(bru.getVar("nonSensitiveScopedKey"));
+    // The var is now sensitive, so the value is masked on read.
+    expect(ret.value).to.equal("******");
+    expect(ret.description).to.equal(bru.getVar("nonSensitiveScopedDescription"));
+    expect(ret.isSensitive).to.equal(true);
+    expect(ret.updatedAt).to.not.equal(ret.createdAt);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

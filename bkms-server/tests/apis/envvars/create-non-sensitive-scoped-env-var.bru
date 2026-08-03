@@ -1,0 +1,56 @@
+meta {
+  name: create-non-sensitive-scoped-env-var
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{envvarsWorkspaceID}}/scoped-env-vars
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "scopeType": "workspace",
+    "scopeValue": "",
+    "key": "{{nonSensitiveScopedKey}}",
+    "value": "{{nonSensitiveScopedValue}}",
+    "description": "{{nonSensitiveScopedDescription}}",
+    "isSensitive": false
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const suffix = bru.getVar("randomSuffix");
+  bru.setVar("nonSensitiveScopedKey", `SCOPED_NON_SENSITIVE_${suffix}`);
+  bru.setVar("nonSensitiveScopedValue", `non-sensitive-value-${suffix}`);
+  bru.setVar("nonSensitiveScopedDescription", `non-sensitive-description-${suffix}`);
+}
+
+script:post-response {
+  bru.setVar("nonSensitiveScopedEnvVarID", res.body.data.id);
+}
+
+tests {
+  test("should create a non-sensitive scoped env var", () => {
+    const ret = res.body.data;
+
+    expect(ret.workspaceID).to.equal(bru.getVar("envvarsWorkspaceID"));
+    expect(ret.scopeType).to.equal("workspace");
+    expect(ret.scopeValue).to.equal("");
+    expect(ret.key).to.equal(bru.getVar("nonSensitiveScopedKey"));
+    expect(ret.value).to.equal(bru.getVar("nonSensitiveScopedValue"));
+    expect(ret.description).to.equal(bru.getVar("nonSensitiveScopedDescription"));
+    expect(ret.isSensitive).to.equal(false);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

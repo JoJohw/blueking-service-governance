@@ -1,0 +1,7 @@
+name: BadPatcher
+version: v1.0.0
+# A sequence is not a valid component fragment root.
+patchers:
+- |-
+  - invalid
+specs: []

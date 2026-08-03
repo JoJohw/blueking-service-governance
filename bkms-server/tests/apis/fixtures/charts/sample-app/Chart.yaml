@@ -1,0 +1,6 @@
+apiVersion: v2
+name: sample-app
+description: A minimal chart used for Helm deploy API tests
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

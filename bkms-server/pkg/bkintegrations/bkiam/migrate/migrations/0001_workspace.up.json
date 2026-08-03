@@ -1,0 +1,133 @@
+{
+  "system_id": "{{ .BKMSSystemID }}",
+  "enabled": true,
+  "operations": [
+    {
+      "operation": "upsert_resource_type",
+      "data": {
+        "id": "workspace",
+        "name": "空间",
+        "name_en": "workspace",
+        "description": "服务治理平台空间",
+        "description_en": "bkms workspace",
+        "parents": [],
+        "provider_config": {
+          "path": "/xxx/workspaces/"
+        },
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_instance_selection",
+      "data": {
+        "id": "workspace_list",
+        "name": "空间列表",
+        "name_en": "workspaces",
+        "resource_type_chain": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "workspace"
+          }
+        ]
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "create_workspace",
+        "name": "创建空间",
+        "name_en": "create workspace",
+        "description": "用户创建空间",
+        "description_en": "create workspace",
+        "type": "create",
+        "related_resource_types": [],
+        "related_actions": [],
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "view_workspace",
+        "name": "查看空间",
+        "name_en": "view workspace",
+        "description": "用户查看空间",
+        "description_en": "view workspace",
+        "type": "view",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "workspace",
+            "name_alias": "",
+            "name_alias_en": "",
+            "selection_mode": "instance",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "workspace_list"
+              }
+            ]
+          }
+        ],
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "edit_workspace",
+        "name": "编辑空间",
+        "name_en": "edit workspace",
+        "description": "用户编辑空间",
+        "description_en": "edit workspace",
+        "type": "edit",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "workspace",
+            "name_alias": "",
+            "name_alias_en": "",
+            "selection_mode": "instance",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "workspace_list"
+              }
+            ]
+          }
+        ],
+        "related_actions": [
+          "view_workspace"
+        ],
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "delete_workspace",
+        "name": "删除空间",
+        "name_en": "delete workspace",
+        "description": "用户删除空间",
+        "description_en": "user delete workspace",
+        "type": "delete",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "workspace",
+            "name_alias": "",
+            "name_alias_en": "",
+            "selection_mode": "instance",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "workspace_list"
+              }
+            ]
+          }
+        ],
+        "version": 1
+      }
+    }
+  ]
+}

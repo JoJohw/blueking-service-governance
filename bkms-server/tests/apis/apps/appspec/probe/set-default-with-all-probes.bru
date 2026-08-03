@@ -1,0 +1,51 @@
+meta {
+  name: set-default-with-all-probes
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{serviceURL}}/apps/{{probeAppID}}/app-spec/default-probe
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecProbe": {
+      "liveness": {
+        "probeHandler": {
+          "type": "HTTP",
+          "url": "http://localhost/health",
+          "port": 8080
+        },
+        "initialDelaySeconds": 10,
+        "timeoutSeconds": 2
+      },
+      "readiness": {
+        "probeHandler": {
+          "type": "EXEC",
+          "command": ["sh", "-c", "test -f /tmp/ready"]
+        },
+        "initialDelaySeconds": 5
+      },
+      "startup": {
+        "probeHandler": {
+          "type": "TCP",
+          "port": 3306
+        },
+        "failureThreshold": 30
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

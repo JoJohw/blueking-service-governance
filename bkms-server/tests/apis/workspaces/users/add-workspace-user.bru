@@ -1,0 +1,34 @@
+meta {
+  name: add-workspace-user
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{createdWorkspaceID}}/roles/sre/users
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "userIDs": ["user1", "user2"]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  console.log(res.body)
+  test("should add workspace users successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

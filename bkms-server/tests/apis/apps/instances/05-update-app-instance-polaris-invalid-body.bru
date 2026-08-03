@@ -1,0 +1,34 @@
+meta {
+  name: 05-update-app-instance-polaris-invalid-body
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{serviceURL}}/apps/invalid-app/envs/test/instances/operations/polaris
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "trafficLaneName": "",
+    "instanceIDs": []
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should require at least one instance id for Polaris update", () => {
+    expect(res.body.error.code).to.equal("INVALID_REQUEST");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

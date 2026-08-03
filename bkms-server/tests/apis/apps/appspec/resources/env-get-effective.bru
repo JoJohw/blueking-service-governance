@@ -1,0 +1,29 @@
+meta {
+  name: env-get-effective
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{serviceURL}}/apps/{{resourcesAppID}}/envs/test/app-spec/resources/effective
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the updated effective values", () => {
+    expect(res.body.data.replicas).to.equal(3);
+    expect(res.body.data.cpuRequests).to.equal("3");
+    expect(res.body.data.memoryRequests).to.equal("333Mi");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

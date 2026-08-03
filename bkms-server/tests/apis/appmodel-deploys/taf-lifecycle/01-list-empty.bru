@@ -1,0 +1,31 @@
+meta {
+  name: 01-list-empty
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{tafLifecycleAppID}}/envs/{{tafLifecycleEnvName}}/taf-deploys?page=1&pageSize=10
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return an empty deploy record list before any deploy", () => {
+    expect(res.body.data).to.be.an("object");
+    // Keep compatibility with legacy deploy APIs where count is returned as a string.
+    expect(res.body.data.count).to.be.a("string");
+    expect(parseInt(res.body.data.count, 10)).to.equal(0);
+    expect(res.body.data.results).to.be.an("array").that.is.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

@@ -1,0 +1,40 @@
+# FIXME: cpp dockerfile template is still under development, please do not use
+# -------------- builder container --------------
+FROM {{ .BuilderImage }} AS builder
+
+{{ range .DockerBuildArgNames -}}
+ARG {{ . }}
+{{ end -}}
+
+WORKDIR /workspace
+
+RUN mkdir -p /out
+
+COPY . .
+
+{{ range .PreBuildCommands -}}
+RUN {{ . }}
+{{ end -}}
+
+{{ range .BuildCommands -}}
+RUN {{ . }}
+{{ end -}}
+
+RUN test -f /out/{{ .AppName }} || (echo "build artifact /out/{{ .AppName }} not found" && exit 1)
+
+# -------------- runner container --------------
+FROM {{ .RunnerImage }} AS runner
+
+WORKDIR /app
+
+{{ range .RuntimeEnvCommands -}}
+RUN {{ . }}
+{{ end -}}
+
+COPY --from=builder /out/{{ .AppName }} /app/{{ .AppName }}
+
+{{ if .StartCommand -}}
+ENTRYPOINT ["/bin/sh", "-ec", {{ quoteStartCommand .StartCommand }}]
+{{ else -}}
+ENTRYPOINT ["/app/{{ .AppName }}"]
+{{ end -}}

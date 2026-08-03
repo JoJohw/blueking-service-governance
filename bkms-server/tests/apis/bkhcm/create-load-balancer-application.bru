@@ -1,0 +1,46 @@
+meta {
+  name: create-load-balancer-application
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{serviceURL}}/bkhcm/load-balancers
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "bk_biz_id": 100,
+    "account_id": "00000001",
+    "region": "ap-guangzhou",
+    "load_balancer_type": "OPEN",
+    "name": "test-lb-e2e",
+    "zones": ["ap-guangzhou-6"],
+    "address_ip_version": "IPV4",
+    "cloud_vpc_id": "vpc-stub001",
+    "cloud_subnet_id": "subnet-stub001",
+    "require_count": 1,
+    "memo": "API test load balancer"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should create load balancer application", () => {
+    expect(res.body.data).to.be.an('object');
+    expect(res.body.data).to.have.property('id');
+    expect(res.body.data.id).to.be.a('string');
+    expect(res.body.data.id).to.not.be.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 30000
+}

@@ -1,0 +1,75 @@
+meta {
+  name: update-component-def
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{serviceURL}}/component-defs/{{testCompDefName}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "displayName": "Updated Test Component",
+    "description": "Updated description for API test component",
+    "propertiesInput":{
+      "properties": [
+        {
+          "name": "instanceKey",
+          "type": "STRING",
+          "defaultValue": "updatedKey",
+          "description": "Updated instance key"
+        },
+        {
+          "name": "serviceName",
+          "type": "STRING",
+          "defaultValue": "updated-service",
+          "description": "Updated service name"
+        },
+        {
+          "name": "servicePort",
+          "type": "INT",
+          "defaultValue": 9090,
+          "description": "Updated service port"
+        },
+        {
+          "name": "enabled",
+          "type": "BOOL",
+          "defaultValue": false,
+          "description": "Updated enable flag"
+        },
+      {
+        "name": "timeout",
+        "type": "INT",
+        "defaultValue": 30,
+        "description": "New timeout property"
+      }
+    ]
+  },
+    "patchers": [
+      "spec:\n  template:\n    spec:\n      containers:\n        - name: \"{{ .bkmsContainerName }}\"\n          env:\n            - name: \"{{ .instanceKey }}_SERVICE_NAME\"\n              value: \"{{ .serviceName }}\"\n            - name: \"{{ .instanceKey }}_SERVICE_PORT\"\n              value: \"{{ .servicePort }}\"\n            - name: \"{{ .instanceKey }}_TIMEOUT\"\n              value: \"{{ .timeout }}\""
+    ],
+    "specs": [
+      "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: \"{{ .name }}-updated-config\"\ndata:\n  instanceKey: \"{{ .instanceKey }}\"\n  serviceName: \"{{ .serviceName }}\"\n  servicePort: \"{{ .servicePort }}\"\n  enabled: \"{{ .enabled }}\"\n  timeout: \"{{ .timeout }}\""
+    ]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update component definition successfully", () => {
+    console.log(res.body)
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

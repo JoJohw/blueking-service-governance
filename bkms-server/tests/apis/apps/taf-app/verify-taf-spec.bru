@@ -1,0 +1,39 @@
+meta {
+  name: verify-taf-spec
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{serviceURL}}/apps/{{testTafAppID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should verify taf spec was updated", () => {
+    expect(res.body.data.appModelSpec.tafSpec.fileName).to.equal('updated_taf_config.conf');
+    expect(res.body.data.appModelSpec.tafSpec.filePath).to.equal('/usr/local/taf/updated/');
+    const envVar = res.body.data.appModelSpec.envVars.find(({ key }) => key === "PRESERVED_TAF_VAR");
+    expect(envVar).to.not.be.undefined;
+    expect(envVar).to.include({
+      value: "taf-value",
+      description: "preserved across spec updates",
+    });
+  });
+
+  test("should ignore env vars sent through taf spec update", () => {
+    const envVar = res.body.data.appModelSpec.envVars.find(({ key }) => key === "IGNORED_TAF_VAR");
+    expect(envVar).to.be.undefined;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

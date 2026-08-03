@@ -1,0 +1,28 @@
+meta {
+  name: env-get-effective-after-del
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{serviceURL}}/apps/{{updateStrategyAppID}}/envs/test/app-spec/update-strategy/effective
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should fall back to the default update strategy values", () => {
+    expect(res.body.data.maxUnavailable).to.equal("88%");
+    expect(res.body.data.maxSurge).to.equal("3");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

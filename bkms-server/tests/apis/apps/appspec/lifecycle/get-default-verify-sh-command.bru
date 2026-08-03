@@ -1,0 +1,37 @@
+meta {
+  name: get-default-verify-sh-command
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/app-spec/default-lifecycle
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("postStart should be EXEC with sh command script", () => {
+    const h = res.body.data.postStart;
+    expect(h.type).to.equal("EXEC");
+    expect(h.exec.shCommand).to.equal("echo post-started && touch /tmp/post-started");
+    expect(h.exec.command || []).to.have.lengthOf(0);
+  });
+
+  test("preStop should be EXEC with sh command script", () => {
+    const h = res.body.data.preStop;
+    expect(h.type).to.equal("EXEC");
+    expect(h.exec.shCommand).to.equal("echo pre-stopping && rm -f /tmp/post-started");
+    expect(h.exec.command || []).to.have.lengthOf(0);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

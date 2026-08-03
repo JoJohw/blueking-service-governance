@@ -1,0 +1,35 @@
+meta {
+  name: 06-list-helm-chart-build-records
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{serviceURL}}/apps/{{helmChartBuildAppID}}/charts/builds?page=1&pageSize=10
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return paginated build records", () => {
+    expect(res.body.data.count).to.be.a('string');
+    expect(res.body.data.results).to.be.an('array');
+  });
+
+  test("should include created build record when build has run", () => {
+    const buildID = bru.getVar('testHelmChartBuildID');
+    if (buildID) {
+      expect(res.body.data.results.some((record) => record.buildID === buildID)).to.be.true;
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

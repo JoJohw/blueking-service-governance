@@ -1,0 +1,28 @@
+meta {
+  name: 04-get-semver-nonexistent-app
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/apps/nonexistent-app-id/charts/semver
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+  res.body: isJson
+}
+
+tests {
+  test("should return Gin error for nonexistent app", () => {
+    expect(res.body.error.code).to.equal("NOT_FOUND");
+    expect(res.body.error.message).to.contain("not found");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

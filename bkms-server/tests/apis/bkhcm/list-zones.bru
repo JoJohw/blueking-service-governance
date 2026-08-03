@@ -1,0 +1,51 @@
+meta {
+  name: list-zones
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{serviceURL}}/bkhcm/regions/{{region}}/zones
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "filter": {
+      "op": "and",
+      "rules": []
+    },
+    "page": {
+      "count": false,
+      "start": 0,
+      "limit": 10
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return zones list", () => {
+    expect(res.body.data).to.be.an('array');
+    if (res.body.data.length > 0) {
+      const zone = res.body.data[0];
+      expect(zone).to.have.property('id');
+      expect(zone).to.have.property('vendor');
+      expect(zone).to.have.property('cloud_id');
+      expect(zone).to.have.property('name');
+      expect(zone).to.have.property('name_cn');
+      expect(zone).to.have.property('region');
+      expect(zone).to.have.property('state');
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

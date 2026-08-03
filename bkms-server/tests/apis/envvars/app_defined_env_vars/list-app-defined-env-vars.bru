@@ -1,0 +1,41 @@
+meta {
+  name: list-app-defined-env-vars
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/apps/{{appDefinedEnvVarsAppID}}/env-vars
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should list the created app-defined env var", () => {
+    const ret = res.body.data;
+
+    expect(ret).to.be.an("array");
+    expect(ret).to.have.length(1);
+    expect(ret[0]).to.include({
+      key: bru.getVar("appDefinedEnvVarKey"),
+      value: bru.getVar("appDefinedEnvVarValue"),
+      description: bru.getVar("appDefinedEnvVarDescription"),
+      isSensitive: false,
+    });
+    expect(new Date(ret[0].createdAt).getTime()).to.equal(
+      new Date(bru.getVar("appDefinedEnvVarCreatedAt")).getTime()
+    );
+    expect(new Date(ret[0].updatedAt).getTime()).to.equal(
+      new Date(bru.getVar("appDefinedEnvVarUpdatedAt")).getTime()
+    );
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

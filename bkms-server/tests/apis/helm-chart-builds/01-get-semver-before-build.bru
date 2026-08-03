@@ -1,0 +1,34 @@
+meta {
+  name: 01-get-semver-before-build
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{helmChartBuildAppID}}/charts/semver
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return zero-value semver before any build", () => {
+    expect(res.body.data.latest.major).to.equal("0");
+    expect(res.body.data.latest.minor).to.equal("0");
+    expect(res.body.data.latest.patch).to.equal("0");
+    expect(res.body.data.latest.version).to.equal("0.0.0");
+  });
+
+  test("should not return next when bumpType is not provided", () => {
+    expect(res.body.data.next).to.be.null;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

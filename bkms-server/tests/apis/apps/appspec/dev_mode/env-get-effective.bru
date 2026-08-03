@@ -1,0 +1,29 @@
+meta {
+  name: env-get-effective
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/apps/{{devModeAppID}}/envs/test/app-spec/dev-mode/effective
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the effective env dev mode values", () => {
+    expect(res.body.data.enabled).to.equal(true);
+    expect(res.body.data.workPath).to.equal("/data/bkms/dev-mode/trpc");
+    expect(res.body.data.mountPath).to.equal("/data/bkms/dev-mode/trpc/configmap-scripts");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

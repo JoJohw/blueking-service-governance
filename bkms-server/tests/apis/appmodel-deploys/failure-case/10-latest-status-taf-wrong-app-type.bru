@@ -1,0 +1,31 @@
+meta {
+  name: 10-latest-status-taf-wrong-app-type
+  type: http
+  seq: 26
+}
+
+get {
+  url: {{serviceURL}}/apps/{{appmodelDeployFailHelmAppID}}/envs/{{appmodelDeployFailEnvName}}/taf-deploys/latest-status
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject helm app on taf latest-status", () => {
+    expect(res.body.error).to.be.an("object");
+    expect(res.body.error.code).to.equal("INVALID_ARGUMENT");
+    expect(res.body.error.message).to.contain("invalid app type");
+    expect(res.body.error.system).to.equal("bkms");
+    expect(res.body.error.module).to.equal("bkms-server");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

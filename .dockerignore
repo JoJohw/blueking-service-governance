@@ -1,0 +1,37 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Editor and OS files
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+tmp/
+temp/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Local dependencies and build outputs
+**/node_modules
+**/dist
+**/coverage
+**/.cache
+**/.turbo
+**/.vite
+
+# Project-local generated outputs
+bkms-server/build
+bkms-server/bin
+bkms-ui/dist
+bkms-ui/node_modules

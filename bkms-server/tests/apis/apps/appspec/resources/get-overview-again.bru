@@ -1,0 +1,28 @@
+meta {
+  name: get-overview-again
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{serviceURL}}/apps/{{resourcesAppID}}/app-spec/overview
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.data.configuredEnvs: isArray
+}
+
+tests {
+  test("should contains env", () => {
+    expect(res.body.data.configuredEnvs).to.eql(['test']);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

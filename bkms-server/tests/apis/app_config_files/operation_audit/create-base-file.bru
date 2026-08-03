@@ -1,0 +1,42 @@
+meta {
+  name: create-base-file
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{serviceURL}}/apps/{{appCfgAuditAppID}}/app-config-files
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "audit-base-{{randomSuffix}}",
+    "type": "normal",
+    "contentSourceType": "local",
+    "fileFormat": "yaml",
+    "versionDescription": "初始版本"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  bru.setVar("appCfgAuditBaseFileID", res.body.item.id);
+  bru.setVar("appCfgAuditBaseFileName", res.body.item.name);
+}
+
+tests {
+  test("should create base app config file", () => {
+    expect(res.body.item.type).to.equal("normal");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

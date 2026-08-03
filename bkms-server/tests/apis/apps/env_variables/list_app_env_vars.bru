@@ -1,0 +1,29 @@
+meta {
+  name: list_app_env_vars
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{envVarsAppID}}/envs/{{envVarsEnvName}}/env-variables
+  body: none
+  auth: inherit
+}
+
+tests {
+  test("should return correct env variables", () => {
+    const expectedEnvKeys = ["BKMS_ENV_TYPE", "BKMS_ENV_NAME", "BKMS_APP_NAME", "BKMS_ENV_NAMESPACE", "BKMS_ENV_CLUSTER", "BKMS_POD_IP"]
+    for (const item of expectedEnvKeys) {
+      expect(hasEnvVar(res.body.data, item)).to.equal(true);
+    }
+  });
+  
+  function hasEnvVar(data, key) {
+    return data.some(item => item.key === key);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

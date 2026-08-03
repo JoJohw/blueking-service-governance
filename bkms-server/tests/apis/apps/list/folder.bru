@@ -1,0 +1,20 @@
+meta {
+  name: list
+  seq: 3
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("appsListWorkspaceID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `apps-list-ws-${suffix}`})
+    bru.setVar("appsListWorkspaceID", ws.id);
+  }
+
+  bru.setVar("workspaceID", bru.getVar("appsListWorkspaceID"));
+}

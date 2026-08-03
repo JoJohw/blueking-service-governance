@@ -1,0 +1,33 @@
+meta {
+  name: env-update-full
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{serviceURL}}/apps/{{resourcesAppID}}/envs/test/app-spec/resources
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecResources": {
+      "replicas": 3,
+      "cpuRequests": "3",
+      "cpuLimits": "3",
+      "memoryRequests": "333Mi",
+      "memoryLimits": "333Mi"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

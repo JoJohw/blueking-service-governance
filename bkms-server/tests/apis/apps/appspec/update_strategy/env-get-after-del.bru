@@ -1,0 +1,27 @@
+meta {
+  name: env-get-after-del
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{serviceURL}}/apps/{{updateStrategyAppID}}/envs/test/app-spec/update-strategy
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+  res.body: isJson
+}
+
+tests {
+  test("should return not found after deleting env update strategy override", () => {
+    expect(res.body.error.message).to.contains("env update strategy not found");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

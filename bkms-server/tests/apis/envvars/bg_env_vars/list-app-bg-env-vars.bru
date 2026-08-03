@@ -1,0 +1,97 @@
+meta {
+  name: list-app-bg-env-vars
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{serviceURL}}/apps/{{bgEnvVarsAppID}}/envs/{{bgEnvVarsEnvName}}/bg-env-vars
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return background env vars for the app in the environment", () => {
+    const ret = res.body.data;
+    expect(ret).to.be.an("array");
+    // Should include builtin vars (with app-level builtins), workspace-scoped,
+    // envType-scoped, and env-scoped vars
+    expect(ret.length).to.be.greaterThan(0);
+  })
+
+  test("should include app-level builtin vars", () => {
+    const ret = res.body.data;
+    const appNameVar = ret.find(v => v.key === "BKMS_APP_NAME");
+    expect(appNameVar).to.not.be.undefined;
+    expect(appNameVar.value).to.equal(bru.getVar("bgEnvVarsAppName"));
+    expect(appNameVar.source).to.equal("builtin");
+
+    // TRPC app should also have container name
+    const containerVar = ret.find(v => v.key === "BKMS_CONTAINER_NAME");
+    expect(containerVar).to.not.be.undefined;
+    expect(containerVar.source).to.equal("builtin");
+  })
+
+  test("should include env-level builtin vars", () => {
+    const ret = res.body.data;
+    const envNameVar = ret.find(v => v.key === "BKMS_ENV_NAME");
+    expect(envNameVar).to.not.be.undefined;
+    expect(envNameVar.value).to.equal(bru.getVar("bgEnvVarsEnvName"));
+  })
+
+  test("should include workspace-scoped vars", () => {
+    const ret = res.body.data;
+    const wsVar = ret.find(v => v.key === bru.getVar("bgTestWorkspaceKey"));
+    expect(wsVar).to.not.be.undefined;
+    expect(wsVar.source).to.equal("scopedWorkspace");
+  })
+
+  test("should include envType-scoped vars", () => {
+    const ret = res.body.data;
+    const etVar = ret.find(v => v.key === bru.getVar("bgTestEnvTypeKey"));
+    expect(etVar).to.not.be.undefined;
+    expect(etVar.source).to.equal("scopedEnvType");
+  })
+
+  test("should include env-scoped vars (unlike env bg view)", () => {
+    const ret = res.body.data;
+    const envVar = ret.find(v => v.key === bru.getVar("bgTestEnvKey"));
+    expect(envVar).to.not.be.undefined;
+    expect(envVar.value).to.equal(bru.getVar("bgTestEnvValue"));
+    expect(envVar.source).to.equal("scopedEnv");
+  })
+
+  test("should return deduplicated vars by source priority", () => {
+    const ret = res.body.data;
+    const dedupVars = ret.filter(v => v.key === bru.getVar("bgTestDedupKey"));
+
+    expect(dedupVars).to.have.lengthOf(1);
+    expect(dedupVars[0].value).to.equal(bru.getVar("bgTestDedupEnvValue"));
+    expect(dedupVars[0].source).to.equal("scopedEnv");
+  })
+
+  test("should not return duplicate keys", () => {
+    const ret = res.body.data;
+    const keys = ret.map(v => v.key);
+    expect(new Set(keys).size).to.equal(keys.length);
+  })
+
+  test("should have more items than the env bg view (due to app builtins and env-scoped)", () => {
+    const ret = res.body.data;
+    const envBgVarCount = Number(bru.getVar("bgEnvVarsEnvBgVarCount"));
+
+    expect(envBgVarCount).to.be.at.least(0);
+    if (envBgVarCount > 0) {
+      expect(ret.length).to.be.greaterThan(envBgVarCount);
+    }
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

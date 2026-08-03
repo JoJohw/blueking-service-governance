@@ -1,0 +1,71 @@
+meta {
+  name: patch-polaris-config
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{serviceURL}}/apps/{{componentsTrpcAppID}}/deps/polaris-configs/{{testPolarisConfigName}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "instanceKey": "test-key-new",
+    "servicePort": 8888,
+    "direct": true,
+    "keepNotReadyPod": false,
+    "enableHealthCheck": true,
+    "weight": 20,
+    "polarisToken": "updated-polaris-token-xxx",
+    "serviceLabels": {
+      "env": "test",
+      "team": "api-test",
+      "updated": "true"
+    },
+    "scope": {
+      "scopeType": "environment",
+      "scopeEnvNames": [
+      ]
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should patch polaris config successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+
+  test("should return the complete updated config", () => {
+    const config = res.body.data;
+    expect(config).to.be.an('object');
+    expect(config.name).to.equal(bru.getVar('testPolarisConfigName'));
+    expect(config.instanceKey).to.equal("test-key-new");
+    expect(config.servicePort).to.equal(8888);
+    expect(config.direct).to.equal(true);
+    expect(config.keepNotReadyPod).to.equal(false);
+    expect(config.enableHealthCheck).to.equal(true);
+    expect(config.weight).to.equal(20);
+    expect(config.polarisToken).to.equal("updated-polaris-token-xxx");
+    expect(config.serviceLabels).to.deep.equal({
+      env: "test",
+      team: "api-test",
+      updated: "true"
+    });
+    expect(config.scopeType).to.equal("environment");
+    expect(config.scopeEnvNames).to.deep.equal([]);
+    expect(config.envStates).to.be.an('object');
+    expect(Object.keys(config.envStates)).to.have.length(0);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

@@ -1,0 +1,58 @@
+meta {
+  name: list-feature-envs
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/apps/{{featureEnvAppID}}/feat-envs
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return display-ready feature env management items", () => {
+    const data = res.body.data;
+
+    expect(data).to.be.an("array").with.lengthOf(1);
+
+    const featureEnv = data[0];
+    expect(featureEnv).to.have.all.keys(
+      "id",
+      "name",
+      "displayName",
+      "type",
+      "sourceEnv",
+      "cluster",
+      "status",
+      "deployStatuses",
+      "creator",
+      "createdAt",
+    );
+    expect(featureEnv.id).to.equal(bru.getVar("createdFeatureEnvID"));
+    expect(featureEnv.name).to.equal(bru.getVar("createdFeatureEnvName"));
+    expect(featureEnv.displayName).to.equal(bru.getVar("featureEnvDisplayName"));
+    expect(featureEnv.type).to.equal("development");
+    expect(featureEnv.sourceEnv).to.deep.equal({
+      id: bru.getVar("featureEnvSourceEnvID"),
+      name: bru.getVar("featureEnvSourceEnvName"),
+      displayName: bru.getVar("featureEnvSourceEnvDisplayName"),
+      isDeleted: false,
+    });
+    expect(featureEnv.cluster).to.deep.equal({
+      clusterID: bru.getVar("featureEnvSourceEnvClusterID"),
+      namespace: bru.getVar("createdFeatureEnvName"),
+    });
+    expect(featureEnv.deployStatuses).to.be.null;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

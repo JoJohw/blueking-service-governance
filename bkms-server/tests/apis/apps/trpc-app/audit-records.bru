@@ -1,0 +1,48 @@
+meta {
+  name: audit-records
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/operation-records?page=1&pageSize=100&appID={{testTrpcAppID}}&resourceType=app&username=api-test-user
+  body: none
+  auth: inherit
+}
+
+script:pre-request {
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  const records = res.body?.data?.results ?? [];
+
+  test("should contain trpc spec update audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "update" &&
+      item.attribute === "appModel" &&
+      !item.group.envName
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after &&
+        after.Workload &&
+        after.Workload.TrpcConfig &&
+        after.Workload.TrpcConfig.FileName === "updated_trpc_go.yaml" &&
+        after.Workload.TrpcConfig.FilePath === "/usr/local/trpc/updated/";
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

@@ -1,0 +1,42 @@
+meta {
+  name: get-bkci-pipeline-detail
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/bkci-pipelines/{{bkciPipelineID}}
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  const assertExistingFields = (target, fields) => {
+    fields.forEach((field) => expect(target[field]).to.exist)
+  }
+
+  const assertPipelineDetail = (data, { checkFirstVariable = false } = {}) => {
+    expect(data).to.be.an('object')
+    expect(data.id).to.equal(bru.getVar('bkciPipelineID'))
+    expect(data.name).to.equal(bru.getVar('bkciPipelineName'))
+    assertExistingFields(data, ['description', 'version', 'creator', 'updater', 'createdAt', 'updatedAt'])
+    expect(data.variables).to.be.an('array')
+
+    if (checkFirstVariable && data.variables.length > 0) {
+      assertExistingFields(data.variables[0], ['id', 'name', 'type'])
+    }
+  }
+
+  test("should return full bkci pipeline detail", () => {
+    assertPipelineDetail(res.body.data, { checkFirstVariable: true })
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

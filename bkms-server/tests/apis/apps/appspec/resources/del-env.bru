@@ -1,0 +1,21 @@
+meta {
+  name: del-env
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{resourcesAppID}}/envs/test/app-spec/resources
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

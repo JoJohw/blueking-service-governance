@@ -1,0 +1,28 @@
+meta {
+  name: list-operation-records
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{auditWorkspaceID}}/operation-records?page=1&pageSize=20
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 1
+  pageSize: 20
+}
+
+assert {
+  res.status: eq 200
+  res.body.data: isJson
+  res.body.data.count: isString
+  res.body.data.results: isArray
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

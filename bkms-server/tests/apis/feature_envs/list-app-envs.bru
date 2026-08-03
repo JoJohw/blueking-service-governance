@@ -1,0 +1,44 @@
+meta {
+  name: list-app-envs
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/apps/{{featureEnvAppID}}/envs
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should list standard envs and current app feature envs", () => {
+    const data = res.body.data;
+
+    expect(data).to.be.an("array");
+
+    const envNames = data.map(item => item.name);
+    expect(envNames).to.include(bru.getVar("featureEnvSourceEnvName"));
+    expect(envNames).to.include(bru.getVar("featureEnvOtherEnvName"));
+    expect(envNames).to.include(bru.getVar("createdFeatureEnvName"));
+
+    const featureEnv = data.find(item => item.name === bru.getVar("createdFeatureEnvName"));
+    expect(featureEnv).to.not.be.undefined;
+    expect(featureEnv.kind).to.equal("feature");
+    expect(featureEnv.ownerAppID).to.equal(bru.getVar("featureEnvAppID"));
+    expect(featureEnv.sourceEnvID).to.equal(bru.getVar("featureEnvSourceEnvID"));
+
+    const standardEnv = data.find(item => item.name === bru.getVar("featureEnvSourceEnvName"));
+    expect(standardEnv).to.not.be.undefined;
+    expect(standardEnv.kind).to.equal("standard");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

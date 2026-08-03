@@ -1,0 +1,28 @@
+meta {
+  name: get-overview-again
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{serviceURL}}/apps/{{probeAppID}}/app-spec/overview
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.data.configuredEnvs: isArray
+}
+
+tests {
+  test("should contains env", () => {
+    expect(res.body.data.configuredEnvs).to.eql([bru.getVar("testEnv")]);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

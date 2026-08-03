@@ -1,0 +1,28 @@
+meta {
+  name: 06-verify-helm-spec
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{serviceURL}}/apps/{{testAppID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should verify helm spec was updated", () => {
+    expect(res.body.data.helmSpec.helmSource.helmRepoConfig.chartName).to.equal('updated-chart');
+    expect(res.body.data.helmSpec.helmSource.helmRepoConfig.repoURL).to.equal('http://www.example.com/updated-helm');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,406 @@
+{
+  "id": "26a2c7da-111f-4d5e-8fad-f7772adf6e9f",
+  "type": "helm-git-build",
+  "version": "1.0.0",
+  "name": "[bkms] 打包并推送 Helm Chart",
+  "description": "[请勿删除或修改] 蓝鲸服务治理（bkms）创建的流水线，支持基于 Git 代码库打包并推送 Helm Chart 到 BkRepo Helm 仓库",
+  "stages": [
+    {
+      "containers": [
+        {
+          "@type": "trigger",
+          "classType": "trigger",
+          "containerHashId": "c-6e09636a03034b3c9f20fd0d75423cb9",
+          "containerId": "0",
+          "elements": [
+            {
+              "@type": "manualTrigger",
+              "atomCode": "manualTrigger",
+              "canElementSkip": false,
+              "classType": "manualTrigger",
+              "executeCount": 1,
+              "id": "T-1-1-1",
+              "name": "手动触发",
+              "taskAtom": "",
+              "useLatestParameters": false,
+              "version": "1.*"
+            }
+          ],
+          "id": "0",
+          "matrixGroupFlag": false,
+          "name": "trigger",
+          "params": [
+            {
+              "category": "",
+              "constant": false,
+              "defaultValue": "",
+              "desc": "待拉取代码库的别名",
+              "id": "BKMS_REPO_ALIAS",
+              "name": "代码库别名",
+              "readOnly": true,
+              "removeFlag": false,
+              "required": true,
+              "type": "STRING",
+              "valueNotEmpty": true
+            },
+            {
+              "category": "",
+              "constant": false,
+              "defaultValue": "BRANCH",
+              "desc": "",
+              "id": "BKMS_REPO_CHECKOUT_BY",
+              "name": "代码库拉取方式",
+              "options": [
+                {
+                  "key": "BRANCH",
+                  "value": "BRANCH"
+                },
+                {
+                  "key": "TAG",
+                  "value": "TAG"
+                },
+                {
+                  "key": "COMMIT_ID",
+                  "value": "COMMIT_ID"
+                }
+              ],
+              "readOnly": true,
+              "removeFlag": false,
+              "required": true,
+              "type": "ENUM",
+              "valueNotEmpty": true
+            },
+            {
+              "category": "",
+              "constant": false,
+              "defaultValue": "master",
+              "desc": "分支名称（如 master） 或 Tag 名称（如 v1.0.0）或 CommitID（32位随机字符串）",
+              "id": "BKMS_REPO_REVISION",
+              "name": "代码库版本号",
+              "readOnly": true,
+              "removeFlag": false,
+              "required": true,
+              "type": "STRING",
+              "valueNotEmpty": true
+            },
+            {
+              "category": "",
+              "constant": false,
+              "defaultValue": "",
+              "desc": "bkms 内置 HelmRepo 地址，格式如：http://helm.bkrepo.example.com/api/${projectCode}/helm/charts",
+              "id": "BKMS_HELM_REPO_URL",
+              "name": "Helm Repo 地址",
+              "readOnly": true,
+              "removeFlag": false,
+              "required": true,
+              "type": "STRING",
+              "valueNotEmpty": true
+            },
+            {
+              "category": "",
+              "constant": false,
+              "defaultValue": "",
+              "desc": "构建出的 Helm Chart 名称，一般为 bkms 的 App 名称",
+              "id": "BKMS_HELM_CHART_NAME",
+              "name": "Helm Chart 名称",
+              "readOnly": true,
+              "removeFlag": false,
+              "required": true,
+              "type": "STRING",
+              "valueNotEmpty": true
+            },
+            {
+              "category": "",
+              "constant": false,
+              "defaultValue": "v1.0.0",
+              "desc": "输出的 Chart 版本（version & appVersion）",
+              "id": "BKMS_HELM_CHART_VERSION",
+              "name": "输出 Chart 版本",
+              "readOnly": true,
+              "removeFlag": false,
+              "required": true,
+              "type": "STRING",
+              "valueNotEmpty": true
+            },
+            {
+              "category": "",
+              "constant": false,
+              "defaultValue": ".",
+              "desc": "指定该目录进行 HelmChart 打包并推送",
+              "id": "BKMS_HELM_CHART_BUILD_DIR",
+              "name": "构建执行目录",
+              "readOnly": true,
+              "removeFlag": false,
+              "required": true,
+              "type": "STRING",
+              "valueNotEmpty": true
+            },
+            {
+              "asInstanceInput": true,
+              "category": "",
+              "constant": false,
+              "defaultValue": "",
+              "desc": "Helm、Helmify、Kustomize 等二进制下载基础 URL，需要拼接具体的二进制名称使用",
+              "displayCondition": {},
+              "id": "BKMS_HELM_TOOLCHAIN_BASE_URL",
+              "name": "二进制工具下载基础 URL",
+              "readOnly": true,
+              "removeFlag": false,
+              "required": true,
+              "type": "STRING",
+              "valueNotEmpty": true
+            }
+          ]
+        }
+      ],
+      "fastKill": false,
+      "finally": false,
+      "id": "stage-1",
+      "name": "stage-1",
+      "tag": [
+        "28ee946a59f64949a74f3dee40a1bda4"
+      ]
+    },
+    {
+      "checkIn": {
+        "manualTrigger": false,
+        "markdownContent": false,
+        "notifyType": [
+          "RTX"
+        ],
+        "timeout": 24
+      },
+      "checkOut": {
+        "manualTrigger": false,
+        "markdownContent": false,
+        "notifyType": [
+          "RTX"
+        ],
+        "timeout": 24
+      },
+      "containers": [
+        {
+          "@type": "vmBuild",
+          "baseOS": "LINUX",
+          "buildEnv": {},
+          "classType": "vmBuild",
+          "containerHashId": "c-15708622a1d64822b0de740c594dd3e3",
+          "containerId": "1",
+          "dispatchType": {
+            "buildType": "PUBLIC_DEVCLOUD",
+            "credentialId": "",
+            "credentialProject": "",
+            "dockerBuildVersion": "[[ .builderImageCode ]]",
+            "imageCode": "[[ .builderImageCode ]]",
+            "imageName": "[[ .builderImageCode ]]",
+            "imagePublicFlag": false,
+            "imageRDType": "",
+            "imageType": "BKSTORE",
+            "imageVersion": "[[ .builderImageVersion ]]",
+            "performanceConfigId": "0",
+            "performanceUid": "",
+            "persistence": false,
+            "recommendFlag": true,
+            "value": "[[ .builderImageCode ]]"
+          },
+          "elements": [
+            {
+              "@type": "marketBuild",
+              "additionalOptions": {
+                "continueWhenFailed": false,
+                "customCondition": "",
+                "customVariables": [
+                  {
+                    "key": "param1",
+                    "value": ""
+                  }
+                ],
+                "enable": true,
+                "enableCustomEnv": true,
+                "manualRetry": false,
+                "manualSkip": false,
+                "otherTask": "",
+                "pauseBeforeExec": false,
+                "retryCount": 1,
+                "retryWhenFailed": false,
+                "runCondition": "PRE_TASK_SUCCESS",
+                "subscriptionPauseUser": "",
+                "timeout": 900,
+                "timeoutVar": "900"
+              },
+              "atomCode": "checkout",
+              "autoAtomCode": "checkout",
+              "classType": "marketBuild",
+              "data": {
+                "input": {
+                  "authType": "TICKET",
+                  "autoCrlf": "false",
+                  "cachePath": "",
+                  "enableFetchRefSpec": false,
+                  "enableGitClean": true,
+                  "enableGitCleanIgnore": true,
+                  "enableGitCleanNested": false,
+                  "enableGitLfs": false,
+                  "enableGitLfsClean": false,
+                  "enablePartialClone": false,
+                  "enableServerPreMerge": false,
+                  "enableSparseCone": false,
+                  "enableSubmodule": true,
+                  "enableSubmoduleRecursive": true,
+                  "enableSubmoduleRemote": false,
+                  "enableTGitCache": false,
+                  "enableTrace": false,
+                  "enableVirtualMergeBranch": false,
+                  "excludePath": "",
+                  "fetchDepth": "",
+                  "fetchOnlyCurrentRef": false,
+                  "fetchRefSpec": "",
+                  "includePath": "",
+                  "lfsConcurrentTransfers": "",
+                  "localPath": "",
+                  "mainRepo": false,
+                  "persistCredentials": true,
+                  "pullType": "${BKMS_REPO_CHECKOUT_BY}",
+                  "refName": "${BKMS_REPO_REVISION}",
+                  "repositoryHashId": "",
+                  "repositoryName": "${BKMS_REPO_ALIAS}",
+                  "repositoryType": "NAME",
+                  "repositoryUrl": "",
+                  "setSafeDirectory": false,
+                  "strategy": "REVERT_UPDATE",
+                  "submoduleDepth": "",
+                  "submoduleJobs": "",
+                  "submodulePath": ""
+                },
+                "namespace": "",
+                "output": {
+                  "BK_CI_GIT_REPO_ALIAS_NAME": "string",
+                  "BK_CI_GIT_REPO_CODE_PATH": "string",
+                  "BK_CI_GIT_REPO_COMMITS": "string",
+                  "BK_CI_GIT_REPO_HEAD_COMMIT_AUTHOR": "string",
+                  "BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT": "string",
+                  "BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER": "string",
+                  "BK_CI_GIT_REPO_HEAD_COMMIT_ID": "string",
+                  "BK_CI_GIT_REPO_LAST_COMMIT_ID": "string",
+                  "BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_COMMENT": "string",
+                  "BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID": "string",
+                  "BK_CI_GIT_REPO_MR_TARGET_HEAD_COMMIT_ID": "string",
+                  "BK_CI_GIT_REPO_NAME": "string",
+                  "BK_CI_GIT_REPO_REF": "string",
+                  "BK_CI_GIT_REPO_URL": "string"
+                }
+              },
+              "executeCount": 1,
+              "id": "e-98e6f9f8ca9a4809ac28c465e4e2a532",
+              "name": "拉取代码",
+              "taskAtom": "",
+              "version": "1.*"
+            },
+            {
+              "@type": "linuxScript",
+              "additionalOptions": {
+                "continueWhenFailed": false,
+                "customCondition": "",
+                "customVariables": [
+                  {
+                    "key": "param1",
+                    "value": ""
+                  }
+                ],
+                "enable": true,
+                "enableCustomEnv": true,
+                "manualRetry": false,
+                "manualSkip": false,
+                "otherTask": "",
+                "pauseBeforeExec": false,
+                "retryCount": 1,
+                "retryWhenFailed": false,
+                "runCondition": "PRE_TASK_SUCCESS",
+                "subscriptionPauseUser": "",
+                "timeout": 900,
+                "timeoutVar": "900"
+              },
+              "archiveFile": "",
+              "atomCode": "linuxScript",
+              "classType": "linuxScript",
+              "continueNoneZero": false,
+              "enableArchiveFile": false,
+              "executeCount": 1,
+              "id": "e-3e6cc1b9924a4d51a25e6668c69cf241",
+              "name": "构建并推送 Helm Chart",
+              "script": "set -euo pipefail\n\n# ============================================================\n# Environment Variables (provided externally)\n# ============================================================\n# BKMS_HELM_REPO_URL          - Helm Repo URL\n# BKMS_HELM_CHART_NAME        - Helm Chart name\n# BKMS_HELM_CHART_VERSION     - Output Chart version (version & appVersion)\n# BKMS_HELM_CHART_BUILD_DIR   - Build directory for Helm Chart\n# BKMS_HELM_TOOLCHAIN_BASE_URL    - Base URL for helm utils (helm/helmify/kustomize binaries)\n\n# ============================================================\n# 0. Validate required environment variables\n# ============================================================\nfor var in BKMS_HELM_REPO_URL \\\n        BKMS_HELM_CHART_NAME \\\n        BKMS_HELM_CHART_VERSION \\\n        BKMS_HELM_CHART_BUILD_DIR \\\n        BKMS_HELM_TOOLCHAIN_BASE_URL; do\n    if [ -z \"${!var:-}\" ]; then\n        echo \"[ERROR] Environment variable '${var}' is not set or empty. Please check and try again.\"\n        exit 1\n    fi\ndone\n\necho \"==========================================\"\necho \" BKMS Helm Chart Build & Push Script\"\necho \"==========================================\"\necho \" Repo:           ${BKMS_HELM_REPO_URL}\"\necho \" Chart:          ${BKMS_HELM_CHART_NAME}\"\necho \" Version:        ${BKMS_HELM_CHART_VERSION}\"\necho \" BuildDir:       ${BKMS_HELM_CHART_BUILD_DIR}\"\necho \" HelmURL:        ${BKMS_HELM_TOOLCHAIN_BASE_URL}/helm\"\necho \" HelmifyURL:     ${BKMS_HELM_TOOLCHAIN_BASE_URL}/helmify\"\necho \" KustomizeURL:   ${BKMS_HELM_TOOLCHAIN_BASE_URL}/kustomize\"\necho \"==========================================\"\n\n# ============================================================\n# 1. Download helm & helmify binaries\n# ============================================================\nTOOLS_DIR=\"$(mktemp -d)\"\nexport PATH=\"${TOOLS_DIR}:${PATH}\"\n\necho \"\"\necho \">>> [Step 1] Downloading helm and helmify ...\"\n\necho \"    Downloading helm from ${BKMS_HELM_TOOLCHAIN_BASE_URL}/helm ...\"\ncurl -sSL \"${BKMS_HELM_TOOLCHAIN_BASE_URL}/helm\" -o \"${TOOLS_DIR}/helm\"\nchmod +x \"${TOOLS_DIR}/helm\"\necho \"    helm installed: $(helm version --short 2>/dev/null || true)\"\n\necho \"    Downloading helmify from ${BKMS_HELM_TOOLCHAIN_BASE_URL}/helmify ...\"\ncurl -sSL \"${BKMS_HELM_TOOLCHAIN_BASE_URL}/helmify\" -o \"${TOOLS_DIR}/helmify\"\nchmod +x \"${TOOLS_DIR}/helmify\"\necho \"    helmify installed: $(helmify --version 2>/dev/null || echo 'ok')\"\n\n# kustomize\necho \"    Downloading kustomize from ${BKMS_HELM_TOOLCHAIN_BASE_URL}/kustomize ...\"\ncurl -sSL \"${BKMS_HELM_TOOLCHAIN_BASE_URL}/kustomize\" -o \"${TOOLS_DIR}/kustomize\"\nchmod +x \"${TOOLS_DIR}/kustomize\"\necho \"    kustomize installed: $(kustomize version --short 2>/dev/null || true)\"\n\n# ============================================================\n# 2. Validate build directory; convert with helmify if needed\n# ============================================================\necho \"\"\necho \">>> [Step 2] Checking if ${BKMS_HELM_CHART_BUILD_DIR} is a valid Helm Chart ...\"\n\nCHART_DIR=\"${BKMS_HELM_CHART_BUILD_DIR}\"\n# Strip leading whitespace and / to prevent path traversal\nCHART_DIR=\"${CHART_DIR#\"${CHART_DIR%%[![:space:]]*}\"}\"\nCHART_DIR=\"${CHART_DIR#/}\"\nCHART_SOURCE=\"native\"\n\nis_valid_helm_chart() {\n    local dir=\"$1\"\n    if [ -f \"${dir}/Chart.yaml\" ] || [ -f \"${dir}/Chart.yml\" ]; then\n        if helm lint \"${dir}\" --quiet 2>/dev/null; then\n            return 0\n        fi\n\n        echo \"    [ERROR] Chart.yaml/Chart.yml exists but is not a valid Helm Chart. Aborting.\"\n        echo \"    [INFO] helm lint output:\"\n        helm lint \"${dir}\" || true\n        exit 1\n    fi\n    return 1\n}\n\nif is_valid_helm_chart \"${CHART_DIR}\"; then\n    echo \"    [OK] Directory is already a valid Helm Chart.\"\nelse\n    # ---- Try kustomize first ----\n    KUSTOMIZATION_FILE=\"\"\n    if [ -f \"${CHART_DIR}/kustomization.yaml\" ] || [ -f \"${CHART_DIR}/kustomization.yml\" ]; then\n        KUSTOMIZATION_FILE=\"${CHART_DIR}\"\n    fi\n\n    if [ -n \"${KUSTOMIZATION_FILE}\" ]; then\n        echo \"    [INFO] Detected kustomization at ${KUSTOMIZATION_FILE}, running kustomize build ...\"\n        KUSTOMIZE_OUTPUT_DIR=\"${CHART_DIR}/_kustomize_output\"\n        mkdir -p \"${KUSTOMIZE_OUTPUT_DIR}\"\n\n        if ! kustomize build \"${KUSTOMIZATION_FILE}\" > \"${KUSTOMIZE_OUTPUT_DIR}/all.yaml\" 2>/dev/null; then\n            echo \"    [ERROR] kustomize build failed. Aborting.\"\n            exit 1\n        fi\n        echo \"    [OK] kustomize build succeeded.\"\n\n        HELMIFY_OUTPUT_DIR=\"${KUSTOMIZE_OUTPUT_DIR}/${BKMS_HELM_CHART_NAME}\"\n        mkdir -p \"${HELMIFY_OUTPUT_DIR}\"\n\n        cat \"${KUSTOMIZE_OUTPUT_DIR}/all.yaml\" | helmify \"${HELMIFY_OUTPUT_DIR}\"\n\n        if is_valid_helm_chart \"${HELMIFY_OUTPUT_DIR}\"; then\n            echo \"    [OK] kustomize -> helmify conversion succeeded.\"\n            CHART_DIR=\"${HELMIFY_OUTPUT_DIR}\"\n            CHART_SOURCE=\"kustomize_helmify\"\n        else\n            echo \"    [ERROR] kustomize -> helmify conversion did not produce a valid Helm Chart. Aborting.\"\n            exit 1\n        fi\n    else\n        # ---- Fallback: plain helmify ----\n        echo \"    [WARN] Directory is NOT a valid Helm Chart. Attempting helmify conversion ...\"\n\n        HELMIFY_OUTPUT_DIR=\"${CHART_DIR}/_helmify_output/${BKMS_HELM_CHART_NAME}\"\n        mkdir -p \"${HELMIFY_OUTPUT_DIR}\"\n\n        find \"${CHART_DIR}\" -maxdepth 1 -type f \\( -name '*.yaml' -o -name '*.yml' \\) \\\n            -exec cat {} + | helmify \"${HELMIFY_OUTPUT_DIR}\"\n\n        if is_valid_helm_chart \"${HELMIFY_OUTPUT_DIR}\"; then\n            echo \"    [OK] helmify conversion succeeded.\"\n            CHART_DIR=\"${HELMIFY_OUTPUT_DIR}\"\n            CHART_SOURCE=\"helmify\"\n        else\n            echo \"    [ERROR] helmify conversion failed. Result is still not a valid Helm Chart.\"\n            exit 1\n        fi\n    fi\nfi\n\n# ============================================================\n# 2.5 Fix helmify line-wrap: merge folded Helm template expressions\n#     helmify uses Go's yaml.v3 which wraps lines at 80 chars,\n#     producing output like:\n#       key: {{ .Values.xxx | toYaml\n#         | indent 1 }}\n#     This perl one-liner folds the continuation back into a single line:\n#       key: {{ .Values.xxx | toYaml | indent 1 }}\n# ============================================================\nif [ \"${CHART_SOURCE}\" = \"helmify\" ] || [ \"${CHART_SOURCE}\" = \"kustomize_helmify\" ]; then\n    echo \"\"\n    echo \">>> [Step 2.5] Fixing helmify line-wrap in template files ...\"\n\n    find \"${CHART_DIR}/templates\" -type f \\( -name '*.yaml' -o -name '*.yml' \\) 2>/dev/null | while read -r f; do\n        # Only merge continuation lines that belong to an unclosed {{ ... }} expression.\n        # The regex matches: a line containing {{ without a closing }}, followed by\n        # a newline + indentation. It folds them into one line, then loops (redo)\n        # until no more unclosed expressions span multiple lines.\n        if ! perl -i -0pe 's/((?:^|(?<=\\n))[^\\n]*\\{\\{(?:(?!\\}\\}).)*)\\n[ \\t]+/\\1 /gm; redo if /\\{\\{(?:(?!\\}\\}).)*\\n/' \"$f\"; then\n            echo \"    [ERROR] Failed to fix helmify line-wrap in template file: ${f}\"\n            exit 1\n        fi\n    done\n\n    echo \"    [OK] Template line-wrap fix applied.\"\nfi\n\n# ============================================================\n# 3. Replace Chart version (version & appVersion)\n# ============================================================\necho \"\"\necho \">>> [Step 3] Setting Chart version to ${BKMS_HELM_CHART_VERSION} ...\"\n\nCHART_YAML=\"${CHART_DIR}/Chart.yaml\"\nif [ ! -f \"${CHART_YAML}\" ]; then\n    CHART_YAML=\"${CHART_DIR}/Chart.yml\"\nfi\n\nif [ ! -f \"${CHART_YAML}\" ]; then\n    echo \"    [ERROR] Chart.yaml not found. Aborting.\"\n    exit 1\nfi\n\nsed -i \"s/^name:.*/name: ${BKMS_HELM_CHART_NAME}/\" \"${CHART_YAML}\"\nsed -i \"s/^version:.*/version: ${BKMS_HELM_CHART_VERSION}/\" \"${CHART_YAML}\"\n\nif grep -q \"^appVersion:\" \"${CHART_YAML}\"; then\n    sed -i \"s/^appVersion:.*/appVersion: \\\"v${BKMS_HELM_CHART_VERSION}\\\"/\" \"${CHART_YAML}\"\nelse\n    echo \"appVersion: \\\"v${BKMS_HELM_CHART_VERSION}\\\"\" >> \"${CHART_YAML}\"\nfi\n\necho \"    [OK] Chart.yaml updated:\"\ngrep -E \"^(name|version|appVersion):\" \"${CHART_YAML}\" | sed 's/^/       /'\n\n# ============================================================\n# 4. Package the Chart\n# ============================================================\necho \"\"\necho \">>> [Step 4] Packaging Helm Chart ...\"\n\nPACKAGE_OUTPUT_DIR=\"$(mktemp -d)\"\nhelm package \"${CHART_DIR}\" --destination \"${PACKAGE_OUTPUT_DIR}\"\n\nCHART_PACKAGE=$(find \"${PACKAGE_OUTPUT_DIR}\" -name '*.tgz' | head -n 1)\n\nif [ -z \"${CHART_PACKAGE}\" ]; then\n    echo \"    [ERROR] Packaging failed. No .tgz file found.\"\n    exit 1\nfi\n\necho \"    [OK] Package created: ${CHART_PACKAGE}\"\n\n# ============================================================\n# 5. Push Chart to Helm Repo\n# ============================================================\necho \"\"\necho \">>> [Step 5] Pushing Chart to ${BKMS_HELM_REPO_URL} ...\"\n\nCRED_USER=\"${{settings.bkms_helm_repo_credential.username}}\"\nCRED_PWD=\"${{settings.bkms_helm_repo_credential.password}}\"\n\nHTTP_CODE=$(curl -s -o /tmp/helm_push_response.txt -w \"%{http_code}\" \\\n    -F \"chart=@${CHART_PACKAGE}\" \\\n    -u \"$CRED_USER:$CRED_PWD\" \\\n    \"${BKMS_HELM_REPO_URL}\")\n\nRESPONSE_BODY=$(cat /tmp/helm_push_response.txt 2>/dev/null || true)\n\nif [ \"${HTTP_CODE}\" -ge 200 ] && [ \"${HTTP_CODE}\" -lt 300 ]; then\n    echo \"    [OK] Push succeeded! (HTTP ${HTTP_CODE})\"\n    echo \"    Response: ${RESPONSE_BODY}\"\nelse\n    echo \"    [ERROR] Push failed! (HTTP ${HTTP_CODE})\"\n    echo \"    Response: ${RESPONSE_BODY}\"\n    exit 1\nfi\n\n# ============================================================\n# Cleanup\n# ============================================================\nrm -rf \"${TOOLS_DIR}\" \"${PACKAGE_OUTPUT_DIR}\" /tmp/helm_push_response.txt\n\necho \"\"\necho \"[DONE] Chart ${BKMS_HELM_CHART_NAME}:${BKMS_HELM_CHART_VERSION} has been pushed to ${BKMS_HELM_REPO_URL}\"\n",
+              "scriptType": "SHELL",
+              "stepId": "iYEkde",
+              "taskAtom": "",
+              "version": "1.*"
+            }
+          ],
+          "enableExternal": false,
+          "id": "1",
+          "jobControlOption": {
+            "continueWhenFailed": false,
+            "customCondition": "",
+            "customVariables": [
+              {
+                "key": "param1",
+                "value": ""
+              }
+            ],
+            "dependOnId": [],
+            "dependOnName": "",
+            "dependOnType": "ID",
+            "enable": true,
+            "prepareTimeout": 10,
+            "runCondition": "STAGE_RUNNING",
+            "timeout": 900,
+            "timeoutVar": "900"
+          },
+          "jobId": "job_WKS",
+          "matrixControlOption": {
+            "excludeCaseStr": "",
+            "fastKill": true,
+            "includeCaseStr": "",
+            "maxConcurrency": 5,
+            "strategyStr": ""
+          },
+          "matrixGroupFlag": false,
+          "maxQueueMinutes": 60,
+          "maxRunningMinutes": 900,
+          "mutexGroup": {
+            "enable": false,
+            "mutexGroupName": "",
+            "queue": 5,
+            "queueEnable": false,
+            "timeout": 900,
+            "timeoutVar": "900"
+          },
+          "name": "Linux",
+          "nfsSwitch": false,
+          "showBuildResource": false,
+          "vmNames": []
+        }
+      ],
+      "fastKill": false,
+      "finally": false,
+      "id": "stage-2",
+      "name": "代码拉取 & 构建 & 推送",
+      "stageControlOption": {
+        "customCondition": "",
+        "customVariables": [
+          {
+            "key": "param1",
+            "value": ""
+          }
+        ],
+        "enable": true,
+        "manualTrigger": false,
+        "runCondition": "AFTER_LAST_FINISHED",
+        "timeout": 24,
+        "triggerUsers": []
+      },
+      "tag": [
+        "28ee946a59f64949a74f3dee40a1bda4"
+      ]
+    }
+  ]
+}

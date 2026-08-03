@@ -1,0 +1,15 @@
+// Package gpa 提供 GeneralPodAutoscaler 资源的状态解析能力
+//
+// 首期 GPA 与 HPA 的状态判定规则完全一致，本包通过委托调用 hpa.Parse 实现；
+// TODO 未来 GPA 出现特有状态字段，可在此文件中扩展差异逻辑，无需改动 HPA 分支
+package gpa
+
+import (
+	k8sstatus "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/kubernetes/status"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/kubernetes/status/autoscaler/hpa"
+)
+
+// Parse 解析 GeneralPodAutoscaler 的综合状态，当前实现直接复用 HPA 判定规则
+func Parse(manifest map[string]any) *k8sstatus.Result {
+	return hpa.Parse(manifest)
+}

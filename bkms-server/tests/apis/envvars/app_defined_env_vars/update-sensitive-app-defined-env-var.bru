@@ -1,0 +1,38 @@
+meta {
+  name: update-sensitive-app-defined-env-var
+  type: http
+  seq: 9
+}
+
+put {
+  url: {{serviceURL}}/apps/{{appDefinedEnvVarsAppID}}/env-vars/{{sensitiveAppDefinedEnvVarKey}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "updatedKey": "{{sensitiveAppDefinedEnvVarKey}}",
+    "description": "{{sensitiveAppDefinedEnvVarDescription}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should keep sensitive fields when optional fields are omitted", () => {
+    const ret = res.body.data;
+
+    expect(ret.key).to.equal(bru.getVar("sensitiveAppDefinedEnvVarKey"));
+    // Value stays masked because the var is still sensitive.
+    expect(ret.value).to.equal("******");
+    expect(ret.isSensitive).to.equal(true);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

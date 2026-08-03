@@ -1,0 +1,30 @@
+meta {
+  name: update-default
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{serviceURL}}/apps/{{updateStrategyAppID}}/app-spec/default-update-strategy
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecUpdateStrategy": {
+      "maxUnavailable": "88%",
+      "maxSurge": "3"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

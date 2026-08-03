@@ -1,0 +1,54 @@
+meta {
+  name: list-placeholder-vars
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/placeholder-vars
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body.data: isArray
+}
+
+tests {
+  test("should return the placeholder vars", () => {
+    expect(res.body).to.deep.equal({
+      data: [
+        {
+          key: "ARTIFACT_IMAGE",
+          description: "镜像地址，如：mirrors.tencent.com/bk/myapp:1.0.0"
+        },
+        {
+          key: "ARTIFACT_IMAGE_NAME",
+          description: "镜像名，如：mirrors.tencent.com/bk/myapp"
+        },
+        {
+          key: "ARTIFACT_IMAGE_TAG",
+          description: "镜像 Tag，如：1.0.0"
+        },
+        {
+          key: "ARTIFACT_IMAGE_REGISTRY",
+          description: "镜像仓库，如：mirrors.tencent.com"
+        },
+        {
+          key: "ARTIFACT_IMAGE_REPOSITORY",
+          description: "镜像库，如：bk/myapp"
+        },
+        {
+          key: "APP_IMAGE_PULL_SECRET",
+          description: "镜像拉取密钥，如：myapp-pull-secret"
+        }
+      ]
+    });
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

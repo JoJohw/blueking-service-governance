@@ -1,0 +1,21 @@
+meta {
+  name: set_content_of_normal_should_succ
+  seq: 1
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("valuesNormalHelmAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `values-normal-ws-${suffix}`})
+    const app = await common.createHelmApp({id: `values-normal-app-${suffix}`, workspaceID: ws.id})
+
+    bru.setVar("valuesNormalWorkspaceID", ws.id);
+    bru.setVar("valuesNormalHelmAppID", app.id);
+  }
+}

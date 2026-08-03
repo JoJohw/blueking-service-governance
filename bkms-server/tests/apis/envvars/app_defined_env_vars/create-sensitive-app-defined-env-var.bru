@@ -1,0 +1,47 @@
+meta {
+  name: create-sensitive-app-defined-env-var
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{serviceURL}}/apps/{{appDefinedEnvVarsAppID}}/env-vars
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "key": "{{sensitiveAppDefinedEnvVarKey}}",
+    "value": "{{sensitiveAppDefinedEnvVarValue}}",
+    "description": "{{sensitiveAppDefinedEnvVarDescription}}",
+    "isSensitive": true
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const suffix = bru.getVar("randomSuffix");
+  bru.setVar("sensitiveAppDefinedEnvVarKey", `SENSITIVE_KEY_${suffix}`);
+  bru.setVar("sensitiveAppDefinedEnvVarValue", `sensitive-value-${suffix}`);
+  bru.setVar("sensitiveAppDefinedEnvVarDescription", `sensitive-description-${suffix}`);
+}
+
+tests {
+  test("should create a sensitive app-defined env var and mask its value", () => {
+    const ret = res.body.data;
+
+    expect(ret.key).to.equal(bru.getVar("sensitiveAppDefinedEnvVarKey"));
+    expect(ret.value).to.equal("******");
+    expect(ret.description).to.equal(bru.getVar("sensitiveAppDefinedEnvVarDescription"));
+    expect(ret.isSensitive).to.equal(true);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

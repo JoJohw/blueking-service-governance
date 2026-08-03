@@ -1,0 +1,26 @@
+fail_fast: true
+repos:
+  - repo: local
+    hooks:
+      # bkms-server
+      - id: bkms-server-format
+        language: system
+        name: run make fmt for "bkms-server"
+        entry: bash -c "cd bkms-server && make fmt"
+        files: '^bkms-server/'
+      - id: bkms-server-lint
+        language: system
+        name: run make lint for "bkms-server"
+        entry: bash -c "cd bkms-server && make lint"
+        files: '^bkms-server/'
+      # bkms-cli
+      - id: bkms-cli-format
+        language: system
+        name: run make fmt for "bkms-cli"
+        entry: bash -c "cd bkms-cli && make fmt"
+        files: '^bkms-cli/'
+      - id: bkms-cli-lint
+        language: system
+        name: run make lint for "bkms-cli"
+        entry: bash -c "cd bkms-cli && make lint"
+        files: '^bkms-cli/'

@@ -1,0 +1,29 @@
+meta {
+  name: env-get
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/apps/{{devModeAppID}}/envs/test/app-spec/dev-mode
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return the updated raw env dev mode values", () => {
+    expect(res.body.data.enabled).to.equal(true);
+    expect(res.body.data.workPath).to.equal("/data/bkms/dev-mode/trpc");
+    expect(res.body.data.mountPath).to.equal("/data/bkms/dev-mode/trpc/configmap-scripts");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

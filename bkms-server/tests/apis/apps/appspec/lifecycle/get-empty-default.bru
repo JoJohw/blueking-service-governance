@@ -1,0 +1,46 @@
+meta {
+  name: get-empty-default
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/app-spec/default-lifecycle
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const common = require("./common")
+  
+  const suffix = bru.getVar("randomSuffix");
+  const ws = await common.createWorkspace({id: `testws-lifecycle-${suffix}`})
+  bru.setVar("lifecycleWorkspaceID", ws.id)
+  const appID = `test-lifecycle-${suffix}`;
+  const app = await common.createTrpcApp({id: appID, name: appID, workspaceID: ws.id})
+  bru.setVar("lifecycleAppID", app.id)
+  
+  // Create an environment for env-related tests
+  const envName = `test-env-${suffix}`;
+  const env = await common.createEnvironment({
+    workspaceID: ws.id,
+    name: envName,
+    type: 'test',
+    cluster: {
+      clusterID: 'BCS-K8S-12345',
+      clusterType: 'single',
+      namespace: 'default'
+    }
+  })
+  bru.setVar("testEnv", envName)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

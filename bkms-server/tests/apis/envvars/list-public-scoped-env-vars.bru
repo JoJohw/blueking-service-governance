@@ -1,0 +1,68 @@
+meta {
+  name: list-public-scoped-env-vars
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{envvarsWorkspaceID}}/scoped-env-vars/public-vars
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should list only public scoped env vars with basic data in public order", () => {
+    const ret = res.body.data;
+
+    expect(ret).to.have.length(2);
+    expect(ret.map((item) => ({
+      id: item.id,
+      workspaceID: item.workspaceID,
+      scopeType: item.scopeType,
+      scopeValue: item.scopeValue,
+      key: item.key,
+      value: item.value,
+      description: item.description,
+      isSensitive: item.isSensitive
+    }))).to.deep.equal([
+      {
+        id: bru.getVar("workspaceScopedEnvVarID"),
+        workspaceID: bru.getVar("envvarsWorkspaceID"),
+        scopeType: "workspace",
+        scopeValue: "",
+        key: bru.getVar("updatedWorkspaceScopedKey"),
+        value: bru.getVar("updatedWorkspaceScopedValue"),
+        description: bru.getVar("updatedWorkspaceScopedDescription"),
+        isSensitive: false
+      },
+      {
+        id: bru.getVar("envTypeScopedEnvVarID"),
+        workspaceID: bru.getVar("envvarsWorkspaceID"),
+        scopeType: "envType",
+        scopeValue: "staging",
+        key: bru.getVar("envTypeScopedKey"),
+        value: bru.getVar("envTypeScopedValue"),
+        description: bru.getVar("envTypeScopedDescription"),
+        isSensitive: false
+      }
+    ]);
+  })
+
+  test("should not include env-scoped detail fields", () => {
+    const ret = res.body.data;
+
+    expect(ret.some((item) => item.id === bru.getVar("envScopedEnvVarID"))).to.equal(false);
+    expect(ret.some((item) => item.id === bru.getVar("envScopedOrderEnvVarID"))).to.equal(false);
+    expect(ret.every((item) => item.scopedEnvVar === undefined)).to.equal(true);
+    expect(ret.every((item) => item.conflictedInfo === undefined)).to.equal(true);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

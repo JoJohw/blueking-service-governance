@@ -1,0 +1,48 @@
+meta {
+  name: 08-delete
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{tafLifecycleAppID}}/envs/{{tafLifecycleEnvName}}/taf-deploys
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  if (res.status !== 200) {
+    return;
+  }
+
+  const appmodel = require("./helpers/appmodel");
+
+  const record = await appmodel.waitForAppModelDeployTerminal({
+    kind: "taf",
+    appID: bru.getVar("tafLifecycleAppID"),
+    envName: bru.getVar("tafLifecycleEnvName"),
+    expectedStatus: "uninstalled",
+    imageTag: bru.getVar("tafLifecycleImageTag2")
+  });
+  bru.setVar("tafLifecycleUninstalledDeployID", record.id);
+  bru.setVar("tafLifecycleUninstalledDeployStatus", record.status);
+}
+
+tests {
+  test("should uninstall the latest taf-deploy in place", () => {
+    expect(res.body).to.deep.equal({});
+    expect(bru.getVar("tafLifecycleUninstalledDeployID"))
+      .to.equal(bru.getVar("tafLifecycleSecondDeployID"));
+    expect(bru.getVar("tafLifecycleUninstalledDeployStatus")).to.equal("uninstalled");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 70000
+}

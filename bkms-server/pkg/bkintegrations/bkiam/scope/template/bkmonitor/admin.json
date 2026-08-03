@@ -1,0 +1,119 @@
+[
+  {
+    "system": "{{ .BKMonitorSystemID }}",
+    "actions": [
+      {
+        "id": "view_business_v2"
+      },
+      {
+        "id": "new_dashboard"
+      },
+      {
+        "id": "manage_datasource_v2"
+      },
+      {
+        "id": "view_event_v2"
+      },
+      {
+        "id": "manage_event_v2"
+      },
+      {
+        "id": "explore_metric_v2"
+      },
+      {
+        "id": "view_rule_v2"
+      },
+      {
+        "id": "manage_rule_v2"
+      },
+      {
+        "id": "view_notify_team_v2"
+      },
+      {
+        "id": "manage_notify_team_v2"
+      },
+      {
+        "id": "view_downtime_v2"
+      },
+      {
+        "id": "manage_downtime_v2"
+      },
+      {
+        "id": "export_config_v2"
+      },
+      {
+        "id": "import_config_v2"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKMonitorSystemID }}",
+        "type": "space",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMonitorSystemID }}",
+              "type": "space",
+              "id": "{{ .SpaceID }}",
+              "name": "{{ .SpaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKMonitorSystemID }}",
+    "actions": [
+      {
+        "id": "view_single_dashboard"
+      },
+      {
+        "id": "edit_single_dashboard"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKMonitorSystemID }}",
+        "type": "grafana_dashboard",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMonitorSystemID }}",
+              "type": "space",
+              "id": "{{ .SpaceID }}",
+              "name": "{{ .SpaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKMonitorSystemID }}",
+    "actions": [
+      {
+        "id": "view_apm_application_v2"
+      },
+      {
+        "id": "manage_apm_application_v2"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKMonitorSystemID }}",
+        "type": "apm_application",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMonitorSystemID }}",
+              "type": "space",
+              "id": "{{ .SpaceID }}",
+              "name": "{{ .SpaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  }
+]

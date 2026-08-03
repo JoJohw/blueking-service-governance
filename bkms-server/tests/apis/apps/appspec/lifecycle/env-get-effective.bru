@@ -1,0 +1,20 @@
+meta {
+  name: env-get-effective
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{serviceURL}}/apps/{{lifecycleAppID}}/envs/{{testEnv}}/app-spec/lifecycle/effective
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

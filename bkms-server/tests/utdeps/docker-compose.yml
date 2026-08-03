@@ -1,0 +1,91 @@
+x-gitea-env: &gitea-env
+  GITEA__database__DB_TYPE: sqlite3
+  GITEA__database__PATH: /var/lib/gitea/gitea.db
+  GITEA__security__INSTALL_LOCK: "true"
+  GITEA__security__SECRET_KEY: supersecretfixturekey
+  GITEA__server__DOMAIN: git
+  GITEA__server__ROOT_URL: http://localhost:28010/
+  GITEA__server__HTTP_PORT: "3000"
+  GITEA__service__DISABLE_REGISTRATION: "true"
+
+services:
+  # Service: Git Server
+  git:
+    image: gitea/gitea:1.21.11-rootless
+    restart: unless-stopped
+    environment:
+      <<: *gitea-env
+    ports:
+      - "28010:3000"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:3000/api/healthz || exit 1" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - ./gitea/data:/var/lib/gitea
+      - ./gitea/config:/etc/gitea
+  git-init:
+    image: gitea/gitea:1.21.11-rootless
+    depends_on:
+      git:
+        condition: service_healthy
+    restart: "no"
+    environment:
+      <<: *gitea-env
+      # GITEA_APP_INI: /etc/gitea/app.ini
+      GIT_HTTP_USER: ufoo
+      GIT_HTTP_PASS: easy_pass
+      GIT_HTTP_EMAIL: ufoo@example.com
+      GIT_SAMPLE_REPO: sample-repo
+    volumes:
+      - ./gitea/data:/var/lib/gitea
+      - ./gitea/config:/etc/gitea
+      - ./git-init.sh:/usr/local/bin/git-init.sh:ro
+    entrypoint: [ "/usr/local/bin/git-init.sh" ]
+  # Service: Helm Repo Registry
+  chartmuseum:
+    image: ghcr.io/helm/chartmuseum:v0.15.0
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      STORAGE: local
+      STORAGE_LOCAL_ROOTDIR: /charts
+      DISABLE_API: "false"
+    volumes:
+      - ./charts/repo:/charts:ro
+    ports:
+      - "28020:8080"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8080/health || exit 1" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  # Service: Container Registry
+  registry:
+    image: registry:2.8.3
+    restart: unless-stopped
+    environment:
+      REGISTRY_HTTP_ADDR: 0.0.0.0:5000
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    ports:
+      - "28030:5000"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:5000/v2/_catalog || exit 1" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  registry-init:
+    image: python:3.12-alpine
+    restart: "no"
+    depends_on:
+      registry:
+        condition: service_healthy
+    environment:
+      REGISTRY_URL: http://registry:5000
+      REGISTRY_REPO: fixture/sample
+      REGISTRY_TAGS: latest,1.0.0
+    working_dir: /opt/init
+    volumes:
+      - ./registry/registry-init.py:/opt/init/registry-init.py:ro
+    entrypoint: [ "python", "/opt/init/registry-init.py" ]

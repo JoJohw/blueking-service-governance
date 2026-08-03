@@ -1,0 +1,188 @@
+{
+  "system_id": "{{ .BKMSSystemID }}",
+  "enabled": true,
+  "operations": [
+    {
+      "operation": "upsert_resource_type",
+      "data": {
+        "id": "env",
+        "name": "环境",
+        "name_en": "env",
+        "description": "环境",
+        "description_en": "env",
+        "provider_config": {
+          "path": "/xxx/envs/"
+        },
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_instance_selection",
+      "data": {
+        "id": "env_list",
+        "name": "环境列表",
+        "name_en": "envs",
+        "resource_type_chain": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "workspace"
+          },
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "env"
+          }
+        ]
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "create_env",
+        "name": "创建环境",
+        "name_en": "create env",
+        "description": "用户创建环境",
+        "description_en": "user create env",
+        "type": "create",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "workspace",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "workspace_list"
+              }
+            ]
+          }
+        ],
+        "related_actions": [
+          "view_workspace"
+        ],
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "view_env",
+        "name": "查看环境",
+        "name_en": "view env",
+        "description": "用户查看环境",
+        "description_en": "user view env",
+        "type": "view",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "env",
+            "name_alias": "",
+            "name_alias_en": "",
+            "selection_mode": "instance",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "env_list"
+              }
+            ]
+          }
+        ],
+        "related_actions": [
+          "view_workspace"
+        ],
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "deploy_env",
+        "name": "部署环境",
+        "name_en": "deploy env",
+        "description": "用户部署环境",
+        "description_en": "user deploy env",
+        "type": "manage",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "env",
+            "name_alias": "",
+            "name_alias_en": "",
+            "selection_mode": "instance",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "env_list"
+              }
+            ]
+          }
+        ],
+        "related_actions": [
+          "view_workspace",
+          "view_env"
+        ],
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "edit_env",
+        "name": "编辑环境",
+        "name_en": "edit env",
+        "description": "用户编辑环境",
+        "description_en": "user edit env",
+        "type": "edit",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "env",
+            "name_alias": "",
+            "name_alias_en": "",
+            "selection_mode": "instance",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "env_list"
+              }
+            ]
+          }
+        ],
+        "related_actions": [
+          "view_workspace",
+          "view_env"
+        ],
+        "version": 1
+      }
+    },
+    {
+      "operation": "upsert_action",
+      "data": {
+        "id": "delete_env",
+        "name": "删除环境",
+        "name_en": "delete env",
+        "description": "用户删除环境",
+        "description_en": "user delete env",
+        "type": "delete",
+        "related_resource_types": [
+          {
+            "system_id": "{{ .BKMSSystemID }}",
+            "id": "env",
+            "name_alias": "",
+            "name_alias_en": "",
+            "selection_mode": "instance",
+            "related_instance_selections": [
+              {
+                "system_id": "{{ .BKMSSystemID }}",
+                "id": "env_list"
+              }
+            ]
+          }
+        ],
+        "related_actions": [
+          "view_workspace",
+          "view_env"
+        ],
+        "version": 1
+      }
+    }
+  ]
+}

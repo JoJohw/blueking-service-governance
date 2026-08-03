@@ -1,0 +1,47 @@
+meta {
+  name: create-env-type-scoped-env-var-for-bg-test
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{bgEnvVarsWorkspaceID}}/scoped-env-vars
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "scopeType": "envType",
+    "scopeValue": "development",
+    "key": "{{bgTestEnvTypeKey}}",
+    "value": "{{bgTestEnvTypeValue}}",
+    "description": "envType scoped var for bg test",
+    "isSensitive": false
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const suffix = bru.getVar("randomSuffix");
+  bru.setVar("bgTestEnvTypeKey", `BG_ENVTYPE_KEY_${suffix}`);
+  bru.setVar("bgTestEnvTypeValue", `bg-envtype-value-${suffix}`);
+}
+
+tests {
+  test("should create envType scoped env var", () => {
+    const ret = res.body.data;
+    expect(ret.scopeType).to.equal("envType");
+    expect(ret.scopeValue).to.equal("development");
+    expect(ret.key).to.equal(bru.getVar("bgTestEnvTypeKey"));
+    expect(ret.value).to.equal(bru.getVar("bgTestEnvTypeValue"));
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

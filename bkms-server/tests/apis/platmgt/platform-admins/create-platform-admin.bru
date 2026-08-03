@@ -1,0 +1,41 @@
+meta {
+  name: assign-platform-admin-role
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{serviceURL}}/plat-mgt/admins
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "usernames": ["{{platAdminCreatedUsername}}"],
+    "roleCode": "admin"
+  }
+}
+
+assert {
+  res.status: eq 204
+}
+
+script:pre-request {
+  const seedUser = bru.getVar("platAdminSeedUser");
+  req.setHeader("X-Bk-Authed-User-Info", JSON.stringify({
+    userId: seedUser,
+  }));
+  req.setHeader("X-Bk-Authed-User-Credential", '{"bkTicket":"xxx"}');
+}
+
+tests {
+  test("should accept batch platform administrator role assignment without response body", () => {
+    expect(res.body).to.equal("");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

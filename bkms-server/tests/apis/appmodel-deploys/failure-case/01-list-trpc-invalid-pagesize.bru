@@ -1,0 +1,30 @@
+meta {
+  name: 01-list-trpc-invalid-pagesize
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{appmodelDeployFailHelmAppID}}/envs/{{appmodelDeployFailEnvName}}/trpc-deploys?page=1&pageSize=7
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject unsupported page size before any app/type check", () => {
+    expect(res.body.error).to.be.an("object");
+    expect(res.body.error.code).to.equal("INVALID_REQUEST");
+    expect(res.body.error.system).to.equal("bkms");
+    expect(res.body.error.module).to.equal("bkms-server");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

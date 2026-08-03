@@ -1,0 +1,72 @@
+
+# PreCI
+.codecc
+
+# common
+.vscode
+*.DS_Store
+.idea/
+.vscode/
+*exvim*
+*vendor*
+build/
+.codebuddy/
+
+!bkms-server/pkg/build/
+!bkms-server/pkg/build/build/
+!bkms-server/pkg/build/image/
+!bkms-cli/cmd/app/build/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+coverage.html
+*,cover
+.hypothesis/
+
+# 新增忽略文件
+bin
+trpc.log
+cover.out
+.idea
+.devspace
+devspace.yaml
+
+pre-*-bkcodeai
+
+# 本地开发时的一些配置文件和环境变量名
+*.local.yaml
+*.local.env
+*.local.sh
+
+# Personal config files for bkms-server E2E tests
+bkms-server/tests/apis/environments/*_local.bru
+bkms-server/tests/.env
+bkms-server/tests/utdeps/gitea
+bkms-server/tests/utdeps/charts/repo/*.tgz
+bkms-server/tests/utdeps_db/mongo8/*
+bkms-server/tests/utdeps_db/rabbitmq/*
+.playwright-cli/
+/charts/bkms-server/charts/
+/charts/bkms-ui/charts/
+test-reports/
+
+# bkms-cli E2E 测试本地环境变量
+bkms-cli/test/e2e/.env
+
+# E2E BDD 测试中间产物
+e2e/node_modules/
+e2e/.features-gen/
+e2e/test-results/
+
+# Go workspace (内部开发者本地使用，不提交到开源仓库)
+go.work
+go.work.sum
+
+### PreCI ###
+.codecc

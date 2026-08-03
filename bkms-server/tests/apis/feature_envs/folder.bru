@@ -1,0 +1,55 @@
+meta {
+  name: feature_envs
+  seq: 11
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("featureEnvWorkspaceID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `feat-env-ws-${suffix}`});
+    const app = await common.createTrpcApp({id: `feat-env-app-${suffix}`, workspaceID: ws.id});
+    const sourceEnvDisplayName = `特性来源环境-${suffix}`;
+    const sourceEnvClusterID = `feat-cluster-${suffix}`;
+
+    const sourceEnv = await common.createEnvironment({
+      workspaceID: ws.id,
+      name: `feat-src-${suffix}`,
+      displayName: sourceEnvDisplayName,
+      type: "development",
+      description: `feature env source ${suffix}`,
+      cluster: {
+        clusterID: sourceEnvClusterID,
+        clusterType: "single",
+        namespace: `feat-src-ns-${suffix}`,
+      }
+    });
+
+    const otherEnv = await common.createEnvironment({
+      workspaceID: ws.id,
+      name: `feat-other-${suffix}`,
+      displayName: `其他公共环境-${suffix}`,
+      type: "test",
+      description: `feature env extra env ${suffix}`,
+      cluster: {
+        clusterID: `feat-cluster-other-${suffix}`,
+        clusterType: "single",
+        namespace: `feat-other-ns-${suffix}`,
+      }
+    });
+
+    bru.setVar("featureEnvWorkspaceID", ws.id);
+    bru.setVar("featureEnvAppID", app.id);
+    bru.setVar("featureEnvSourceEnvID", sourceEnv.id);
+    bru.setVar("featureEnvSourceEnvName", sourceEnv.name);
+    bru.setVar("featureEnvSourceEnvDisplayName", sourceEnvDisplayName);
+    bru.setVar("featureEnvSourceEnvClusterID", sourceEnvClusterID);
+    bru.setVar("featureEnvOtherEnvName", otherEnv.name);
+    bru.setVar("featureEnvDisplayName", `登录联调-${suffix}`);
+  }
+}

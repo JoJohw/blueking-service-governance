@@ -1,0 +1,41 @@
+meta {
+  name: 08-list-chart-versions
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{serviceURL}}/apps/{{helmChartRepoAppID}}/charts/versions
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  if (!bru.getVar('readableChartVersion') && res.body && Array.isArray(res.body.data) && res.body.data.length > 0) {
+    bru.setVar('readableChartVersion', res.body.data[0].name);
+  }
+}
+
+tests {
+  test("should return chart versions", () => {
+    expect(res.body.data).to.be.an('array');
+  });
+
+  test("should return version fields when results exist", () => {
+    if (res.body.data.length > 0) {
+      expect(res.body.data[0].name).to.be.a('string');
+      expect(res.body.data[0].createdAt).to.be.a('string');
+      expect(res.body.data[0]).to.have.property('updatedAt');
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 30000
+}

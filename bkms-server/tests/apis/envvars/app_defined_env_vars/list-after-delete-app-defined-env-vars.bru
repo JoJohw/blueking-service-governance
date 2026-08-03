@@ -1,0 +1,26 @@
+meta {
+  name: list-after-delete-app-defined-env-vars
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{serviceURL}}/apps/{{appDefinedEnvVarsAppID}}/env-vars
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should remove the deleted app-defined env var", () => {
+    expect(res.body.data).to.deep.equal([]);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

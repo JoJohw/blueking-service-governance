@@ -1,0 +1,30 @@
+meta {
+  name: update-default
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{serviceURL}}/apps/{{labelsAppID}}/app-spec/default-labels
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "labels": {
+      "team": "sre",
+      "version": "v1"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

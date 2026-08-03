@@ -1,0 +1,35 @@
+meta {
+  name: env-get-effective-after-del
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{serviceURL}}/apps/{{probeAppID}}/envs/{{testEnv}}/app-spec/probe/effective
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should fall back to the default probe values", () => {
+    // 环境配置被删除后，应该回退到默认配置
+    expect(res.body.data.liveness.probeHandler.type).to.equal("HTTP");
+    expect(res.body.data.liveness.probeHandler.url).to.include("localhost");
+    expect(res.body.data.liveness.initialDelaySeconds).to.equal(10);
+    
+    expect(res.body.data.readiness.probeHandler.type).to.equal("EXEC");
+    expect(res.body.data.readiness.probeHandler.command).to.include("sh");
+    
+    expect(res.body.data.startup.probeHandler.type).to.equal("TCP");
+    expect(res.body.data.startup.probeHandler.port).to.equal(3306);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

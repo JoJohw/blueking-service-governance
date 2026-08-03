@@ -1,0 +1,27 @@
+meta {
+  name: delete-trpc-platform-build-app
+  type: http
+  seq: 13
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{testTrpcPlatformBuildAppID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete trpc platform build app successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

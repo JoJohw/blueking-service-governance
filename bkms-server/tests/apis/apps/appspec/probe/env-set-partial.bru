@@ -1,0 +1,35 @@
+meta {
+  name: env-set-partial
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{serviceURL}}/apps/{{probeAppID}}/envs/{{testEnv}}/app-spec/probe
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecProbe": {
+      "readiness": {
+        "probeHandler": {
+          "type": "EXEC",
+          "command": ["test", "-f", "/tmp/ready"]
+        },
+        "timeoutSeconds": 5
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

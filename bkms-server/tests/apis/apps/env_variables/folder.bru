@@ -1,0 +1,22 @@
+meta {
+  name: env_variables
+  seq: 6
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("envVarsAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `ws-${suffix}`})
+    const app = await common.createTrpcApp({id: `app-${suffix}`, workspaceID: ws.id})
+    const env = await common.createEnvironment({"workspaceID": ws.id, "name": `env-${suffix}`, "cluster": {"clusterID": `cluster-${suffix}`, "namespace": `ns-${suffix}`}})
+
+    bru.setVar("envVarsAppID", app.id);
+    bru.setVar("envVarsEnvName", env.name);
+  }
+}

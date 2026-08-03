@@ -1,0 +1,42 @@
+meta {
+  name: envvars
+  seq: 7
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  // Create workspace for testing
+  if (!bru.getVar("envvarsWorkspaceID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({id: `envvars-ws-${suffix}`})
+
+    bru.setVar("workspaceID", ws.id);
+    bru.setVar("envvarsWorkspaceID", ws.id);
+  }
+
+  // Create environment for testing
+  if (!bru.getVar("envvarsEnvName")) {
+    const suffix = bru.getVar("randomSuffix");
+    const envName = `envvars-env-${suffix}`;
+    const env = await common.createEnvironment({
+      workspaceID: bru.getVar("envvarsWorkspaceID"),
+      name: envName,
+      displayName: envName,
+      type: "staging",
+      description: `envvars api test env ${suffix}`,
+      cluster: {
+        clusterID: `c-${suffix}`,
+        clusterType: "single",
+        namespace: `ns-${suffix}`
+      }
+    })
+
+    bru.setVar("envvarsEnvID", env.id);
+    bru.setVar("envvarsEnvName", env.name);
+  }
+}

@@ -1,0 +1,33 @@
+meta {
+  name: update-default
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{serviceURL}}/apps/{{resourcesAppID}}/app-spec/default-resources
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "appSpecResources": {
+      "replicas": 2,
+      "cpuRequests": "1",
+      "cpuLimits": "2",
+      "memoryRequests": "256Mi",
+      "memoryLimits": "256Mi"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,61 @@
+# Docs: https://golangci-lint.run/usage/configuration/
+version: "2"
+run:
+  concurrency: 4
+  issues-exit-code: 1
+  tests: true
+  allow-parallel-runners: true
+linters:
+  default: standard
+  enable:
+    - revive
+    - govet
+    - gosec
+    - nilerr
+  settings:
+    revive:
+      rules:
+        # Disable the entire "exported * must have comment" rule set
+        - name: exported
+          disabled: true
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - composites
+      settings:
+        shadow:
+          strict: false
+    gosec:
+      excludes:
+        # Disable: Poor file permissions used when writing to a new file
+        - G306
+  exclusions:
+    generated: lax
+    presets:
+      - common-false-positives
+      - legacy
+      - std-error-handling
+# TODO: Use golangci-lint's built-in formatter
+
+formatters:
+  enable:
+    - gci
+    - gofumpt
+    - golines
+  settings:
+    gci:
+      custom-order: true
+      sections:
+        - standard
+        - default
+        - localmodule
+      no-inline-comments: true
+      no-prefix-comments: true
+    gofumpt:
+      extra-rules: true
+    golines:
+      max-len: 119
+      tab-len: 4
+      shorten-comments: true
+      reformat-tags: false

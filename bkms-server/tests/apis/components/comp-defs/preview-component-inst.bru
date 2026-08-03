@@ -1,0 +1,53 @@
+meta {
+  name: preview-component-inst
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/component-insts/preview
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "type": "ImportPolaris",
+    "properties": {
+      "instanceKey": "test-instance",
+      "polarisName": "test-polaris-name",
+      "polarisNamespace": "test-namespace",
+      "polarisToken": "test-token-xxxx",
+      "servicePort": 8080,
+      "direct": false,
+      "keepNotReadyPod": false,
+      "enableHealthCheck": true,
+      "weight": 100
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should preview component instance by type without existing instance", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.resources).to.be.an("array");
+    expect(res.body.resources.length).to.equal(2);
+    expect(res.body.resources[0].kind).to.equal("PolarisConfig");
+    expect(res.body.resources[0].manifest).to.include("test-polaris-name");
+    expect(res.body.resources[1].kind).to.equal("Service");
+    expect(res.body.patchPreview).to.be.an("array");
+    expect(res.body.patchPreview.length).to.be.greaterThan(0);
+    expect(res.body.patchPreview[0].targetKind).to.equal("GameDeployment");
+    expect(res.body.patchPreview[0].patchedManifest).to.include("test-instance_polarisToken");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

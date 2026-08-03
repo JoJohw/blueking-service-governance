@@ -1,0 +1,41 @@
+meta {
+  name: 05-update-helm-spec
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{serviceURL}}/apps/{{testAppID}}/helm-spec
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "helmSpec": {
+      "helmSource": {
+        "repoType": "HelmRepo",
+        "helmRepoConfig": {
+          "repoURL": "http://www.example.com/updated-helm",
+          "chartName": "updated-chart"
+        }
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should update helm spec successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,32 @@
+meta {
+  name: list-workspaces-with-keyword
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{serviceURL}}/workspaces?keyword=img
+  body: none
+  auth: inherit
+}
+
+params:query {
+  keyword: img
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return filtered workspaces", () => {
+    expect(res.body.data).to.be.an('array');
+    expect(res.body.data.length).to.equal(1);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

@@ -1,0 +1,47 @@
+meta {
+  name: list-created-platform-admin
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/plat-mgt/admins
+  body: none
+  auth: inherit
+}
+
+params:query {
+  keyword: {{platAdminCreatedUsername}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const seedUser = bru.getVar("platAdminSeedUser");
+  req.setHeader("X-Bk-Authed-User-Info", JSON.stringify({
+    userId: seedUser,
+  }));
+  req.setHeader("X-Bk-Authed-User-Credential", '{"bkTicket":"xxx"}');
+}
+
+tests {
+  test("should list the platform administrator role binding created by the batch assignment request", () => {
+    expect(res.body.data).to.be.an("array");
+
+    const created = res.body.data.find((item) => item.username === bru.getVar("platAdminCreatedUsername"));
+    expect(created).to.be.an("object");
+    expect(created.roleCode).to.equal("admin");
+    expect(created.creator).to.equal(bru.getVar("platAdminSeedUser"));
+    expect(created.updater).to.equal(bru.getVar("platAdminSeedUser"));
+    expect(created.createdAt).to.be.a("string");
+    expect(created.updatedAt).to.be.a("string");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

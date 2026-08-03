@@ -1,0 +1,33 @@
+meta {
+  name: get-image-registry-workspace
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{imageRegistryWsID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.data.bkSystems: isJson
+  res.body.data.bkSystems.bkCIProjectID: isNotEmpty
+  res.body.data.bkSystems.bkCIProjectUID: isNotEmpty
+}
+
+tests {
+  test("should get workspace with updated value", () => {
+    expect(res.body.data.state).to.equal('Disabled')
+    expect(res.body.data.displayName).to.equal("updated displayName")
+    expect(res.body.data.description).to.equal("updated description")
+    expect(res.body.data.imageRegistry.username).to.equal("testuser")
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

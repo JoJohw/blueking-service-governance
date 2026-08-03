@@ -1,0 +1,55 @@
+# Number of bkms-ui nginx pods to run.
+replicaCount: 1
+
+# Container image used by the bkms-ui Deployment.
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: ""
+
+# Optional overrides for generated Kubernetes resource names.
+nameOverride: ""
+fullnameOverride: ""
+
+# Internal Service exposed by this chart. The nginx container listens on 5000.
+service:
+  type: ClusterIP
+  port: 5000
+
+# Ingress always routes path "/" to this chart's Service.
+ingress:
+  # Ingress Class 名称。K8s >= 1.18 使用 spec.ingressClassName，旧版本自动回退到 annotation。
+  ingressClass: ""
+  # Domain name used by the Ingress rule.
+  host: bkms-ui.example.com
+  # Ingress 路径配置。
+  path: /
+  pathType: Prefix
+  annotations:
+    # HTTP 和 HTTPS 都可以正常访问，HTTP 请求不会被强制跳转到 HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+# Business environment variables passed to the bkms-ui nginx container.
+env:
+  # API 前缀
+  BK_API_PREFIX: ""
+  # 网站 route 前缀
+  BK_SITE_URL: ""
+  # 蓝盾项目地址
+  BK_DEVOPS: ""
+  # 容器项目地址
+  BK_BCS: ""
+  # 监控项目地址
+  BK_MONITOR: ""
+  # BCS API 地址
+  BK_BCS_API_BASE_URL: ""
+  # 登录地址（关联退出登录）
+  BK_LOGIN_URL: ""
+  # 北极星项目地址
+  BK_POLARIS_URL: ""
+  # 文档地址
+  BK_DOC_URL: ""
+  # 蓝鲸 API 网关模板
+  BK_API_URL_TMPL: ""
+  # 代码库数据源地址
+  BK_REPO_URL: ""

@@ -1,0 +1,29 @@
+meta {
+  name: env-get-effective-after-del
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{serviceURL}}/apps/{{resourcesAppID}}/envs/test/app-spec/resources/effective
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should fall back to the default resources values", () => {
+    expect(res.body.data.replicas).to.equal(2);
+    expect(res.body.data.cpuRequests).to.equal("1");
+    expect(res.body.data.memoryRequests).to.equal("256Mi");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,30 @@
+meta {
+  name: env-get-effective
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{serviceURL}}/apps/{{labelsAppID}}/envs/test/app-spec/labels/effective
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return key-level merged effective labels", () => {
+    // default {team:sre, version:v1} merged with env {version:v2, region:sh}
+    expect(res.body.data.labels.team).to.equal("sre");
+    expect(res.body.data.labels.version).to.equal("v2");
+    expect(res.body.data.labels.region).to.equal("sh");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

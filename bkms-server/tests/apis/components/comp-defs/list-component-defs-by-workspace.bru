@@ -1,0 +1,39 @@
+meta {
+  name: list-component-defs-by-workspace
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{serviceURL}}/component-defs?scopeWorkspaceID={{workspaceID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should list component definitions by workspace successfully", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('array');
+  });
+
+  test("should return global and workspace-scoped components", () => {
+    if (res.body.data && res.body.data.length > 0) {
+      res.body.data.forEach(compDef => {
+        // Should be either global or scoped to this workspace
+        const isGlobal = compDef.scopeType === 'global';
+        const isWorkspaceScoped = compDef.scopeType === 'workspace';
+        expect(isGlobal || isWorkspaceScoped).to.be.true;
+      });
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

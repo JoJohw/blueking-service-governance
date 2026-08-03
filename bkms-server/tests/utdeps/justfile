@@ -1,0 +1,19 @@
+up-base:
+    mkdir -p gitea/{data,config}
+    # To avoid permission issues
+    chmod -R 777 gitea/{data,config}
+    mkdir -p charts/repo
+    cd charts && helm package sample-app && mv sample-app-0.1.0.tgz repo
+
+up: up-base
+    docker-compose up -d
+
+# Start the services with a bridge network instead of mapping the ports to host.
+# Use NETWORK_NAME environment variable to specify the network name.
+up-set-network: up-base
+    docker-compose -f docker-compose.yml -f compose-set-network.yml up -d
+
+clean:
+    docker-compose down
+    rm -rf gitea
+    rm -rf charts/repo

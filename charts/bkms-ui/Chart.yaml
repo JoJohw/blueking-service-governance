@@ -1,0 +1,10 @@
+apiVersion: v2
+name: bkms-ui
+description: A Helm chart for bkms-ui
+type: application
+version: 0.1.0-alpha.2
+appVersion: "v0.1.0-alpha.2"
+dependencies:
+  - name: common
+    repository: https://charts.bitnami.com/bitnami
+    version: 2.13.3

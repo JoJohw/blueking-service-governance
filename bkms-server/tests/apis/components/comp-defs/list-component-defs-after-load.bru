@@ -1,0 +1,30 @@
+meta {
+  name: list-component-defs-after-load
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{serviceURL}}/component-defs
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should list component definitions successfully", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('array');
+    // 最少有一个内置组件定义
+    expect(res.body.data.length).to.be.greaterThanOrEqual(1);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

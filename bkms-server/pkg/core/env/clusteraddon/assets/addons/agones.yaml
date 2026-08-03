@@ -1,0 +1,30 @@
+name: agones
+displayName: agones
+description: Agones 是 Kubernetes 上的游戏服务器管理器，用于管理游戏服务器实例的部署、伸缩和调度。
+chartInfo:
+  chartName: agones
+  releaseName: agones
+  defaultNamespace: bcs-system
+  exampleValues: |
+    agones:
+      image:
+        registry: mirrors.tencent.com/bkms
+      gameservers:
+        # 需要部署的游戏服务器所在的命名空间, 与环境的命名空间一致, 可配置多个
+        namespaces: [default]
+        # 游戏服务器实例的端口范围
+        minPort: 8000
+        maxPort: 8010
+      controller:
+        # Controller 实例数量
+        replicas: 2
+        # Worker 数量
+        numWorkers: 100                    
+        # 访问 API Server 的 QPS 和 QPS burst
+        apiServerQPS: 400
+        apiServerQPSBurst: 500
+      allocator:
+        # Allocator 实例数量
+        replicas: 3
+requiredForAppTypes: 
+  - agones

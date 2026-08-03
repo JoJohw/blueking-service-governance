@@ -1,0 +1,27 @@
+meta {
+  name: remove-workspace-user
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{serviceURL}}/workspaces/{{createdWorkspaceID}}/users/user1
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  console.log(res.body)
+  test("should remove workspace users successfully", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

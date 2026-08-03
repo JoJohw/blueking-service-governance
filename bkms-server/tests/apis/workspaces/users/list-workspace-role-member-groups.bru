@@ -1,0 +1,35 @@
+meta {
+  name: list-workspace-role-member-groups
+  type: http
+  seq: 1
+}
+
+script:pre-request {
+  const common = require("./common")
+  
+  // Make sure the default helm application exists.
+  const suffix = bru.getVar("randomSuffix");
+  await common.createWorkspace({id: `workspace-users-ws-${suffix}`})
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{createdWorkspaceID}}/role-member-groups
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.data.length: eq 4
+  res.body.data[0].roleCode: eq admin
+  res.body.data[0].userGroupID: eq "10001"
+  res.body.data[0].members: matches ["admin", "blueking"]
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+  followRedirects: true
+  maxRedirects: 5
+}

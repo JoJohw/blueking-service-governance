@@ -1,0 +1,61 @@
+meta {
+  name: failure-case
+  seq: 3
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  // The failure-case suite intentionally targets validation/auth/type-check
+  // code paths only — it must NOT actually deploy anything to the cluster
+  // and therefore is NOT gated behind RUN_*_DEPLOY_API_TESTS.
+  //
+  // Bootstrap a workspace, an environment, and a Helm app once. The Helm app
+  // is reused to exercise representative "wrong app type" branches on
+  // trpc-deploys / taf-deploys endpoints (validateAppModelDeployAppEnv returns
+  // `not appmodel app`; getLatest*DeployStatus returns `invalid app type`).
+  const common = require("./common");
+
+  if (!bru.getVar("appmodelDeployFailReady")) {
+    const suffix = bru.getVar("randomSuffix");
+    const workspaceID = `apdf-ws-${suffix}`;
+    const envName = `apdf-env-${suffix}`;
+    const helmAppID = `apdf-helm-${suffix}`;
+
+    const ws = await common.createWorkspace({id: workspaceID});
+    await common.createEnvironment({
+      name: envName,
+      workspaceID: ws.id,
+      type: "test",
+      description: "AppModel deploy failure-case shared env",
+      cluster: {
+        clusterID: "BCS-K8S-00001",
+        clusterType: "single",
+        namespace: "default"
+      }
+    });
+    // Helm app is enough to trigger the "not appmodel app" / "invalid app type"
+    // branches; we do NOT deploy it.
+    await common.createHelmApp({
+      id: helmAppID,
+      name: helmAppID,
+      workspaceID: ws.id,
+      helmRepoConfig: {
+        repoURL: "http://chartmuseum:8080",
+        chartName: "sample-app"
+      },
+      buildConfig: {
+        sourceType: "imageRegistry",
+        pipelineType: "123",
+        imageBuildConfig: {name: "nginx"}
+      }
+    });
+
+    bru.setVar("appmodelDeployFailWorkspaceID", ws.id);
+    bru.setVar("appmodelDeployFailEnvName", envName);
+    bru.setVar("appmodelDeployFailHelmAppID", helmAppID);
+    bru.setVar("appmodelDeployFailReady", true);
+  }
+}

@@ -1,0 +1,28 @@
+meta {
+  name: 10-get-values-file
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{serviceURL}}/apps/{{helmChartRepoAppID}}/charts/{{readableChartVersion}}/valuesfile
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return values file content", () => {
+    expect(res.body.data).to.be.a('string');
+    expect(res.body.data).to.contain("replicaCount:");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 30000
+}

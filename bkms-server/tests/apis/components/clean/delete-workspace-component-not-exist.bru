@@ -1,0 +1,28 @@
+meta {
+  name: delete-workspace-component-not-exist
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/components/not-exist-component-name
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should delete non-existent workspace component without error", () => {
+    // 删除不存在的组件不返回错误
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

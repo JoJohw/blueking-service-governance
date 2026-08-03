@@ -1,0 +1,20 @@
+meta {
+  name: env-delete-startup-by-type-again
+  type: http
+  seq: 21
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{probeAppID}}/envs/{{testEnv}}/app-spec/probe/startup
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

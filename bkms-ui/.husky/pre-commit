@@ -1,0 +1,2 @@
+cd apps/ui
+pnpm typecheck:staged

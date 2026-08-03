@@ -1,0 +1,33 @@
+meta {
+  name: set-workspace-state-disabled
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{serviceURL}}/workspaces/{{imageRegistryWsID}}/state
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "state": "Disabled"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should set workspace state to disabled", () => {
+    expect(res.status).to.equal(200);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

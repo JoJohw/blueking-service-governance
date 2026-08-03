@@ -1,0 +1,35 @@
+meta {
+  name: downgrade-sensitive-app-defined-env-var
+  type: http
+  seq: 11
+}
+
+put {
+  url: {{serviceURL}}/apps/{{appDefinedEnvVarsAppID}}/env-vars/{{sensitiveAppDefinedEnvVarKey}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "updatedKey": "{{sensitiveAppDefinedEnvVarKey}}",
+    "value": "plaintext-after-downgrade",
+    "description": "{{sensitiveAppDefinedEnvVarDescription}}",
+    "isSensitive": false
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+tests {
+  test("should reject downgrading a sensitive env var to non-sensitive", () => {
+    expect(res.status).to.equal(400);
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,42 @@
+meta {
+  name: 07-delete
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{serviceURL}}/apps/{{helmLifecycleAppID}}/envs/{{helmLifecycleEnvName}}/helm-deploys/{{helmLifecycleRollbackDeployID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  // Uninstall replaces the latest record's status with `uninstalled` (no new
+  // record). Wait until that transition is observed.
+  const helm = require("./helpers/helm");
+
+  const record = await helm.waitForDeploy({
+    appID: bru.getVar("helmLifecycleAppID"),
+    envName: bru.getVar("helmLifecycleEnvName"),
+    expectedStatus: "uninstalled",
+    imageTag: bru.getVar("helmLifecycleImageTag1")
+  });
+  bru.setVar("helmLifecycleUninstalledDeployID", record.id);
+}
+
+tests {
+  test("should uninstall the latest helm-deploy", () => {
+    expect(res.body).to.deep.equal({});
+    expect(bru.getVar("helmLifecycleUninstalledDeployID")).to.equal(bru.getVar("helmLifecycleRollbackDeployID"));
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 70000
+}

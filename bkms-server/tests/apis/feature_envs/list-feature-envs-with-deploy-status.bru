@@ -1,0 +1,33 @@
+meta {
+  name: list-feature-envs-with-deploy-status
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{serviceURL}}/apps/{{featureEnvAppID}}/feat-envs?with_deploy_status=true
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return an empty deploy status array before the feature env is deployed", () => {
+    const data = res.body.data;
+
+    expect(data).to.be.an("array").with.lengthOf(1);
+
+    const featureEnv = data[0];
+    expect(featureEnv.id).to.equal(bru.getVar("createdFeatureEnvID"));
+    expect(featureEnv.deployStatuses).to.be.an("array").that.is.empty;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,60 @@
+meta {
+  name: list-subnets
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{serviceURL}}/bkhcm/bizs/100/subnets
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "filter": {
+      "op": "and",
+      "rules": [
+        {
+          "field": "vendor",
+          "op": "eq",
+          "value": "tcloud-ziyan"
+        }
+      ]
+    },
+    "page": {
+      "count": false,
+      "start": 0,
+      "limit": 10
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return subnets list", () => {
+    expect(res.body.data).to.be.an('array');
+    if (res.body.data.length > 0) {
+      const subnet = res.body.data[0];
+      expect(subnet).to.have.property('id');
+      expect(subnet).to.have.property('vendor');
+      expect(subnet).to.have.property('account_id');
+      expect(subnet).to.have.property('cloud_vpc_id');
+      expect(subnet).to.have.property('cloud_id');
+      expect(subnet).to.have.property('name');
+      expect(subnet).to.have.property('region');
+      expect(subnet).to.have.property('zone');
+      expect(subnet).to.have.property('vpc_id');
+      expect(subnet).to.have.property('bk_biz_id');
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

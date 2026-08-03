@@ -1,0 +1,55 @@
+meta {
+  name: create-app-defined-env-var
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/apps/{{appDefinedEnvVarsAppID}}/env-vars
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "key": "{{appDefinedEnvVarKey}}",
+    "value": "{{appDefinedEnvVarValue}}",
+    "description": "{{appDefinedEnvVarDescription}}",
+    "isSensitive": false
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:post-response {
+  bru.setVar("appDefinedEnvVarCreatedAt", res.body.data.createdAt);
+  bru.setVar("appDefinedEnvVarInitialUpdatedAt", res.body.data.updatedAt);
+  bru.setVar("appDefinedEnvVarUpdatedAt", res.body.data.updatedAt);
+}
+
+script:pre-request {
+  const suffix = bru.getVar("randomSuffix");
+  bru.setVar("appDefinedEnvVarKey", `APP_DEFINED_KEY_${suffix}`);
+  bru.setVar("appDefinedEnvVarValue", `app-defined-value-${suffix}`);
+  bru.setVar("appDefinedEnvVarDescription", `app-defined-description-${suffix}`);
+}
+
+tests {
+  test("should create an app-defined env var", () => {
+    const ret = res.body.data;
+
+    expect(ret.key).to.equal(bru.getVar("appDefinedEnvVarKey"));
+    expect(ret.value).to.equal(bru.getVar("appDefinedEnvVarValue"));
+    expect(ret.description).to.equal(bru.getVar("appDefinedEnvVarDescription"));
+    expect(ret.isSensitive).to.equal(false);
+    expect(new Date(ret.createdAt).toString()).to.not.equal("Invalid Date");
+    expect(new Date(ret.updatedAt).getTime()).to.equal(new Date(ret.createdAt).getTime());
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

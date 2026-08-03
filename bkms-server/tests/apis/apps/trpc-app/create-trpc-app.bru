@@ -1,0 +1,81 @@
+meta {
+  name: create-trpc-app
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/apps
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "app-trpc-test-{{randomSuffix}}",
+    "id": "app-trpc-test-{{randomSuffix}}-id",
+    "type": "trpc",
+    "displayName": "TRPC App Test",
+    "appModelSpec": {
+      "trpcSpec": {
+        "language": "go",
+        "fileName": "trpc_go.yaml",
+        "filePath": "/usr/local/trpc/bin/",
+        "fileContent": "dGVzdAo="
+      },
+      "envVars": [
+        {
+          "key": "PRESERVED_TRPC_VAR",
+          "value": "trpc-value",
+          "description": "preserved across spec updates"
+        }
+      ]
+    },
+    "buildConfig": {
+      "sourceType": "codeRepository",
+      "repoBuildConfig": {
+        "type": "TGit",
+        "repoAlias": "test",
+        "repoURL": "https://git.com/bkms-govern.git",
+        "defaultBranch": "main",
+        "sourceDir": ".",
+        "dockerfile": "Dockerfile",
+        "dockerBuildArgs": {
+          "ARG1": "value1",
+          "ARG2": "value2"
+        }
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  // Save trpc app name and ID for later tests
+  if (res.body && res.body.data) {
+    if (res.body.data.name) {
+      bru.setVar('testTrpcAppName', res.body.data.name);
+      console.log("Saved testTrpcAppName:", res.body.data.name);
+    }
+    if (res.body.data.id) {
+      bru.setVar('testTrpcAppID', res.body.data.id);
+      console.log("Saved testTrpcAppID:", res.body.data.id);
+    }
+  }
+}
+
+tests {
+  test("should create trpc app successfully", () => {
+    expect(res.body.data.type).to.equal('trpc');
+    expect(res.body.data.name).to.contain(bru.getVar('randomSuffix'));
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

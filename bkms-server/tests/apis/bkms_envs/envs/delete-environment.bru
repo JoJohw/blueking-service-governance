@@ -1,0 +1,20 @@
+meta {
+  name: delete-environment
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{serviceURL}}/envs/{{envID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

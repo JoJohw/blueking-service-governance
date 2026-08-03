@@ -1,0 +1,74 @@
+[
+  {
+    "system": "{{ .BKMSSystemID }}",
+    "actions": [
+      {
+        "id": "view_workspace"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKMSSystemID }}",
+        "type": "workspace",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMSSystemID }}",
+              "type": "workspace",
+              "id": "{{ .WorkspaceID }}",
+              "name": "{{ .WorkspaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKMSSystemID }}",
+    "actions": [
+      {
+        "id": "view_app"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKMSSystemID }}",
+        "type": "app",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMSSystemID }}",
+              "type": "workspace",
+              "id": "{{ .WorkspaceID }}",
+              "name": "{{ .WorkspaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKMSSystemID }}",
+    "actions": [
+      {
+        "id": "view_env"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKMSSystemID }}",
+        "type": "env",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKMSSystemID }}",
+              "type": "workspace",
+              "id": "{{ .WorkspaceID }}",
+              "name": "{{ .WorkspaceName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  }
+]

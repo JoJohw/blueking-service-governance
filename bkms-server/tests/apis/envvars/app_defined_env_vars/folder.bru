@@ -1,0 +1,28 @@
+meta {
+  name: app_defined_env_vars
+  seq: 10
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("appDefinedEnvVarsWorkspaceID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const ws = await common.createWorkspace({ id: `appdefev-ws-${suffix}` });
+    bru.setVar("appDefinedEnvVarsWorkspaceID", ws.id);
+  }
+
+  if (!bru.getVar("appDefinedEnvVarsAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const app = await common.createTrpcApp({
+      id: `appdefev-app-${suffix}`,
+      workspaceID: bru.getVar("appDefinedEnvVarsWorkspaceID"),
+    });
+    bru.setVar("appDefinedEnvVarsAppID", app.id);
+    bru.setVar("appDefinedEnvVarsAppName", app.name);
+  }
+}

@@ -1,0 +1,59 @@
+meta {
+  name: audit-records
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{devModeWorkspaceID}}/operation-records?page=1&pageSize=100&appID={{devModeAppID}}&resourceType=app&username=api-test-user
+  body: none
+  auth: inherit
+}
+
+script:pre-request {
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  const records = res.body?.data?.results ?? [];
+
+  test("should contain env dev mode update audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "update" &&
+      item.attribute === "appModel" &&
+      item.group.envName === "test"
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after && after.Enabled === true;
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should contain env dev mode delete audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "delete" &&
+      item.attribute === "appModel" &&
+      item.group.envName === "test"
+    );
+
+    const record = candidates.find((item) => {
+      const before = item.data?.before ? JSON.parse(item.data.before) : null;
+      return before && before.Enabled === true && !item.data?.after;
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

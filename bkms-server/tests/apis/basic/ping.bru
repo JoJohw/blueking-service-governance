@@ -1,0 +1,22 @@
+meta {
+  name: ping
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{rootURL}}/ping
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+  res.body.data: eq "pong"
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

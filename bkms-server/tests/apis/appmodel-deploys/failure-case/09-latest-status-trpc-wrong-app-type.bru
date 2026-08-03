@@ -1,0 +1,32 @@
+meta {
+  name: 09-latest-status-trpc-wrong-app-type
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{serviceURL}}/apps/{{appmodelDeployFailHelmAppID}}/envs/{{appmodelDeployFailEnvName}}/trpc-deploys/latest-status
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject helm app on trpc latest-status", () => {
+    expect(res.body.error).to.be.an("object");
+    // getLatestAppModelDeployStatus -> "invalid app type" with INVALID_ARGUMENT.
+    expect(res.body.error.code).to.equal("INVALID_ARGUMENT");
+    expect(res.body.error.message).to.contain("invalid app type");
+    expect(res.body.error.system).to.equal("bkms");
+    expect(res.body.error.module).to.equal("bkms-server");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 5000
+}

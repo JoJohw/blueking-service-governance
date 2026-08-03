@@ -1,0 +1,47 @@
+meta {
+  name: list-build-records
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{serviceURL}}/apps/{{testBuildDeployTrpcAppID}}/builds?page=1&pageSize=10
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should list build records for trpc-build-deploy app", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('object');
+    expect(res.body.data.results).to.be.an('array');
+    expect(res.body.data.results.length).to.be.greaterThan(0);
+  });
+
+  test("should contain the previously created trpc-build-deploy record", () => {
+    const testBuildID = bru.getVar('testBuildDeployBuildID');
+    const foundRecord = res.body.data.results.find(record => record.buildID === testBuildID);
+
+    expect(foundRecord).to.not.be.undefined;
+    expect(foundRecord.buildID).to.equal(testBuildID);
+    expect(foundRecord.status).to.be.a('string');
+  });
+
+  test("should expose image tag for later deploy correlation", () => {
+    const testBuildID = bru.getVar('testBuildDeployBuildID');
+    const foundRecord = res.body.data.results.find(record => record.buildID === testBuildID);
+
+    expect(foundRecord.params).to.be.an('object');
+    expect(foundRecord.params.BKMS_IMAGE_TAG).to.equal('v1.0.0-build-deploy');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

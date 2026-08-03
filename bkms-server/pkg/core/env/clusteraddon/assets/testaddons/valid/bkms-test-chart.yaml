@@ -1,0 +1,10 @@
+name: bkms-test-chart
+displayName: 测试集群插件
+description: 测试集群插件，用于测试集群插件的部署和卸载
+chartInfo:
+  chartName: bkms-test-chart
+  defaultNamespace: bcs-system
+  exampleValues: |
+    test: "test"
+requiredForAppTypes: []
+optionalForAppTypes: ["trpc", "taf"]

@@ -1,0 +1,74 @@
+[
+  {
+    "system": "{{ .BKRepoSystemID }}",
+    "actions": [
+      {
+        "id": "project_view"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKRepoSystemID }}",
+        "type": "project",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKRepoSystemID }}",
+              "type": "project",
+              "id": "{{ .ProjectID }}",
+              "name": "{{ .ProjectName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKRepoSystemID }}",
+    "actions": [
+      {
+        "id": "repo_view"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKRepoSystemID }}",
+        "type": "repo",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKRepoSystemID }}",
+              "type": "project",
+              "id": "{{ .ProjectID }}",
+              "name": "{{ .ProjectName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "system": "{{ .BKRepoSystemID }}",
+    "actions": [
+      {
+        "id": "node_view"
+      }
+    ],
+    "resources": [
+      {
+        "system": "{{ .BKRepoSystemID }}",
+        "type": "node",
+        "paths": [
+          [
+            {
+              "system": "{{ .BKRepoSystemID }}",
+              "type": "project",
+              "id": "{{ .ProjectID }}",
+              "name": "{{ .ProjectName }}"
+            }
+          ]
+        ]
+      }
+    ]
+  }
+]

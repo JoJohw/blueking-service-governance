@@ -1,0 +1,74 @@
+meta {
+  name: audit-records
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{resourcesWorkspaceID}}/operation-records?page=1&pageSize=100&appID={{resourcesAppID}}&resourceType=app&username=api-test-user
+  body: none
+  auth: inherit
+}
+
+script:pre-request {
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  const records = res.body?.data?.results ?? [];
+
+  test("should contain default resources update audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "update" &&
+      item.attribute === "appModel" &&
+      !item.group.envName
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after && after.MemoryLimits === "256Mi";
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should contain env resources update audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "update" &&
+      item.attribute === "appModel" &&
+      item.group.envName === "test"
+    );
+
+    const record = candidates.find((item) => {
+      const after = item.data?.after ? JSON.parse(item.data.after) : null;
+      return after && after.MemoryLimits === "333Mi";
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+
+  test("should contain env resources delete audit record", () => {
+    const candidates = records.filter((item) =>
+      item.operationType === "delete" &&
+      item.attribute === "appModel" &&
+      item.group.envName === "test"
+    );
+
+    const record = candidates.find((item) => {
+      const before = item.data?.before ? JSON.parse(item.data.before) : null;
+      return before && before.MemoryLimits === "333Mi" && !item.data?.after;
+    });
+
+    expect(record, `matched records: ${JSON.stringify(candidates, null, 2)}`).to.exist;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

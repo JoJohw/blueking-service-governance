@@ -1,0 +1,38 @@
+meta {
+  name: list-workspace-components
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/components
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should return workspace components with reference apps", () => {
+    expect(res.status).to.equal(200);
+    expect(res.body.data).to.be.an('array');
+    
+    // 查找目标工作空间组件
+    const targetCompName = bru.getVar('appComponentWorkspaceCompName');
+    const targetAppID = bru.getVar('componentsTrpcAppID');
+    
+    const targetComp = res.body.data.find(comp => comp.name === targetCompName);
+    expect(targetComp, `Workspace component '${targetCompName}' should exist`).to.not.be.undefined;
+    
+    // Verify refAppIDs include the target app ID.
+    expect(targetComp.refAppIDs, 'refAppIDs should be an array').to.be.an('array');
+    expect(targetComp.refAppIDs, `refAppIDs should contain '${targetAppID}'`).to.include(targetAppID);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

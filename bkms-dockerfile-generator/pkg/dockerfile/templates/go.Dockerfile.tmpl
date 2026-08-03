@@ -1,0 +1,52 @@
+# -------------- builder container --------------
+FROM {{ .BuilderImage }} AS builder
+
+{{ range .DockerBuildArgNames -}}
+ARG {{ . }}
+{{ end -}}
+
+WORKDIR /workspace
+
+RUN mkdir -p /out
+
+{{ if imageTagContains .BuilderImage "alpine" -}}
+RUN apk add --no-cache ca-certificates git
+{{ else -}}
+# Non-Alpine official golang builder tags are treated as Debian based by default.
+# Extend this branch before introducing other base image families such as UBI or distroless.
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates git && rm -rf /var/lib/apt/lists/*
+{{ end -}}
+
+{{ range .DependencyFiles -}}
+COPY {{ . }} ./
+{{ end -}}
+RUN go mod download
+
+COPY . .
+
+{{ range .PreBuildCommands -}}
+RUN {{ . }}
+{{ end -}}
+
+{{ range .BuildCommands -}}
+RUN {{ . }}
+{{ end -}}
+
+RUN test -f /out/{{ .AppName }} || (echo "build artifact /out/{{ .AppName }} not found" && exit 1)
+
+# -------------- runner container --------------
+FROM {{ .RunnerImage }} AS runner
+
+WORKDIR /app
+
+{{ range .RuntimeEnvCommands -}}
+RUN {{ . }}
+{{ end -}}
+
+COPY --from=builder /out/{{ .AppName }} /app/{{ .AppName }}
+
+{{ if .StartCommand -}}
+ENTRYPOINT ["/bin/sh", "-ec", {{ quoteStartCommand .StartCommand }}]
+{{ else -}}
+ENTRYPOINT ["/app/{{ .AppName }}"]
+{{ end -}}

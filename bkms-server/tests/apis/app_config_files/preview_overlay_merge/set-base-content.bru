@@ -1,0 +1,36 @@
+meta {
+  name: set-base-content
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{serviceURL}}/apps/{{previewMergeAppID}}/app-config-files/{{previewBaseFileID}}/content
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "content": "global:\n  image: myapp:latest\n  replicas: 3\n  env: development\nservice:\n  port: 8080\n  type: ClusterIP",
+    "versionDescription": "设置基础内容"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should set base file content successfully", () => {
+    console.log(res.body)
+    expect(res.body.compiledContent).to.contain('global:');
+    expect(res.body.compiledContent).to.contain('image: myapp:latest');
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

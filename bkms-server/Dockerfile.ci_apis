@@ -1,0 +1,72 @@
+# 本 Dockerfile 用于构建在 CI 环境中执行 API 测试的项目镜像。说明：
+#
+# - 必须在 bkms-govern 根目录下执行 docker build 命令（因为依赖 libs/bkms-adapter）；
+#
+# 示例:
+#    docker build -f bkms-server/Dockerfile.ci_apis \
+#       -t bkms/bkms-server-ci-apis:0.0.1-alpha.1 \
+#       --build-arg GOPROXY="https://goproxy.cn,direct" \
+#       --build-arg GOSUMDB="<...>" .
+#
+# -------------- builder container --------------
+FROM golang:1.25.7-alpine3.22 AS builder
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tencent.com/g' /etc/apk/repositories
+
+RUN apk --update --no-cache add make git curl
+
+# 下载 Helm 并解压（ArgoCD 依赖）
+RUN curl -LO https://get.helm.sh/helm-v3.18.2-linux-amd64.tar.gz \
+    && tar -zxvf helm-v3.18.2-linux-amd64.tar.gz \
+    && mv linux-amd64/helm /usr/local/bin/helm \
+    && rm -rf helm-*.tar.gz linux-amd64
+
+ARG VERSION
+ARG GIT_HASH
+ARG GOPROXY
+ARG GOSUMDB
+
+WORKDIR /go/src/
+
+# Copy local adapter module.
+COPY libs/bkms-adapter /go/libs/bkms-adapter
+
+COPY bkms-server/go.mod go.mod
+COPY bkms-server/go.sum go.sum
+
+RUN go mod download
+
+COPY bkms-server/ .
+
+RUN make build VERSION=$VERSION GIT_HASH=$GIT_HASH
+
+
+# -------------- runner container --------------
+FROM alpine:3.22 AS runner
+
+ENV TZ=Asia/Shanghai
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tencent.com/g' /etc/apk/repositories
+
+RUN apk --update --no-cache add bash curl tzdata
+
+WORKDIR /app
+
+ARG BKMS_HOME="/go/src/"
+COPY --from=builder ${BKMS_HOME}/build/bkms-server /usr/bin/bkms-server
+
+# 配置文件目录
+RUN mkdir -p /app/etc
+COPY --from=builder ${BKMS_HOME}/configs/config.yaml /app/etc/config.yaml
+RUN mkdir -p /app/assets
+COPY --from=builder ${BKMS_HOME}/pkg/bkintegrations/bkci/assets/pipeline_templates /app/assets/pipeline_templates
+COPY --from=builder ${BKMS_HOME}/pkg/extension/component/assets/comps /app/assets/comps
+COPY --from=builder ${BKMS_HOME}/pkg/core/env/clusteraddon/assets/addons /app/assets/addons
+
+WORKDIR /app
+# 日志目录
+RUN mkdir -p /app/logs
+
+# command + args example:
+# - bkms-server webserver --srvCfg /app/etc/config.yaml
+# - bkms-server worker --srvCfg /app/etc/config.yaml

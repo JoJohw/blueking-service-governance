@@ -1,0 +1,78 @@
+meta {
+  name: create-trpc-app-with-platform-build
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{workspaceID}}/apps
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "app-trpc-platform-build-{{randomSuffix}}",
+    "id": "app-trpc-platform-build-{{randomSuffix}}-id",
+    "type": "trpc",
+    "displayName": "TRPC App with Platform Build",
+    "appModelSpec": {
+      "trpcSpec": {
+        "language": "go",
+        "fileName": "trpc_go.yaml",
+        "filePath": "/usr/local/trpc/bin/",
+        "fileContent": "dGVzdAo="
+      }
+    },
+    "buildConfig": {
+      "sourceType": "codeRepository",
+      "repoBuildConfig": {
+        "type": "TGit",
+        "repoAlias": "test",
+        "repoURL": "https://git.com/bkms-govern.git",
+        "defaultBranch": "main",
+        "sourceDir": ".",
+        "imageBuildMode": "platform",
+        "platformBuildConfig": {
+          "builderImage": "golang:1.24",
+          "runnerImage": "debian:12",
+          "commands": {
+            "preBuild": [
+              "go mod download"
+            ],
+            "build": [
+              "go build -o app ./cmd/server"
+            ],
+            "runtimeEnv": [
+              "apt-get update && apt-get install -y ca-certificates"
+            ],
+            "start": "./app"
+          }
+        }
+      }
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:post-response {
+  if (res.body && res.body.data) {
+    bru.setVar('testTrpcPlatformBuildAppID', res.body.data.id);
+  }
+}
+
+tests {
+  test("should create trpc app with platform build successfully", () => {
+    expect(res.body.data.type).to.equal('trpc');
+    expect(res.body.data.name).to.contain(bru.getVar('randomSuffix'));
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

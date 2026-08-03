@@ -1,0 +1,17 @@
+name: BadProp
+version: v1.0.0
+properties:
+- name: foo
+  # Use an invalid type
+  type: INVALID_TYPE
+patchers:
+- |-
+  spec:
+    template:
+      spec:
+        containers:
+          - name: web
+            resources:
+              requests:
+                cpu: 2
+specs: []

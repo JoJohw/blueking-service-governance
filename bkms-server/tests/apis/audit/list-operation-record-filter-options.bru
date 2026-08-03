@@ -1,0 +1,26 @@
+meta {
+  name: list-operation-record-filter-options
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{serviceURL}}/operation-records/filter-options
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body.data: isJson
+  res.body.data.resourceTypes: isArray
+  res.body.data.operationTypes: isArray
+  res.body.data.operationResults: isArray
+  res.body.data.operationResults[0].value: eq success
+  res.body.data.operationResults[0].displayName: isString
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

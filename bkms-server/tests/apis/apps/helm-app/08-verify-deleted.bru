@@ -1,0 +1,30 @@
+meta {
+  name: 08-verify-deleted
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{serviceURL}}/apps/{{testAppID}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+  res.body: isJson
+}
+
+tests {
+  test("should return 404 for deleted app", () => {
+    expect(res.status).to.equal(404);
+  });
+  test("should return not found for deleted app", () => {
+    expect(res.body.error.message).to.contain("not found");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
