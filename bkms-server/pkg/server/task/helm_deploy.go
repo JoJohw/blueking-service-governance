@@ -28,13 +28,11 @@ import (
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/config"
 	log "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/logging"
-	envmodel "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env/model"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/deploy"
 	helmdeploy "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/deploy/helm"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/database"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/helm"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/misc/audit"
-	alertstrategy "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/observability/bkmonitor/alert/strategy"
 	storereg "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/registry"
 )
 
@@ -81,6 +79,15 @@ func pollingHelmDeployStatus(ctx context.Context, args PollingHelmDeployStatusAr
 	if err != nil {
 		return nil, errors.Wrapf(err, "get deploy record")
 	}
+
+	// 进入部署轮询后异步触发一次资源范围刷新
+	go triggerTopologyRefreshForHelmDeploy(
+		context.WithoutCancel(ctx),
+		args,
+		record.ClusterID,
+		record.Namespace,
+		record.ReleaseName,
+	)
 
 	// 初始化 Helm SDK action.Configuration，用于后续轮询查询 Release 状态
 	debugLog := helm.NewHelmDebugLogger(ctx, record.ReleaseName, "polling-status")
@@ -149,57 +156,7 @@ func pollingHelmDeployStatus(ctx context.Context, args PollingHelmDeployStatusAr
 
 			// 部署成功时，记录应用到环境的关联
 			if record.Status == helm.StatusDeployed {
-				reg := storereg.G()
-				// 1. 记录应用到环境的部署关联（envStore 初始化失败时仅告警，不阻断主流程）。
-				envStore, sErr := envmodel.NewEnvironmentStoreMongo(database.Client(), database.Name())
-				if sErr != nil {
-					log.Errorf(ctx, "track env add app: create env store: %v", sErr)
-				} else {
-					deploy.TrackEnvAddApp(ctx, envStore, args.WorkspaceID, args.EnvName, args.AppID)
-				}
-
-				// 2. 异步将应用关联的告警策略同步到当前环境（失败仅记录日志，不影响部署结果）。
-				ws, wsErr := reg.WorkspaceStore.Get(ctx, args.WorkspaceID)
-				if wsErr != nil {
-					log.Errorf(ctx, "get workspace %s for alert sync failed: %v", args.WorkspaceID, wsErr)
-				}
-				var env *envmodel.Environment
-				if envStore == nil {
-					log.Errorf(ctx, "env store is not initialized for alert sync")
-				} else {
-					env, err = envStore.GetByName(ctx, args.WorkspaceID, args.AppID, args.EnvName)
-					if err != nil {
-						log.Errorf(ctx, "get env %s for alert sync failed: %v", args.EnvName, err)
-					}
-				}
-				if ws != nil && env != nil {
-					log.Infof(
-						ctx,
-						"dispatch alert strategy sync, workspace=%s app=%s env=%s envID=%s lane=%s operator=%s",
-						args.WorkspaceID, args.AppID, env.Name, env.ID.Hex(), args.TrafficLaneName, record.Operator,
-					)
-					// TODO(alertstrategy): 用 go 裸起 goroutine 无法保证跨 Pod 串行，
-					// 后续迁移到 asynq 任务队列以解决多 Pod 并发风险。
-					go alertstrategy.NewService(
-						reg.AlertStrategyStore,
-						reg.EnvStore,
-						reg.AppStore,
-						reg.ResourceSnapshotStore,
-					).SyncStrategiesForAppInEnv(
-						context.WithoutCancel(ctx), ws, args.AppID, env.ID, args.TrafficLaneName, record.Operator,
-					)
-				} else {
-					log.Warnf(
-						ctx,
-						"skip alert strategy sync: ws or env is nil, workspace=%s app=%s envName=%s wsNil=%v envNil=%v",
-						args.WorkspaceID, args.AppID, args.EnvName, ws == nil, env == nil,
-					)
-				}
-
-				// 3. 部署成功后异步触发资源范围刷新
-				go triggerTopologyRefreshAfterHelmDeploy(
-					context.WithoutCancel(ctx), args, record.ClusterID, record.Namespace, record.ReleaseName,
-				)
+				handleHelmDeploySucceeded(ctx, args, record)
 			}
 
 			// 转换为操作结果 & 记录操作审计
@@ -213,4 +170,20 @@ func pollingHelmDeployStatus(ctx context.Context, args PollingHelmDeployStatusAr
 			return &emptyResult, nil
 		}
 	}
+}
+
+// handleHelmDeploySucceeded 处理 Helm 部署成功后的后置动作
+// 包括记录应用与环境的部署关联，以及异步同步当前环境下的告警策略；这些动作失败时只记录日志，不阻断部署轮询结果
+func handleHelmDeploySucceeded(ctx context.Context, args PollingDeployStatusArgs, record *helmdeploy.Record) {
+	reg := storereg.G()
+
+	// 1. 记录应用到环境的部署关联（envStore 未初始化时仅告警，不阻断主流程）
+	if reg.EnvStore == nil {
+		log.Errorf(ctx, "track env add app: env store is not initialized")
+	} else {
+		deploy.TrackEnvAddApp(ctx, reg.EnvStore, args.WorkspaceID, args.EnvName, args.AppID)
+	}
+
+	// 2. 异步将应用关联的告警策略同步到当前环境（失败仅记录日志，不影响部署结果）
+	syncAlertStrategiesAfterDeploy(ctx, reg, args, record.Operator)
 }

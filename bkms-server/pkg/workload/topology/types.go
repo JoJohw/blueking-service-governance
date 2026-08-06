@@ -34,6 +34,8 @@ const (
 	// RefreshStatusProgressing 刷新中，Refresher 开始刷新时设置
 	RefreshStatusProgressing = "progressing"
 	// RefreshStatusSuccess 刷新成功，数据可用于拓扑构图
+	// 注意：Success 不代表资源在集群中全部存在，快照只记录声明的资源范围，
+	// 缺失资源由 Builder 查询时标记为 NotFound 并置 Graph.IsPartial
 	RefreshStatusSuccess = "success"
 	// RefreshStatusFailed 刷新失败，保留上一版可用数据
 	RefreshStatusFailed = "failed"
