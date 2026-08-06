@@ -159,6 +159,12 @@
               property="type"
               required
             >
+              <template #label>
+                <span class="inline-flex items-center">
+                  <span class="mr-[4px]">{{ $t('环境分类') }}</span>
+                  <EnvCategoryDescription />
+                </span>
+              </template>
               <Select
                 v-model="formData.type"
                 class="mr-[8px] w-[400px]"
@@ -379,6 +385,7 @@
   import { useSpaceStore } from '~/stores/space';
 
   import ClusterComponents from './cluster-components/cluster-components.vue';
+  import EnvCategoryDescription from './components/env-category-description.vue';
   import DeployedAppsWarning from './components/project-selector/deployed-apps-warning.vue';
   import ProjectSelector from './components/project-selector/project-selector.vue';
 
@@ -416,6 +423,7 @@
   const envTypeList = [
     { id: 'development', name: t('开发') },
     { id: 'test', name: t('测试') },
+    { id: 'staging', name: t('预发布') },
     { id: 'production', name: t('生产') },
   ];
 

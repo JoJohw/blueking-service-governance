@@ -150,14 +150,22 @@
           field="type"
           filter-multiple
           :filters="filterOptions.type"
-          :label="$t('环境分类')"
           :min-width="200"
           show-overflow="tooltip"
         >
+          <template #header>
+            <span class="inline-flex items-center gap-[4px] mr-[4px]">
+              {{ $t('环境分类') }}
+              <EnvCategoryDescription />
+            </span>
+          </template>
           <template #default="{ row }">
-            <div :class="['w-[50px] text-[#fff] rounded-[2px] text-center env-normal', `env-${row.type}`]">
+            <span
+              class="env-normal inline-flex items-center justify-center min-w-[40px] px-[8px] rounded-[2px]"
+              :class="envTypeTagClassMap[row.type]"
+            >
               {{ envTypeMap(row.type) || '--' }}
-            </div>
+            </span>
           </template>
         </TableColumn>
         <TableColumn
@@ -285,11 +293,13 @@
   import { EnvService } from '~/api/modules/v1';
   import Layout from '~/components/skeleton/skeleton-layout';
   import { useElementHeight } from '~/composables/use-element-height';
+  import { envTypeTagClassMap } from '~/composables/use-env-manager';
   import { useTableSearchSelect } from '~/composables/use-search';
   import { useSearchPlaceholder } from '~/composables/use-search-placeholder';
   import useTableEmpty from '~/composables/use-table-empty';
   import { useSpaceStore } from '~/stores/space';
 
+  import EnvCategoryDescription from './components/env-category-description.vue';
   import DeployedAppsWarning from './components/project-selector/deployed-apps-warning.vue';
   import CreateEnv from './create-env.vue';
   import DeleteEnvDialog from './delete-env-dialog.vue';
@@ -389,6 +399,10 @@
           id: 'test',
         },
         {
+          name: t('预发布'),
+          id: 'staging',
+        },
+        {
           name: t('生产'),
           id: 'production',
         },
@@ -414,13 +428,16 @@
   const { setTypeToError, clearErrorType, curExceptionType } = useTableEmpty({
     filters: searchValue,
   });
+
   // 映射环境分类
-  const envTypeMap = (type: 'development' | 'production' | 'test') => {
+  const envTypeMap = (type: 'development' | 'production' | 'staging' | 'test') => {
     switch (type) {
       case 'development':
         return t('开发');
       case 'test':
         return t('测试');
+      case 'staging':
+        return t('预发布');
       case 'production':
         return t('生产');
       default:
@@ -436,7 +453,7 @@
     { label: t('环境 ID'), value: 'name' },
     { label: t('环境名称'), value: 'displayName' },
   ]);
-  const ENV_TYPE_ORDER: Record<string, number> = { development: 1, test: 2, production: 3 };
+  const ENV_TYPE_ORDER: Record<string, number> = { development: 1, test: 2, staging: 3, production: 4 };
 
   function getRowActiveClass({ row }: { row: EnvOutput }) {
     return router.currentRoute.value.query?.active === row.name ? 'row--current' : '';
@@ -557,8 +574,9 @@
     isShowDeleteEnvDialog.value = true;
   }
 
-  // 更新环境详情后，重新获取列表
-  async function handleUpdate() {
+  // 更新环境详情后，同步详情抽屉数据并重新获取列表
+  async function handleUpdate(row: EnvOutput) {
+    curRow.value = row;
     await handleGetEnvList();
   }
 
@@ -592,25 +610,13 @@
     ::-webkit-scrollbar {
       height: 8px !important;
     }
+
+    .row--current .env-normal.env-tag-development {
+      background-color: #cddffe !important;
+    }
   }
   .env-normal {
     color: #63656e;
     background-color: #f0f1f5;
-    border: 1px solid #979ba54d;
-  }
-  .env-production {
-    color: #299e56;
-    background-color: #daf6e5;
-    border: 1px solid #a1e3ba;
-  }
-  .env-test {
-    color: #e38b02;
-    background-color: #fdeed8;
-    border: 1px solid #f9d090;
-  }
-  .env-development {
-    color: #1768ef;
-    background-color: #e1ecff;
-    border: 1px solid #a3c5fd;
   }
 </style>

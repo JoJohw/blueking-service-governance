@@ -108,6 +108,7 @@
               >
                 <Radio label="development">{{ $t('开发') }}</Radio>
                 <Radio label="test">{{ $t('测试') }}</Radio>
+                <Radio label="staging">{{ $t('预发布') }}</Radio>
                 <Radio label="production">{{ $t('生产') }}</Radio>
               </Radio.Group>
             </div>
@@ -119,7 +120,9 @@
           v-if="isEdit"
           :label="$t('生效环境类型')"
         >
-          <Tag :type="scopeDisplay.tagType">{{ scopeDisplay.label }}</Tag>
+          <Tag :class="scopeDisplay.tagClass">
+            {{ scopeDisplay.label }}
+          </Tag>
         </Form.FormItem>
 
         <!-- 描述 -->
