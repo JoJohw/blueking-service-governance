@@ -75,6 +75,25 @@ func (o EnvVariableObj) ToKubeObj() corev1.EnvVar {
 // EnvVariableList represents a list of EnvVariableObj.
 type EnvVariableList []EnvVariableObj
 
+// DeduplicateByKey removes duplicate items by key while preserving the original order
+// of the surviving items. Later items have higher priority, so only the last item for
+// the same key is kept.
+func DeduplicateByKey[T any](items []T, key func(T) string) []T {
+	latestIndexByKey := make(map[string]int, len(items))
+	for i, item := range items {
+		latestIndexByKey[key(item)] = i
+	}
+
+	result := make([]T, 0, len(latestIndexByKey))
+	for i, item := range items {
+		if latestIndexByKey[key(item)] != i {
+			continue
+		}
+		result = append(result, item)
+	}
+	return result
+}
+
 // ToKubeObjs converts the EnvVariableList to a list of Kubernetes corev1.EnvVar objects.
 func (varList EnvVariableList) ToKubeObjs() []corev1.EnvVar {
 	return lo.Map(varList, func(varObj EnvVariableObj, _ int) corev1.EnvVar {
@@ -95,6 +114,14 @@ func (varList EnvVariableList) ToMap() map[string]string {
 		}
 	}
 	return result
+}
+
+// ToDeduplicatedList returns the effective env var list with duplicate keys removed.
+// Later items have higher priority, so only the last item for the same key is kept.
+func (varList EnvVariableList) ToDeduplicatedList() EnvVariableList {
+	return DeduplicateByKey(varList, func(item EnvVariableObj) string {
+		return item.Key
+	})
 }
 
 // EnvVariableRichItem wraps EnvVariableObj with source info.
@@ -122,19 +149,11 @@ func (l EnvVariableRichList) GetDataList() EnvVariableList {
 // ToDeduplicatedList returns the effective rich env var list with duplicate keys removed.
 // Later items have higher priority, so only the last item for the same key is kept.
 func (l EnvVariableRichList) ToDeduplicatedList() EnvVariableRichList {
-	latestIndexByKey := make(map[string]int, len(l.Vars))
-	for i, item := range l.Vars {
-		latestIndexByKey[item.Obj.Key] = i
+	return EnvVariableRichList{
+		Vars: DeduplicateByKey(l.Vars, func(item EnvVariableRichItem) string {
+			return item.Obj.Key
+		}),
 	}
-
-	result := make([]EnvVariableRichItem, 0, len(latestIndexByKey))
-	for i, item := range l.Vars {
-		if latestIndexByKey[item.Obj.Key] != i {
-			continue
-		}
-		result = append(result, item)
-	}
-	return EnvVariableRichList{Vars: result}
 }
 
 // SortBySourcePriority sorts the Vars in EnvVariableRichList by their source priority.
