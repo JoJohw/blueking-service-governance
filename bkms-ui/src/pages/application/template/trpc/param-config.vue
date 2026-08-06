@@ -279,9 +279,13 @@
                     </div>
                     <Input
                       v-model="buildText"
-                      :placeholder="$t('留空则使用平台默认：{0}', ['CGO_ENABLED=0 go build -trimpath -o <app> .'])"
+                      :placeholder="buildPlaceholder"
                       :rows="4"
                       type="textarea"
+                    />
+                    <BuildOutputHint
+                      :app-name="formData.name"
+                      class="mt-[16px]"
                     />
                   </div>
                   <div class="mb-[24px] last:mb-0">
@@ -319,15 +323,16 @@
               :label="$t('构建参数')"
               property="buildConfig.repoBuildConfig.dockerBuildArgs"
             >
-              <KeyValue
-                :model-value="dockerBuildArgs"
+              <GoBuildArgs
+                :language="formData.appModelSpec.trpcSpec.language"
+                :model-value="formData.buildConfig.repoBuildConfig.dockerBuildArgs"
                 @update:model-value="handleDockerBuildArgsChange"
               />
               <!-- 等价构建命令（示意） -->
               <div class="mb-[24px]">
                 <span class="inline-block mb-[2px] mt-[10px] font-bold">{{ $t('等价构建命令（示意）') }}</span>
                 <div
-                  class="bg-[#f5f7fa] rounded-[4px] p-[12px] font-mono leading-[22px] text-[#63656e] overflow-x-auto"
+                  class="equivalent-build-command bg-[#f5f7fa] p-[16px] leading-[20px] text-[#4D4F56] overflow-x-auto"
                 >
                   <pre
                     v-bk-xss-html="highlightedBuildCommand"
@@ -378,14 +383,14 @@
 
   import { Alert, Button, Form, Input, Select, Tag } from 'bkui-vue';
   import { Share } from 'bkui-vue/lib/icon';
-  import hljs from 'highlight.js/lib/core';
-  import dockerfile from 'highlight.js/lib/languages/dockerfile';
   import { cloneDeep, debounce } from 'lodash-es';
   import { useI18n } from 'vue-i18n';
   import { ApiServerService } from '~/api/modules/bkmsserver';
   import { DOC_LINKS } from '~/common/const';
   import { BKMS_REGEX } from '~/common/const';
   import CardRadio, { type CardRadioOption } from '~/components/card-radio.vue';
+  import BuildOutputHint from '~/pages/application/components/build-output-hint.vue';
+  import GoBuildArgs from '~/pages/application/components/go-build-args.vue';
 
   import PipelineConfig from '../components/pipeline-config.vue';
   import { usePlatformBuildImages } from './use-platform-build-images';
@@ -400,11 +405,6 @@
     TrpcSpecInput,
   } from '~/@types/v1/app';
   import type { BkCIOAuthGitProjectOutput } from '~/@types/v1/bkintegrations-bkci';
-
-  import 'highlight.js/styles/github.css'; // 代码块高亮样式
-
-  // 注册 dockerfile 用于等价构建命令的语法高亮（docker build 命令的 --build-arg、镜像名等元素能正确着色）
-  hljs.registerLanguage('dockerfile', dockerfile);
 
   // 表单场景：repoBuildConfig 和 pipelineBuildConfig 在初始化时即赋值，始终存在
   // dockerBuildArgs 在表单场景下始终为 {} 初始化，不会是 undefined
@@ -441,6 +441,9 @@
   const { t } = useI18n();
 
   const formData = ref<TrpcFormRequest>(props.form as TrpcFormRequest);
+  const buildPlaceholder = computed(
+    () => `${t('留空则使用平台默认：')}\ngo build -o /out/${formData.value.name || '{{ appName }}'} .`,
+  );
   const formRef = ref<InstanceType<typeof Form> | null>(null);
   async function validate() {
     try {
@@ -714,54 +717,37 @@
     appIdSuffix.value = ret.suffix ?? '';
   }
 
-  const dockerBuildArgs = computed(() =>
-    Object.entries(formData.value.buildConfig.repoBuildConfig.dockerBuildArgs).map(([key, value]) => ({
-      key,
-      value,
-    })),
-  );
-
-  // 等价构建命令（示意）
-  const equivalentBuildCommand = computed(() => {
+  // 等价构建命令按片段着色，避免通用语法高亮规则影响参数和镜像标签的展示。
+  const highlightedBuildCommand = computed(() => {
     const sourceDir = formData.value.buildConfig.repoBuildConfig.sourceDir?.trim();
     const buildArgs = formData.value.buildConfig.repoBuildConfig.dockerBuildArgs;
-    const appName = formData.value.id || formData.value.name || '<应用名>';
-    const lines: string[] = [];
-    if (sourceDir) {
-      lines.push(`# 进入 ${sourceDir} 目录执行构建，仅该目录下的文件参与镜像构建`);
-    } else {
-      lines.push('# 进入仓库根目录执行构建，仅该目录下的文件参与镜像构建');
-    }
-    lines.push('# Dockerfile 由平台根据标准框架自动生成');
-    lines.push('docker build \\');
-    const argEntries = Object.entries(buildArgs || {});
-    argEntries.forEach(([key, value]) => {
-      lines.push(`  --build-arg ${key}=${value} \\`);
+    const appName = formData.value.id || formData.value.name || '&lt;应用名&gt;';
+    const lines = [
+      `<span class="build-command-comment">${
+        sourceDir
+          ? `# 进入 ${sourceDir} 目录执行构建，仅该目录下的文件参与镜像构建`
+          : '# 进入仓库根目录执行构建，仅该目录下的文件参与镜像构建'
+      }</span>`,
+      '<span class="build-command-comment"># Dockerfile 由平台根据标准框架自动生成</span>',
+      'docker build \\',
+    ];
+
+    Object.entries(buildArgs || {}).forEach(([key, value]) => {
+      lines.push(
+        `  <span class="build-command-option">--build-arg</span> <span class="build-command-arg-key">${key}</span>=${value} \\`,
+      );
     });
-    lines.push('  -f Dockerfile \\');
-    lines.push(`  -t ${appName}:<tag> .`);
+    lines.push('  <span class="build-command-option">-f</span> Dockerfile \\');
+    lines.push(
+      `  <span class="build-command-option">-t</span> <span class="build-command-image">${appName}:&lt;tag&gt;</span> .`,
+    );
     return lines.join('\n');
   });
 
-  // 对等价构建命令做语法高亮（bash 语法）
-  const highlightedBuildCommand = computed(
-    () => hljs.highlight(equivalentBuildCommand.value, { language: 'dockerfile' }).value,
-  );
-
   // 构建参数变化
-  function handleDockerBuildArgsChange(newArgs: Record<string, string> | Record<string, string>[]) {
-    const argsObject: Record<string, string> = {};
-    if (Array.isArray(newArgs)) {
-      newArgs.forEach(arg => {
-        if (arg.key && arg.value) {
-          argsObject[arg.key] = arg.value;
-        }
-      });
-    } else {
-      Object.assign(argsObject, newArgs);
-    }
+  function handleDockerBuildArgsChange(newArgs: Record<string, string> | undefined) {
     formData.value.buildConfig.repoBuildConfig.type = 'TGit';
-    formData.value.buildConfig.repoBuildConfig.dockerBuildArgs = argsObject;
+    formData.value.buildConfig.repoBuildConfig.dockerBuildArgs = newArgs ?? {};
   }
 
   // 查看流水线构建操作指引
@@ -828,3 +814,25 @@
     getAppIDAutoSuffix,
   });
 </script>
+
+<style scoped>
+  .equivalent-build-command {
+    font-family: Consolas, 'Courier New', monospace;
+  }
+
+  .equivalent-build-command :deep(.build-command-comment) {
+    color: #c4c6cc;
+  }
+
+  .equivalent-build-command :deep(.build-command-option) {
+    color: #699df4;
+  }
+
+  .equivalent-build-command :deep(.build-command-arg-key) {
+    color: #ad7a6b;
+  }
+
+  .equivalent-build-command :deep(.build-command-image) {
+    color: #8648d7;
+  }
+</style>
