@@ -32,7 +32,6 @@ import (
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env"
 	bkmsenv "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env/model"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris"
-	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/component"
 )
 
 var _ = Describe("PolarisEnvStateManager", func() {
@@ -82,7 +81,9 @@ var _ = Describe("PolarisEnvStateManager", func() {
 		config := newTestConfig(app.ID, name, scopeEnvNames, states)
 		Expect(store.Create(ctx, config)).To(Succeed())
 		for envName, state := range states {
-			update := polaris.PolarisEnvStateUpdate{AppliedFields: state.AppliedFields}
+			update := polaris.PolarisEnvStateUpdate{
+				AppliedFields: state.AppliedFields,
+			}
 			if state.LastError != "" {
 				errorMessage := state.LastError
 				update.LastError = &errorMessage
@@ -151,10 +152,7 @@ var _ = Describe("PolarisEnvStateManager", func() {
 			updated, envNames := updateAndPrepareDynamicApply(
 				config,
 				&polaris.ConfigUpdateData{
-					Scope: &polaris.PatchPolarisScope{
-						ScopeType:     component.ScopeTypeEnvironment,
-						ScopeEnvNames: []string{environment.Name, otherEnvironment.Name},
-					},
+					ScopeEnvNames: []string{environment.Name, otherEnvironment.Name},
 				},
 			)
 			Expect(updated.EnvStates).To(HaveLen(1))
@@ -174,7 +172,7 @@ var _ = Describe("PolarisEnvStateManager", func() {
 			updated, envNames := updateAndPrepareDynamicApply(
 				config,
 				&polaris.ConfigUpdateData{
-					Scope: &polaris.PatchPolarisScope{ScopeType: component.ScopeTypeEnvironment},
+					ScopeEnvNames: []string{},
 				},
 			)
 			Expect(updated.EnvStates).To(HaveKey(environment.Name))
@@ -197,7 +195,7 @@ var _ = Describe("PolarisEnvStateManager", func() {
 			updated, envNames := updateAndPrepareDynamicApply(
 				config,
 				&polaris.ConfigUpdateData{
-					Scope: &polaris.PatchPolarisScope{ScopeType: component.ScopeTypeEnvironment},
+					ScopeEnvNames: []string{},
 				},
 			)
 			Expect(updated.EnvStates).NotTo(HaveKey(environment.Name))
@@ -215,10 +213,7 @@ var _ = Describe("PolarisEnvStateManager", func() {
 			updated, envNames := updateAndPrepareDynamicApply(
 				config,
 				&polaris.ConfigUpdateData{
-					Scope: &polaris.PatchPolarisScope{
-						ScopeType:     component.ScopeTypeEnvironment,
-						ScopeEnvNames: []string{environment.Name},
-					},
+					ScopeEnvNames: []string{environment.Name},
 				},
 			)
 			Expect(updated.GetEnvState(environment.Name).AppliedFields).To(Equal(state.AppliedFields))
@@ -305,6 +300,22 @@ var _ = Describe("PolarisEnvStateManager", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(stored.EnvStates).NotTo(HaveKey(environment.Name))
 		})
+
+		It("should remove retained weight when an out-of-scope environment is deployed", func() {
+			state := envState(redeployFields("k1", "t1", 8080))
+			config := createConfig(
+				"cfg-out-of-scope-weight",
+				nil,
+				map[string]polaris.PolarisEnvState{environment.Name: state},
+			)
+			Expect(store.UpsertEnvWeight(ctx, app.ID, config.Name, environment.Name, 35)).To(Succeed())
+
+			Expect(manager.ReconcileAfterDeploy(ctx, app, environment)).To(Succeed())
+			stored, err := store.Get(ctx, app.ID, config.Name)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(stored.EnvStates).NotTo(HaveKey(environment.Name))
+			Expect(stored.EnvWeights).NotTo(HaveKey(environment.Name))
+		})
 	})
 
 	Describe("ReconcileAfterUninstall", func() {
@@ -344,6 +355,40 @@ var _ = Describe("PolarisEnvStateManager", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(stored.EnvStates).NotTo(HaveKey(environment.Name))
 			Expect(stored.GetEnvState(otherEnvironment.Name).AppliedFields).To(Equal(applied))
+		})
+
+		It("should keep weight for an in-scope environment after uninstall", func() {
+			config := createConfig(
+				"cfg-uninstall-keep-weight",
+				[]string{environment.Name},
+				map[string]polaris.PolarisEnvState{
+					environment.Name: envState(redeployFields("k1", "t1", 8080)),
+				},
+			)
+			Expect(store.UpsertEnvWeight(ctx, app.ID, config.Name, environment.Name, 35)).To(Succeed())
+
+			Expect(manager.ReconcileAfterUninstall(ctx, app, environment.Name)).To(Succeed())
+			stored, err := store.Get(ctx, app.ID, config.Name)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(stored.EnvStates).NotTo(HaveKey(environment.Name))
+			Expect(stored.EnvWeights[environment.Name]).To(Equal(int32(35)))
+		})
+
+		It("should remove retained weight for an out-of-scope environment after uninstall", func() {
+			config := createConfig(
+				"cfg-uninstall-drop-weight",
+				nil,
+				map[string]polaris.PolarisEnvState{
+					environment.Name: envState(redeployFields("k1", "t1", 8080)),
+				},
+			)
+			Expect(store.UpsertEnvWeight(ctx, app.ID, config.Name, environment.Name, 35)).To(Succeed())
+
+			Expect(manager.ReconcileAfterUninstall(ctx, app, environment.Name)).To(Succeed())
+			stored, err := store.Get(ctx, app.ID, config.Name)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(stored.EnvStates).NotTo(HaveKey(environment.Name))
+			Expect(stored.EnvWeights).NotTo(HaveKey(environment.Name))
 		})
 	})
 })

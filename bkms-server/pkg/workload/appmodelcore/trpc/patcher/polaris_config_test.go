@@ -32,7 +32,6 @@ import (
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env"
 	bkmsenv "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env/model"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris"
-	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/component"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/trpc/patcher"
 )
 
@@ -94,7 +93,6 @@ var _ = Describe("PolarisRegistryPatcher", func() {
 					ServicePort:       8080,
 					EnableHealthCheck: false,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{environment.Name},
 			}
 			err := store.Create(ctx, config)
@@ -120,7 +118,6 @@ var _ = Describe("PolarisRegistryPatcher", func() {
 					ServicePort:       8080,
 					EnableHealthCheck: true,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{environment.Name},
 			}
 			err := store.Create(ctx, config)
@@ -244,7 +241,6 @@ var _ = Describe("PolarisRegistryPatcher", func() {
 					ServicePort:       8080,
 					EnableHealthCheck: true,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{environment.Name},
 			}
 			err := store.Create(ctx, configA)
@@ -261,7 +257,6 @@ var _ = Describe("PolarisRegistryPatcher", func() {
 					ServicePort:       8081,
 					EnableHealthCheck: false,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{environment.Name},
 			}
 			err = store.Create(ctx, configB)
@@ -278,7 +273,6 @@ var _ = Describe("PolarisRegistryPatcher", func() {
 					ServicePort:       8082,
 					EnableHealthCheck: true,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{environment.Name},
 			}
 			err = store.Create(ctx, configC)
@@ -323,7 +317,6 @@ var _ = Describe("PolarisRegistryPatcher", func() {
 					ServicePort:       8080,
 					EnableHealthCheck: true,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{environment.Name},
 			}
 			err := store.Create(ctx, configEnv)
@@ -340,7 +333,6 @@ var _ = Describe("PolarisRegistryPatcher", func() {
 					ServicePort:       8081,
 					EnableHealthCheck: true,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{otherEnvironment.Name},
 			}
 			err = store.Create(ctx, configProd)

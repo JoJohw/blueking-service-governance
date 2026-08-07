@@ -29,7 +29,6 @@ import (
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/app/appcfg"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris"
-	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/component"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/appmodel"
 )
 
@@ -114,7 +113,26 @@ var _ = Describe("CollectConfigWarnings", func() {
 		Expect(err).NotTo(HaveOccurred())
 	}
 
-	Context("when app is tRPC type with global scope", func() {
+	Context("when scope env names is empty", func() {
+		BeforeEach(func() {
+			createTrpcAppModel()
+		})
+
+		It("should skip service name validation", func() {
+			config := &polaris.PolarisConfig{
+				Name:  "my-polaris",
+				AppID: testAppID,
+				Properties: polaris.Properties{
+					PolarisName: "trpc.app.server.service",
+				},
+			}
+			warnings := polaris.CollectConfigWarnings(ctx, appModelStore, appConfigFileStore, config)
+			Expect(warnings).To(BeEmpty())
+		})
+	})
+
+	// 原 global scope 场景：改为对 ScopeEnvNames 环境校验，使用 app-level 配置回退。
+	Context("when app is tRPC type with app-level config", func() {
 		BeforeEach(func() {
 			createTrpcAppModel()
 		})
@@ -137,7 +155,7 @@ var _ = Describe("CollectConfigWarnings", func() {
 					Properties: polaris.Properties{
 						PolarisName: "trpc.app.server.service",
 					},
-					ScopeType: component.ScopeTypeGlobal,
+					ScopeEnvNames: []string{"dev"},
 				}
 				warnings := polaris.CollectConfigWarnings(ctx, appModelStore, appConfigFileStore, config)
 				Expect(warnings).To(BeEmpty())
@@ -162,10 +180,11 @@ var _ = Describe("CollectConfigWarnings", func() {
 					Properties: polaris.Properties{
 						PolarisName: "trpc.app.server.service",
 					},
-					ScopeType: component.ScopeTypeGlobal,
+					ScopeEnvNames: []string{"dev"},
 				}
 				warnings := polaris.CollectConfigWarnings(ctx, appModelStore, appConfigFileStore, config)
 				Expect(warnings).To(HaveLen(1))
+				Expect(warnings[0]).To(ContainSubstring("环境 'dev'"))
 				Expect(warnings[0]).To(ContainSubstring("推荐与 tRPC 配置中的服务名"))
 				Expect(warnings[0]).To(ContainSubstring("trpc.app.server.service"))
 				Expect(warnings[0]).To(ContainSubstring("trpc.app.server.other"))
@@ -191,7 +210,7 @@ var _ = Describe("CollectConfigWarnings", func() {
 					Properties: polaris.Properties{
 						PolarisName: "trpc.app.server.service2",
 					},
-					ScopeType: component.ScopeTypeGlobal,
+					ScopeEnvNames: []string{"dev"},
 				}
 				warnings := polaris.CollectConfigWarnings(ctx, appModelStore, appConfigFileStore, config)
 				Expect(warnings).To(BeEmpty())
@@ -213,11 +232,12 @@ var _ = Describe("CollectConfigWarnings", func() {
 					Properties: polaris.Properties{
 						PolarisName: "trpc.app.server.service",
 					},
-					ScopeType: component.ScopeTypeGlobal,
+					ScopeEnvNames: []string{"dev"},
 				}
 				warnings := polaris.CollectConfigWarnings(ctx, appModelStore, appConfigFileStore, config)
 				Expect(warnings).To(HaveLen(1))
 				Expect(warnings[0]).To(ContainSubstring("[my-polaris]"))
+				Expect(warnings[0]).To(ContainSubstring("环境 'dev'"))
 				Expect(warnings[0]).To(ContainSubstring("推荐与 tRPC 配置中的服务名"))
 			})
 		})
@@ -251,7 +271,6 @@ var _ = Describe("CollectConfigWarnings", func() {
 					Properties: polaris.Properties{
 						PolarisName: "trpc.app.server.dev-svc",
 					},
-					ScopeType:     component.ScopeTypeEnvironment,
 					ScopeEnvNames: []string{"dev", "prod"},
 				}
 				warnings := polaris.CollectConfigWarnings(ctx, appModelStore, appConfigFileStore, config)
@@ -280,7 +299,6 @@ var _ = Describe("CollectConfigWarnings", func() {
 					Properties: polaris.Properties{
 						PolarisName: "trpc.app.server.svc",
 					},
-					ScopeType:     component.ScopeTypeEnvironment,
 					ScopeEnvNames: []string{"dev", "staging"},
 				}
 				warnings := polaris.CollectConfigWarnings(ctx, appModelStore, appConfigFileStore, config)
@@ -305,7 +323,6 @@ var _ = Describe("CollectConfigWarnings", func() {
 					Properties: polaris.Properties{
 						PolarisName: "trpc.app.server.svc",
 					},
-					ScopeType:     component.ScopeTypeEnvironment,
 					ScopeEnvNames: []string{"dev"},
 				}
 				warnings := polaris.CollectConfigWarnings(ctx, appModelStore, appConfigFileStore, config)

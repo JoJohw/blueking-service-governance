@@ -3428,6 +3428,81 @@ const docTemplate = `{
                 }
             }
         },
+        "/apps/{appID}/deps/polaris-configs/{configName}/envs/{envName}/weight": {
+            "put": {
+                "security": [
+                    {
+                        "BkUserInfo": []
+                    },
+                    {
+                        "BkUserCredential": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "polaris-config"
+                ],
+                "summary": "更新指定环境的北极星实例权重",
+                "operationId": "PutEnvWeight",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用 ID",
+                        "name": "appID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "配置名称",
+                        "name": "configName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "环境名称",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/serializer.PutEnvWeightInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/serializer.PutEnvWeightOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/{appID}/deps/polaris-configs/{configName}/vars": {
             "get": {
                 "security": [
@@ -20055,7 +20130,6 @@ const docTemplate = `{
                 "instanceKey",
                 "polarisName",
                 "polarisNamespace",
-                "scopeType",
                 "servicePort"
             ],
             "properties": {
@@ -20103,18 +20177,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "scopeEnvNames": {
-                    "description": "组件生效的环境列表，当 scopeType 为 environment 时有效",
+                    "description": "生效的环境列表",
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
-                },
-                "scopeType": {
-                    "description": "组件生效范围类型，可选值只能为 environment",
-                    "type": "string",
-                    "enum": [
-                        "environment"
-                    ]
                 },
                 "serviceLabels": {
                     "description": "服务标签",
@@ -20128,11 +20195,6 @@ const docTemplate = `{
                     "type": "integer",
                     "maximum": 65535,
                     "minimum": 1
-                },
-                "weight": {
-                    "description": "服务权重，默认 10",
-                    "type": "integer",
-                    "minimum": 0
                 }
             }
         },
@@ -24435,13 +24497,12 @@ const docTemplate = `{
                     "description": "北极星 Token（可选更新）",
                     "type": "string"
                 },
-                "scope": {
-                    "description": "组件生效范围（可选更新）",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/serializer.PatchPolarisScopeInput"
-                        }
-                    ]
+                "scopeEnvNames": {
+                    "description": "生效的环境列表（可选更新；传入时全量替换，空数组表示清空，nil 表示不更新）",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "serviceLabels": {
                     "description": "服务标签（可选更新，传入时全量替换）",
@@ -24455,11 +24516,6 @@ const docTemplate = `{
                     "type": "integer",
                     "maximum": 65535,
                     "minimum": 1
-                },
-                "weight": {
-                    "description": "服务权重（可选更新）",
-                    "type": "integer",
-                    "minimum": 0
                 }
             }
         },
@@ -24564,28 +24620,6 @@ const docTemplate = `{
                 }
             }
         },
-        "serializer.PatchPolarisScopeInput": {
-            "type": "object",
-            "required": [
-                "scopeType"
-            ],
-            "properties": {
-                "scopeEnvNames": {
-                    "description": "组件生效的环境列表，当 scopeType 为 environment 时有效",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "scopeType": {
-                    "description": "组件生效范围类型，可选值只能为 environment",
-                    "type": "string",
-                    "enum": [
-                        "environment"
-                    ]
-                }
-            }
-        },
         "serializer.PatchWorkspaceComponentInput": {
             "type": "object",
             "properties": {
@@ -24674,6 +24708,14 @@ const docTemplate = `{
                         "$ref": "#/definitions/serializer.PolarisEnvStateOutput"
                     }
                 },
+                "envWeights": {
+                    "description": "各环境的单实例权重，key 为环境名称",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
                 "instanceKey": {
                     "description": "组件实例标识，用于环境变量拼接",
                     "type": "string"
@@ -24703,15 +24745,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "scopeEnvNames": {
-                    "description": "组件生效的环境列表",
+                    "description": "生效的环境列表",
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
-                },
-                "scopeType": {
-                    "description": "组件生效范围类型",
-                    "type": "string"
                 },
                 "serviceLabels": {
                     "description": "服务标签",
@@ -24734,10 +24772,6 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
-                },
-                "weight": {
-                    "description": "服务权重",
-                    "type": "integer"
                 }
             }
         },
@@ -25364,6 +25398,33 @@ const docTemplate = `{
                 },
                 "value": {
                     "type": "string"
+                }
+            }
+        },
+        "serializer.PutEnvWeightInput": {
+            "type": "object",
+            "required": [
+                "weight"
+            ],
+            "properties": {
+                "weight": {
+                    "description": "单实例权重，取值范围 0-10000",
+                    "type": "integer",
+                    "maximum": 10000,
+                    "minimum": 0
+                }
+            }
+        },
+        "serializer.PutEnvWeightOutput": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "更新后的北极星配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/serializer.PolarisConfigOutputObj"
+                        }
+                    ]
                 }
             }
         },

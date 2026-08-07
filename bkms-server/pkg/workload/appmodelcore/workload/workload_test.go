@@ -997,11 +997,10 @@ spec:
 					Direct:            true,
 					KeepNotReadyPod:   true,
 					EnableHealthCheck: false,
-					Weight:            10,
 					ServiceLabels:     map[string]string{"env": "test", "env-var": "${{env.ENV_VAR}}"},
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{testEnv.Name},
+				EnvWeights:    map[string]int32{testEnv.Name: 10},
 			}
 			err = stores.PolarisConfigStore.Create(ctx, polarisConfig)
 			Expect(err).NotTo(HaveOccurred())
@@ -1083,7 +1082,6 @@ spec:
 					PolarisToken:     "other-token",
 					ServicePort:      9090,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{"other-env"}, // Not current env
 			}
 			err := stores.PolarisConfigStore.Create(ctx, polarisConfig)
@@ -1126,7 +1124,6 @@ spec:
 					PolarisToken:     "env-token-123",
 					ServicePort:      7070,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{testEnv.Name}, // Current env
 			}
 			err := stores.PolarisConfigStore.Create(ctx, polarisConfig)
@@ -1168,7 +1165,6 @@ spec:
 					PolarisToken:     "token1",
 					ServicePort:      8081,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{testEnv.Name},
 			}
 			config2 := &polaris.PolarisConfig{
@@ -1180,7 +1176,6 @@ spec:
 					PolarisToken:     "token2",
 					ServicePort:      8082,
 				},
-				ScopeType:     component.ScopeTypeEnvironment,
 				ScopeEnvNames: []string{testEnv.Name},
 			}
 			err := stores.PolarisConfigStore.Create(ctx, config1)
