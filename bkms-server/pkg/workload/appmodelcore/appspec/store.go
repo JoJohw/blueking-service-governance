@@ -74,7 +74,7 @@ func NewAppSpecStoreMongo(client *mongo.Client, dbName string) (*AppSpecStoreMon
 
 // Create validates and inserts a new application specification.
 func (s *AppSpecStoreMongo) Create(ctx context.Context, spec *AppSpec) error {
-	scoped := cloneSpec(spec)
+	scoped := Clone(spec)
 	if err := validate.Struct(scoped); err != nil {
 		return errors.Wrap(err, "app spec validation failed")
 	}
@@ -98,7 +98,7 @@ func (s *AppSpecStoreMongo) Get(ctx context.Context, appID, envName string) (*Ap
 		}
 		return nil, err
 	}
-	return cloneSpec(spec), nil
+	return Clone(spec), nil
 }
 
 // ListEnvNamesByApp returns non-default environment names with configured sections.
@@ -133,7 +133,7 @@ func (s *AppSpecStoreMongo) ListEnvNamesByApp(ctx context.Context, appID string)
 
 // Upsert validates and replaces an application specification, creating it when absent.
 func (s *AppSpecStoreMongo) Upsert(ctx context.Context, spec *AppSpec) error {
-	scoped := cloneSpec(spec)
+	scoped := Clone(spec)
 	if err := validate.Struct(scoped); err != nil {
 		return errors.Wrap(err, "app spec validation failed")
 	}
@@ -146,7 +146,7 @@ func (s *AppSpecStoreMongo) Upsert(ctx context.Context, spec *AppSpec) error {
 
 // Patch updates the non-nil fields of an application specification.
 func (s *AppSpecStoreMongo) Patch(ctx context.Context, spec AppSpec) error {
-	scoped := cloneSpec(&spec)
+	scoped := Clone(&spec)
 	if err := validate.Struct(scoped); err != nil {
 		return errors.Wrap(err, "app spec validation failed")
 	}
@@ -176,7 +176,7 @@ func (s *AppSpecStoreMongo) Patch(ctx context.Context, spec AppSpec) error {
 
 // SetSections replaces or removes the specified top-level application specification sections.
 func (s *AppSpecStoreMongo) SetSections(ctx context.Context, spec AppSpec, sectionIDs ...AppSpecSectionID) error {
-	scoped := cloneSpec(&spec)
+	scoped := Clone(&spec)
 	if err := validate.Struct(scoped); err != nil {
 		return errors.Wrap(err, "app spec validation failed")
 	}

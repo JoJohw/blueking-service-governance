@@ -1,0 +1,27 @@
+meta {
+  name: list-empty-dev-mode-after-delete
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{appDefaultsWorkspaceID}}/app-spec/dev-mode
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should remove the dev-mode rule", () => {
+    expect(res.body.data).to.deep.equal([]);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

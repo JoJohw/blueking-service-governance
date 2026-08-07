@@ -220,6 +220,9 @@ func (s *WorkspaceStoreMongo) Update(ctx context.Context, workspace *Workspace) 
 
 // Delete 删除一个工作空间
 func (s *WorkspaceStoreMongo) Delete(ctx context.Context, id string) error {
+	if err := runPreDeleteHooks(ctx, id); err != nil {
+		return err
+	}
 	_, err := s.collection.DeleteOne(ctx, bson.M{"id": id})
 	return err
 }

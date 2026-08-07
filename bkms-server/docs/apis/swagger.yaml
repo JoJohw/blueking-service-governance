@@ -858,6 +858,8 @@ definitions:
     type: object
   github_com_TencentBlueKing_blueking-service-governance_bkms-server_pkg_observability_bkmonitor_usergroup_serializer.EmptyOutput:
     type: object
+  github_com_TencentBlueKing_blueking-service-governance_bkms-server_pkg_workload_appmodelcore_appdefaults_serializer.EmptyOutput:
+    type: object
   github_com_TencentBlueKing_blueking-service-governance_bkms-server_pkg_workload_appmodelcore_appspec_serializer.EmptyOutput:
     type: object
   github_com_TencentBlueKing_blueking-service-governance_bkms-server_pkg_workload_envvars_serializer.EmptyOutput:
@@ -3139,6 +3141,46 @@ definitions:
         description: 环境变量值
         type: string
     type: object
+  serializer.DevModeRuleInput:
+    properties:
+      envType:
+        type: string
+      spec:
+        $ref: '#/definitions/serializer.DevModeSpecInput'
+    required:
+    - envType
+    - spec
+    type: object
+  serializer.DevModeRuleOutput:
+    properties:
+      data:
+        $ref: '#/definitions/serializer.DevModeRuleOutputObj'
+    type: object
+  serializer.DevModeRuleOutputObj:
+    properties:
+      createdAt:
+        type: string
+      envType:
+        type: string
+      id:
+        type: string
+      spec:
+        $ref: '#/definitions/serializer.DevModeSpecOutput'
+      updatedAt:
+        type: string
+    type: object
+  serializer.DevModeSpecInput:
+    properties:
+      enabled:
+        type: boolean
+    required:
+    - enabled
+    type: object
+  serializer.DevModeSpecOutput:
+    properties:
+      enabled:
+        type: boolean
+    type: object
   serializer.EdgeReasonOutputObj:
     properties:
       matchedLabels:
@@ -4920,6 +4962,13 @@ definitions:
           $ref: '#/definitions/serializer.ScopedEnvVarDetailedOutputObj'
         type: array
     type: object
+  serializer.ListDevModeRulesOutput:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/serializer.DevModeRuleOutputObj'
+        type: array
+    type: object
   serializer.ListEnvAvailableEnvVarsOutput:
     properties:
       data:
@@ -5021,6 +5070,13 @@ definitions:
         description: 作用域为 workspace 和 envType 的环境变量列表
         items:
           $ref: '#/definitions/serializer.ScopedEnvVarOutputObj'
+        type: array
+    type: object
+  serializer.ListResourcesRulesOutput:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/serializer.ResourcesRuleOutputObj'
         type: array
     type: object
   serializer.ListRoleBindingsResponse:
@@ -6462,6 +6518,54 @@ definitions:
         items:
           type: string
         type: array
+    type: object
+  serializer.ResourcesRuleInput:
+    properties:
+      envType:
+        type: string
+      spec:
+        $ref: '#/definitions/serializer.ResourcesSpecInput'
+    required:
+    - envType
+    - spec
+    type: object
+  serializer.ResourcesRuleOutput:
+    properties:
+      data:
+        $ref: '#/definitions/serializer.ResourcesRuleOutputObj'
+    type: object
+  serializer.ResourcesRuleOutputObj:
+    properties:
+      createdAt:
+        type: string
+      envType:
+        type: string
+      id:
+        type: string
+      spec:
+        $ref: '#/definitions/serializer.AppSpecResourcesOutput'
+      updatedAt:
+        type: string
+    type: object
+  serializer.ResourcesSpecInput:
+    properties:
+      cpuLimits:
+        type: string
+      cpuRequests:
+        type: string
+      memoryLimits:
+        type: string
+      memoryRequests:
+        type: string
+      replicas:
+        minimum: 0
+        type: integer
+    required:
+    - cpuLimits
+    - cpuRequests
+    - memoryLimits
+    - memoryRequests
+    - replicas
     type: object
   serializer.RoleBindingOutput:
     properties:
@@ -16238,6 +16342,294 @@ paths:
       summary: 获取指定工作空间的详细信息，包括基本信息、镜像仓库、蓝鲸关联系统信息等
       tags:
       - workspace
+  /workspaces/{workspaceID}/app-spec/dev-mode:
+    get:
+      operationId: ListWorkspaceAppSpecDevModeRules
+      parameters:
+      - description: 工作空间 ID
+        in: path
+        name: workspaceID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.ListDevModeRulesOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 查询工作空间开发模式默认配置规则
+      tags:
+      - app-spec
+    post:
+      consumes:
+      - application/json
+      operationId: CreateWorkspaceAppSpecDevModeRule
+      parameters:
+      - description: 工作空间 ID
+        in: path
+        name: workspaceID
+        required: true
+        type: string
+      - description: 开发模式默认配置规则
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/serializer.DevModeRuleInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.DevModeRuleOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 新增工作空间开发模式默认配置规则
+      tags:
+      - app-spec
+  /workspaces/{workspaceID}/app-spec/dev-mode/{ruleID}:
+    delete:
+      operationId: DeleteWorkspaceAppSpecDevModeRule
+      parameters:
+      - description: 工作空间 ID
+        in: path
+        name: workspaceID
+        required: true
+        type: string
+      - description: 规则 ID
+        in: path
+        name: ruleID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_TencentBlueKing_blueking-service-governance_bkms-server_pkg_workload_appmodelcore_appdefaults_serializer.EmptyOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 删除工作空间开发模式默认配置规则
+      tags:
+      - app-spec
+    put:
+      consumes:
+      - application/json
+      operationId: UpdateWorkspaceAppSpecDevModeRule
+      parameters:
+      - description: 工作空间 ID
+        in: path
+        name: workspaceID
+        required: true
+        type: string
+      - description: 规则 ID
+        in: path
+        name: ruleID
+        required: true
+        type: string
+      - description: 开发模式默认配置规则
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/serializer.DevModeRuleInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.DevModeRuleOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 编辑工作空间开发模式默认配置规则
+      tags:
+      - app-spec
+  /workspaces/{workspaceID}/app-spec/resources:
+    get:
+      operationId: ListWorkspaceAppSpecResourcesRules
+      parameters:
+      - description: 工作空间 ID
+        in: path
+        name: workspaceID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.ListResourcesRulesOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 查询工作空间资源规格默认配置规则
+      tags:
+      - app-spec
+    post:
+      consumes:
+      - application/json
+      operationId: CreateWorkspaceAppSpecResourcesRule
+      parameters:
+      - description: 工作空间 ID
+        in: path
+        name: workspaceID
+        required: true
+        type: string
+      - description: 资源规格默认配置规则
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/serializer.ResourcesRuleInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.ResourcesRuleOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 新增工作空间资源规格默认配置规则
+      tags:
+      - app-spec
+  /workspaces/{workspaceID}/app-spec/resources/{ruleID}:
+    delete:
+      operationId: DeleteWorkspaceAppSpecResourcesRule
+      parameters:
+      - description: 工作空间 ID
+        in: path
+        name: workspaceID
+        required: true
+        type: string
+      - description: 规则 ID
+        in: path
+        name: ruleID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_TencentBlueKing_blueking-service-governance_bkms-server_pkg_workload_appmodelcore_appdefaults_serializer.EmptyOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 删除工作空间资源规格默认配置规则
+      tags:
+      - app-spec
+    put:
+      consumes:
+      - application/json
+      operationId: UpdateWorkspaceAppSpecResourcesRule
+      parameters:
+      - description: 工作空间 ID
+        in: path
+        name: workspaceID
+        required: true
+        type: string
+      - description: 规则 ID
+        in: path
+        name: ruleID
+        required: true
+        type: string
+      - description: 资源规格默认配置规则
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/serializer.ResourcesRuleInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.ResourcesRuleOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 编辑工作空间资源规格默认配置规则
+      tags:
+      - app-spec
   /workspaces/{workspaceID}/apps:
     get:
       operationId: ListApps

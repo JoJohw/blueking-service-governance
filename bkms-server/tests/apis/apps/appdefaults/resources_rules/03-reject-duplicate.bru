@@ -1,0 +1,40 @@
+meta {
+  name: reject-duplicate-resources-rule
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{serviceURL}}/workspaces/{{appDefaultsWorkspaceID}}/app-spec/resources
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "envType": "production",
+    "spec": {
+      "replicas": 1,
+      "cpuRequests": "500m",
+      "cpuLimits": "1",
+      "memoryRequests": "1Gi",
+      "memoryLimits": "2Gi"
+    }
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body: isJson
+}
+
+tests {
+  test("should reject a second resources rule for the same environment type", () => {
+    expect(res.status).to.equal(400);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}

@@ -32,6 +32,18 @@ import (
 	trpcapp "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/trpc"
 )
 
+func (h *Handler) newTrpcService() *trpcapp.Service {
+	return trpcapp.NewService(
+		h.registry.AppModelStore,
+		h.registry.AppSpecStore,
+		h.registry.AppDefaultRuleStore,
+		h.registry.EnvStore,
+		h.registry.AppConfigFileStore,
+		h.registry.AppConfigFileVersionStore,
+		h.registry.AppStore,
+	)
+}
+
 // UpdateAppTrpcSpec 更新应用 Trpc 配置。
 //
 //	@ID			UpdateAppTrpcSpec
@@ -90,13 +102,7 @@ func (h *Handler) createTrpcApp(
 	// 参数转换：serializer 输入 -> 内部类型
 	params := input.ToTrpcCreateParams()
 
-	svc := trpcapp.NewService(
-		h.registry.AppModelStore,
-		h.registry.AppConfigFileStore,
-		h.registry.AppConfigFileVersionStore,
-		h.registry.AppStore,
-	)
-	return svc.Create(ctx, app, params)
+	return h.newTrpcService().Create(ctx, app, params)
 }
 
 // updateTrpcApp 更新 tRPC 应用（handler 层，负责参数转换和审计）
@@ -109,13 +115,7 @@ func (h *Handler) updateTrpcApp(
 	params := input.ToTrpcUpdateParams()
 
 	// 调用 trpc 服务
-	svc := trpcapp.NewService(
-		h.registry.AppModelStore,
-		h.registry.AppConfigFileStore,
-		h.registry.AppConfigFileVersionStore,
-		h.registry.AppStore,
-	)
-	oldModel, newModel, err := svc.Update(ctx, app, params)
+	oldModel, newModel, err := h.newTrpcService().Update(ctx, app, params)
 	if err != nil {
 		return err
 	}

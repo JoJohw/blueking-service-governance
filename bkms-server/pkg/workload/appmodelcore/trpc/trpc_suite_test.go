@@ -29,7 +29,7 @@ import (
 
 func TestTrpc(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "AppModel Suite")
+	RunSpecs(t, "tRPC Suite")
 }
 
 var _ = BeforeSuite(func() {

@@ -1,0 +1,27 @@
+meta {
+  name: list-empty-resources-after-delete
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{serviceURL}}/workspaces/{{appDefaultsWorkspaceID}}/app-spec/resources
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+tests {
+  test("should remove the resources rule", () => {
+    expect(res.body.data).to.deep.equal([]);
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 10000
+}
