@@ -30,6 +30,7 @@ import (
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/cmd/auth"
 	cfgCmd "github.com/TencentBlueKing/blueking-service-governance/bkms-cli/cmd/config"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/cmd/env"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/cmd/envvar"
 	updateCmd "github.com/TencentBlueKing/blueking-service-governance/bkms-cli/cmd/update"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/cmd/version"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/cmd/workspace"
@@ -97,6 +98,8 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.AddCommand(env.NewCmd())
 	// 应用相关命令
 	rootCmd.AddCommand(app.NewCmd())
+	// 环境变量相关命令
+	rootCmd.AddCommand(envvar.NewCmd())
 
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "log level: debug, info, warn, error")
 
