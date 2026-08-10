@@ -5,6 +5,9 @@ GIT_HASH ?= $(shell git rev-parse HEAD)
 GOOS ?= ""
 GOARCH ?= ""
 
+# 发布产物只保留 tag 中的版本部分，例如 bkms-cli/v1.2.3 -> v1.2.3。
+ASSET_VERSION := $(notdir $(VERSION))
+
 ifeq (${GOOS}, windows)
     BIN_NAME=bkms-cli.exe
 else
@@ -27,11 +30,15 @@ UPX ?= $(shell command -v upx 2>/dev/null)
 # -s: 去除符号表
 # -w: 去除 DWARF 调试信息
 
-# BCS API 网关地址，构建时必须通过 BCS_API_HOST=xxx 传入
-BCS_API_HOST ?=
+# BCS API 网关地址，构建时可以通过 BCS_API_HOST=xxx 传入
+BCS_API_HOST ?= https://api.example.com
 
-# bkms_server 服务地址，作为配置文件中 bkmsBaseUrl 的值，构建时必须通过 BKMS_BASE_URL=xxx 传入
-BKMS_BASE_URL ?=
+# bkms_server 服务地址，作为配置文件中 bkmsBaseUrl 的值，构建时可以通过 BKMS_BASE_URL=xxx 传入
+BKMS_BASE_URL ?= https://example.com
+
+# 更新源：owner/repository 使用 GitHub Releases，http(s) URL 使用制品仓库
+# 例如 TencentBlueKing/blueking-service-governance 或 https://repo.example.com/path/bkms-cli/latest/
+UPDATE_SOURCE ?= TencentBlueKing/blueking-service-governance
 
 .PHONY: check-build-vars
 check-build-vars: ## 校验构建所需变量
@@ -45,9 +52,10 @@ check-build-vars: ## 校验构建所需变量
 	fi
 
 LDFLAGS="-s -w \
-	-X github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/version.Version=${VERSION} \
+	-X github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/version.Version=${ASSET_VERSION} \
 	-X github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/version.GitHash=${GIT_HASH} \
 	-X github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/version.BuildTime=${BUILD_TIME} \
+	-X github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/updater.updateSource=${UPDATE_SOURCE} \
 	-X github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/handler/publish.bcsAPIHost=${BCS_API_HOST} \
 	-X github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/config.bkmsBaseURL=${BKMS_BASE_URL}"
 
@@ -76,8 +84,8 @@ define build-platforms
 		$(eval EXT := $(if $(filter windows,$(OS)),.exe,)) \
 		echo "构建 $(OS)/$(ARCH)..." && \
 		CGO_ENABLED=0 GOOS=$(OS) GOARCH=$(ARCH) go build -ldflags ${LDFLAGS} \
-			-o ./build/bkms-cli-$(OS)-$(ARCH)$(EXT) ./main.go && \
-		echo "✓ $(OS)/$(ARCH) 构建完成: bkms-cli-$(OS)-$(ARCH)$(EXT)" || exit 1; \
+			-o ./build/bkms-cli-$(OS)-$(ARCH)-$(ASSET_VERSION)$(EXT) ./main.go && \
+		echo "✓ $(OS)/$(ARCH) 构建完成: bkms-cli-$(OS)-$(ARCH)-$(ASSET_VERSION)$(EXT)" || exit 1; \
 	)
 	@echo "✓ $(2) 平台构建完成"
 	@ls -lh ./build/bkms-cli-$(word 1,$(subst /, ,$(firstword $(1))))-*
@@ -101,7 +109,7 @@ build: check-build-vars tidy ## 构建 bkms-cli 可执行文件（当前平台�
 	fi
 
 .PHONY: build-all
-build-all: check-build-vars tidy ## 构建所有支持平台的二进制文件（命名格式: bkms-cli-{os}-{arch}）
+build-all: check-build-vars tidy ## 构建所有支持平台的发布二进制（命名格式: bkms-cli-{os}-{arch}-{version}）
 	@echo "开始构建所有平台的二进制文件..."
 	@mkdir -p ./build/
 	@$(foreach platform,$(PLATFORMS), \
@@ -110,8 +118,8 @@ build-all: check-build-vars tidy ## 构建所有支持平台的二进制文件�
 		$(eval EXT := $(if $(filter windows,$(OS)),.exe,)) \
 		echo "构建 $(OS)/$(ARCH)..." && \
 		CGO_ENABLED=0 GOOS=$(OS) GOARCH=$(ARCH) go build -ldflags ${LDFLAGS} \
-			-o ./build/bkms-cli-$(OS)-$(ARCH)$(EXT) ./main.go && \
-		echo "✓ $(OS)/$(ARCH) 构建完成: bkms-cli-$(OS)-$(ARCH)$(EXT)" || exit 1; \
+			-o ./build/bkms-cli-$(OS)-$(ARCH)-$(ASSET_VERSION)$(EXT) ./main.go && \
+		echo "✓ $(OS)/$(ARCH) 构建完成: bkms-cli-$(OS)-$(ARCH)-$(ASSET_VERSION)$(EXT)" || exit 1; \
 	)
 	@echo ""
 	@echo "所有平台构建完成！"

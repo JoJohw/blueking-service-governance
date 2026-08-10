@@ -81,6 +81,7 @@ make build-all compress
 构建产物位于 `./build/` 目录，命名规则：
 - 当前平台：`bkms-cli`（或 `bkms-cli.exe`）
 - 指定平台：`bkms-cli-{os}-{arch}`
+- 平台发布构建：`bkms-cli-{os}-{arch}-{version}`
 
 ### 编译期注入参数
 
@@ -91,6 +92,7 @@ make build-all compress
 | `pkg/version.Version` | 版本号（`git describe --always`） |
 | `pkg/version.GitHash` | Git commit hash |
 | `pkg/version.BuildTime` | 构建时间 |
+| `pkg/updater.updateSource` | 更新源；`owner/repository` 使用 GitHub Releases，HTTP(S) URL 使用制品仓库目录 |
 | `pkg/handler/publish.bcsAPIHost` | BCS API 网关地址 |
 
 ### 代码检查 & 格式化
