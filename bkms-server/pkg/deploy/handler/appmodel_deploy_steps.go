@@ -76,7 +76,7 @@ func (h *Handler) listAppModelDeployRecords(c *gin.Context) {
 		return
 	}
 
-	// 转换成输出格式
+	// 转换成输出格式；构建+部署触发的补充字段直接从部署记录 Extras 中读取
 	outputRecords := make([]*serializer.AppModelDeployRecordOutputObj, 0, len(records))
 	for _, record := range records {
 		outputRecords = append(outputRecords, new(serializer.AppModelDeployRecordOutputObj).FromModel(record))

@@ -18216,10 +18216,22 @@ const docTemplate = `{
         "serializer.AppModelDeployRecordOutputObj": {
             "type": "object",
             "properties": {
+                "branch": {
+                    "description": "代码分支（仅构建+部署记录返回）",
+                    "type": "string"
+                },
                 "clusterID": {
                     "type": "string"
                 },
+                "commitID": {
+                    "description": "Commit ID（仅构建+部署记录返回）",
+                    "type": "string"
+                },
                 "createdAt": {
+                    "type": "string"
+                },
+                "deploySource": {
+                    "description": "部署来源",
                     "type": "string"
                 },
                 "id": {
@@ -18227,6 +18239,10 @@ const docTemplate = `{
                 },
                 "imageTag": {
                     "type": "string"
+                },
+                "isBuildAutoDeploy": {
+                    "description": "兼容字段：供前端迁移期使用，待前端全部改用 deploySource 后删除。",
+                    "type": "boolean"
                 },
                 "message": {
                     "type": "string"
@@ -23010,6 +23026,9 @@ const docTemplate = `{
                 "deployID": {
                     "type": "string"
                 },
+                "deploySource": {
+                    "type": "string"
+                },
                 "endedAt": {
                     "type": "string"
                 },
@@ -23020,6 +23039,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "isBuildAutoDeploy": {
+                    "description": "兼容字段：供前端迁移期使用，待前端全部改用 deploySource 后删除。",
                     "type": "boolean"
                 },
                 "message": {

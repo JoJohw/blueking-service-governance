@@ -156,10 +156,18 @@ type PaginatedAppModelDeployRecordsOutputObjs struct {
 
 // AppModelDeployRecordOutputObj contains one AppModel deploy record.
 type AppModelDeployRecordOutputObj struct {
-	ID        string    `json:"id"`
-	ClusterID string    `json:"clusterID"`
-	Namespace string    `json:"namespace"`
-	ImageTag  string    `json:"imageTag"`
+	ID        string `json:"id"`
+	ClusterID string `json:"clusterID"`
+	Namespace string `json:"namespace"`
+	ImageTag  string `json:"imageTag"`
+	// 兼容字段：供前端迁移期使用，待前端全部改用 deploySource 后删除。
+	IsBuildAutoDeploy bool `json:"isBuildAutoDeploy"`
+	// 部署来源
+	DeploySource string `json:"deploySource"`
+	// 代码分支（仅构建+部署记录返回）
+	Branch string `json:"branch"`
+	// Commit ID（仅构建+部署记录返回）
+	CommitID  string    `json:"commitID"`
 	Replicas  int32     `json:"replicas"`
 	Message   string    `json:"message"`
 	Status    string    `json:"status"`
@@ -174,6 +182,16 @@ func (o *AppModelDeployRecordOutputObj) FromModel(record appmodeldeploy.Record) 
 	o.ClusterID = record.ClusterID
 	o.Namespace = record.Namespace
 	o.ImageTag = record.ImageTag
+	o.IsBuildAutoDeploy = false
+	// 对于未显式写入 deploySource 的历史/直接部署记录，默认按 directDeploy 返回；
+	// 当 Extras 中标记为 buildAutoDeploy 时，再补充 branch、commitID 等构建信息。
+	o.DeploySource = appmodeldeploy.DeploySourceDirectDeploy
+	if record.Extras[appmodeldeploy.ExtraKeyDeploySource] == appmodeldeploy.DeploySourceBuildAutoDeploy {
+		o.IsBuildAutoDeploy = true
+		o.DeploySource = appmodeldeploy.DeploySourceBuildAutoDeploy
+		o.Branch = record.Extras[appmodeldeploy.ExtraKeyBuildBranch]
+		o.CommitID = record.Extras[appmodeldeploy.ExtraKeyBuildCommitID]
+	}
 	o.Replicas = record.Replicas
 	o.Message = record.Message
 	o.Status = string(record.Status)
@@ -190,12 +208,14 @@ type GetLatestAppModelDeployStatusOutput struct {
 
 // LatestDeployStatus contains the latest AppModel deploy attempt status.
 type LatestDeployStatus struct {
-	Stage             string    `json:"stage"`
-	Status            string    `json:"status"`
-	Message           string    `json:"message"`
-	BuildID           string    `json:"buildID"`
-	DeployID          string    `json:"deployID"`
+	Stage    string `json:"stage"`
+	Status   string `json:"status"`
+	Message  string `json:"message"`
+	BuildID  string `json:"buildID"`
+	DeployID string `json:"deployID"`
+	// 兼容字段：供前端迁移期使用，待前端全部改用 deploySource 后删除。
 	IsBuildAutoDeploy bool      `json:"isBuildAutoDeploy"`
+	DeploySource      string    `json:"deploySource"`
 	StartedAt         time.Time `json:"startedAt"`
 	EndedAt           time.Time `json:"endedAt"`
 	Branch            string    `json:"branch"`
@@ -213,6 +233,7 @@ func (o *LatestDeployStatus) FromBuildAutoDeployRecord(record *autodeploy.Record
 	o.BuildID = record.BuildID
 	o.DeployID = record.DeployID
 	o.IsBuildAutoDeploy = true
+	o.DeploySource = appmodeldeploy.DeploySourceBuildAutoDeploy
 	o.StartedAt = record.StartedAt
 	o.EndedAt = record.EndedAt
 	o.Branch = record.Branch
@@ -229,6 +250,7 @@ func (o *LatestDeployStatus) FromDeployRecord(record *appmodeldeploy.Record) *La
 	o.Message = record.Message
 	o.DeployID = record.ID.Hex()
 	o.IsBuildAutoDeploy = false
+	o.DeploySource = appmodeldeploy.DeploySourceDirectDeploy
 	o.StartedAt = record.StartedAt
 	o.EndedAt = record.EndedAt
 	return o
