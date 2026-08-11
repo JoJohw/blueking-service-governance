@@ -21,26 +21,69 @@ package taskq
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"fmt"
+	stderrors "errors"
+	"sync"
+	"time"
 
 	"github.com/hibiken/asynq"
+	"github.com/pkg/errors"
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/logging"
 )
 
-// 内建哨兵错误: 业务 handler 直接返回(或用 %w 包装)即可控制重试行为,
+// 内建哨兵错误: 业务 handler 直接返回(或用 errors.Wrap 包装)即可控制重试行为,
 //
 // 其余错误(未命中任一哨兵)一律走默认指数退避重试。
 var (
 	// ErrStopRetry 标记不可恢复的失败, 框架停止重试(置为终态失败)。
-	// 业务用法: return fmt.Errorf("invalid arg: %w", taskq.ErrStopRetry)。
-	ErrStopRetry = errors.New("taskq: stop retry")
+	// 业务用法: return errors.Wrap(taskq.ErrStopRetry, "invalid arg")。
+	ErrStopRetry = stderrors.New("taskq: stop retry")
 	// ErrFixedRetry 标记"任务仍在进行中", 框架以固定间隔重试(而非指数退避)。
-	// 间隔取 config.Asynq.RetryInterval(全局默认)。
-	// 业务用法: return fmt.Errorf("still provisioning: %w", taskq.ErrFixedRetry)。
-	ErrFixedRetry = errors.New("taskq: retry with fixed interval")
+	// 间隔优先取 TaskType.WithFixedRetryInterval 注册值，否则用 config.Asynq.RetryInterval。
+	// 业务用法: return errors.Wrap(taskq.ErrFixedRetry, "still provisioning")。
+	ErrFixedRetry = stderrors.New("taskq: retry with fixed interval")
 )
+
+// ExhaustedHandlerFunc 是重试耗尽时的回调函数签名。
+// payload 为原始 JSON 负载，lastErr 为最后一次执行时的错误。
+type ExhaustedHandlerFunc func(ctx context.Context, payload []byte, lastErr error)
+
+// taskTypeRegistryMu 保护任务类型级注册表
+var (
+	taskTypeRegistryMu  sync.RWMutex
+	exhaustedHandlers   = make(map[string]ExhaustedHandlerFunc)
+	fixedRetryIntervals = make(map[string]time.Duration)
+)
+
+// registerExhaustedHandler 注册指定 task type 的 exhausted 回调。
+func registerExhaustedHandler(name string, fn ExhaustedHandlerFunc) {
+	taskTypeRegistryMu.Lock()
+	defer taskTypeRegistryMu.Unlock()
+	exhaustedHandlers[name] = fn
+}
+
+// getExhaustedHandler 查找指定 task type 的 exhausted 回调。
+func getExhaustedHandler(name string) (ExhaustedHandlerFunc, bool) {
+	taskTypeRegistryMu.RLock()
+	defer taskTypeRegistryMu.RUnlock()
+	fn, ok := exhaustedHandlers[name]
+	return fn, ok
+}
+
+// registerFixedRetryInterval 注册指定 task type 在 ErrFixedRetry 时的固定间隔。
+func registerFixedRetryInterval(name string, d time.Duration) {
+	taskTypeRegistryMu.Lock()
+	defer taskTypeRegistryMu.Unlock()
+	fixedRetryIntervals[name] = d
+}
+
+// getFixedRetryInterval 查找指定 task type 的固定重试间隔。
+func getFixedRetryInterval(name string) (time.Duration, bool) {
+	taskTypeRegistryMu.RLock()
+	defer taskTypeRegistryMu.RUnlock()
+	d, ok := fixedRetryIntervals[name]
+	return d, ok
+}
 
 // TaskType 是一种强类型异步任务的定义(模板), 由 NewTaskType 构造。
 //
@@ -71,6 +114,29 @@ func NewTaskType[Args any](name string, h HandlerFunc[Args], opts ...asynq.Optio
 // Name 返回任务名(用于 mux.Handle 与投递)。
 func (t *TaskType[Args]) Name() string { return t.name }
 
+// OnExhausted 注册重试耗尽时的回调。框架会自动反序列化 payload 为 Args 并调用 fn。
+// 返回 TaskType 自身以支持链式调用。
+func (t *TaskType[Args]) OnExhausted(fn func(ctx context.Context, args Args, lastErr error)) *TaskType[Args] {
+	registerExhaustedHandler(t.name, func(ctx context.Context, payload []byte, lastErr error) {
+		var args Args
+		if err := json.Unmarshal(payload, &args); err != nil {
+			logging.ErrorNoContextf("taskq: unmarshal args in exhausted handler for %q: %v", t.name, err)
+			return
+		}
+		fn(ctx, args, lastErr)
+	})
+	return t
+}
+
+// WithFixedRetryInterval 为该任务类型指定 ErrFixedRetry 的固定重试间隔，覆盖全局默认。
+// 返回 TaskType 自身以支持链式调用。
+func (t *TaskType[Args]) WithFixedRetryInterval(d time.Duration) *TaskType[Args] {
+	if d > 0 {
+		registerFixedRetryInterval(t.name, d)
+	}
+	return t
+}
+
 // Handler 返回可挂载到 asynq.ServeMux 的底层处理函数。
 //
 // 它负责: 反序列化 Args -> 调用业务 handler ->
@@ -80,14 +146,14 @@ func (t *TaskType[Args]) Handler() asynq.HandlerFunc {
 		var args Args
 		if err := json.Unmarshal(task.Payload(), &args); err != nil {
 			// 负载无法解析属不可恢复, 停止重试。
-			return wrapStopRetry(fmt.Errorf("unmarshal args for task %q: %w", t.name, err))
+			return wrapStopRetry(errors.Wrapf(err, "unmarshal args for task %q", t.name))
 		}
 		err := t.handler(ctx, args)
 		if err == nil {
 			return nil
 		}
 		// 业务显式要求停止重试。
-		if errors.Is(err, ErrStopRetry) {
+		if stderrors.Is(err, ErrStopRetry) {
 			return wrapStopRetry(err)
 		}
 		// 其余错误直接抛给上层，由上层决定重试策略
