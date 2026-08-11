@@ -68,6 +68,10 @@ type BuildRecordOutputObj struct {
 	Operator string `json:"operator"`
 	// 额外元数据
 	Extras map[string]string `json:"extras"`
+	// 触发方式：manual 手动，auto 自动
+	TriggerType string `json:"triggerType"`
+	// 自动触发时关联的触发策略 ID，手动触发为空
+	TriggerPolicyID string `json:"triggerPolicyID"`
 	// 开始时间
 	StartedAt time.Time `json:"startedAt"`
 	// 结束时间
@@ -77,19 +81,21 @@ type BuildRecordOutputObj struct {
 // FromModel fills output fields from a build record model.
 func (o *BuildRecordOutputObj) FromModel(r imagebuild.Record) *BuildRecordOutputObj {
 	*o = BuildRecordOutputObj{
-		PipelineID: r.PipelineID,
-		BuildID:    r.BuildID,
-		Num:        r.Num,
-		Params:     r.Params,
-		Status:     string(r.Status),
-		RepoURL:    r.Params[pipelineparam.RepoURL],
-		Revision:   r.Params[pipelineparam.RepoRevision],
-		CommitID:   r.Extras[pipelinevar.GitRepoHeadCommitID],
-		Artifact:   r.Artifact,
-		Operator:   r.Operator,
-		Extras:     r.Extras,
-		StartedAt:  r.StartedAt,
-		EndedAt:    r.EndedAt,
+		PipelineID:      r.PipelineID,
+		BuildID:         r.BuildID,
+		Num:             r.Num,
+		Params:          r.Params,
+		Status:          string(r.Status),
+		RepoURL:         r.Params[pipelineparam.RepoURL],
+		Revision:        r.Params[pipelineparam.RepoRevision],
+		CommitID:        r.Extras[pipelinevar.GitRepoHeadCommitID],
+		Artifact:        r.Artifact,
+		Operator:        r.Operator,
+		Extras:          r.Extras,
+		TriggerType:     string(r.TriggerType),
+		TriggerPolicyID: r.TriggerPolicyID,
+		StartedAt:       r.StartedAt,
+		EndedAt:         r.EndedAt,
 	}
 	return o
 }
