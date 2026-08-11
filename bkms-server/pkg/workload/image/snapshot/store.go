@@ -57,6 +57,9 @@ type SnapshotStore interface {
 	// UpdateDetail 更新单条快照的详情字段（用于详情补全）
 	UpdateDetail(ctx context.Context, repoKey, tag string, detail *registry.ImageDetail) error
 
+	// MarkDetailSyncPending 将指定标签标记为需要重新拉取详情（标签不存在时忽略）
+	MarkDetailSyncPending(ctx context.Context, repoKey string, tags []string) error
+
 	// ListByRepoKey 分页查询指定仓库的快照列表（支持关键词过滤和时间排序）
 	ListByRepoKey(ctx context.Context, repoKey, keyword string, page, pageSize int) ([]Image, int64, error)
 
@@ -65,7 +68,8 @@ type SnapshotStore interface {
 		ctx context.Context, repoKey string, tags []string, keyword string, page, pageSize int,
 	) ([]Image, int64, error)
 
-	// ListUnsyncedDetailTags 获取指定仓库中需要补全详情的标签列表（未同步详情的标签 + latest）
+	// ListUnsyncedDetailTags 获取指定仓库中需要补全详情的标签列表
+	// （builtAt 为空、detailSyncPending，或 latest）
 	ListUnsyncedDetailTags(ctx context.Context, repoKey string) ([]string, error)
 
 	// ListAllTags 获取指定仓库中所有标签列表（用于 diff 计算）
@@ -196,6 +200,9 @@ func (s *SnapshotStoreMongo) HasTag(ctx context.Context, repoKey, tag string) (b
 }
 
 // UpdateDetail 更新快照详情
+//
+// 会无条件清除 detailSyncPending；并发同 tag 构建下可能误清较新的 pending 标记，
+// 详见 Image.DetailSyncPending 字段注释中的 TODO
 func (s *SnapshotStoreMongo) UpdateDetail(
 	ctx context.Context,
 	repoKey, tag string,
@@ -210,12 +217,29 @@ func (s *SnapshotStoreMongo) UpdateDetail(
 			"builtAt":   detail.BuiltAt,
 			"updatedAt": now,
 		},
+		// 详情已是最新，清除重新拉取标记（无条件清除，见函数注释中的并发限制）
+		"$unset": bson.M{"detailSyncPending": ""},
 	}
 
 	filter := bson.M{"repoKey": repoKey, "tag": tag}
 	_, err := s.snapshotColl.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return errors.Wrapf(err, "update detail for %s:%s", repoKey, tag)
+	}
+
+	return nil
+}
+
+// MarkDetailSyncPending 将指定标签标记为需要重新拉取详情
+func (s *SnapshotStoreMongo) MarkDetailSyncPending(ctx context.Context, repoKey string, tags []string) error {
+	if len(tags) == 0 {
+		return nil
+	}
+
+	filter := bson.M{"repoKey": repoKey, "tag": bson.M{"$in": tags}}
+	update := bson.M{"$set": bson.M{"detailSyncPending": true}}
+	if _, err := s.snapshotColl.UpdateMany(ctx, filter, update); err != nil {
+		return errors.Wrapf(err, "mark detail sync pending for %s", repoKey)
 	}
 
 	return nil
@@ -338,12 +362,13 @@ func (s *SnapshotStoreMongo) listTags(ctx context.Context, filter bson.M) ([]str
 
 // ListUnsyncedDetailTags 获取需要补全详情的标签
 func (s *SnapshotStoreMongo) ListUnsyncedDetailTags(ctx context.Context, repoKey string) ([]string, error) {
-	// 查询：builtAt 为空（未补全详情）或者 tag 为 latest（每次都刷新）
+	// 查询：builtAt 为空（未补全详情）、被标记需重新拉取，或者 tag 为 latest（每次都刷新）
 	filter := bson.M{
 		"repoKey": repoKey,
 		"$or": []bson.M{
 			{"builtAt": bson.M{"$exists": false}},
 			{"builtAt": nil},
+			{"detailSyncPending": true},
 			{"tag": TagLatest},
 		},
 	}
