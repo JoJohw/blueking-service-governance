@@ -28,6 +28,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris/instancestats"
 	_ "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/ginutils/validators" // register global validators
 )
 
@@ -373,5 +374,62 @@ type PutEnvWeightOutput struct {
 // FromModel fills output fields from the updated config.
 func (o *PutEnvWeightOutput) FromModel(config *polaris.PolarisConfig) *PutEnvWeightOutput {
 	o.Data = new(PolarisConfigOutputObj).FromModel(*config, nil)
+	return o
+}
+
+// -----------------------------------------------------------------------------
+// Env instance stats
+// -----------------------------------------------------------------------------
+
+// GetEnvInstanceStatsOutput is the JSON response for per-env polaris instance stats.
+type GetEnvInstanceStatsOutput struct {
+	Data *GetEnvInstanceStatsOutputObj `json:"data"`
+}
+
+// GetEnvInstanceStatsOutputObj is the payload of GetEnvInstanceStats.
+type GetEnvInstanceStatsOutputObj struct {
+	// 各环境匹配到的北极星实例统计，key 为环境名
+	EnvStats map[string]EnvInstanceStatsOutput `json:"envStats"`
+	// 北极星服务下全部健康实例数（含非平台注册，例如迁移业务）
+	TotalHealthyInstanceCount int32 `json:"totalHealthyInstanceCount"`
+	// 北极星服务下全部健康实例的权重总和
+	TotalHealthyInstanceWeight int32 `json:"totalHealthyInstanceWeight"`
+}
+
+// EnvInstanceStatsOutput is the JSON representation of matched polaris instance counts.
+type EnvInstanceStatsOutput struct {
+	// 匹配实例中健康的数量（isHealthy && !isIsolated && weight > 0）
+	HealthyInstanceCount int32 `json:"healthyInstanceCount"`
+	// 匹配健康实例的权重总和
+	HealthyInstanceWeight int32 `json:"healthyInstanceWeight"`
+	// 匹配实例中隔离的数量（isIsolated == true）
+	IsolatedInstanceCount int32 `json:"isolatedInstanceCount"`
+	// 匹配到本环境 Pod 的实例总数
+	TotalInstanceCount int32 `json:"totalInstanceCount"`
+	// 本环境被单独设置过权重的实例数，其实际权重可能与配置的单实例权重不一致
+	WeightOverriddenInstanceCount int32 `json:"weightOverriddenInstanceCount"`
+}
+
+// FromModel fills output fields from collected env instance stats.
+func (o *GetEnvInstanceStatsOutput) FromModel(result *instancestats.Result) *GetEnvInstanceStatsOutput {
+	obj := &GetEnvInstanceStatsOutputObj{
+		EnvStats: map[string]EnvInstanceStatsOutput{},
+	}
+	if result != nil {
+		obj.EnvStats = make(map[string]EnvInstanceStatsOutput, len(result.EnvStats))
+		for envName, s := range result.EnvStats {
+			obj.EnvStats[envName] = EnvInstanceStatsOutput{
+				HealthyInstanceCount:  int32(s.HealthyInstanceCount),  //nolint:gosec // G115: counts fit in int32
+				HealthyInstanceWeight: int32(s.HealthyInstanceWeight), //nolint:gosec // G115: weights fit in int32
+				IsolatedInstanceCount: int32(s.IsolatedInstanceCount), //nolint:gosec // G115: counts fit in int32
+				TotalInstanceCount:    int32(s.TotalInstanceCount),    //nolint:gosec // G115: counts fit in int32
+				//nolint:gosec // G115: counts fit in int32
+				WeightOverriddenInstanceCount: int32(s.WeightOverriddenInstanceCount),
+			}
+		}
+		obj.TotalHealthyInstanceCount = int32(result.TotalHealthyInstanceCount)   //nolint:gosec // G115: counts fit in int32
+		obj.TotalHealthyInstanceWeight = int32(result.TotalHealthyInstanceWeight) //nolint:gosec // G115: weights fit in int32
+	}
+	o.Data = obj
 	return o
 }

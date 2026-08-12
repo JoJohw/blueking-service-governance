@@ -3932,6 +3932,68 @@ const docTemplate = `{
                 }
             }
         },
+        "/apps/{appID}/deps/polaris-configs/{configName}/env-instance-stats": {
+            "get": {
+                "security": [
+                    {
+                        "BkUserInfo": []
+                    },
+                    {
+                        "BkUserCredential": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "polaris-config"
+                ],
+                "summary": "获取北极星配置各环境实例统计",
+                "operationId": "GetEnvInstanceStats",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用 ID",
+                        "name": "appID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "配置名称",
+                        "name": "configName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/serializer.GetEnvInstanceStatsOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/{appID}/deps/polaris-configs/{configName}/envs/{envName}/weight": {
             "put": {
                 "security": [
@@ -21992,6 +22054,31 @@ const docTemplate = `{
                 }
             }
         },
+        "serializer.EnvInstanceStatsOutput": {
+            "type": "object",
+            "properties": {
+                "healthyInstanceCount": {
+                    "description": "匹配实例中健康的数量（isHealthy \u0026\u0026 !isIsolated \u0026\u0026 weight \u003e 0）",
+                    "type": "integer"
+                },
+                "healthyInstanceWeight": {
+                    "description": "匹配健康实例的权重总和",
+                    "type": "integer"
+                },
+                "isolatedInstanceCount": {
+                    "description": "匹配实例中隔离的数量（isIsolated == true）",
+                    "type": "integer"
+                },
+                "totalInstanceCount": {
+                    "description": "匹配到本环境 Pod 的实例总数",
+                    "type": "integer"
+                },
+                "weightOverriddenInstanceCount": {
+                    "description": "本环境被单独设置过权重的实例数，其实际权重可能与配置的单实例权重不一致",
+                    "type": "integer"
+                }
+            }
+        },
         "serializer.EnvOutput": {
             "type": "object",
             "properties": {
@@ -22866,6 +22953,34 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/serializer.GetEnvApmOutput"
+                }
+            }
+        },
+        "serializer.GetEnvInstanceStatsOutput": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/serializer.GetEnvInstanceStatsOutputObj"
+                }
+            }
+        },
+        "serializer.GetEnvInstanceStatsOutputObj": {
+            "type": "object",
+            "properties": {
+                "envStats": {
+                    "description": "各环境匹配到的北极星实例统计，key 为环境名",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/serializer.EnvInstanceStatsOutput"
+                    }
+                },
+                "totalHealthyInstanceCount": {
+                    "description": "北极星服务下全部健康实例数（含非平台注册，例如迁移业务）",
+                    "type": "integer"
+                },
+                "totalHealthyInstanceWeight": {
+                    "description": "北极星服务下全部健康实例的权重总和",
+                    "type": "integer"
                 }
             }
         },

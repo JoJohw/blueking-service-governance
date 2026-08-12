@@ -28,6 +28,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris/instancestats"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris/serializer"
 )
 
@@ -290,4 +291,32 @@ var _ = Describe("AppConfigEnvNameURIInput", func() {
 		Entry("rejects an environment name containing a dot", "env.test", true),
 		Entry("rejects an environment name containing a dollar sign", "env$test", true),
 	)
+})
+
+var _ = Describe("GetEnvInstanceStatsOutput", func() {
+	It("maps per-environment instance counts and healthy totals", func() {
+		output := new(serializer.GetEnvInstanceStatsOutput).FromModel(&instancestats.Result{
+			EnvStats: map[string]instancestats.Stats{
+				"stable": {
+					HealthyInstanceCount:          3,
+					HealthyInstanceWeight:         300,
+					IsolatedInstanceCount:         1,
+					TotalInstanceCount:            4,
+					WeightOverriddenInstanceCount: 2,
+				},
+			},
+			TotalHealthyInstanceCount:  7,
+			TotalHealthyInstanceWeight: 520,
+		})
+
+		Expect(output.Data.EnvStats["stable"]).To(Equal(serializer.EnvInstanceStatsOutput{
+			HealthyInstanceCount:          3,
+			HealthyInstanceWeight:         300,
+			IsolatedInstanceCount:         1,
+			TotalInstanceCount:            4,
+			WeightOverriddenInstanceCount: 2,
+		}))
+		Expect(output.Data.TotalHealthyInstanceCount).To(Equal(int32(7)))
+		Expect(output.Data.TotalHealthyInstanceWeight).To(Equal(int32(520)))
+	})
 })
