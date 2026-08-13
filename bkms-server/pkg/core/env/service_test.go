@@ -55,6 +55,7 @@ var _ = Describe("Test EnvService", func() {
 
 	AfterEach(func() {
 		Expect(envStore.DeleteAll(ctx)).NotTo(HaveOccurred())
+		ResetHooksForTest()
 		diApp.RequireStop()
 	})
 
@@ -108,6 +109,53 @@ var _ = Describe("Test EnvService", func() {
 				Namespace: &newNamespace,
 			})
 			Expect(updateErr.Error()).To(ContainSubstring("cannot update cluster"))
+		})
+
+		It("runs update hooks with before and after env when type changes", func() {
+			beforeType := envType
+			afterType := "staging"
+			hookCalled := make(chan struct{}, 1)
+
+			registered := RegisterUpdateHook("test.update_env", func(
+				_ context.Context,
+				before model.Environment,
+				after model.Environment,
+			) error {
+				Expect(before.ID).To(Equal(envID))
+				Expect(before.Type).To(Equal(beforeType))
+				Expect(after.ID).To(Equal(envID))
+				Expect(after.Type).To(Equal(afterType))
+				hookCalled <- struct{}{}
+				return nil
+			})
+			Expect(registered).To(BeTrue())
+
+			updateErr := envSvc.Update(ctx, envID, &model.EnvironmentUpdateData{
+				Type: &afterType,
+			})
+			Expect(updateErr).NotTo(HaveOccurred())
+			Eventually(hookCalled).Should(Receive())
+		})
+
+		It("resets delete and update hooks together", func() {
+			Expect(RegisterDeleteHook("test.delete_env", func(context.Context, model.Environment) error {
+				return nil
+			})).To(BeTrue())
+			Expect(RegisterUpdateHook("test.update_env", func(
+				context.Context,
+				model.Environment,
+				model.Environment,
+			) error {
+				return nil
+			})).To(BeTrue())
+
+			Expect(IsDeleteHookRegistered("test.delete_env")).To(BeTrue())
+			Expect(IsUpdateHookRegistered("test.update_env")).To(BeTrue())
+
+			ResetHooksForTest()
+
+			Expect(IsDeleteHookRegistered("test.delete_env")).To(BeFalse())
+			Expect(IsUpdateHookRegistered("test.update_env")).To(BeFalse())
 		})
 	})
 })

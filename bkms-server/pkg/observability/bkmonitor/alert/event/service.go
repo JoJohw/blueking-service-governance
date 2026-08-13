@@ -22,6 +22,7 @@ package event
 import (
 	"context"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -51,8 +52,6 @@ type SearchInput struct {
 	PageSize int
 	// AlertID 按告警 ID 过滤。
 	AlertID string
-	// AlertName 按告警名称过滤。
-	AlertName string
 	// Description 按告警内容过滤。
 	Description string
 	// StrategyName 按策略名称过滤。
@@ -61,6 +60,10 @@ type SearchInput struct {
 	EventID string
 	// Target 按目标实例过滤。
 	Target string
+	// ClusterID 按集群 ID 过滤。
+	ClusterID string
+	// Namespace 按命名空间过滤。
+	Namespace string
 	// Ordering 排序字段列表，沿用蓝鲸监控 API 的排序语法。
 	Ordering []string
 }
@@ -82,7 +85,7 @@ func (s *Service) Search(
 	operator string,
 	input SearchInput,
 ) (*bkmapi.SearchAlertResp, error) {
-	bkBizID, err := ws.ResolveBkMonitorProjectID()
+	bkMonitorProjectID, err := ws.ResolveBkMonitorProjectID()
 	if err != nil {
 		return nil, errors.Wrap(err, "resolve bkMonitorProjectID")
 	}
@@ -90,7 +93,7 @@ func (s *Service) Search(
 	if err != nil {
 		return nil, errors.Wrap(err, "new bkmonitor client")
 	}
-	return client.SearchAlert(ctx, s.buildSearchAlertReq(bkBizID, input, nil))
+	return client.SearchAlert(ctx, s.buildSearchAlertReq(bkMonitorProjectID, input, nil))
 }
 
 // SearchByStrategyIDs 按策略 ID 列表查询告警事件
@@ -101,7 +104,7 @@ func (s *Service) SearchByStrategyIDs(
 	strategyIDs []int64,
 	input SearchInput,
 ) (*bkmapi.SearchAlertResp, error) {
-	bkBizID, err := ws.ResolveBkMonitorProjectID()
+	bkMonitorProjectID, err := ws.ResolveBkMonitorProjectID()
 	if err != nil {
 		return nil, errors.Wrap(err, "resolve bkMonitorProjectID")
 	}
@@ -109,7 +112,7 @@ func (s *Service) SearchByStrategyIDs(
 	if err != nil {
 		return nil, errors.Wrap(err, "new bkmonitor client")
 	}
-	return client.SearchAlert(ctx, s.buildSearchAlertReq(bkBizID, input, strategyIDs))
+	return client.SearchAlert(ctx, s.buildSearchAlertReq(bkMonitorProjectID, input, strategyIDs))
 }
 
 // GetDetail 查询单条告警详情
@@ -119,7 +122,7 @@ func (s *Service) GetDetail(
 	operator string,
 	alertID string,
 ) (map[string]any, error) {
-	bkBizID, err := ws.ResolveBkMonitorProjectID()
+	bkMonitorProjectID, err := ws.ResolveBkMonitorProjectID()
 	if err != nil {
 		return nil, errors.Wrap(err, "resolve bkMonitorProjectID")
 	}
@@ -127,11 +130,11 @@ func (s *Service) GetDetail(
 	if err != nil {
 		return nil, errors.Wrap(err, "new bkmonitor client")
 	}
-	return client.GetAlertDetail(ctx, &bkmapi.AlertDetailReq{BkBizID: bkBizID, ID: alertID})
+	return client.GetAlertDetail(ctx, &bkmapi.AlertDetailReq{BkBizID: bkMonitorProjectID, ID: alertID})
 }
 
 func (s *Service) buildSearchAlertReq(
-	bkBizID int64,
+	bkMonitorProjectID int64,
 	input SearchInput,
 	strategyIDs []int64,
 ) *bkmapi.SearchAlertReq {
@@ -144,7 +147,7 @@ func (s *Service) buildSearchAlertReq(
 		startTime = endTime - int64(defaultSearchAlertLookback/time.Second)
 	}
 	req := &bkmapi.SearchAlertReq{
-		BkBizIDs:    []int64{bkBizID},
+		BkBizIDs:    []int64{bkMonitorProjectID},
 		Status:      input.Status,
 		Severity:    input.Severity,
 		StartTime:   startTime,
@@ -164,7 +167,7 @@ func (s *Service) buildSearchAlertReq(
 // buildSearchConditions 将事件查询输入转换为蓝鲸监控 search_alert 接口使用的 conditions 数组。
 // 这里只处理“可选过滤条件”的拼装：策略 ID 走整型数组，其余字符串字段按接口要求包装成单元素字符串数组。
 func buildSearchConditions(input SearchInput, strategyIDs []int64) []map[string]any {
-	conditions := make([]map[string]any, 0, 6)
+	conditions := make([]map[string]any, 0, 8)
 	appendIf := func(ok bool, key string, value any) {
 		if ok {
 			conditions = append(conditions, map[string]any{"key": key, "value": value})
@@ -175,20 +178,41 @@ func buildSearchConditions(input SearchInput, strategyIDs []int64) []map[string]
 		key string
 		val string
 	}{
-		{key: "id", val: input.AlertID},
-		{key: "alert_name", val: input.AlertName},
 		{key: "strategy_name", val: input.StrategyName},
 		{key: "event_id", val: input.EventID},
 		{key: "target", val: input.Target},
+		{key: "tags.bcs_cluster_id", val: input.ClusterID},
+		{key: "tags.namespace", val: input.Namespace},
 	} {
 		appendIf(item.val != "", item.key, []string{item.val})
 	}
 	return conditions
 }
 
+// buildSearchQueryString 将查询输入中的告警 ID、告警内容拼接为蓝鲸监控 search_alert 接口
+// 使用的 query_string 查询条件。
+//
+//   - 仅当对应字段非空时才参与拼装，为空则忽略；
+//   - 每个字段以 field:"value" 的形式表达（value 经 strconv.Quote 转义，避免特殊字符破坏查询语法）；
+//   - 多个字段短语之间以 AND 连接；
+//   - 当没有任何字段参与时返回空字符串，交由接口侧忽略该查询项。
 func buildSearchQueryString(input SearchInput) string {
-	if input.Description == "" {
+	parts := make([]string, 0, 2)
+	appendPhrase := func(field, value string) {
+		if value == "" {
+			return
+		}
+		parts = append(parts, field+":"+strconv.Quote(value))
+	}
+
+	// 告警名称展示与查询统一收敛到 BKMS 本地 displayName 语义，由上层先映射远端 strategyID。
+	// 因此这里不再对监控原始 alert_name 做 query_string 过滤，避免前端依赖远端命名规则。
+	appendPhrase("id", input.AlertID)
+	appendPhrase("description", input.Description)
+	// 没有任何过滤条件时返回空字符串，交由接口侧忽略该查询项。
+	if len(parts) == 0 {
 		return ""
 	}
-	return "description:" + strconv.Quote(input.Description)
+	// 多个短语以 AND 连接，构成蓝鲸监控 query_string 查询条件。
+	return strings.Join(parts, " AND ")
 }

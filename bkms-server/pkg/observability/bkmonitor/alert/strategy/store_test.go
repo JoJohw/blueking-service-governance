@@ -211,6 +211,26 @@ var _ = Describe("AlertStrategyStoreMongo", func() {
 			Expect(strategies[1].StrategyCode).To(Equal("rule_env_type"))
 			Expect(strategies[2].StrategyCode).To(Equal("rule_all"))
 		})
+
+		It("should detect duplicate displayName in same app", func() {
+			first := newStoreRule("ws-list", "app-a", "app-a", "rule_a")
+			first.DisplayName = "Same Name"
+			firstID, err := store.Create(ctx, first)
+			Expect(err).NotTo(HaveOccurred())
+
+			second := newStoreRule("ws-list", "app-a", "app-a", "rule_b")
+			second.DisplayName = "Same Name"
+			_, err = store.Create(ctx, second)
+			Expect(err).To(HaveOccurred())
+
+			exists, err := store.ExistsByAppAndDisplayName(ctx, "ws-list", "app-a", "Same Name", nil)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(exists).To(BeTrue())
+
+			exists, err = store.ExistsByAppAndDisplayName(ctx, "ws-list", "app-a", "Same Name", &firstID)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(exists).To(BeFalse())
+		})
 	})
 
 	Describe("Update", func() {
@@ -294,7 +314,9 @@ var _ = Describe("AlertStrategyStoreMongo", func() {
 			_, err := store.Create(ctx, newStoreRule("ws-a", "app-a", "app-a", "same_code"))
 			Expect(err).NotTo(HaveOccurred())
 
-			_, err = store.Create(ctx, newStoreRule("ws-a", "app-a", "app-a", "same_code"))
+			second := newStoreRule("ws-a", "app-a", "app-a", "same_code")
+			second.DisplayName = "same_code-display-2"
+			_, err = store.Create(ctx, second)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -320,6 +342,8 @@ var _ = Describe("AlertStrategyStoreMongo", func() {
 			}
 
 			Expect(indexByName).To(HaveKey("workspaceID_1_appID_1_enabled_1"))
+			Expect(indexByName).To(HaveKey("workspaceID_1_appID_1_displayName_1"))
+			Expect(indexByName["workspaceID_1_appID_1_displayName_1"].Unique).To(BeTrue())
 			Expect(indexByName).NotTo(HaveKey("workspaceID_1_enabled_1"))
 		})
 	})

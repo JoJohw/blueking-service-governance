@@ -44,6 +44,7 @@ import (
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/perm"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/misc/audit"
 	alertstrategy "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/observability/bkmonitor/alert/strategy"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/observability/bkmonitor/usergroup"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/ginutils"
 	ginperm "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/ginutils/perm"
 	storereg "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/registry"
@@ -170,12 +171,35 @@ func (h *Handler) CreateApp(c *gin.Context) {
 	// 创建应用后，异步为该应用初始化默认监控告警策略，应用部署后真正下发到监控平台
 	go func() {
 		bgCtx := context.WithoutCancel(ctx)
+		ws, wsErr := h.registry.WorkspaceStore.Get(bgCtx, app.WorkspaceID)
+		if wsErr != nil {
+			log.Errorf(bgCtx, "get workspace %s for default alert strategies failed: %v", app.WorkspaceID, wsErr)
+			return
+		}
+		noticeGroupIDs, groupErr := usergroup.ResolveDefaultAlertNoticeGroupIDs(
+			bgCtx,
+			ws,
+			usergroup.New(),
+			perm.NewManager(),
+			auth.MustGetUser(ctx).ID,
+		)
+		if groupErr != nil {
+			log.Errorf(
+				bgCtx,
+				"resolve default alert user group for workspace %s failed: %v",
+				app.WorkspaceID,
+				groupErr,
+			)
+			return
+		}
 		initErr := alertstrategy.NewService(
 			storereg.G().AlertStrategyStore,
 			storereg.G().EnvStore,
 			storereg.G().AppStore,
 			storereg.G().ResourceSnapshotStore,
-		).InitDefaultAlertStrategiesForApp(bgCtx, app.WorkspaceID, app.ID, app.Name, auth.MustGetUser(ctx).ID)
+		).InitDefaultAlertStrategiesForApp(
+			bgCtx, app.WorkspaceID, app.ID, app.Name, auth.MustGetUser(ctx).ID, noticeGroupIDs,
+		)
 		if initErr != nil {
 			// 初始化失败不影响应用创建结果，仅记录错误日志，由后续重试/手动补偿处理。
 			log.Errorf(bgCtx, "init default alert strategies for app %s failed: %v", app.ID, initErr)
@@ -376,13 +400,13 @@ func (h *Handler) DeleteApp(c *gin.Context) {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-
 	ctx := c.Request.Context()
 	app, err := ginperm.ValidateAppByID(ctx, h.registry, uriInput.AppID, ginperm.TypeDelete)
 	if err != nil {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
+	operator := auth.MustGetUser(ctx).ID
 
 	// 检查是否存在活跃的部署
 	if bkmsapp.IsAppModelType(app.Type) {
@@ -416,7 +440,6 @@ func (h *Handler) DeleteApp(c *gin.Context) {
 		bkerrs.AbortWithErr(c, bkerrs.Wrap(err, bkerrs.ErrCodeInternalServerError, "cleanup app resources"))
 		return
 	}
-
 	// 根据应用类型删除特定资源
 	if bkmsapp.IsAppModelType(app.Type) {
 		if err = h.deleteAppModelApp(ctx, app); err != nil {
@@ -438,6 +461,7 @@ func (h *Handler) DeleteApp(c *gin.Context) {
 		bkerrs.AbortWithErr(c, bkerrs.Wrap(err, bkerrs.ErrCodeInternalServerError, "delete app"))
 		return
 	}
+	h.cleanupAlertStrategiesAsync(ctx, app, operator)
 
 	// 添加操作审计
 	go audit.AddOperationRecordAsync(
@@ -681,6 +705,32 @@ func (h *Handler) cleanupAppResources(ctx context.Context, appID string) error {
 	}
 
 	return nil
+}
+
+// cleanupAlertStrategiesAsync 异步清理已删除应用关联的全部告警策略。
+func (h *Handler) cleanupAlertStrategiesAsync(
+	ctx context.Context,
+	app *bkmsapp.Application,
+	operator string,
+) {
+	go func() {
+		bgCtx := context.WithoutCancel(ctx)
+		ws, err := h.registry.WorkspaceStore.Get(bgCtx, app.WorkspaceID)
+		if err != nil {
+			log.Errorf(bgCtx, "get workspace %s for app %s alert cleanup failed: %v", app.WorkspaceID, app.ID, err)
+			return
+		}
+
+		err = alertstrategy.NewService(
+			h.registry.AlertStrategyStore,
+			h.registry.EnvStore,
+			h.registry.AppStore,
+			h.registry.ResourceSnapshotStore,
+		).DeleteByApp(bgCtx, ws, app.WorkspaceID, app.ID, operator)
+		if err != nil {
+			log.Errorf(bgCtx, "cleanup alert strategies for deleted app %s failed: %v", app.ID, err)
+		}
+	}()
 }
 
 func (h *Handler) convertAppComponentsForOutput(

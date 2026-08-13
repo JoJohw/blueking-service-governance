@@ -21,9 +21,11 @@ package strategy
 
 import (
 	"context"
+	stderrors "errors"
 
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 
 	log "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/logging"
 	bkmsapp "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/app"
@@ -33,6 +35,9 @@ import (
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/observability/bkmonitor/alert"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/topology"
 )
+
+// ErrDisplayNameAlreadyExists 表示同一应用下已存在相同策略名称。
+var ErrDisplayNameAlreadyExists = errors.New("alert strategy displayName already exists in app")
 
 // NewService 创建 Service 实例。
 func NewService(
@@ -65,9 +70,15 @@ func (s *Service) Create(ctx context.Context, req *CreateReq) (*AlertStrategy, e
 	if err := req.EffectiveScope.Validate(); err != nil {
 		return nil, errors.Wrap(err, "validate effectiveScope")
 	}
+	if err := s.ensureDisplayNameUnique(ctx, req.WorkspaceID, req.AppID, req.DisplayName, nil); err != nil {
+		return nil, err
+	}
 	strategy := buildStrategyFromCreateReq(req)
 	id, err := s.store.Create(ctx, strategy)
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return nil, ErrDisplayNameAlreadyExists
+		}
 		return nil, errors.Wrap(err, "create alert strategy")
 	}
 	strategy.ID = id
@@ -86,6 +97,9 @@ func (s *Service) CreateAndSync(
 	if err := req.EffectiveScope.Validate(); err != nil {
 		return nil, errors.Wrap(err, "validate effectiveScope")
 	}
+	if err := s.ensureDisplayNameUnique(ctx, req.WorkspaceID, req.AppID, req.DisplayName, nil); err != nil {
+		return nil, err
+	}
 
 	strategy := buildStrategyFromCreateReq(req)
 	strategy.ID = bson.NewObjectID()
@@ -97,6 +111,9 @@ func (s *Service) CreateAndSync(
 	strategy.RemoteRefs = remoteRefs
 
 	if _, err = s.store.Create(ctx, strategy); err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return nil, ErrDisplayNameAlreadyExists
+		}
 		return nil, errors.Wrap(err, "create alert strategy")
 	}
 	return strategy, nil
@@ -117,19 +134,6 @@ func (s *Service) ListByApp(ctx context.Context, workspaceID, appID string) ([]A
 	return s.store.ListByApp(ctx, workspaceID, appID)
 }
 
-// Update 更新告警策略；若请求未产生变更则返回 false。
-func (s *Service) Update(ctx context.Context, id bson.ObjectID, req *UpdateReq) (bool, error) {
-	updateData, changed, err := req.ToBSON()
-	if err != nil {
-		return false, err
-	}
-	if !changed {
-		return false, nil
-	}
-	updateData["updater"] = req.Operator
-	return true, s.store.Update(ctx, id, updateData)
-}
-
 // UpdateAndSync 更新告警策略；若有变更，则先同步远端，再持久化本地记录。
 func (s *Service) UpdateAndSync(
 	ctx context.Context,
@@ -147,9 +151,23 @@ func (s *Service) UpdateAndSync(
 	if err = s.withLockedStrategy(ctx, id, "get alert strategy before update", func(current *AlertStrategy) error {
 		next := cloneStrategy(current)
 		req.ApplyTo(next)
+		if next.DisplayName != current.DisplayName {
+			if uniqueErr := s.ensureDisplayNameUnique(
+				ctx,
+				current.WorkspaceID,
+				current.AppID,
+				next.DisplayName,
+				&id,
+			); uniqueErr != nil {
+				return uniqueErr
+			}
+		}
 		if !next.Enabled && len(current.RemoteRefs) == 0 {
 			updateData["updater"] = req.Operator
 			if updateErr := s.store.Update(ctx, id, updateData); updateErr != nil {
+				if mongo.IsDuplicateKeyError(updateErr) {
+					return ErrDisplayNameAlreadyExists
+				}
 				return errors.Wrap(updateErr, "update alert strategy")
 			}
 			return nil
@@ -163,6 +181,9 @@ func (s *Service) UpdateAndSync(
 		updateData["remoteRefs"] = remoteRefs
 		updateData["updater"] = req.Operator
 		if updateErr := s.store.Update(ctx, id, updateData); updateErr != nil {
+			if mongo.IsDuplicateKeyError(updateErr) {
+				return ErrDisplayNameAlreadyExists
+			}
 			return errors.Wrap(updateErr, "update alert strategy")
 		}
 		return nil
@@ -190,11 +211,45 @@ func (s *Service) Delete(ctx context.Context, ws *workspace.Workspace, id bson.O
 	})
 }
 
+// DeleteByApp 删除应用下的所有告警策略。
+//
+// 该方法用于应用删除后的异步补偿清理，会尽量删除完全部策略并聚合失败信息返回，
+// 以便调用方记录日志或做后续补偿，而不会因为首条失败就停止后续清理。
+func (s *Service) DeleteByApp(
+	ctx context.Context,
+	ws *workspace.Workspace,
+	workspaceID, appID string,
+	operator string,
+) error {
+	strategies, err := s.store.ListByApp(ctx, workspaceID, appID)
+	if err != nil {
+		return errors.Wrap(err, "list alert strategies by app")
+	}
+
+	var joinedErr error
+	for _, strategy := range strategies {
+		if err := s.Delete(ctx, ws, strategy.ID, operator); err != nil {
+			log.Errorf(
+				ctx,
+				"delete alert strategy during app cleanup failed, workspaceID=%s appID=%s strategyID=%s code=%s err=%v",
+				workspaceID,
+				appID,
+				strategy.ID.Hex(),
+				strategy.StrategyCode,
+				err,
+			)
+			joinedErr = stderrors.Join(joinedErr, errors.Wrapf(err, "delete alert strategy %s", strategy.ID.Hex()))
+		}
+	}
+	return joinedErr
+}
+
 // InitDefaultAlertStrategiesForApp 为应用初始化预置告警策略（仅本地，不自动同步远端）。
 func (s *Service) InitDefaultAlertStrategiesForApp(
 	ctx context.Context,
 	workspaceID, appID, appName string,
 	operator string,
+	noticeGroupIDs []int64,
 ) error {
 	for _, tmpl := range defaultTemplates {
 		rule := &AlertStrategy{
@@ -210,12 +265,19 @@ func (s *Service) InitDefaultAlertStrategiesForApp(
 			RecoverCondition:   tmpl.RecoverCondition,
 			EffectiveTimeRange: tmpl.EffectiveTimeRange,
 			EffectiveScope:     EffectiveScope{Type: EffectiveScopeAll},
+			NoticeGroupIDs:     append([]int64(nil), noticeGroupIDs...),
 			Enabled:            true,
 			Creator:            operator,
 			Updater:            operator,
 		}
 
+		if err := s.ensureDisplayNameUnique(ctx, workspaceID, appID, rule.DisplayName, nil); err != nil {
+			return err
+		}
 		if _, createErr := s.store.Create(ctx, rule); createErr != nil {
+			if mongo.IsDuplicateKeyError(createErr) {
+				return ErrDisplayNameAlreadyExists
+			}
 			log.Errorf(ctx, "failed to create default alert strategy %s for workspace %s app %s: %v",
 				tmpl.StrategyCode, workspaceID, appID, createErr)
 			return createErr
@@ -238,7 +300,7 @@ func buildStrategyFromCreateReq(req *CreateReq) *AlertStrategy {
 		AppName:            req.AppName,
 		StrategyCode:       req.StrategyCode,
 		DisplayName:        req.DisplayName,
-		MonitorMetric:      req.MonitorMetric,
+		MonitorMetric:      MonitorMetricForStrategyCode(req.StrategyCode),
 		Severity:           req.Severity,
 		Threshold:          req.Threshold,
 		TriggerCondition:   req.TriggerCondition,
@@ -262,4 +324,19 @@ func cloneStrategy(strategy *AlertStrategy) *AlertStrategy {
 	cloned.EffectiveScope.EnvTypes = append([]string(nil), strategy.EffectiveScope.EnvTypes...)
 	cloned.EffectiveScope.EnvIDs = append([]bson.ObjectID(nil), strategy.EffectiveScope.EnvIDs...)
 	return &cloned
+}
+
+func (s *Service) ensureDisplayNameUnique(
+	ctx context.Context,
+	workspaceID, appID, displayName string,
+	excludeID *bson.ObjectID,
+) error {
+	exists, err := s.store.ExistsByAppAndDisplayName(ctx, workspaceID, appID, displayName, excludeID)
+	if err != nil {
+		return errors.Wrap(err, "check alert strategy displayName uniqueness")
+	}
+	if exists {
+		return ErrDisplayNameAlreadyExists
+	}
+	return nil
 }

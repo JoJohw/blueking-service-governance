@@ -331,20 +331,9 @@ func buildDefaultNoticeTitle(displayName, signal string) string {
 	}
 }
 
-// buildRemoteStrategyName 使用原始命名生成远端策略名称，附带本地策略 ID 后缀以降低重名概率。
+// buildRemoteStrategyName 使用“策略名称【应用名称】”格式生成远端策略名称。
 func buildRemoteStrategyName(strategy *AlertStrategy) string {
-	strategyIDShort := strategy.ID.Hex()
-	if len(strategyIDShort) > 6 {
-		strategyIDShort = strategyIDShort[len(strategyIDShort)-6:]
-	}
-	return fmt.Sprintf("bkms-%s-%s-%s", strategy.AppName, strategy.StrategyCode, strategyIDShort)
-}
-
-func buildRemoteStrategyItemName(strategy *AlertStrategy, env envmodel.Environment, trafficLaneName string) string {
-	if trafficLaneName != "" {
-		return fmt.Sprintf("%s-%s-%s", strategy.StrategyCode, env.Name, trafficLaneName)
-	}
-	return fmt.Sprintf("%s-%s", strategy.StrategyCode, env.Name)
+	return fmt.Sprintf("%s【%s】", strategy.DisplayName, strategy.AppName)
 }
 
 func uniqRemoteTargets(targets []remoteTargetContext) []remoteTargetContext {

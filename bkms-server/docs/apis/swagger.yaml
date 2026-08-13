@@ -887,7 +887,12 @@ definitions:
     type: object
   serializer.AlertEventOutput:
     properties:
-      alertName:
+      alertDisplayName:
+        description: |-
+          AlertDisplayName 是 BKMS 本地策略展示名，供前端直接展示。
+          不再对外暴露监控原始 alertName，避免前端感知远端命名格式。
+        type: string
+      alertID:
         type: string
       assignee:
         items:
@@ -914,8 +919,6 @@ definitions:
       endTime:
         type: integer
       eventID:
-        type: string
-      id:
         type: string
       latestTime:
         type: integer
@@ -2542,8 +2545,6 @@ definitions:
         $ref: '#/definitions/serializer.EffectiveTimeRangeInput'
       enabled:
         type: boolean
-      monitorMetric:
-        type: string
       noticeGroupIDs:
         items:
           type: integer
@@ -2565,7 +2566,6 @@ definitions:
     required:
     - displayName
     - effectiveScope
-    - monitorMetric
     - severity
     - strategyCode
     - threshold
@@ -7099,35 +7099,19 @@ definitions:
         type: array
       desc:
         type: string
-      dutyArranges:
-        items:
-          $ref: '#/definitions/bkmonitor.DutyArrange'
-        type: array
-      dutyNotice:
-        $ref: '#/definitions/bkmonitor.DutyNotice'
-      dutyRules:
-        items:
-          type: integer
-        type: array
-      mentionList:
-        items:
-          $ref: '#/definitions/bkmonitor.UserGroupUser'
-        type: array
-      mentionType:
-        type: integer
       name:
         type: string
-      needDuty:
-        type: boolean
-      path:
-        type: string
-      timezone:
-        type: string
+      users:
+        items:
+          $ref: '#/definitions/bkmonitor.UserGroupUser'
+        minItems: 1
+        type: array
     required:
     - actionNotice
     - alertNotice
     - channels
     - name
+    - users
     type: object
   serializer.SaveUserGroupResp:
     properties:
@@ -17884,9 +17868,9 @@ paths:
         in: query
         name: alertID
         type: string
-      - description: 按告警名称过滤
+      - description: 按告警展示名称过滤
         in: query
-        name: alertName
+        name: alertDisplayName
         type: string
       - description: 按告警内容过滤（映射到 query_string）
         in: query
@@ -18062,9 +18046,9 @@ paths:
         in: query
         name: alertID
         type: string
-      - description: 按告警名称过滤
+      - description: 按告警展示名称过滤
         in: query
-        name: alertName
+        name: alertDisplayName
         type: string
       - description: 按告警内容过滤（映射到 query_string）
         in: query

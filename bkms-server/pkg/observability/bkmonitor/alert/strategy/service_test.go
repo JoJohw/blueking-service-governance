@@ -72,6 +72,26 @@ func (c *failAlertStrategyClient) DeleteAlarmStrategy(
 	return c.deleteErr
 }
 
+type failOnNthDeleteAlertStrategyClient struct {
+	*bkmapi.StubClient
+	failAtCall int
+	deleteReqs []*bkmapi.DeleteAlarmStrategyReq
+	deleteErr  error
+	callCount  int
+}
+
+func (c *failOnNthDeleteAlertStrategyClient) DeleteAlarmStrategy(
+	_ context.Context,
+	req *bkmapi.DeleteAlarmStrategyReq,
+) error {
+	c.callCount++
+	c.deleteReqs = append(c.deleteReqs, req)
+	if c.callCount == c.failAtCall {
+		return c.deleteErr
+	}
+	return nil
+}
+
 type failingCreateStore struct {
 	Store
 	createErr error
@@ -92,14 +112,13 @@ var _ = Describe("AlertStrategyService", func() {
 
 	newCreateReq := func() *CreateReq {
 		return &CreateReq{
-			WorkspaceID:   "test-ws",
-			AppID:         "app-1",
-			AppName:       "demo-app",
-			StrategyCode:  "test_strategy",
-			DisplayName:   "Test Strategy",
-			MonitorMetric: "test_metric",
-			Severity:      AlertSeverityInfo,
-			Threshold:     ThresholdConfig{Method: "gte", Value: 50},
+			WorkspaceID:  "test-ws",
+			AppID:        "app-1",
+			AppName:      "demo-app",
+			StrategyCode: "test_strategy",
+			DisplayName:  "Test Strategy",
+			Severity:     AlertSeverityInfo,
+			Threshold:    ThresholdConfig{Method: "gte", Value: 50},
 			EffectiveScope: EffectiveScope{
 				Type: EffectiveScopeAll,
 			},
@@ -164,7 +183,6 @@ var _ = Describe("AlertStrategyService", func() {
 			req.AppName = "app-one"
 			req.StrategyCode = "cpu_high"
 			req.DisplayName = "CPU 过高"
-			req.MonitorMetric = "cpu_usage"
 			req.Severity = AlertSeverityWarning
 			req.Threshold = ThresholdConfig{Method: "gte", Value: 80}
 			req.Enabled = true
@@ -177,13 +195,22 @@ var _ = Describe("AlertStrategyService", func() {
 			Expect(rule.ID).NotTo(Equal(bson.NilObjectID))
 		})
 
+		It("should fill monitorMetric from strategyCode when request omits it", func() {
+			req := newCreateReq()
+			req.StrategyCode = "cpu_limit_usage_high"
+
+			rule, err := svc.Create(ctx, req)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(rule.MonitorMetric).To(Equal("container_cpu_usage_seconds_total"))
+		})
+
 		It("should allow duplicate strategyCode in same workspace for different apps", func() {
 			firstReq := newCreateReq()
 			firstReq.AppID = "app-a"
 			firstReq.AppName = "app-a"
 			firstReq.StrategyCode = "dup_code"
 			firstReq.DisplayName = "First"
-			firstReq.MonitorMetric = "metric"
 
 			_, err := svc.Create(ctx, firstReq)
 			Expect(err).NotTo(HaveOccurred())
@@ -193,10 +220,29 @@ var _ = Describe("AlertStrategyService", func() {
 			secondReq.AppName = "app-b"
 			secondReq.StrategyCode = "dup_code"
 			secondReq.DisplayName = "Second"
-			secondReq.MonitorMetric = "metric"
 
 			_, err = svc.Create(ctx, secondReq)
 			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should reject duplicate displayName in same app", func() {
+			firstReq := newCreateReq()
+			firstReq.AppID = "app-a"
+			firstReq.AppName = "app-a"
+			firstReq.StrategyCode = "code_a"
+			firstReq.DisplayName = "Same Name"
+
+			_, err := svc.Create(ctx, firstReq)
+			Expect(err).NotTo(HaveOccurred())
+
+			secondReq := newCreateReq()
+			secondReq.AppID = "app-a"
+			secondReq.AppName = "app-a"
+			secondReq.StrategyCode = "code_b"
+			secondReq.DisplayName = "Same Name"
+
+			_, err = svc.Create(ctx, secondReq)
+			Expect(err).To(HaveOccurred())
 		})
 	})
 
@@ -483,7 +529,9 @@ var _ = Describe("AlertStrategyService", func() {
 
 	Describe("InitDefaultAlertStrategiesForApp", func() {
 		It("should create default rules enabled with scope=all for app (local only, no remote sync)", func() {
-			err := svc.InitDefaultAlertStrategiesForApp(ctx, "default-ws", "app-1", "demo-app", "test-user")
+			err := svc.InitDefaultAlertStrategiesForApp(
+				ctx, "default-ws", "app-1", "demo-app", "test-user", []int64{1001},
+			)
 			Expect(err).NotTo(HaveOccurred())
 
 			rules, err := store.ListByApp(ctx, "default-ws", "app-1")
@@ -497,6 +545,7 @@ var _ = Describe("AlertStrategyService", func() {
 				Expect(r.EffectiveScope.Type).To(Equal(EffectiveScopeAll))
 				Expect(r.EffectiveTimeRange.StartTime).To(Equal(defaultEffectiveStartTime))
 				Expect(r.EffectiveTimeRange.EndTime).To(Equal(defaultEffectiveEndTime))
+				Expect(r.NoticeGroupIDs).To(Equal([]int64{1001}))
 				Expect(r.Creator).To(Equal("test-user"))
 				Expect(r.RemoteRefs).To(BeEmpty())
 			}
@@ -568,7 +617,6 @@ var _ = Describe("AlertStrategyService", func() {
 				req := newCreateReq()
 				req.StrategyCode = "cpu_limit_usage_high"
 				req.DisplayName = "CPU Limit 使用率过高"
-				req.MonitorMetric = "container_cpu_usage_seconds_total"
 				req.Severity = AlertSeverityFatal
 				req.Threshold = ThresholdConfig{Method: "gte", Value: 90}
 				req.Enabled = false
@@ -633,54 +681,6 @@ var _ = Describe("AlertStrategyService", func() {
 			stored, getErr := store.Get(ctx, ruleID)
 			Expect(getErr).NotTo(HaveOccurred())
 			Expect(stored.Enabled).To(BeFalse())
-		})
-	})
-
-	Describe("Update", func() {
-		It("should update fields", func() {
-			req := newCreateReq()
-			req.StrategyCode = "update_test"
-			req.DisplayName = "Before Update"
-
-			rule, err := svc.Create(ctx, req)
-			Expect(err).NotTo(HaveOccurred())
-
-			newName := "After Update"
-			newSev := AlertSeverityFatal
-			changed, err := svc.Update(ctx, rule.ID, &UpdateReq{
-				DisplayName: &newName,
-				Severity:    &newSev,
-				Operator:    "updater",
-			})
-			Expect(err).NotTo(HaveOccurred())
-			Expect(changed).To(BeTrue())
-
-			updated, err := store.Get(ctx, rule.ID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(updated.DisplayName).To(Equal("After Update"))
-			Expect(updated.Severity).To(Equal(AlertSeverityFatal))
-			Expect(updated.Updater).To(Equal("updater"))
-		})
-
-		It("should report unchanged when request has no mutable fields", func() {
-			req := newCreateReq()
-			req.StrategyCode = "update_noop"
-			req.DisplayName = "Noop Update"
-
-			rule, err := svc.Create(ctx, req)
-			Expect(err).NotTo(HaveOccurred())
-
-			original, err := store.Get(ctx, rule.ID)
-			Expect(err).NotTo(HaveOccurred())
-
-			changed, err := svc.Update(ctx, rule.ID, &UpdateReq{Operator: "noop-user"})
-			Expect(err).NotTo(HaveOccurred())
-			Expect(changed).To(BeFalse())
-
-			updated, err := store.Get(ctx, rule.ID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(updated.UpdatedAt).To(BeTemporally("==", original.UpdatedAt))
-			Expect(updated.Updater).To(Equal(original.Updater))
 		})
 	})
 
@@ -814,6 +814,135 @@ var _ = Describe("AlertStrategyService", func() {
 			stored, getErr := store.Get(ctx, ruleID)
 			Expect(getErr).NotTo(HaveOccurred())
 			Expect(stored.DisplayName).To(Equal("Delete Fail Test"))
+		})
+	})
+
+	Describe("DeleteByApp", func() {
+		It("should delete all strategies for the app", func() {
+			ws := &workspace.Workspace{ID: "test-ws"}
+			ws.BkSystems.BkMonitorProjectID = "-100"
+
+			firstID, err := store.Create(ctx, &AlertStrategy{
+				WorkspaceID:  "test-ws",
+				AppID:        "app-1",
+				AppName:      "demo-app",
+				StrategyCode: "delete_app_first",
+				DisplayName:  "Delete App First",
+				Threshold:    ThresholdConfig{Method: "gte", Value: 80},
+				EffectiveScope: EffectiveScope{
+					Type: EffectiveScopeAll,
+				},
+				RemoteRefs: []RemoteStrategyRef{{
+					EnvID:              bson.NewObjectID(),
+					EnvName:            "prod",
+					RemoteStrategyName: "demo-first",
+					RemoteStrategyID:   1001,
+				}},
+				Creator: "tester",
+				Updater: "tester",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			secondID, err := store.Create(ctx, &AlertStrategy{
+				WorkspaceID:  "test-ws",
+				AppID:        "app-1",
+				AppName:      "demo-app",
+				StrategyCode: "delete_app_second",
+				DisplayName:  "Delete App Second",
+				Threshold:    ThresholdConfig{Method: "gte", Value: 90},
+				EffectiveScope: EffectiveScope{
+					Type: EffectiveScopeAll,
+				},
+				RemoteRefs: []RemoteStrategyRef{{
+					EnvID:              bson.NewObjectID(),
+					EnvName:            "stag",
+					RemoteStrategyName: "demo-second",
+					RemoteStrategyID:   1002,
+				}},
+				Creator: "tester",
+				Updater: "tester",
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			err = svc.DeleteByApp(ctx, ws, "test-ws", "app-1", "tester")
+
+			Expect(err).NotTo(HaveOccurred())
+			_, err = store.Get(ctx, firstID)
+			Expect(err).To(Equal(ErrNotFound))
+			_, err = store.Get(ctx, secondID)
+			Expect(err).To(Equal(ErrNotFound))
+		})
+
+		It("should continue deleting later strategies when one delete fails", func() {
+			ws := &workspace.Workspace{ID: "test-ws"}
+			ws.BkSystems.BkMonitorProjectID = "-100"
+			failClient := &failOnNthDeleteAlertStrategyClient{
+				StubClient: bkmapi.NewStub("test-user"),
+				failAtCall: 1,
+				deleteErr:  bkmapi.ErrApmAppNotFound,
+			}
+			failSvc := newServiceWithClientFactory(
+				svc.store,
+				svc.envStore,
+				svc.appStore,
+				svc.snapshotStore,
+				func(_ string) (bkmapi.MonitorClient, error) {
+					return failClient, nil
+				},
+			)
+
+			_, err := store.Create(ctx, &AlertStrategy{
+				WorkspaceID:  "test-ws",
+				AppID:        "app-1",
+				AppName:      "demo-app",
+				StrategyCode: "delete_app_keep",
+				DisplayName:  "Delete App Keep",
+				Threshold:    ThresholdConfig{Method: "gte", Value: 80},
+				EffectiveScope: EffectiveScope{
+					Type: EffectiveScopeAll,
+				},
+				RemoteRefs: []RemoteStrategyRef{{
+					EnvID:              bson.NewObjectID(),
+					EnvName:            "prod",
+					RemoteStrategyName: "demo-keep",
+					RemoteStrategyID:   1101,
+				}},
+				Creator: "tester",
+				Updater: "tester",
+			})
+			Expect(err).NotTo(HaveOccurred())
+			_, err = store.Create(ctx, &AlertStrategy{
+				WorkspaceID:  "test-ws",
+				AppID:        "app-1",
+				AppName:      "demo-app",
+				StrategyCode: "delete_app_remove",
+				DisplayName:  "Delete App Remove",
+				Threshold:    ThresholdConfig{Method: "gte", Value: 90},
+				EffectiveScope: EffectiveScope{
+					Type: EffectiveScopeAll,
+				},
+				RemoteRefs: []RemoteStrategyRef{{
+					EnvID:              bson.NewObjectID(),
+					EnvName:            "stag",
+					RemoteStrategyName: "demo-remove",
+					RemoteStrategyID:   1102,
+				}},
+				Creator: "tester",
+				Updater: "tester",
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			ordered, err := store.ListByApp(ctx, "test-ws", "app-1")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(ordered).To(HaveLen(2))
+
+			err = failSvc.DeleteByApp(ctx, ws, "test-ws", "app-1", "tester")
+
+			Expect(err).To(HaveOccurred())
+			Expect(failClient.deleteReqs).To(HaveLen(2))
+			_, firstErr := store.Get(ctx, ordered[0].ID)
+			Expect(firstErr).NotTo(HaveOccurred())
+			_, secondErr := store.Get(ctx, ordered[1].ID)
+			Expect(secondErr).To(Equal(ErrNotFound))
 		})
 	})
 })

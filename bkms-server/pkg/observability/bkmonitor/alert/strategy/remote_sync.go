@@ -26,6 +26,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"golang.org/x/sync/errgroup"
 
 	log "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/logging"
 	envmodel "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env/model"
@@ -251,6 +252,72 @@ func (s *Service) SyncStrategiesForAppInEnv(
 	}
 }
 
+// ReconcileStrategiesForEnvTypeChange 在环境类型变更后，收敛该环境下受影响应用的告警策略远端状态。
+func (s *Service) ReconcileStrategiesForEnvTypeChange(
+	ctx context.Context,
+	ws *workspace.Workspace,
+	before, after envmodel.Environment,
+	operator string,
+) error {
+	// 环境 ID 不一致（非同一环境）或环境类型未变更时无需收敛，直接返回。
+	if before.ID != after.ID || before.Type == after.Type {
+		return nil
+	}
+
+	// 逐个处理受环境类型变更影响的应用：环境类型变更会改变应用与目标环境的匹配关系，
+	// 进而影响其告警策略在蓝鲸监控远端的预期状态，需要重新同步。
+	for _, appID := range affectedAppIDsForEnvTypeChange(before, after) {
+		// 查询该应用下的全部告警策略。
+		appStrategies, err := s.store.ListByApp(ctx, ws.ID, appID)
+		if err != nil {
+			return errors.Wrapf(err, "list alert strategies for app %s", appID)
+		}
+		// 查询该应用在新环境类型(after.Type)、新环境下已启用且匹配的策略。
+		matchedStrategies, err := s.store.ListEnabledByAppMatchingEnv(ctx, ws.ID, appID, after.Type, after.ID)
+		if err != nil {
+			return errors.Wrapf(err, "list matched alert strategies for app %s", appID)
+		}
+
+		// 以策略 ID 去重收集需要重新同步的候选策略：
+		// - 原有策略中，曾在该环境上存在远端引用（hasRemoteRefForEnv）的策略需要重新收敛；
+		// - 新环境类型下匹配生效的启用策略也需要同步到远端。
+		candidates := make(map[string]AlertStrategy, len(appStrategies)+len(matchedStrategies))
+		for _, strategy := range appStrategies {
+			if hasRemoteRefForEnv(strategy, after.ID) {
+				candidates[strategy.ID.Hex()] = strategy
+			}
+		}
+		for _, strategy := range matchedStrategies {
+			candidates[strategy.ID.Hex()] = strategy
+		}
+
+		// 对去重后的候选策略做受限并发同步，避免候选策略较多时串行收敛过慢。
+		const reconcileEnvTypeChangeMaxConcurrency = 4
+		g, gCtx := errgroup.WithContext(ctx)
+		g.SetLimit(reconcileEnvTypeChangeMaxConcurrency)
+		for _, strategy := range candidates {
+			strategy := strategy
+			g.Go(func() error {
+				if err := s.SyncToRemote(gCtx, ws, strategy.ID, operator); err != nil {
+					return errors.Wrapf(
+						err,
+						"reconcile strategy %s for env %s type change %s->%s",
+						strategy.ID.Hex(),
+						after.Name,
+						before.Type,
+						after.Type,
+					)
+				}
+				return nil
+			})
+		}
+		if err := g.Wait(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // CleanupStrategiesForAppInEnv 清理某个应用在指定环境或泳道下不再需要保留的远端策略引用。
 func (s *Service) CleanupStrategiesForAppInEnv(
 	ctx context.Context,
@@ -281,6 +348,30 @@ func (s *Service) CleanupStrategiesForAppInEnv(
 			log.Errorf(ctx, "cleanup strategy %s failed: %v", strategies[i].ID.Hex(), cleanupErr)
 		}
 	}
+}
+
+// affectedAppIDsForEnvTypeChange 收集环境类型变更前后可能受影响的全部应用 ID。
+//
+// 除了普通部署应用记录在 AppIDs 中，某些环境级能力的“所属应用”只会写在 OwnerAppID 上；
+// 因此这里需要同时合并 before/after 的 AppIDs 与 OwnerAppID，才能在环境类型变化后完整触发相关策略重收敛。
+func affectedAppIDsForEnvTypeChange(before, after envmodel.Environment) []string {
+	appIDs := append([]string(nil), before.AppIDs...)
+	appIDs = append(appIDs, after.AppIDs...)
+	if before.OwnerAppID != "" {
+		appIDs = append(appIDs, before.OwnerAppID)
+	}
+	if after.OwnerAppID != "" {
+		appIDs = append(appIDs, after.OwnerAppID)
+	}
+	return lo.Uniq(lo.Filter(appIDs, func(appID string, _ int) bool {
+		return appID != ""
+	}))
+}
+
+func hasRemoteRefForEnv(strategy AlertStrategy, envID bson.ObjectID) bool {
+	return lo.ContainsBy(strategy.RemoteRefs, func(ref RemoteStrategyRef) bool {
+		return ref.EnvID == envID
+	})
 }
 
 // ListRemoteStrategies 按分页查询当前工作空间在蓝鲸监控远端创建的策略列表。
