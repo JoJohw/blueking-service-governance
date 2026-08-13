@@ -1,0 +1,76 @@
+meta {
+  name: get-app-deploy-overview
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{serviceURL}}/apps/{{deployOverviewAppID}}/deploy-overview
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body: isJson
+}
+
+script:pre-request {
+  const common = require("./common")
+
+  if (!bru.getVar("deployOverviewAppID")) {
+    const suffix = bru.getVar("randomSuffix");
+    const workspaceID = `deploy-overview-ws-${suffix}`;
+    const appID = `deploy-overview-app-${suffix}`;
+
+    await common.createWorkspace({ id: workspaceID });
+    const app = await common.createTrpcApp({
+      id: appID,
+      name: appID,
+      workspaceID,
+    });
+
+    bru.setVar("deployOverviewWorkspaceID", workspaceID);
+    bru.setVar("deployOverviewAppID", app.id);
+  }
+}
+
+tests {
+  test("should get app deploy overview for trpc app", () => {
+    expect(res.body.data).to.be.an("array");
+
+    res.body.data.forEach((item) => {
+      expect(item).to.have.property("envID");
+      expect(item).to.have.property("envName");
+      expect(item).to.have.property("envDisplayName");
+      expect(item).to.have.property("envType");
+      expect(item).to.have.property("envKind");
+      expect(item).to.have.property("deployStatus");
+      expect(item).to.have.property("autoscaling");
+      expect(item).to.have.property("resources");
+      // instances may be null when workloads are not present in the test env
+      expect(item).to.have.property("instances");
+      // autoscaling is null when the env has no GPA config
+      if (item.autoscaling !== null) {
+        expect(item.autoscaling).to.have.property("enabled");
+        expect(item.autoscaling).to.have.property("minReplicas");
+        expect(item.autoscaling).to.have.property("maxReplicas");
+        expect(item.autoscaling).to.have.property("metrics");
+        expect(item.autoscaling).to.have.property("computeByLimits");
+        // status may be null when GPA is disabled / CR missing / cluster query failed
+        expect(item.autoscaling).to.have.property("status");
+        if (item.autoscaling.status !== null) {
+          expect(item.autoscaling.status).to.have.property("phase");
+          expect(item.autoscaling.status).to.have.property("statusMessage");
+          expect(item.autoscaling.status).to.have.property("currentReplicas");
+          expect(item.autoscaling.status).to.have.property("desiredReplicas");
+        }
+      }
+    });
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

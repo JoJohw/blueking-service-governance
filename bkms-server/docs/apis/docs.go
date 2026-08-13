@@ -3631,6 +3631,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/apps/{appID}/deploy-overview": {
+            "get": {
+                "security": [
+                    {
+                        "BkUserInfo": []
+                    },
+                    {
+                        "BkUserCredential": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "查询应用在各环境上的部署总览（仅 trpc/taf）",
+                "operationId": "GetAppDeployOverview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用 ID",
+                        "name": "appID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/serializer.GetAppDeployOverviewOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/{appID}/deploy-statuses": {
             "get": {
                 "security": [
@@ -18591,6 +18634,63 @@ const docTemplate = `{
                 }
             }
         },
+        "serializer.AppDeployOverviewEnvObj": {
+            "type": "object",
+            "properties": {
+                "autoscaling": {
+                    "description": "自动扩缩容配置摘要，可选：无 GPA 配置时为 null",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/serializer.DeployOverviewAutoscalingObj"
+                        }
+                    ]
+                },
+                "deployStatus": {
+                    "description": "部署状态（原始枚举）",
+                    "type": "string"
+                },
+                "envDisplayName": {
+                    "description": "环境展示名称",
+                    "type": "string"
+                },
+                "envID": {
+                    "description": "环境 ID",
+                    "type": "string"
+                },
+                "envKind": {
+                    "description": "环境类别（standard / feature）",
+                    "type": "string"
+                },
+                "envName": {
+                    "description": "环境名称（英文标识）",
+                    "type": "string"
+                },
+                "envType": {
+                    "description": "环境类型（development / test / staging / production）",
+                    "type": "string"
+                },
+                "instances": {
+                    "description": "实例数，可选：集群查询失败或缺少 workload 时为 null",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/serializer.DeployOverviewInstancesObj"
+                        }
+                    ]
+                },
+                "lastDeployStartedAt": {
+                    "description": "最近一次部署开始时间，可选：无部署记录时不返回该字段",
+                    "type": "string"
+                },
+                "resources": {
+                    "description": "资源规格（app-spec 生效值）",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/serializer.DeployOverviewResourcesObj"
+                        }
+                    ]
+                }
+            }
+        },
         "serializer.AppDetailOutputObj": {
             "type": "object",
             "properties": {
@@ -21578,6 +21678,118 @@ const docTemplate = `{
                 }
             }
         },
+        "serializer.DeployOverviewAutoscalingMetricObj": {
+            "type": "object",
+            "properties": {
+                "averageUtilization": {
+                    "description": "平均使用率阈值（百分比）",
+                    "type": "integer"
+                },
+                "resource": {
+                    "description": "指标资源类型：cpu / memory",
+                    "type": "string"
+                }
+            }
+        },
+        "serializer.DeployOverviewAutoscalingObj": {
+            "type": "object",
+            "properties": {
+                "computeByLimits": {
+                    "description": "利用率计算基准：true 以 limits 为基准，false 以 requests 为基准",
+                    "type": "boolean"
+                },
+                "enabled": {
+                    "description": "是否启用",
+                    "type": "boolean"
+                },
+                "maxReplicas": {
+                    "description": "最大副本数",
+                    "type": "integer"
+                },
+                "metrics": {
+                    "description": "指标模式扩缩容指标列表，仅配置定时扩缩容时为空数组",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/serializer.DeployOverviewAutoscalingMetricObj"
+                    }
+                },
+                "minReplicas": {
+                    "description": "最小副本数",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "集群 GPA CR 运行状态，可选：未启用 / CR 缺失 / 查询失败时为 null",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/serializer.DeployOverviewAutoscalingStatusObj"
+                        }
+                    ]
+                }
+            }
+        },
+        "serializer.DeployOverviewAutoscalingStatusObj": {
+            "type": "object",
+            "properties": {
+                "currentReplicas": {
+                    "description": "当前副本数",
+                    "type": "integer"
+                },
+                "desiredReplicas": {
+                    "description": "期望副本数",
+                    "type": "integer"
+                },
+                "lastScaleTime": {
+                    "description": "上次扩缩容时间（RFC3339 字符串），可选：尚未发生扩缩容时为空字符串",
+                    "type": "string"
+                },
+                "phase": {
+                    "description": "Phase：Active / Paused / Limited / Failed / Initializing / Unknown",
+                    "type": "string"
+                },
+                "statusMessage": {
+                    "description": "非 True condition 的汇总消息，可选：一切正常时为空字符串",
+                    "type": "string"
+                }
+            }
+        },
+        "serializer.DeployOverviewInstancesObj": {
+            "type": "object",
+            "properties": {
+                "abnormal": {
+                    "description": "存在但未 Ready 的 Pod 数",
+                    "type": "integer"
+                },
+                "expected": {
+                    "description": "期望副本数（workload spec.replicas）",
+                    "type": "integer"
+                },
+                "running": {
+                    "description": "Ready Pod 数",
+                    "type": "integer"
+                }
+            }
+        },
+        "serializer.DeployOverviewResourcesObj": {
+            "type": "object",
+            "properties": {
+                "cpuLimits": {
+                    "description": "CPU limits（Kubernetes quantity 字符串），可选：未配置时不返回该字段",
+                    "type": "string"
+                },
+                "cpuRequests": {
+                    "description": "CPU requests，可选：未配置时不返回该字段",
+                    "type": "string"
+                },
+                "memoryLimits": {
+                    "description": "Memory limits，可选：未配置时不返回该字段",
+                    "type": "string"
+                },
+                "memoryRequests": {
+                    "description": "Memory requests，可选：未配置时不返回该字段",
+                    "type": "string"
+                }
+            }
+        },
         "serializer.DeployableImageTagOutputObj": {
             "type": "object",
             "properties": {
@@ -22842,6 +23054,18 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/serializer.AppConfigFileVersionOutputObj"
+                }
+            }
+        },
+        "serializer.GetAppDeployOverviewOutput": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "已关联（AppIDs）环境行",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/serializer.AppDeployOverviewEnvObj"
+                    }
                 }
             }
         },
