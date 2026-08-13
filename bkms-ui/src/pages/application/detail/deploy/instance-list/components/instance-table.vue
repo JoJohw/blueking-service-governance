@@ -259,7 +259,9 @@
           </template>
           <template #default="{ row }: { row: AppInstanceOutputObj }">
             <StatusIcon
+              emphasized
               :message="row.status !== 'Running' ? row.message : ''"
+              :size="12"
               :status="row.status"
             />
           </template>
@@ -283,11 +285,13 @@
             <span v-else>{{ $t('健康状态') }}</span>
           </template>
           <template #default="{ row }: { row: AppInstanceOutputObj }">
-            <ColorIcon
-              class="inline-block"
-              :icon="row.isHealthy ? 'normal' : 'abnormal'"
-            />
-            {{ row.isHealthy ? 'Healthy' : 'UnHealthy' }}
+            <div class="flex items-center">
+              <StatusDotIcon
+                :icon="row.isHealthy ? 'normal' : 'abnormal'"
+                :size="12"
+              />
+              {{ row.isHealthy ? 'Healthy' : 'UnHealthy' }}
+            </div>
           </template>
         </TableColumn>
 
@@ -320,9 +324,9 @@
               :width="770"
             >
               <div class="inline-flex cursor-pointer items-center">
-                <ColorIcon
-                  class="mr-[4px]"
+                <StatusDotIcon
                   :icon="isPolarisHealthy(row) ? 'normal' : 'abnormal'"
+                  :size="12"
                 />
                 <span class="!border-b-[1px] !border-[#AFAFAF] !border-dashed">
                   {{ isPolarisHealthy(row) ? 'Healthy' : 'UnHealthy' }}
@@ -352,11 +356,13 @@
                       min-width="100"
                     >
                       <template #default="{ row: polarisRow }">
-                        <ColorIcon
-                          class="inline-block"
-                          :icon="polarisRow.isHealthy ? 'normal' : 'abnormal'"
-                        />
-                        {{ polarisRow.isHealthy ? 'Healthy' : 'UnHealthy' }}
+                        <div class="flex items-center">
+                          <StatusDotIcon
+                            :icon="polarisRow.isHealthy ? 'normal' : 'abnormal'"
+                            :size="12"
+                          />
+                          {{ polarisRow.isHealthy ? 'Healthy' : 'UnHealthy' }}
+                        </div>
                       </template>
                     </TableColumn>
                     <TableColumn
@@ -512,9 +518,9 @@
   import { AngleDownLine, RightShape } from 'bkui-vue/lib/icon';
   import { AppInstanceOutputObj } from '~/@types/v1/instance';
   import { InstanceService } from '~/api/modules/v1';
-  import ColorIcon from '~/components/color-icon.vue';
   import CustomFilter from '~/components/custom-filter.vue';
   import HoverCopy from '~/components/hover-copy.vue';
+  import StatusDotIcon from '~/components/status-dot-icon.vue';
   import StatusIcon from '~/components/status-icon.vue';
   import TableException from '~/components/table-exception.vue';
   import { envTypeMap, envTypeTagClassMap } from '~/composables/use-env-manager';
