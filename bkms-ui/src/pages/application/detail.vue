@@ -205,9 +205,7 @@
 
   watch(
     [activeKey, type, currentApplicationName],
-    (newValue, oldValue) => {
-      const [key, type, name] = newValue;
-      const [oldKey] = oldValue || [];
+    ([key, type, name], [oldKey]) => {
       if (name) {
         appDetailStore.updateAppName(name);
         appDetailStore.updateAppType(type);
@@ -217,22 +215,21 @@
         activeKey.value = 'info';
       } else if (isHelmLikeAppType(type) && HelmSpecNotHas.includes(key as string)) {
         activeKey.value = 'info';
-      } else {
-        if (key && type && name) {
-          // 只在真正切换菜单时清理 activeTab 参数，初始化时保留
-          const shouldClearActiveTab = oldKey && oldKey !== key;
-          const { activeTab, ...query } = router.currentRoute.value.query;
-
-          router.push({
-            name: 'detail',
-            params: {
-              type,
-              name,
-              menuName: key as string,
-            },
-            query: shouldClearActiveTab ? query : router.currentRoute.value.query,
-          });
-        }
+      } else if (key && type && name) {
+        // 同菜单内切换应用沿用 query：让新应用继承当前 Tab 等页面状态；跨菜单切换则重置为默认
+        const isMenuSwitch = oldKey && oldKey !== key;
+        // 快照当前 query 供新页 hook（useUrlQuerySync）接管：watch 同步阶段已固化进导航参数（快照），
+        // 旧页卸载时 hook 会清理自身字段，新页挂载时按该快照写回恢复，保证状态正确继承且不残留旧页字段
+        const snapshotQuery = router.currentRoute.value.query;
+        router.push({
+          name: 'detail',
+          params: {
+            type,
+            name,
+            menuName: key as string,
+          },
+          query: isMenuSwitch ? undefined : snapshotQuery,
+        });
       }
     },
     {

@@ -13,3 +13,11 @@
 3. yaml文件
    - 安装 VSCode 插件：[YAML (Red Hat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
    - 该插件可自动检测 YAML 文件中的重复 key、格式错误等问题
+
+4. 页面 URL query 同步（use-url-query-sync.ts）
+   - 页面状态与 URL query 双向同步（如 Tab 锚点），推荐优先使用该 hook，避免手写 route.query 读写
+   - 特殊场景：
+     - 数组模式：default 传 string[] 支持多值参数（如 envNames）
+     - override 返回空串：该字段不参与 URL 同步，挂载时从 URL 移除
+     - hook 卸载只清理本页声明字段，外部注入参数（如 envName）由消费页自行清理
+     - 跨页保留 query：同菜单切换应用由 detail.vue 的 push 携带；跨菜单切换不沿用，走页面默认值

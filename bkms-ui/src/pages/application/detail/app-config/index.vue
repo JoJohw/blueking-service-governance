@@ -33,11 +33,11 @@
 
 <script setup lang="ts">
   import type { Component } from 'vue';
-  import { computed, onMounted } from 'vue';
+  import { computed } from 'vue';
 
   import { useI18n } from 'vue-i18n';
-  import { useRoute, useRouter } from 'vue-router';
   import TabHeader from '~/components/tab-header.vue';
+  import { useUrlQuerySync } from '~/composables/use-url-query-sync';
 
   import DeployConfig from './deploy-config.vue';
   import EnvVariable from './env-variable.vue';
@@ -46,9 +46,6 @@
   import type { TabItem } from '~/components/tab-header.vue';
 
   const { t } = useI18n();
-
-  const route = useRoute();
-  const router = useRouter();
 
   // Tab 配置（扩展 TabItem，添加组件字段）
   interface TabConfig extends TabItem {
@@ -61,40 +58,21 @@
     { label: t('环境变量'), name: 'env-variable', component: EnvVariable },
   ];
 
-  // 从路由 query 中获取 activeTab，如果没有则使用第一项
-  const activeTab = computed({
-    get: () => {
-      const tabFromQuery = route.query.activeTab as string;
-      // 如果有有效的 tab 参数，返回它；否则返回第一项
-      return tabFromQuery && tabList.some(tab => tab.name === tabFromQuery)
-        ? tabFromQuery
-        : tabList[0]?.name || 'deploy-config';
-    },
-    set: (value: string) => {
-      router.replace({
-        query: {
-          ...route.query,
-          activeTab: value,
-        },
-      });
+  // Tab 与 URL query（activeTab）双向同步锚定
+  const { fields } = useUrlQuerySync({
+    activeTab: {
+      queryKey: 'activeTab',
+      data: {
+        allowed: tabList.map(tab => tab.name),
+        default: tabList[0]?.name || 'deploy-config',
+      },
     },
   });
+  const activeTab = fields.activeTab;
 
   // 当前显示的组件
   const currentComponent = computed(() => {
     const tab = tabList.find(item => item.name === activeTab.value);
     return tab?.component || DeployConfig;
-  });
-
-  // 首次进入时，如果没有 activeTab 参数，则添加默认值到 URL
-  onMounted(() => {
-    if (!route.query.activeTab) {
-      router.replace({
-        query: {
-          ...route.query,
-          activeTab: tabList[0]?.name || 'deploy-config',
-        },
-      });
-    }
   });
 </script>

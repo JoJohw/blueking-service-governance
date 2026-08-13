@@ -47,12 +47,12 @@
 
 <script setup lang="ts">
   import type { Component } from 'vue';
-  import { computed, nextTick, onBeforeUnmount, watch } from 'vue';
+  import { computed } from 'vue';
 
   import { useI18n } from 'vue-i18n';
-  import { useRoute, useRouter } from 'vue-router';
   import TabHeader from '~/components/tab-header.vue';
   import { isHelmLikeAppType } from '~/composables/app-type';
+  import { useUrlQuerySync } from '~/composables/use-url-query-sync';
   import { useAppDetail } from '~/stores/app-detail';
 
   import ContainerImage from './container-image.vue';
@@ -62,11 +62,9 @@
 
   const { t } = useI18n();
 
-  const route = useRoute();
-  const router = useRouter();
   const appDetailStore = useAppDetail();
 
-  /** 是否为 Helm-like 应用（显示 TabHeader） */
+  /** 是否为 Helm-like 应用（显示 TabHeader）；非 helm-like 无 Tab，activeTab 固定为默认值 */
   const isHelmLike = computed(() => isHelmLikeAppType(appDetailStore.appType));
 
   interface TabConfig extends TabItem {
@@ -78,56 +76,22 @@
     { label: t('Helm Chart'), name: 'helm-chart', component: HelmChart },
   ];
 
-  // 从路由 query 中获取 activeTab
-  const activeTab = computed({
-    get: () => {
-      const tabFromQuery = route.query.activeTab as string;
-      return tabFromQuery && tabList.some(tab => tab.name === tabFromQuery)
-        ? tabFromQuery
-        : tabList[0]?.name || 'container-image';
-    },
-    set: (value: string) => {
-      router.push({
-        query: {
-          ...route.query,
-          activeTab: value,
-        },
-      });
+  // Tab 与 URL query（activeTab）双向同步锚定；非 helm-like 应用无 Tab，activeTab 不参与 URL 同步
+  const { fields } = useUrlQuerySync({
+    activeTab: {
+      queryKey: 'activeTab',
+      data: {
+        allowed: tabList.map(tab => tab.name),
+        default: tabList[0]?.name || 'container-image',
+        override: valueFromQuery => (isHelmLike.value ? (valueFromQuery ?? tabList[0]?.name) : ''),
+      },
     },
   });
+  const activeTab = fields.activeTab;
 
   // 根据 activeTab 获取当前要显示的组件
   const currentTabComponent = computed(() => {
     const currentTab = tabList.find(tab => tab.name === activeTab.value);
     return currentTab?.component || tabList[0]?.component;
-  });
-
-  // 监听路由变化，确保 activeTab 有效
-  watch(
-    () => route.query.activeTab,
-    newTab => {
-      if (newTab && !tabList.some(tab => tab.name === newTab)) {
-        router.replace({
-          query: {
-            ...route.query,
-            activeTab: tabList[0]?.name || 'container-image',
-          },
-        });
-      }
-    },
-  );
-
-  // 组件卸载前清除 activeTab query 参数
-  onBeforeUnmount(() => {
-    if (route.query.activeTab) {
-      const { activeTab, ...restQuery } = route.query;
-      nextTick(() => {
-        if (router.currentRoute.value.query.activeTab) {
-          router.replace({
-            query: restQuery,
-          });
-        }
-      });
-    }
   });
 </script>
