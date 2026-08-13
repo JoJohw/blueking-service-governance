@@ -19,6 +19,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
@@ -267,7 +268,14 @@ func (h *Handler) ExportPublicScopedEnvVars(c *gin.Context) {
 		return
 	}
 
-	writeEnvFileAttachment(c, "public-scoped-env-vars.env", content)
+	writeEnvFileAttachment(
+		c,
+		buildExportFilename(
+			ws.ID,
+			"public-scoped-env-vars.env",
+		),
+		content,
+	)
 }
 
 // ExportEnvScopedEnvVars 下载单环境环境变量。
@@ -302,7 +310,16 @@ func (h *Handler) ExportEnvScopedEnvVars(c *gin.Context) {
 		return
 	}
 
-	writeEnvFileAttachment(c, buildFilename("env", environment.Name, "scoped-env-vars.env"), content)
+	writeEnvFileAttachment(
+		c,
+		buildExportFilename(
+			environment.WorkspaceID,
+			"env",
+			environment.Name,
+			"scoped-env-vars.env",
+		),
+		content,
+	)
 }
 
 // ExportAppEnvVars 下载应用环境变量。
@@ -331,64 +348,75 @@ func (h *Handler) ExportAppEnvVars(c *gin.Context) {
 	ctx := c.Request.Context()
 	switch queryInput.Scope {
 	case exportScopeAppDefined:
-		app, err := perm.ValidateAppByID(ctx, h.registry, uriInput.AppID, perm.TypeEdit)
-		if err != nil {
-			bkerrs.AbortWithErr(c, err)
-			return
-		}
-		if err = ensureAppSupportsDefinedEnvVars(app); err != nil {
-			bkerrs.AbortWithErr(c, err)
-			return
-		}
-
-		content, err := h.newExportService().ExportAppDefined(ctx, app.ID)
-		if err != nil {
-			bkerrs.AbortWithErr(c, bkerrs.Wrap(err, bkerrs.ErrCodeInternalServerError, "export app defined env vars"))
-			return
-		}
-		writeEnvFileAttachment(c, buildFilename("app", app.Name, "env-vars.env"), content)
+		h.exportAppDefinedEnvVars(ctx, c, uriInput.AppID)
 	case exportScopeEffectiveByEnv:
-		// 最终生效变量的导出必须带环境名，因为结果依赖该环境下
-		// workspace / envType / env / app 的层叠覆盖关系。
-		if strings.TrimSpace(queryInput.EnvName) == "" {
-			bkerrs.AbortWithErr(
-				c,
-				bkerrs.Errorf(
-					bkerrs.ErrCodeInvalidRequest,
-					"envName is required when scope=%s",
-					exportScopeEffectiveByEnv,
-				),
-			)
-			return
-		}
-		app, environment, err := perm.ValidateAppEnvByName(
-			ctx,
-			h.registry,
-			uriInput.AppID,
-			queryInput.EnvName,
-			perm.TypeEdit,
-		)
-		if err != nil {
-			bkerrs.AbortWithErr(c, err)
-			return
-		}
-		if err = ensureAppSupportsDefinedEnvVars(app); err != nil {
-			bkerrs.AbortWithErr(c, err)
-			return
-		}
-
-		content, err := h.newExportService().ExportEffectiveAppEnv(ctx, app, environment)
-		if err != nil {
-			bkerrs.AbortWithErr(
-				c,
-				bkerrs.Wrap(err, bkerrs.ErrCodeInternalServerError, "export effective app env vars"),
-			)
-			return
-		}
-		writeEnvFileAttachment(c, buildFilename("app", app.Name, environment.Name, "effective-env-vars.env"), content)
+		h.exportEffectiveAppEnvVars(ctx, c, uriInput.AppID, queryInput.EnvName)
 	default:
 		bkerrs.AbortWithErr(c, bkerrs.Errorf(bkerrs.ErrCodeInvalidRequest, "unsupported export scope"))
 	}
+}
+
+func (h *Handler) exportAppDefinedEnvVars(ctx context.Context, c *gin.Context, appID string) {
+	app, err := perm.ValidateAppByID(ctx, h.registry, appID, perm.TypeEdit)
+	if err != nil {
+		bkerrs.AbortWithErr(c, err)
+		return
+	}
+	if err = ensureAppSupportsDefinedEnvVars(app); err != nil {
+		bkerrs.AbortWithErr(c, err)
+		return
+	}
+
+	content, err := h.newExportService().ExportAppDefined(ctx, app.ID)
+	if err != nil {
+		bkerrs.AbortWithErr(c, bkerrs.Wrap(err, bkerrs.ErrCodeInternalServerError, "export app defined env vars"))
+		return
+	}
+	writeEnvFileAttachment(
+		c,
+		buildExportFilename(app.WorkspaceID, "app", app.Name, "env-vars.env"),
+		content,
+	)
+}
+
+func (h *Handler) exportEffectiveAppEnvVars(
+	ctx context.Context,
+	c *gin.Context,
+	appID, envName string,
+) {
+	// 最终生效变量的导出必须带环境名，因为结果依赖该环境下
+	// workspace / envType / env / app 的层叠覆盖关系。
+	if strings.TrimSpace(envName) == "" {
+		bkerrs.AbortWithErr(
+			c,
+			bkerrs.Errorf(
+				bkerrs.ErrCodeInvalidRequest,
+				"envName is required when scope=%s",
+				exportScopeEffectiveByEnv,
+			),
+		)
+		return
+	}
+	app, environment, err := perm.ValidateAppEnvByName(ctx, h.registry, appID, envName, perm.TypeEdit)
+	if err != nil {
+		bkerrs.AbortWithErr(c, err)
+		return
+	}
+	if err = ensureAppSupportsDefinedEnvVars(app); err != nil {
+		bkerrs.AbortWithErr(c, err)
+		return
+	}
+
+	content, err := h.newExportService().ExportEffectiveAppEnv(ctx, app, environment)
+	if err != nil {
+		bkerrs.AbortWithErr(c, bkerrs.Wrap(err, bkerrs.ErrCodeInternalServerError, "export effective app env vars"))
+		return
+	}
+	writeEnvFileAttachment(
+		c,
+		buildExportFilename(app.WorkspaceID, "app", app.Name, environment.Name, "effective-env-vars.env"),
+		content,
+	)
 }
 
 // DownloadScopedEnvVarTemplate 下载 scoped 环境变量导入模板。
@@ -444,9 +472,11 @@ func writeEnvFileAttachment(c *gin.Context, filename, content string) {
 	c.Data(http.StatusOK, httpresp.AttachmentContentType, []byte(content))
 }
 
-func buildFilename(parts ...string) string {
-	sanitized := make([]string, 0, len(parts))
-	for _, part := range parts {
+// buildExportFilename 基于工作空间 ID 拼接导出文件名。
+// 会先把 workspaceID 作为前缀，再追加其余 parts，并在拼接前过滤空白项。
+func buildExportFilename(workspaceID string, parts ...string) string {
+	sanitized := make([]string, 0, len(parts)+1)
+	for _, part := range append([]string{workspaceID}, parts...) {
 		trimmed := strings.TrimSpace(part)
 		if trimmed == "" {
 			continue
