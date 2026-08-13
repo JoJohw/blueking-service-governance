@@ -492,15 +492,9 @@
     });
   }
 
-  // env详情
+  // env详情（URL 的 active 由环境详情组件的 hook 统一写回，避免与组件挂载写回产生竞态）
   function handleShowEnvDetail(row: EnvOutput) {
     curRow.value = row;
-    // 更新query参数
-    router.replace({
-      query: {
-        active: row.name,
-      },
-    });
     nextTick(() => {
       envDetailRef.value?.show();
     });

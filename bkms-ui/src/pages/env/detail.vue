@@ -58,7 +58,6 @@
       :label-height="42"
       type="card-tab"
       :validate-active="false"
-      @change="handleChangeDetail"
     >
       <!-- <Tab.TabPanel name="overview" :label="$t('概览')">概览</Tab.TabPanel>
       <Tab.TabPanel name="applicationList" :label="$t('应用列表')">应用列表</Tab.TabPanel>
@@ -156,17 +155,18 @@
   </SlideDetail>
 </template>
 <script lang="ts" setup>
-  import { computed, onMounted, ref, watch } from 'vue';
+  import { computed, ref, watch } from 'vue';
 
   import { Dropdown, Tab, Tag } from 'bkui-vue';
   import { Ellipsis } from 'bkui-vue/lib/icon';
-  import { useRoute, useRouter } from 'vue-router';
+  import { useRoute } from 'vue-router';
   import { GetEnvApmOutput } from '~/@types/v1/bkintegrations-bkmonitor';
   import { EnvOutput } from '~/@types/v1/env';
   import { BkintegrationsBkmonitorService } from '~/api/modules/v1';
   import MonitorIframe from '~/components/monitor-iframe.vue';
   import SlideDetail from '~/components/slide-detail.vue';
   import { envTypeMap, envTypeTagClassMap } from '~/composables/use-env-manager';
+  import { useUrlQuerySync } from '~/composables/use-url-query-sync';
 
   import ApmInstance from './apm-instance.vue';
   import BasicInfo from './basic-info.vue';
@@ -196,11 +196,36 @@
   const props = defineProps<IProps>();
   const emits = defineEmits(['update', 'delete']);
 
-  const router = useRouter();
   const route = useRoute();
   const slideDetailRef = ref<InstanceType<typeof SlideDetail>>();
 
-  const activeTabName = ref<ActiveTabType>(props.activeTab || 'basicInfo');
+  // 侧滑状态与 URL query 双向同步锚定：activeTab 记忆 Tab，active 定位当前环境（供刷新后恢复）
+  const { fields } = useUrlQuerySync({
+    activeTab: {
+      queryKey: 'activeTab',
+      data: {
+        allowed: ACTIVE_TABS,
+        default: props.activeTab || 'basicInfo',
+      },
+    },
+    active: {
+      queryKey: 'active',
+      data: {
+        default: props.data?.name || '',
+      },
+    },
+  });
+  const activeTabName = fields.activeTab;
+
+  // 切换环境时同步 URL 的 active（default 为静态值，环境变化需主动写回）
+  watch(
+    () => props.data?.name,
+    name => {
+      if (name && name !== route.query.active) {
+        fields.active.value = name;
+      }
+    },
+  );
 
   const tabKey = computed(() => props.data?.createdAt?.toString() || Date.now().toString());
 
@@ -238,18 +263,6 @@
     return currentApm.value?.name || props.data.name;
   });
 
-  // 切换详情
-  function handleChangeDetail(active: ActiveTabType) {
-    activeTabName.value = active;
-    // 更新query参数
-    router.replace({
-      query: {
-        active: props?.data?.name,
-        activeTab: activeTabName.value,
-      },
-    });
-  }
-
   // 删除环境
   function handleDeleteEnv() {
     emits('delete', props.data);
@@ -264,22 +277,6 @@
   function show() {
     slideDetailRef.value?.show();
   }
-
-  onMounted(() => {
-    // 判断 route.query.activeTab 的值是否为有效的 Tab 类型
-    const queryTab = route.query.activeTab as string;
-    if (queryTab && ACTIVE_TABS.includes(queryTab as ActiveTabType)) {
-      activeTabName.value = queryTab as ActiveTabType;
-    } else {
-      activeTabName.value = props.activeTab || 'basicInfo';
-      router.replace({
-        query: {
-          ...route.query,
-          activeTab: activeTabName.value,
-        },
-      });
-    }
-  });
 
   watch([activeTabName, () => props.data?.id], getEnvApm, { immediate: true });
 
