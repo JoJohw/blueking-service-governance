@@ -26,9 +26,12 @@
     @hidden="handleHidden"
   >
     <div class="flex flex-col px-6 pt-[18px] pb-6 h-full gap-[16px]">
+      <!-- 提示信息 -->
+      <Alert theme="info"> {{ $t('可添加公共环境变量，对全部环境或某类环境生效。') }} </Alert>
+
       <!-- 操作栏：新增按钮 + Tab 筛选 + 搜索 -->
       <div class="flex items-center justify-between flex-wrap">
-        <div class="flex items-center gap-[12px]">
+        <div class="flex items-center gap-[8px]">
           <Button
             theme="primary"
             @click="handleCreate"
@@ -39,45 +42,52 @@
             />
             {{ $t('新增环境变量') }}
           </Button>
-          <Radio.Group
-            v-model="activeTab"
-            type="capsule"
+          <Button @click="showImportSlider = true">
+            <i class="bkms-icon bkms-icon-daoru mr-[6px] text-[#979BA5]"></i>
+            {{ $t('导入') }}
+          </Button>
+          <Button
+            :loading="isExporting"
+            @click="handleExport"
           >
-            <Radio.Button
-              v-for="tab in tabs"
-              :key="tab.key"
-              :label="tab.key"
-            >
-              <div class="flex items-center justify-center">
-                {{ tab.label }}
-                <span
-                  :class="[
-                    'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-[8px]',
-                    tab.key === activeTab ? 'bg-[#E1ECFF] text-[#3A84FF]' : 'bg-[#fff]',
-                  ]"
-                  >{{ tab.count }}</span
-                >
-              </div>
-            </Radio.Button>
-          </Radio.Group>
+            <i class="bkms-icon bkms-icon-daochu mr-[6px] text-[#979BA5]"></i>
+            {{ $t('导出') }}
+          </Button>
         </div>
-        <SearchSelect
-          v-model="searchValue"
-          class="w-[360px]"
-          :data="searchSelectData"
-          :placeholder="
-            createPlaceholder({
-              type: 'searchSelect',
-              labels: ['Key', 'Value', '描述', '生效环境类型'],
-            })
-          "
-          unique-select
-          value-behavior="need-key"
-        />
+        <Radio.Group
+          v-model="activeTab"
+          type="capsule"
+        >
+          <Radio.Button
+            v-for="tab in tabs"
+            :key="tab.key"
+            :label="tab.key"
+          >
+            <div class="flex items-center justify-center">
+              {{ tab.label }}
+              <span
+                :class="[
+                  'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-[8px]',
+                  tab.key === activeTab ? 'bg-[#E1ECFF] text-[#3A84FF]' : 'bg-[#fff]',
+                ]"
+                >{{ tab.count }}</span
+              >
+            </div>
+          </Radio.Button>
+        </Radio.Group>
       </div>
-
-      <!-- 提示信息 -->
-      <Alert theme="info"> {{ $t('可添加公共环境变量，对全部环境或某类环境生效。') }} </Alert>
+      <SearchSelect
+        v-model="searchValue"
+        :data="searchSelectData"
+        :placeholder="
+          createPlaceholder({
+            type: 'searchSelect',
+            labels: ['Key', 'Value', '描述', '生效环境类型'],
+          })
+        "
+        unique-select
+        value-behavior="need-key"
+      />
 
       <Table
         class="public-env-var-table"
@@ -219,6 +229,19 @@
       :workspace-id="space"
       @deleted="fetchList"
     />
+
+    <!-- 公共环境变量导入侧栏 -->
+    <EnvVarsImportSideslider
+      v-model:visible="showImportSlider"
+      :download-template-request="handleDownloadTemplateRequest"
+      :import-request="handleImportRequest"
+      :preview-request="handlePreviewRequest"
+      show-effective-scope
+      :show-target-info="false"
+      template-filename="scoped-env-vars-template.env"
+      :title="$t('导入公共环境变量')"
+      @success="fetchList"
+    />
   </Sideslider>
 </template>
 
@@ -229,12 +252,13 @@
   import { Alert, Button, Radio, SearchSelect, Sideslider, Tag } from 'bkui-vue';
   import { Plus } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
-  import { ScopedEnvVarOutputObj } from '~/@types/v1/envvars';
   import { EnvvarsService } from '~/api/modules/v1';
   import { sortByDate } from '~/common/util';
   import SensitiveValuePlaceholder from '~/components/editable-variable-table/sensitive-value-placeholder.vue';
+  import EnvVarsImportSideslider from '~/components/env-vars-import-sideslider.vue';
   import HoverCopy from '~/components/hover-copy.vue';
   import TableException from '~/components/table-exception.vue';
+  import { useFileExport } from '~/composables/use-file-export';
   import { getScopeDisplay } from '~/composables/use-scope-display';
   import useSearchFilter from '~/composables/use-search-filter';
   import { useSearchPlaceholder } from '~/composables/use-search-placeholder';
@@ -244,6 +268,11 @@
   import EnvVarFormDialog from './env-var-form-dialog.vue';
 
   import type { ISearchItem, ISearchValue } from 'bkui-vue/lib/search-select/utils';
+  import type {
+    DownloadScopedEnvVarTemplateRequest,
+    ExportPublicScopedEnvVarsRequest,
+    ScopedEnvVarOutputObj,
+  } from '~/@types/v1/envvars';
 
   interface Emits {
     (e: 'update:visible', value: boolean): void;
@@ -259,6 +288,8 @@
 
   const { t } = useI18n();
   const { createPlaceholder } = useSearchPlaceholder();
+  const showImportSlider = ref(false);
+  const { exportFile, isExporting } = useFileExport();
 
   const visible = computed({
     get: () => props.visible,
@@ -425,10 +456,29 @@
     isShowDeleteDialog.value = true;
   }
 
+  function handleDownloadTemplateRequest() {
+    return EnvvarsService.downloadScopedEnvVarTemplate<DownloadScopedEnvVarTemplateRequest, Response>(undefined, {
+      originalResponse: true,
+    });
+  }
+
   /** 编辑 */
   function handleEdit(row: ScopedEnvVarOutputObj) {
     editingVar.value = row;
     isShowFormDialog.value = true;
+  }
+
+  /** 导出工作空间的全部公共环境变量 */
+  function handleExport() {
+    if (!props.space) return;
+    return exportFile({
+      request: () =>
+        EnvvarsService.exportPublicScopedEnvVars<ExportPublicScopedEnvVarsRequest, Response>(
+          { workspaceID: props.space },
+          { originalResponse: true },
+        ),
+      fallbackFilename: 'public-scoped-env-vars.env',
+    });
   }
 
   /** 面板关闭时重置状态 */
@@ -438,6 +488,14 @@
     activeTab.value = 'all';
     editingVar.value = null;
     deletingVar.value = null;
+    showImportSlider.value = false;
+  }
+
+  function handleImportRequest(file: File) {
+    return EnvvarsService.importPublicScopedEnvVar(
+      { workspaceID: props.space, file },
+      { interceptorErr: false, multipart: true },
+    );
   }
 
   /** 从列表数据中提取去重值，填充筛选项 children */
@@ -474,6 +532,13 @@
 
     if (keyItem) keyItem.children = toChildren(keySet, hasEmptyKey);
     if (valueItem) valueItem.children = toChildren(valueSet, hasEmptyValue);
+  }
+
+  function handlePreviewRequest(file: File) {
+    return EnvvarsService.previewPublicScopedEnvVar(
+      { workspaceID: props.space, file },
+      { interceptorErr: false, multipart: true },
+    );
   }
 
   watch(
