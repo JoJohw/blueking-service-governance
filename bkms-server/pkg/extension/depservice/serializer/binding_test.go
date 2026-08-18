@@ -16,19 +16,20 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-package model
+package serializer
 
-import (
-	"go.uber.org/fx"
+import "testing"
 
-	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/database"
-)
+func TestValidateEnvVars(t *testing.T) {
+	t.Parallel()
 
-var FxModule = fx.Module("depservice",
-	database.PrivateFxModule,
-	fx.Provide(
-		fx.Annotate(NewServiceStoreMongo, fx.As(new(ServiceStore))),
-		NewServiceInstanceStoreMongo,
-		NewServiceBindingStoreMongo,
-	),
-)
+	if err := ValidateEnvVars(nil); err != nil {
+		t.Fatalf("empty env vars should pass, got %v", err)
+	}
+	if err := ValidateEnvVars(map[string]string{"REDIS_HOST": "${{env.REDIS_HOST}}"}); err != nil {
+		t.Fatalf("valid env vars should pass, got %v", err)
+	}
+	if err := ValidateEnvVars(map[string]string{"1INVALID": "x"}); err == nil {
+		t.Fatal("invalid key should fail")
+	}
+}

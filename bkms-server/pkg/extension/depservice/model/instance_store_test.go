@@ -104,6 +104,13 @@ var _ = Describe("Test ServiceInstanceStoreMongo", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
+		It("rejects duplicate names in the same workspace and service", func() {
+			dup := *initInst
+			dup.ID = bson.NilObjectID
+			_, err := store.Create(ctx, &dup)
+			Expect(err).To(MatchError(ErrInstanceNameExists))
+		})
+
 		It("test create rejects workspace scope with non-empty scopeValue", func() {
 			inst := &ServiceInstance{
 				Name:         "test-name" + stringx.Random(6),
@@ -157,6 +164,19 @@ var _ = Describe("Test ServiceInstanceStoreMongo", func() {
 			Expect(inst.ServiceName).To(Equal(initInst.ServiceName))
 			Expect(inst.Config).To(Equal(initInst.Config))
 			Expect(inst.Credentials).To(Equal(initInst.Credentials))
+		})
+
+		It("lists instances by ids and omits missing ones", func() {
+			instList, err := store.ListByIDs(ctx, []bson.ObjectID{initInstID, bson.NewObjectID()})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(instList).To(HaveLen(1))
+			Expect(instList[0].ID).To(Equal(initInstID))
+		})
+
+		It("returns empty when listing by empty ids", func() {
+			instList, err := store.ListByIDs(ctx, nil)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(instList).To(BeEmpty())
 		})
 
 		It("test update config", func() {
@@ -235,18 +255,14 @@ var _ = Describe("Test ServiceInstanceStoreMongo", func() {
 		It("test update", func() {
 			newConfig := map[string]any{stringx.Random(6): stringx.Random(6), "updated": true}
 			newCreds := map[string]any{"new_username": stringx.Random(6), "new_password": stringx.Random(6)}
-			newCustomEnvVars := map[string]string{
-				"FOO_DSN": "foo://${{FOO_USER}}@${{FOO_HOST}}",
-			}
 			newOperator := "test-operator-" + stringx.Random(6)
 
 			updateData := &SvcInstUpdateData{
-				ScopeType:     ScopeTypeWorkspace,
-				ScopeValue:    "",
-				Config:        newConfig,
-				Credentials:   newCreds,
-				CustomEnvVars: newCustomEnvVars,
-				Operator:      newOperator,
+				ScopeType:   ScopeTypeWorkspace,
+				ScopeValue:  "",
+				Config:      newConfig,
+				Credentials: newCreds,
+				Operator:    newOperator,
 			}
 
 			err := store.Update(ctx, initInstID, updateData)
@@ -259,7 +275,6 @@ var _ = Describe("Test ServiceInstanceStoreMongo", func() {
 			Expect(inst.ScopeValue).To(Equal(""))
 			Expect(inst.Config).To(Equal(newConfig))
 			Expect(inst.Credentials).To(Equal(newCreds))
-			Expect(inst.CustomEnvVars).To(Equal(newCustomEnvVars))
 			Expect(inst.Operator).To(Equal(newOperator))
 
 			// 还原数据
@@ -280,82 +295,6 @@ var _ = Describe("Test ServiceInstanceStoreMongo", func() {
 				Operator:   "x",
 			})
 			Expect(err).To(HaveOccurred())
-		})
-
-		It("test attach/detach app", func() {
-			appID1 := "app-id-" + stringx.Random(6)
-			appID2 := "app-id-" + stringx.Random(6)
-			appID3 := "app-id-" + stringx.Random(6)
-
-			// 关联第一个应用
-			err := store.AttachApp(ctx, initInstID, appID1)
-			Expect(err).NotTo(HaveOccurred())
-
-			inst, err := store.Get(ctx, initInstID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(inst.AttachedApps).To(ContainElement(appID1))
-			Expect(inst.AttachedApps).To(HaveLen(1))
-
-			// 关联第二个应用
-			err = store.AttachApp(ctx, initInstID, appID2)
-			Expect(err).NotTo(HaveOccurred())
-
-			inst, err = store.Get(ctx, initInstID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(inst.AttachedApps).To(ContainElement(appID1))
-			Expect(inst.AttachedApps).To(ContainElement(appID2))
-			Expect(inst.AttachedApps).To(HaveLen(2))
-
-			// 重复关联同一个应用，应该不会重复
-			err = store.AttachApp(ctx, initInstID, appID1)
-			Expect(err).NotTo(HaveOccurred())
-
-			inst, err = store.Get(ctx, initInstID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(inst.AttachedApps).To(HaveLen(2))
-
-			// 关联第三个应用
-			err = store.AttachApp(ctx, initInstID, appID3)
-			Expect(err).NotTo(HaveOccurred())
-
-			inst, err = store.Get(ctx, initInstID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(inst.AttachedApps).To(HaveLen(3))
-
-			// 解关联第一个应用
-			err = store.DetachApp(ctx, initInstID, appID1)
-			Expect(err).NotTo(HaveOccurred())
-
-			inst, err = store.Get(ctx, initInstID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(inst.AttachedApps).To(ContainElement(appID2))
-			Expect(inst.AttachedApps).To(ContainElement(appID3))
-			Expect(inst.AttachedApps).To(HaveLen(2))
-
-			// 解关联第二个应用
-			err = store.DetachApp(ctx, initInstID, appID2)
-			Expect(err).NotTo(HaveOccurred())
-
-			inst, err = store.Get(ctx, initInstID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(inst.AttachedApps).To(ContainElement(appID3))
-			Expect(inst.AttachedApps).To(HaveLen(1))
-
-			// 重复解关联同一个应用，应该不会报错
-			err = store.DetachApp(ctx, initInstID, appID1)
-			Expect(err).NotTo(HaveOccurred())
-
-			inst, err = store.Get(ctx, initInstID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(inst.AttachedApps).To(HaveLen(1))
-
-			// 解关联最后一个应用
-			err = store.DetachApp(ctx, initInstID, appID3)
-			Expect(err).NotTo(HaveOccurred())
-
-			inst, err = store.Get(ctx, initInstID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(inst.AttachedApps).To(BeEmpty())
 		})
 
 		Context("test list service instances", func() {
@@ -441,70 +380,6 @@ var _ = Describe("Test ServiceInstanceStoreMongo", func() {
 				})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(instList).To(BeEmpty())
-			})
-
-			It("test list by attachedAppID: only returns instances attached to the given app", func() {
-				appID1 := "app-id-" + stringx.Random(6)
-				appID2 := "app-id-" + stringx.Random(6)
-
-				// initInst attach appID1, envTypeInst attach appID2
-				Expect(store.AttachApp(ctx, initInstID, appID1)).NotTo(HaveOccurred())
-				Expect(store.AttachApp(ctx, envTypeInstID, appID2)).NotTo(HaveOccurred())
-
-				// 按 appID1 过滤, 只应返回 initInst
-				instList, err := store.List(ctx, &SvcInstQueryOptions{
-					WorkspaceID:   initInst.WorkspaceID,
-					AttachedAppID: appID1,
-				})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(instList).To(HaveLen(1))
-				Expect(instList[0].ID).To(Equal(initInstID))
-
-				// 按 appID2 过滤, 只应返回 envTypeInst
-				instList, err = store.List(ctx, &SvcInstQueryOptions{
-					WorkspaceID:   initInst.WorkspaceID,
-					AttachedAppID: appID2,
-				})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(instList).To(HaveLen(1))
-				Expect(instList[0].ID).To(Equal(envTypeInstID))
-
-				// 按不存在的 appID 过滤, 应返回空
-				instList, err = store.List(ctx, &SvcInstQueryOptions{
-					WorkspaceID:   initInst.WorkspaceID,
-					AttachedAppID: "non-existent-app-id",
-				})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(instList).To(BeEmpty())
-			})
-
-			It("test list by attachedAppID: combined with env filters", func() {
-				appID := "app-id-" + stringx.Random(6)
-
-				// initInst 和 envTypeInst 都 attach 同一个 app
-				Expect(store.AttachApp(ctx, initInstID, appID)).NotTo(HaveOccurred())
-				Expect(store.AttachApp(ctx, envTypeInstID, appID)).NotTo(HaveOccurred())
-
-				// 同时按 appID + env 过滤, 应命中两个实例
-				instList, err := store.List(ctx, &SvcInstQueryOptions{
-					WorkspaceID:   initInst.WorkspaceID,
-					AttachedAppID: appID,
-					EnvName:       initInst.ScopeValue,
-					EnvType:       "test",
-				})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(instList).To(HaveLen(2))
-
-				// envType 不匹配时, envTypeInst 不应命中
-				instList, err = store.List(ctx, &SvcInstQueryOptions{
-					WorkspaceID:   initInst.WorkspaceID,
-					AttachedAppID: appID,
-					EnvName:       initInst.ScopeValue,
-					EnvType:       "production",
-				})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(instList).To(HaveLen(1))
-				Expect(instList[0].ID).To(Equal(initInstID))
 			})
 
 			It("test list by status: only returns instances with the given status", func() {
