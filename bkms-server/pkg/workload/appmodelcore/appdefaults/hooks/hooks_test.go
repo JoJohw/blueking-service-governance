@@ -8,6 +8,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/testutil"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/testutil/dbfactory"
 	bkmsworkspace "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/workspace"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/appdefaults"
@@ -40,7 +41,7 @@ var _ = Describe("Application default lifecycle hooks", func() {
 		if workspace != nil {
 			Expect(workspaceStore.Delete(ctx, workspace.ID)).To(Succeed())
 		}
-		Expect(ruleStore.Drop(ctx)).To(Succeed())
+		Expect(testutil.CleanupCollection(appdefaults.CollectionName)).To(Succeed())
 		bkmsworkspace.ResetLifecycleHooksForTest()
 		diApp.RequireStop()
 	})
@@ -52,7 +53,7 @@ var _ = Describe("Application default lifecycle hooks", func() {
 		Expect(ruleStore.Create(ctx, &appdefaults.Rule{
 			WorkspaceID: workspaceID,
 			ConfigType:  appspec.AppSpecSectionDevMode,
-			EnvType:     "production",
+			EnvTypes:    []string{"production"},
 			Spec: &appspec.AppSpec{
 				DevMode: &appspec.DevModeSpec{Enabled: &enabled},
 			},
