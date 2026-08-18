@@ -31,7 +31,6 @@ import (
 	"log/slog"
 	"os"
 	osfilepath "path/filepath"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -43,8 +42,8 @@ import (
 	"k8s.io/kubectl/pkg/scheme"
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/client"
-	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/config"
 	instancehandler "github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/handler/instance"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/console"
 )
 
 // bcsAPIHost BCS API 网关地址，通过 go build -ldflags 注入
@@ -141,7 +140,7 @@ func (h *Publisher) PreCheck() error {
 	h.devModeBinPath = osfilepath.Join(devMode.WorkPath, "/bin")
 	h.restartScriptPath = osfilepath.Join(devMode.MountPath, "/restart.sh")
 
-	fmt.Printf("App type: %s, WorkPath: %s, MountPath: %s\n", app.Type, devMode.WorkPath, devMode.MountPath)
+	console.Info("App type: %s, WorkPath: %s, MountPath: %s", app.Type, devMode.WorkPath, devMode.MountPath)
 
 	return nil
 }
@@ -215,20 +214,18 @@ func (h *Publisher) GetSpecifiedInstanceIDs(instanceIDs []string) ([]string, err
 
 // Publish 执行发布：
 // 1. 确认指定的文件是否存在，且大小合法
-// 2. 初始化 k8s client
+// 2. 从服务端获取 BCS Auth Info 并初始化 k8s client
 // 3. 计算文件 MD5
 // 4. 生成随机文件名
 // 5. 预先压缩文件为 tar.gz 格式
 // 6. 逐个 pod 上传文件并执行 restart.sh
-func (h *Publisher) Publish(filePath string, instanceIDs []string, bcsToken string) error {
+func (h *Publisher) Publish(filePath string, instanceIDs []string) error {
 	if h.env == nil || h.devMode == nil || h.app == nil {
 		return errors.New("preCheck must be called before publish")
 	}
 	if len(instanceIDs) == 0 {
 		return errors.New("no instances to publish")
 	}
-
-	// 开始前打印本次操作的实例信息
 	slog.Info(fmt.Sprintf("This publish will operate on %d instances", len(instanceIDs)), "instanceIDs", instanceIDs)
 
 	// 1. 确认指定的文件是否存在
@@ -243,7 +240,12 @@ func (h *Publisher) Publish(filePath string, instanceIDs []string, bcsToken stri
 			float64(maxUploadSize)/(1024*1024))
 	}
 
-	// 2. 初始化 k8s client
+	// 2. 从服务端获取 BCS Auth Info 并初始化 k8s client
+	console.Info("Fetching BCS Auth Info from server...")
+	bcsToken, err := h.cli.GetBCSToken(h.ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to get BCS Auth Info from server")
+	}
 	if buildErr := buildKubeClient(h.env.Cluster.ClusterID, bcsToken); buildErr != nil {
 		return errors.Wrap(buildErr, "failed to build kubernetes client")
 	}
@@ -253,48 +255,46 @@ func (h *Publisher) Publish(filePath string, instanceIDs []string, bcsToken stri
 	if err != nil {
 		return errors.Wrap(err, "failed to calculate file MD5")
 	}
-	fmt.Printf("File MD5: %s\n", fileMD5)
+	console.Info("File MD5: %s", fileMD5)
 
 	// 4. 生成随机文件名（只需生成一次）
 	randomName := generateRandomName()
-	fmt.Printf("Random filename: %s\n", randomName)
+	console.Info("Random filename: %s", randomName)
 
 	// 5. 预先压缩文件为 tar.gz 格式（只需压缩一次）
-	fmt.Println("Compressing file to tar.gz format...")
+	console.Info("Compressing file to tar.gz format...")
 	tarGzData, err := compressFileToTarGz(filePath, randomName)
 	if err != nil {
 		return errors.Wrap(err, "failed to compress file to tar.gz")
 	}
-	fmt.Printf("Compressed size: %.2f MB\n", float64(len(tarGzData))/(1024*1024))
-
 	namespace := h.env.Cluster.Namespace
-	fmt.Println("==================================================")
-	fmt.Println("Publish workflow: 1. Upload file ==> 2. Execute restart script ==> 3. Done")
-	fmt.Println("==================================================")
+	console.Info("Compressed size: %.2f MB", float64(len(tarGzData))/(1024*1024))
+	console.Info("==================================================")
+	console.Info("Publish workflow: 1. Upload file ==> 2. Execute restart script ==> 3. Done")
+	console.Info("==================================================")
 
 	// 6. 逐个 pod 上传文件并执行 restart.sh
 	for i, instanceID := range instanceIDs {
-		fmt.Printf("\n[%d/%d] Processing instance: %s\n", i+1, len(instanceIDs), instanceID)
-		fmt.Printf("  Random filename: %s\n", randomName)
+		console.Info("\n[%d/%d] Processing instance: %s", i+1, len(instanceIDs), instanceID)
+		console.Info("  Random filename: %s", randomName)
 
 		// 上传已压缩的 tar.gz 数据到 pod
-		fmt.Printf("  Uploading file to %s...\n", h.devModeBinPath)
+		console.Info("  Uploading file to %s...", h.devModeBinPath)
 		if err = uploadTarGzToPod(h.ctx, tarGzData, instanceID, namespace, h.devModeBinPath); err != nil {
 			return errors.Wrapf(err, "failed to upload file to pod %s", instanceID)
 		}
-		fmt.Printf("  File upload completed!\n")
+		console.Info("  File upload completed!")
 
 		// 执行 restart.sh 脚本
-		fmt.Printf("  Executing restart.sh script...\n")
+		console.Info("  Executing restart.sh script...")
 		if err = executeRestartScript(h.ctx, instanceID, namespace, h.restartScriptPath, randomName, fileMD5); err != nil {
 			return errors.Wrapf(err, "failed to execute restart script on pod %s", instanceID)
 		}
-		fmt.Printf("  Instance %s restart completed!\n", instanceID)
+		console.Info("  Instance %s restart completed!", instanceID)
 	}
-
-	fmt.Println("\n==================================================")
-	fmt.Println("All instances published successfully!")
-	fmt.Println("==================================================")
+	console.Info("\n==================================================")
+	console.Info("All instances published successfully!")
+	console.Info("==================================================")
 
 	return nil
 }
@@ -326,33 +326,15 @@ func getEnvByName(ctx context.Context, cli client.Client, workspaceID, envName s
 }
 
 // buildKubeClient 构造 K8s client
-// 使用 BCS 配置（--bcs-token）通过 BCS API 网关连接集群。
-// bcsToken 优先级：命令行参数 --bcs-token > 配置文件中的 bcs.token。
-// 如果通过命令行传入了 token，会自动保存到配置文件中，后续无需再次传入。
-func buildKubeClient(clusterID, bcsToken string) error {
+// 使用 BCS Auth Info 通过 BCS API 网关连接集群。
+func buildKubeClient(clusterID, token string) error {
 	var err error
 
-	// 优先使用命令行传入的 bcsToken
-	token := strings.TrimSpace(bcsToken)
-	if token != "" {
-		// 命令行传入了新 token，保存到配置文件中，后续不需要再传
-		config.G.BCS.Token = token
-		if err = config.G.Dump(); err != nil {
-			return errors.Wrap(err, "failed to save BCS Token to config file")
-		}
-		fmt.Println("BCS Token saved to config file, no need to pass --bcs-token next time.")
-	} else {
-		// 没有通过命令行传入，则从配置文件中读取
-		token = config.G.BCS.Token
-	}
-
 	if token == "" {
-		return errors.New(
-			"BCS Token is required. Please pass --bcs-token on first use, it will be saved for future use",
-		)
+		return errors.New("BCS Auth Info is empty")
 	}
 
-	fmt.Printf("Using BCS API to connect cluster %s...\n", clusterID)
+	console.Info("Using BCS API to connect cluster %s...", clusterID)
 	restConfig = &rest.Config{
 		BearerToken:     token,
 		TLSClientConfig: rest.TLSClientConfig{Insecure: true},

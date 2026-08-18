@@ -18,6 +18,9 @@
 
 package bcs
 
+// UserTokenStatusActive 有效的 Token 状态
+const UserTokenStatusActive = 1
+
 // Project BCS 项目信息
 type Project struct {
 	// ID 项目 id, 如: 01234560123456e3acc1024d6bcs44b5
@@ -66,4 +69,14 @@ type Namespace struct {
 	Name string
 	// Status 命名空间状态, 如: Active
 	Status string
+}
+
+// UserToken BCS Auth 信息
+type UserToken struct {
+	// Token 令牌值
+	Token string
+	// Status 状态, 1 表示有效
+	Status int
+	// ExpiredAt 过期时间, nil 表示永不过期
+	ExpiredAt *string
 }

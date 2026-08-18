@@ -54,6 +54,8 @@ type Client interface {
 		ctx context.Context,
 		projectID, clusterID, namespace, podName, containerName, command string,
 	) (string, error)
+	// ListUserTokens 获取用户的 BCS Token 列表
+	ListUserTokens(ctx context.Context) ([]UserToken, error)
 }
 
 // ApiClient api client
@@ -62,41 +64,71 @@ type ApiClient struct {
 	user auth.User
 }
 
+// ClientOption 用于配置 BCS API 客户端的可选参数
+type ClientOption struct {
+	// UserMode 是否使用用户态认证
+	UserMode bool
+}
+
 // New 创建 BCS API 客户端实例
 //
-// 该函数用于创建与 BCS API 网关交互的客户端，配置了必要的认证信息：
-// - 使用应用认证：通过 bk_app_code 和 bk_app_secret 进行应用身份验证
-// - 免用户认证：网关本身不进行用户认证. 但 BCS 后端通过解析 X-Bcs-Username 头获取用户信息
+// 默认使用应用认证模式：通过 bk_app_code 和 bk_app_secret 进行应用身份验证，
+// BCS 后端通过解析 X-Bcs-Username 头获取用户信息。
 //
-// 参数：
-// - user: 用户信息，用于设置 X-Bcs-Username 请求头
-func New(user auth.User) (Client, error) {
-	// 测试时使用 stub 客户端
+// 当 opts.UserMode 为 true 时，使用用户态认证模式：在 x-bkapi-authorization 中
+// 同时包含应用凭据和用户凭据（access_token 或 bk_ticket），适用于需要验证用户身份的接口。
+func New(user auth.User, opts ...ClientOption) (Client, error) {
 	if config.G.Development.UseStubBCS {
 		log.InfoNoContext("use stub bcs client according to config")
 		return NewStub(user), nil
 	}
 
-	authorization, _ := json.Marshal(map[string]string{
-		"bk_app_code":   config.G.BkApp.Code,
-		"bk_app_secret": config.G.BkApp.Secret,
-	})
+	var opt ClientOption
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+
+	authorization := buildAuthorization(user, opt.UserMode)
+	clientOptions := buildClientOptions(user, opt.UserMode, authorization)
+
 	client, err := bkapi.NewBkApiClient("bcs-api-gateway", bkapi.ClientConfig{
-		BkApiUrlTmpl: config.G.BkPlatUrls.BkApiUrlTmpl,
-		Stage:        config.G.BkApiStages.BCS,
-		ClientOptions: []define.BkApiClientOption{
-			bkapi.OptSetRequestHeader("x-bkapi-authorization", string(authorization)),
-			// 设置用户信息
-			bkapi.OptSetRequestHeader("X-Bcs-Username", user.ID),
-			bkapi.OptJsonResultProvider(),
-			bkapi.OptJsonBodyProvider(),
-			bkapi.OptTimeout(60 * time.Second),
-		},
+		BkApiUrlTmpl:  config.G.BkPlatUrls.BkApiUrlTmpl,
+		Stage:         config.G.BkApiStages.BCS,
+		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &ApiClient{client, user}, nil
+}
+
+// buildAuthorization 构造 x-bkapi-authorization 头的 JSON 值
+func buildAuthorization(user auth.User, userMode bool) string {
+	authMap := map[string]string{
+		"bk_app_code":   config.G.BkApp.Code,
+		"bk_app_secret": config.G.BkApp.Secret,
+	}
+	if userMode {
+		authMap[user.Cred.CredKey()] = user.Cred.CredValue()
+	}
+	data, _ := json.Marshal(authMap)
+	return string(data)
+}
+
+// buildClientOptions 构造 BkApiClient 选项列表
+func buildClientOptions(user auth.User, userMode bool, authorization string) []define.BkApiClientOption {
+	options := []define.BkApiClientOption{
+		bkapi.OptSetRequestHeader("x-bkapi-authorization", authorization),
+		bkapi.OptJsonResultProvider(),
+		bkapi.OptTimeout(60 * time.Second),
+	}
+	if !userMode {
+		options = append(options,
+			bkapi.OptSetRequestHeader("X-Bcs-Username", user.ID),
+			bkapi.OptJsonBodyProvider(),
+		)
+	}
+	return options
 }
 
 // ListAuthorizedProjects 获取有权限的项目列表
@@ -287,4 +319,36 @@ func (c *ApiClient) handleOperation(
 		return nil, errors.New(mapx.GetStr(result, "message"))
 	}
 	return result, nil
+}
+
+// ListUserTokens 获取 BCS Auth Info
+func (c *ApiClient) ListUserTokens(ctx context.Context) ([]UserToken, error) {
+	op := c.NewOperation(
+		bkapi.OperationConfig{
+			Name:   "list_user_tokens",
+			Method: "GET",
+			Path:   fmt.Sprintf("/v4/usermanager/v1/users/%s/tokens", c.user.ID),
+		},
+	)
+
+	result, err := c.handleOperation(ctx, op)
+	if err != nil {
+		return nil, err
+	}
+
+	tokens := make([]UserToken, 0)
+	for _, item := range mapx.GetList(result, "data") {
+		if v, ok := item.(map[string]any); ok {
+			token := UserToken{
+				Token:  mapx.GetStr(v, "token"),
+				Status: cast.ToInt(v["status"]),
+			}
+			if ea, exists := v["expired_at"]; exists && ea != nil {
+				s := cast.ToString(ea)
+				token.ExpiredAt = &s
+			}
+			tokens = append(tokens, token)
+		}
+	}
+	return tokens, nil
 }
