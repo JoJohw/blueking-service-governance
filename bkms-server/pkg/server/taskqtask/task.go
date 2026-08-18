@@ -35,6 +35,7 @@ import (
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/taskqtask/buildpoll"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/taskqtask/depsvcredis"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/taskqtask/example"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/taskqtask/workspace"
 )
 
 // Setup 初始化各业务任务 handler 所需依赖, 并将 handler 挂载到给定的 mux。
@@ -47,6 +48,7 @@ func Setup(mux *asynq.ServeMux) error {
 	if err := depsvcredis.Init(storereg.G().DepSvcInstStore); err != nil {
 		return errors.Wrap(err, "init depsvcredis")
 	}
+	mux.Handle(workspace.Initialization.Name(), workspace.Initialization.Handler())
 	mux.Handle(depsvcredis.CreateTask.Name(), depsvcredis.CreateTask.Handler())
 	mux.Handle(depsvcredis.DisableTask.Name(), depsvcredis.DisableTask.Handler())
 	mux.Handle(depsvcredis.DestroyTask.Name(), depsvcredis.DestroyTask.Handler())
