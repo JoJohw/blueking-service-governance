@@ -20,6 +20,7 @@ package polaris
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
@@ -31,7 +32,7 @@ import (
 // PolarisEnvStateManager 管理 PolarisConfig 的环境部署快照、权重生命周期和动态下发结果。
 //
 // 配置更新后调用 PrepareDynamicApply，清理无效记录并返回允许动态下发的环境；
-// 动态下发完成后调用 RecordDynamicApplyResult，记录下发结果；
+// 动态下发完成后调用 RecordDynamicApplyResult，按配置版本记录下发结果，避免旧任务覆盖新配置状态；
 // 应用部署后调用 ReconcileAfterDeploy，记录本次部署生效的关键字段并清理离域权重；
 // 应用卸载后调用 ReconcileAfterUninstall，移除对应环境的记录与离域权重（条件见函数说明）。
 type PolarisEnvStateManager struct {
@@ -141,7 +142,7 @@ func (*PolarisEnvStateManager) reconcileEnvWeightsForScope(
 func (m *PolarisEnvStateManager) selectEnvNamesForDynamicApply(config *PolarisConfig) []string {
 	envNames := make([]string, 0, len(config.ScopeEnvNames))
 	for _, envName := range config.ScopeEnvNames {
-		if !m.isEnvReadyForDynamicApply(config, envName) {
+		if !m.IsEnvReadyForDynamicApply(config, envName) {
 			continue
 		}
 		envNames = append(envNames, envName)
@@ -149,30 +150,33 @@ func (m *PolarisEnvStateManager) selectEnvNamesForDynamicApply(config *PolarisCo
 	return envNames
 }
 
-// isEnvReadyForDynamicApply 判断指定环境是否允许动态下发。
+// IsEnvReadyForDynamicApply 判断指定环境是否允许动态下发。
 // 动态下发 PolarisConfig CR，仅当三个关键字段的快照与当前配置的一致时，可以更新非关键字段。
 // 这三个字段会影响到环境变量的生成和端口等服务配置，若不一致则必须重新部署实例。
-func (*PolarisEnvStateManager) isEnvReadyForDynamicApply(config *PolarisConfig, envName string) bool {
+func (*PolarisEnvStateManager) IsEnvReadyForDynamicApply(config *PolarisConfig, envName string) bool {
 	state := config.GetEnvState(envName)
 	desiredFields := NewRedeployRequiredFields(config)
 	return state.IsDeployed() && *state.AppliedFields == *desiredFields
 }
 
-// RecordDynamicApplyResult 记录一次动态下发结果；成功时清空 LastError。
+// RecordDynamicApplyResult 仅在配置顶层 UpdatedAt 仍为 expectedUpdatedAt 时记录结果。
+// 配置版本已变化时视为旧任务，跳过写入且不返回错误。
 func (m *PolarisEnvStateManager) RecordDynamicApplyResult(
 	ctx context.Context,
 	appID, configName, envName string,
+	expectedUpdatedAt time.Time,
 	applyErr error,
 ) error {
 	lastError := ""
 	if applyErr != nil {
 		lastError = applyErr.Error()
 	}
-	if err := m.store.UpsertEnvState(
+	if _, err := m.store.UpsertEnvStateIfUpdatedAtMatch(
 		ctx,
 		appID,
 		configName,
 		envName,
+		expectedUpdatedAt,
 		PolarisEnvStateUpdate{LastError: &lastError},
 	); err != nil {
 		return errors.Wrapf(err, "record dynamic apply result for env %s", envName)
