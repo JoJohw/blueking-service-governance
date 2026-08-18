@@ -16,7 +16,7 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-package buildpoll
+package appmodeldeploypoll
 
 import (
 	"time"
@@ -28,19 +28,17 @@ import (
 
 const (
 	// name asynq 任务类型名
-	name = "taskq.pollingBuildStatus"
+	name = "taskq.pollingAppModelDeployStatus"
 	// tickMaxRetry 单次 tick 意外失败的 asynq 重试上限，不含轮询续跑
 	tickMaxRetry = 10
-	// totalFailureRetryCount 查蓝盾连续失败次数上限，耗尽后标 StatusPollingBroken；
+	// totalFailureRetryCount 查部署状态连续失败次数上限，耗尽后标 StatusPollingBroken；
 	// 查到状态即复位（见 runTick），故约束的是连续失败而非整轮累计失败
 	totalFailureRetryCount = 10
 	// saveStatusTimeout 状态落库的独立超时，避免 handler ctx 取消导致写不进去
 	saveStatusTimeout = 10 * time.Second
-	// pollingTimeout 从 record.StartedAt 起算的轮询窗口，超时标 StatusPollingTimeout
-	pollingTimeout = 24 * time.Hour
 )
 
-// Task 构建状态轮询任务；init 赋值避免与 enqueueNext 引用形成包初始化环
+// Task 部署状态轮询任务；init 赋值避免与 enqueueNext 引用形成包初始化环
 var Task *taskq.TaskType[Args]
 
 func init() {
