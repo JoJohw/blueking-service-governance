@@ -94,6 +94,17 @@
       />
     </Form.FormItem>
   </Form>
+
+  <!-- 环境变量预检查弹窗 -->
+  <EnvVarPrecheckDialog
+    v-if="precheckBeforeSubmit"
+    v-model:is-show="isShowPrecheckDialog"
+    :env-name="precheckEnvName"
+    :undefined-vars="undefinedVars"
+    @cancel="cancelDeploy"
+    @go-modify="cancelDeploy"
+    @still-deploy="continueDeploy"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -106,22 +117,33 @@
   import { useTrpcDeployStore } from '~/stores/trpc-deploy';
 
   import ImageSelect from '../../components/image-select.vue';
+  import EnvVarPrecheckDialog from './env-var-precheck-dialog.vue';
   import { type DeployableAppType, type DeployParams, useDeployAPIs } from './use-deploy';
+  import { useEnvVarPrecheck } from './use-env-var-precheck';
 
   // 镜像来源类型：从源码构建 / 已构建镜像
   type ImageSourceType = 'code' | 'image';
 
-  const props = defineProps<{
-    effectiveReplicas?: number; // 当前生效的实例数，用于重置表单时回填
-    envName?: string;
-    envType?: string;
-    isProdEnv?: boolean;
-    /** 总览入口强制使用显式传入的目标环境，防止未选中时误回退到 store 中的旧环境。 */
-    useProvidedEnv?: boolean;
-  }>();
+  const props = withDefaults(
+    defineProps<{
+      effectiveReplicas?: number; // 当前生效的实例数，用于重置表单时回填
+      envName?: string;
+      envType?: string;
+      isProdEnv?: boolean;
+      /** 是否在提交表单时执行预检查；普通部署已在打开侧栏前完成检查。 */
+      precheckBeforeSubmit?: boolean;
+      /** 总览入口强制使用显式传入的目标环境，防止未选中时误回退到 store 中的旧环境。 */
+      useProvidedEnv?: boolean;
+    }>(),
+    {
+      precheckBeforeSubmit: true,
+    },
+  );
 
   const trpcDeployStore = useTrpcDeployStore();
   const appDetailStore = useAppDetail();
+  const { cancelDeploy, continueDeploy, isShowPrecheckDialog, precheck, precheckEnvName, undefinedVars } =
+    useEnvVarPrecheck();
 
   // 当前选择的镜像来源
   const imageSource = ref<ImageSourceType>('image');
@@ -221,6 +243,11 @@
   async function submit(targetEnvName: string) {
     const valid = await validate();
     if (!valid) return false;
+
+    if (props.precheckBeforeSubmit) {
+      const precheckPassed = await precheck(targetEnvName);
+      if (!precheckPassed) return false;
+    }
 
     await deploy(targetEnvName);
     forceCleanDirtyTag();

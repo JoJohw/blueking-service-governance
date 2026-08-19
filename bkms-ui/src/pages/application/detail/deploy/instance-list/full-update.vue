@@ -211,7 +211,6 @@
   const { t } = useI18n();
   const trpcDeployStore = useTrpcDeployStore();
   const appDetailStore = useAppDetail();
-
   const imageSource = ref<ImageSourceType>('image');
   const formRef = ref();
   const imageSelectRef = ref();
@@ -301,7 +300,6 @@
    * 配置+镜像、仅配置
    */
   async function handleConfigAndImage() {
-    loading.value = true;
     try {
       // 根据应用类型获取对应的部署 API
       const deployAPIs = useDeployAPIs(appDetailStore.appType as DeployableAppType);
@@ -337,8 +335,6 @@
     } catch (error) {
       console.warn(error);
       return false;
-    } finally {
-      loading.value = false;
     }
   }
 
@@ -347,34 +343,40 @@
     const valid = await formRef.value?.validate().catch(() => false);
     if (!valid) return;
 
-    let result = false;
-    if (formModel.updateContent !== 'image') {
-      result = await handleConfigAndImage();
-    } else {
-      result = await handleImage();
-    }
+    loading.value = true;
+    try {
+      let result = false;
+      if (formModel.updateContent !== 'image') {
+        result = await handleConfigAndImage();
+      } else {
+        result = await handleImage();
+      }
 
-    if (!result) return;
+      if (!result) return;
 
-    if (shouldBuildFromSource.value) {
-      showBuildLog.value = true;
-    }
+      if (shouldBuildFromSource.value) {
+        showBuildLog.value = true;
+      }
 
-    forceCleanDirtyTag(() => {
-      // 源码构建后保留当前侧滑，以便持续展示流式日志；其他部署方式沿用成功后关闭侧滑的交互。
-      emit('update', shouldBuildFromSource.value);
-      Message({
-        theme: 'success',
-        message: t('操作成功'),
+      forceCleanDirtyTag(() => {
+        // 源码构建后保留当前侧滑，以便持续展示流式日志；其他部署方式沿用成功后关闭侧滑的交互。
+        emit('update', shouldBuildFromSource.value);
+        Message({
+          theme: 'success',
+          message: t('操作成功'),
+        });
       });
-    });
+    } catch (error) {
+      console.warn(error);
+    } finally {
+      loading.value = false;
+    }
   }
 
   /**
    * 仅镜像
    */
   async function handleImage() {
-    loading.value = true;
     try {
       await InstanceService.updateAppInstances({
         appID: appDetailStore.appID,
@@ -387,8 +389,6 @@
     } catch (error) {
       console.warn(error);
       return false;
-    } finally {
-      loading.value = false;
     }
   }
 
