@@ -16,34 +16,30 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-package appmodeldeploypoll
+package helmdeploypoll
 
 import (
 	"context"
 
 	log "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/logging"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/deploy"
-	appmodeldeploy "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/deploy/appmodel"
+	helmdeploy "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/deploy/helm"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/database"
 	storereg "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/registry"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/topology"
 )
 
-// triggerTopologyRefresh 按部署记录的 ResourceKeys / LabelSelector 刷拓扑资源范围
-// 由 Handle 在 goroutine 中调用，resourceKeys 为空则跳过；失败只打日志，不影响本 tick
-func triggerTopologyRefresh(ctx context.Context, args Args, record *appmodeldeploy.Record) {
-	var resourceKeys []topology.ResourceKeyEntry
-	for _, rk := range record.ResourceKeys {
-		resourceKeys = append(resourceKeys, topology.ResourceKeyEntry{Kind: rk.Kind, Name: rk.Name})
-	}
-	if len(resourceKeys) == 0 {
-		log.Warnf(ctx, "skip topology refresh (app model): resourceKeys is empty")
+// triggerTopologyRefresh 按 ReleaseName 刷拓扑资源范围
+// 由 Handle 在 goroutine 中调用，releaseName 为空则跳过；失败只打日志，不影响本 tick
+func triggerTopologyRefresh(ctx context.Context, args Args, record *helmdeploy.Record) {
+	if record.ReleaseName == "" {
+		log.Warnf(ctx, "skip topology refresh (helm): releaseName is empty")
 		return
 	}
 
 	store, err := topology.NewResourceSnapshotStoreMongo(database.Client(), database.Name())
 	if err != nil {
-		log.Errorf(ctx, "topology refresh (app model): create store: %v", err)
+		log.Errorf(ctx, "topology refresh (helm): create store: %v", err)
 		return
 	}
 	topology.NewRefresher(store).TriggerRefresh(ctx, topology.RefreshArgs{
@@ -52,14 +48,13 @@ func triggerTopologyRefresh(ctx context.Context, args Args, record *appmodeldepl
 		TrafficLaneName: args.TrafficLaneName,
 		ClusterID:       record.ClusterID,
 		Namespace:       record.Namespace,
-		ResourceKeys:    resourceKeys,
-		LabelSelector:   record.LabelSelector,
+		ReleaseName:     record.ReleaseName,
 	})
 }
 
 // handleDeploySucceeded 部署成功后的后置动作：记录应用与环境关联，并异步同步该环境告警策略
 // 仅 StatusDeployed 时由 onStable 调用；任一步失败只打日志，不改部署结果、不让本 tick 失败
-func handleDeploySucceeded(ctx context.Context, args Args, record *appmodeldeploy.Record) {
+func handleDeploySucceeded(ctx context.Context, args Args, record *helmdeploy.Record) {
 	reg := storereg.G()
 	if reg == nil {
 		log.Errorf(ctx, "post-deploy hooks: registry is not initialized")
@@ -68,7 +63,7 @@ func handleDeploySucceeded(ctx context.Context, args Args, record *appmodeldeplo
 
 	log.Infof(
 		ctx, "deploy succeeded, start post-deploy hooks for workspace=%s app=%s env=%s lane=%s operator=%s",
-		args.WorkspaceID, args.AppID, args.EnvName, args.TrafficLaneName, record.Creator,
+		args.WorkspaceID, args.AppID, args.EnvName, args.TrafficLaneName, record.Operator,
 	)
 	// 记录应用到环境的部署关联，envStore 未初始化时只打日志，不阻断后续告警同步
 	if reg.EnvStore == nil {
@@ -79,6 +74,6 @@ func handleDeploySucceeded(ctx context.Context, args Args, record *appmodeldeplo
 
 	// 异步把应用关联的告警策略同步到当前环境，失败只打日志，不改部署结果、不让本 tick 失败
 	deploy.SyncAlertStrategiesAfterDeploy(
-		ctx, args.WorkspaceID, args.AppID, args.EnvName, args.TrafficLaneName, record.Creator,
+		ctx, args.WorkspaceID, args.AppID, args.EnvName, args.TrafficLaneName, record.Operator,
 	)
 }
