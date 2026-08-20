@@ -150,8 +150,25 @@ type ConfigUpdateData struct {
 	// ScopeEnvNames 生效环境列表；nil 表示不更新，非 nil（含空切片）表示覆盖
 	ScopeEnvNames []string
 	PolarisToken  *string
+	Operator      *string
 	// envWeights 仅由 service 在 scope 变化时生成并交给 store 持久化。
 	envWeights map[string]int32
+}
+
+// affectsWorkload 判断本次更新是否影响 PolarisConfig CR / 工作负载渲染。
+// operator 只同步北极星 Owners，不参与 CR，因此单独更新负责人时不触发动态下发。
+func (d *ConfigUpdateData) affectsWorkload() bool {
+	if d == nil {
+		return false
+	}
+	return d.InstanceKey != nil ||
+		d.ServicePort != nil ||
+		d.Direct != nil ||
+		d.KeepNotReadyPod != nil ||
+		d.EnableHealthCheck != nil ||
+		d.ServiceLabels != nil ||
+		d.ScopeEnvNames != nil ||
+		d.PolarisToken != nil
 }
 
 // RegistryServiceEntry 表示 tRPC 配置中 plugins.registry.polaris.service 的单条服务配置
