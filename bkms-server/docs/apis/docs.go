@@ -7954,6 +7954,7 @@ const docTemplate = `{
                         "BkUserCredential": []
                     }
                 ],
+                "description": "北极星拉取失败不阻塞 Pod 输出：polarisInfos 为空数组，与未注册北极星同形，其余字段照常返回。",
                 "produces": [
                     "application/json"
                 ],
@@ -7984,18 +7985,22 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "页码，从 1 开始",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
+                        "type": "boolean",
+                        "description": "为 true 时一次返回全量实例；禁止同时带 page 或 pageSize",
+                        "name": "all",
+                        "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "每页数量",
+                        "description": "页码，取值 1-10000；分页模式必填，all=true 时禁止出现",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量；分页模式必填，all=true 时禁止出现",
                         "name": "pageSize",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -8436,6 +8441,69 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appID}/envs/{envName}/instances/watch": {
+            "get": {
+                "security": [
+                    {
+                        "BkUserInfo": []
+                    },
+                    {
+                        "BkUserCredential": []
+                    }
+                ],
+                "description": "事件类型为 ADDED / MODIFIED / DELETED；object 对齐 AppInstanceOutputObj（含 polarisInfos）。",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "instance"
+                ],
+                "summary": "订阅应用实例投影变更",
+                "operationId": "WatchAppInstances",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用 ID",
+                        "name": "appID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "部署环境名称",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "部署的泳道名称（空字符串表示不使用泳道）",
+                        "name": "trafficLaneName",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Watch 事件逻辑结构（编码格式随传输形态而定）",
+                        "schema": {
+                            "$ref": "#/definitions/serializer.AppInstanceWatchEvent"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "$ref": "#/definitions/bkerrs.GinErrorOutput"
                         }
@@ -19481,6 +19549,28 @@ const docTemplate = `{
                 }
             }
         },
+        "serializer.AppInstanceWatchEvent": {
+            "type": "object",
+            "properties": {
+                "object": {
+                    "description": "实例投影；字段集合对齐 AppInstanceOutputObj（含 polarisInfos）",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/serializer.AppInstanceOutputObj"
+                        }
+                    ]
+                },
+                "type": {
+                    "description": "事件类型\nEnums: ADDED, MODIFIED, DELETED",
+                    "type": "string",
+                    "enum": [
+                        "ADDED",
+                        "MODIFIED",
+                        "DELETED"
+                    ]
+                }
+            }
+        },
         "serializer.AppModelDeployRecordOutputObj": {
             "type": "object",
             "properties": {
@@ -26153,16 +26243,28 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "count": {
-                    "description": "结果数量",
+                    "description": "结果数量；全量为成功投影条数，分页为 LabelSelector 匹配的 Pod 总数",
                     "type": "string",
                     "example": "0"
                 },
                 "results": {
-                    "description": "查询结果",
+                    "description": "查询结果，只含成功投影",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/serializer.AppInstanceOutputObj"
                     }
+                },
+                "skipped": {
+                    "description": "无法投影的实例列表；分页模式为空数组，无跳过项时亦为空数组",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/serializer.SkippedAppInstanceObj"
+                    }
+                },
+                "skippedCount": {
+                    "description": "本次响应中跳过的实例数（仅全量模式可能非 0）",
+                    "type": "string",
+                    "example": "0"
                 }
             }
         },
@@ -28679,6 +28781,19 @@ const docTemplate = `{
                         "Ready",
                         "Disabled"
                     ]
+                }
+            }
+        },
+        "serializer.SkippedAppInstanceObj": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "实例 ID（即 k8s pod 的 name）；解析前无 name 时为空字符串",
+                    "type": "string"
+                },
+                "reason": {
+                    "description": "跳过原因",
+                    "type": "string"
                 }
             }
         },

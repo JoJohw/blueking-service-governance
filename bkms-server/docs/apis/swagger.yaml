@@ -1332,6 +1332,22 @@ definitions:
         description: 状态，由 pod.status.phase 等解析获得
         type: string
     type: object
+  serializer.AppInstanceWatchEvent:
+    properties:
+      object:
+        allOf:
+        - $ref: '#/definitions/serializer.AppInstanceOutputObj'
+        description: 实例投影；字段集合对齐 AppInstanceOutputObj（含 polarisInfos）
+      type:
+        description: |-
+          事件类型
+          Enums: ADDED, MODIFIED, DELETED
+        enum:
+        - ADDED
+        - MODIFIED
+        - DELETED
+        type: string
+    type: object
   serializer.AppModelDeployRecordOutputObj:
     properties:
       branch:
@@ -5823,14 +5839,23 @@ definitions:
   serializer.PaginatedAppInstancesOutputObj:
     properties:
       count:
-        description: 结果数量
+        description: 结果数量；全量为成功投影条数，分页为 LabelSelector 匹配的 Pod 总数
         example: "0"
         type: string
       results:
-        description: 查询结果
+        description: 查询结果，只含成功投影
         items:
           $ref: '#/definitions/serializer.AppInstanceOutputObj'
         type: array
+      skipped:
+        description: 无法投影的实例列表；分页模式为空数组，无跳过项时亦为空数组
+        items:
+          $ref: '#/definitions/serializer.SkippedAppInstanceObj'
+        type: array
+      skippedCount:
+        description: 本次响应中跳过的实例数（仅全量模式可能非 0）
+        example: "0"
+        type: string
     type: object
   serializer.PaginatedAppModelDeployRecordsOutputObjs:
     properties:
@@ -7576,6 +7601,15 @@ definitions:
         type: string
     required:
     - state
+    type: object
+  serializer.SkippedAppInstanceObj:
+    properties:
+      id:
+        description: 实例 ID（即 k8s pod 的 name）；解析前无 name 时为空字符串
+        type: string
+      reason:
+        description: 跳过原因
+        type: string
     type: object
   serializer.SnapshotStatusInfoOutputObj:
     properties:
@@ -13811,6 +13845,7 @@ paths:
       - deploy
   /apps/{appID}/envs/{envName}/instances:
     get:
+      description: 北极星拉取失败不阻塞 Pod 输出：polarisInfos 为空数组，与未注册北极星同形，其余字段照常返回。
       operationId: ListAppInstances
       parameters:
       - description: 应用 ID
@@ -13827,15 +13862,17 @@ paths:
         in: query
         name: trafficLaneName
         type: string
-      - description: 页码，从 1 开始
+      - description: 为 true 时一次返回全量实例；禁止同时带 page 或 pageSize
+        in: query
+        name: all
+        type: boolean
+      - description: 页码，取值 1-10000；分页模式必填，all=true 时禁止出现
         in: query
         name: page
-        required: true
         type: integer
-      - description: 每页数量
+      - description: 每页数量；分页模式必填，all=true 时禁止出现
         in: query
         name: pageSize
-        required: true
         type: integer
       produces:
       - application/json
@@ -14303,6 +14340,47 @@ paths:
       - BkUserInfo: []
       - BkUserCredential: []
       summary: 执行 TAF 管理命令
+      tags:
+      - instance
+  /apps/{appID}/envs/{envName}/instances/watch:
+    get:
+      description: 事件类型为 ADDED / MODIFIED / DELETED；object 对齐 AppInstanceOutputObj（含
+        polarisInfos）。
+      operationId: WatchAppInstances
+      parameters:
+      - description: 应用 ID
+        in: path
+        name: appID
+        required: true
+        type: string
+      - description: 部署环境名称
+        in: path
+        name: envName
+        required: true
+        type: string
+      - description: 部署的泳道名称（空字符串表示不使用泳道）
+        in: query
+        name: trafficLaneName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Watch 事件逻辑结构（编码格式随传输形态而定）
+          schema:
+            $ref: '#/definitions/serializer.AppInstanceWatchEvent'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+        "501":
+          description: Not Implemented
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 订阅应用实例投影变更
       tags:
       - instance
   /apps/{appID}/envs/{envName}/resource-topology:
