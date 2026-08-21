@@ -35,6 +35,7 @@ import (
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/ginutils/perm"
 	storereg "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/registry"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/taskqtask/polarisapply"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/envvars"
 )
 
 // Handler handles Gin polaris-config API requests.
@@ -57,6 +58,12 @@ func (h *Handler) polarisConfigService() *polaris.PolarisConfigService {
 		),
 		polaris.NewPolarisEnvStateManager(h.registry.PolarisConfigStore),
 		h.registry.EnvStore,
+		h.registry.AppModelStore,
+		envvars.NewUnifiedEnvVarsReader(
+			h.registry.ScopedEnvVarStore,
+			h.registry.AppDepsVarReader,
+			h.registry.PolarisVarReader,
+		),
 		polarisapply.Enqueue,
 	)
 }
@@ -124,14 +131,12 @@ func (h *Handler) ListAppPolarisConfigs(c *gin.Context) {
 func (h *Handler) CreateAppPolarisConfig(c *gin.Context) {
 	var uriInput serializer.AppURIInput
 	var jsonInput serializer.CreateAppPolarisConfigInput
-
 	if err := ginutils.BindURIJSON(c, &uriInput, &jsonInput); err != nil {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
 
 	ctx := c.Request.Context()
-
 	app, err := perm.ValidateAppByID(ctx, h.registry, uriInput.AppID, perm.TypeEdit)
 	if err != nil {
 		bkerrs.AbortWithErr(c, err)
@@ -160,20 +165,22 @@ func (h *Handler) CreateAppPolarisConfig(c *gin.Context) {
 			EnableHealthCheck: lo.FromPtrOr(jsonInput.EnableHealthCheck, false),
 			ServiceLabels:     jsonInput.ServiceLabels,
 			Operator:          lo.FromPtrOr(jsonInput.Operator, ""),
+			RegisterMode:      lo.FromPtrOr(jsonInput.RegisterMode, polaris.RegisterModeOnDeploy),
 		},
 		ScopeEnvNames: jsonInput.ScopeEnvNames,
 	}
 
-	if err := h.polarisConfigService().Create(ctx, app, config, jsonInput.CreateNewService); err != nil {
-		if errors.Is(err, polaris.ErrConfigNameExists) {
+	createErr := h.polarisConfigService().Create(ctx, app, config, jsonInput.CreateNewService)
+	// 集群同步失败时配置已经落库，仍需记录审计并把失败原因返回给调用方
+	if createErr != nil && !errors.Is(createErr, polaris.ErrClusterSyncFailed) {
+		if errors.Is(createErr, polaris.ErrConfigNameExists) {
 			bkerrs.AbortWithErr(c, bkerrs.Errorf(
 				bkerrs.ErrCodeInvalidRequest,
-				"polaris config name already exists in app(%s)",
-				uriInput.AppID,
+				"polaris config name already exists in app(%s)", uriInput.AppID,
 			))
 			return
 		}
-		bkerrs.AbortWithErr(c, bkerrs.Wrap(err, bkerrs.ErrCodeInternalServerError, "create polaris config"))
+		bkerrs.AbortWithErr(c, bkerrs.Wrap(createErr, bkerrs.ErrCodeInternalServerError, "create polaris config"))
 		return
 	}
 
@@ -187,6 +194,14 @@ func (h *Handler) CreateAppPolarisConfig(c *gin.Context) {
 		audit.WithWorkspaceID(app.WorkspaceID),
 		audit.WithAppID(app.ID),
 	)
+
+	if createErr != nil {
+		bkerrs.AbortWithErr(c, bkerrs.Wrapf(
+			createErr, bkerrs.ErrCodeInternalServerError,
+			"polaris config(%s) saved but registering to polaris failed", config.Name,
+		))
+		return
+	}
 
 	ginutils.OK(c, serializer.CreateAppPolarisConfigOutput{
 		Data: serializer.PolarisNameOutputObj{Name: config.Name},
@@ -217,21 +232,18 @@ func (h *Handler) PatchAppPolarisConfig(c *gin.Context) {
 	}
 
 	ctx := c.Request.Context()
-
 	app, err := perm.ValidateAppByID(ctx, h.registry, uriInput.AppID, perm.TypeEdit)
 	if err != nil {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
 
-	service := h.polarisConfigService()
 	existingConfig, err := h.registry.PolarisConfigStore.Get(ctx, app.ID, uriInput.ConfigName)
 	if err != nil {
 		if errors.Is(err, polaris.ErrConfigNotFound) {
 			bkerrs.AbortWithErr(c, bkerrs.Errorf(
 				bkerrs.ErrCodeNotFound,
-				"polaris config(%s) not found in app(%s)",
-				uriInput.ConfigName, uriInput.AppID,
+				"polaris config(%s) not found in app(%s)", uriInput.ConfigName, uriInput.AppID,
 			))
 			return
 		}
@@ -251,13 +263,13 @@ func (h *Handler) PatchAppPolarisConfig(c *gin.Context) {
 		Operator:          jsonInput.Operator,
 	}
 
-	updatedConfig, updateErr := service.Update(ctx, app, existingConfig, updateData)
-	if updateErr != nil {
+	updatedConfig, updateErr := h.polarisConfigService().Update(ctx, app, existingConfig, updateData)
+	// 集群同步失败时配置已经落库，仍需记录审计并把失败原因返回给调用方
+	if updateErr != nil && !errors.Is(updateErr, polaris.ErrClusterSyncFailed) {
 		if errors.Is(updateErr, polaris.ErrConfigNotFound) {
 			bkerrs.AbortWithErr(c, bkerrs.Errorf(
 				bkerrs.ErrCodeNotFound,
-				"polaris config(%s) not found in app(%s)",
-				uriInput.ConfigName, uriInput.AppID,
+				"polaris config(%s) not found in app(%s)", uriInput.ConfigName, uriInput.AppID,
 			))
 			return
 		}
@@ -281,6 +293,14 @@ func (h *Handler) PatchAppPolarisConfig(c *gin.Context) {
 		audit.WithWorkspaceID(app.WorkspaceID),
 		audit.WithAppID(app.ID),
 	)
+
+	if updateErr != nil {
+		bkerrs.AbortWithErr(c, bkerrs.Wrapf(
+			updateErr, bkerrs.ErrCodeInternalServerError,
+			"polaris config(%s) saved but syncing to polaris failed", uriInput.ConfigName,
+		))
+		return
+	}
 
 	ginutils.OK(c, new(serializer.PatchAppPolarisConfigOutput).FromModel(updatedConfig))
 }
@@ -362,7 +382,7 @@ func (h *Handler) DeleteAppPolarisConfig(c *gin.Context) {
 	ginutils.OK(c, serializer.EmptyOutput{})
 }
 
-// ListAppPolarisConfigVars 获取北极星配置变量列表。
+// ListAppPolarisConfigVars 获取北极星配置会注入的环境变量列表。
 //
 //	@ID			ListAppPolarisConfigVars
 //	@Summary	获取北极星配置变量列表
@@ -446,6 +466,7 @@ func (h *Handler) ValidateAppPolarisConfig(c *gin.Context) {
 		Properties: polaris.Properties{
 			PolarisName:      jsonInput.PolarisName,
 			PolarisNamespace: jsonInput.PolarisNamespace,
+			RegisterMode:     lo.FromPtrOr(jsonInput.RegisterMode, polaris.RegisterModeOnDeploy),
 		},
 		ScopeEnvNames: jsonInput.ScopeEnvNames,
 	}

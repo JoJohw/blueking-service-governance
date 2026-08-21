@@ -32,6 +32,7 @@ import (
 	bkmsapp "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/app"
 	envmodel "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env/model"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/render"
+	k8skind "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/kubernetes/kind"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/envvarrefs"
 )
 
@@ -56,7 +57,7 @@ func NewWorkloadBuilder(store PolarisConfigStore) *WorkloadBuilder {
 	return &WorkloadBuilder{store: store}
 }
 
-// Build injects Polaris ports into the main container and builds the related extra resources.
+// Build builds polaris related extra resources.
 // Only ServiceLabels participate in env-var rendering and undefined-reference collection.
 func (b *WorkloadBuilder) Build(
 	ctx context.Context,
@@ -64,7 +65,6 @@ func (b *WorkloadBuilder) Build(
 	env *envmodel.Environment,
 	vars map[string]string,
 	podSpec corev1.PodSpec,
-	mainContainerName string,
 	collector *envvarrefs.Collector,
 ) (*WorkloadResult, error) {
 	configs, err := b.store.ListByEnv(ctx, app.ID, env.Name)
@@ -82,13 +82,6 @@ func (b *WorkloadBuilder) Build(
 			return nil, fmt.Errorf("build resources for polaris config %s: %w", cfg.Name, buildErr)
 		}
 		result.ExtraObjects = append(result.ExtraObjects, objects...)
-	}
-
-	for idx := range result.PodSpec.Containers {
-		if result.PodSpec.Containers[idx].Name == mainContainerName {
-			injectContainerPorts(configs, &result.PodSpec.Containers[idx])
-			break
-		}
 	}
 	return result, nil
 }
@@ -110,7 +103,7 @@ func buildExtraResources(
 	vars map[string]string,
 	collector *envvarrefs.Collector,
 ) ([]unstructured.Unstructured, error) {
-	crName, serviceName := polarisResourceNames(app.Name, cfg.Name)
+	crName, serviceName := PolarisResourceNames(app.Name, cfg.Name)
 
 	serviceSpec := map[string]any{
 		"name":              serviceName,
@@ -151,7 +144,10 @@ func buildExtraResources(
 	}
 
 	service := corev1.Service{
-		TypeMeta: metav1.TypeMeta{APIVersion: "v1", Kind: "Service"},
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: corev1.SchemeGroupVersion.String(),
+			Kind:       k8skind.SVC,
+		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: serviceName,
 		},
@@ -175,30 +171,10 @@ func buildExtraResources(
 	}, nil
 }
 
-func polarisResourceNames(appName, configName string) (crName, serviceName string) {
+// PolarisResourceNames 返回该配置在集群中的 PolarisConfig CR 名与配套 Service 名。
+func PolarisResourceNames(appName, configName string) (crName, serviceName string) {
 	baseName := strings.ToLower(fmt.Sprintf("%s-%s", appName, configName))
 	return baseName + "-polaris", baseName + "-polaris-service"
-}
-
-// injectContainerPorts injects Polaris service ports using the same merge key as the old component patch.
-func injectContainerPorts(configs []*PolarisConfig, container *corev1.Container) {
-	for _, cfg := range configs {
-		upsertContainerPort(&container.Ports, corev1.ContainerPort{
-			Name:          fmt.Sprintf("polaris-%d", cfg.ServicePort),
-			ContainerPort: cfg.ServicePort,
-			Protocol:      corev1.ProtocolTCP,
-		})
-	}
-}
-
-func upsertContainerPort(items *[]corev1.ContainerPort, value corev1.ContainerPort) {
-	for idx := range *items {
-		if (*items)[idx].ContainerPort == value.ContainerPort {
-			(*items)[idx] = value
-			return
-		}
-	}
-	*items = append(*items, value)
 }
 
 // renderServiceLabels 渲染 serviceLabels 中的 ${{env.X}} 变量，并收集未定义的环境变量引用。
