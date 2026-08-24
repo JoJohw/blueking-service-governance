@@ -138,6 +138,36 @@ func (s *Service) ResolveRepoKeyForWorkspace(
 	}, nil
 }
 
+// RefreshWorkspaceSnapshots 按工作空间凭证刷新自定义镜像快照
+func (s *Service) RefreshWorkspaceSnapshots(
+	ctx context.Context, workspaceID, imageName string,
+) (*RefreshResult, error) {
+	info, err := s.ResolveRepoKeyForWorkspace(ctx, workspaceID, imageName)
+	if err != nil {
+		return nil, errors.Wrapf(err, "resolve repo key for workspace %s image %s", workspaceID, imageName)
+	}
+	return s.refreshSnapshotsByRepoInfo(ctx, info)
+}
+
+// GetWorkspaceSnapshotStatus 按工作空间凭证口径查自定义镜像的快照状态。
+//
+// repoKey 必须经 ResolveRepoKeyForWorkspace 计算，才能与刷新流程写入的状态对上；
+// 该镜像尚无任何快照记录时返回 nil，调用方据此判断是否需要初始化刷新
+func (s *Service) GetWorkspaceSnapshotStatus(
+	ctx context.Context, workspaceID, imageName string,
+) (*RepoSnapshotStatus, error) {
+	info, err := s.ResolveRepoKeyForWorkspace(ctx, workspaceID, imageName)
+	if err != nil {
+		return nil, errors.Wrapf(err, "resolve repo key for workspace %s image %s", workspaceID, imageName)
+	}
+
+	status, err := s.snapshotStore.GetStatus(ctx, info.RepoKey)
+	if err != nil {
+		return nil, errors.Wrapf(err, "get snapshot status of %s", info.RepoKey)
+	}
+	return status, nil
+}
+
 // ListRepositorySnapshots 从本地快照查询指定镜像仓库的标签列表。
 //
 // 如果本地还没有该仓库的快照记录，会复用刷新流程异步触发一次初始化同步；
@@ -270,7 +300,7 @@ func (s *Service) refreshSnapshotsByRepoInfo(
 func (s *Service) doRefresh(ctx context.Context, info *RepoKeyInfo) (*RefreshResult, error) {
 	// 获取远程所有标签
 	client := registry.New(info.Username, info.Password, true)
-	remoteTags, err := client.ListAllTags(info.RepoName)
+	remoteTags, err := client.ListAllTags(ctx, info.RepoName)
 	if err != nil {
 		return nil, errors.Wrapf(err, "list all tags for %s", info.RepoName)
 	}

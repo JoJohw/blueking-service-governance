@@ -50,17 +50,27 @@ import (
 	ginperm "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/ginutils/perm"
 	storereg "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/registry"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/appmodel"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/image/customruntime"
 	workloadruntime "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/image/runtime"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/image/snapshot"
 )
 
 // Handler handles Gin app API requests.
 type Handler struct {
-	registry *storereg.Registry
+	registry   *storereg.Registry
+	persistMgr *customruntime.PersistManager
 }
 
 // New creates a Handler.
 func New(registry *storereg.Registry) *Handler {
-	return &Handler{registry: registry}
+	snapshotService := snapshot.NewService(registry.SnapshotStore, registry.BuildConfigStore, registry.AppStore)
+	return &Handler{
+		registry: registry,
+		persistMgr: customruntime.NewPersistManager(
+			registry.CustomRuntimeImageStore,
+			snapshotService,
+		),
+	}
 }
 
 // CreateApp 创建应用。
@@ -154,8 +164,15 @@ func (h *Handler) CreateApp(c *gin.Context) {
 		h.registry.RuntimeImageStore,
 		h.registry.SnapshotStore,
 	)
-	if err = build.ValidatePlatformBuildImages(ctx, imageReferenceValidator, buildConfig); err != nil {
-		bkerrs.AbortWithErr(c, bkerrs.New(bkerrs.ErrCodeInvalidArgument, err.Error()))
+	if err = build.ValidatePlatformBuildImages(
+		ctx, imageReferenceValidator, h.persistMgr, buildConfig, app.WorkspaceID,
+	); err != nil {
+		// 镜像源鉴权失败或不可达时改镜像引用也没用，按内部错误上报；其余按参数问题
+		errCode := bkerrs.ErrCodeInvalidArgument
+		if build.IsImageRegistryFailure(err) {
+			errCode = bkerrs.ErrCodeInternalServerError
+		}
+		bkerrs.AbortWithErr(c, bkerrs.New(errCode, err.Error()))
 		return
 	}
 	if err = bkci.EnsureWorkspaceRepositories(
@@ -176,6 +193,16 @@ func (h *Handler) CreateApp(c *gin.Context) {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
+
+	// 应用与构建配置都已落库后再异步 get_or_create 自定义镜像记录，尚无成功快照的镜像会触发一次刷新
+	// 放在应用创建之后，避免创建失败时仍往工作空间写入候选镜像
+	// 失败只打日志，不回滚已保存的数据；WithoutCancel 避免请求结束后 persist 被取消
+	go func() {
+		rCtx := context.WithoutCancel(ctx)
+		if persistErr := h.persistMgr.PersistAfterSave(rCtx, app.WorkspaceID, buildConfig); persistErr != nil {
+			log.Errorf(rCtx, "persist custom runtime images for workspace %s failed: %v", app.WorkspaceID, persistErr)
+		}
+	}()
 
 	// 创建应用后，异步为该应用初始化默认监控告警策略，应用部署后真正下发到监控平台
 	go func() {
