@@ -1,85 +1,100 @@
-# 应用实例 List 全量与 Watch 契约
-
-本文档固化实例列表「List 全量首包 + Watch 投影增量」的接口契约，供后续实现卡对齐。
-**不含** Watch 代理推送或前端改造的业务实现细节。
+# 应用实例 List 全量与 Watch 增量
 
 ## 1. 背景
 
-UI 将从「分页 List + 定时轮询」改为「一次 List 全量 + Watch 增量」。CLI / 非 UI 调用方继续使用分页 List。
-服务端筛排（keyword / status / orderBy / order）与 MongoDB Pod 缓存方案已废弃。
+实例列表早期是「分页 List + 定时轮询」：页面要等下一次轮询才能看到 Pod 变化，间隔内的状态是陈旧的，实例多时还会反复拉全量。
 
-## 2. List：可选全量参数 `all`
+现在改成**一次 List 拿全量首包，之后由 Watch 推增量**。筛选排序放在前端本地做，服务端不提供筛排参数。CLI 等非 UI 调用方继续走分页 List，两种模式共存于同一个接口。
 
-```http
-GET /bkms/v1/bkms-server/apps/{appID}/envs/{envName}/instances
-  ?trafficLaneName=xxx
-  &all=true                         # 全量：禁止同时带 page / pageSize
-  &page=1&pageSize=5                # 分页：不传 all 时必填
+## 2. 两个接口如何衔接
+
+衔接点是 `resourceVersion`——集群 List 响应里的位点，Watch 带着它才能不重不漏地接上。它由 List 成功响应返回，Watch 请求必填。
+
+```mermaid
+sequenceDiagram
+    participant UI as 前端
+    participant Server as bkms-server
+    participant K8s as 集群
+
+    UI->>Server: List all=true
+    Server->>K8s: List Pods（按部署记录的 LabelSelector）
+    K8s-->>Server: Pods + resourceVersion
+    Server-->>UI: 全量投影 + resourceVersion
+    UI->>Server: Watch（带 resourceVersion）
+    Server->>K8s: Watch from resourceVersion
+    K8s-->>Server: Pod 变更事件
+    Server-->>UI: SSE 投影事件
 ```
 
-| 规则                     | 说明                                                                   |
-|------------------------|----------------------------------------------------------------------|
-| 未传 `all` 或 `all=false` | 分页模式；`page` / `pageSize` 必填；当前页解析失败则整次失败（与改造前一致，供 CLI 使用）            |
-| `all=true`             | 一次返回该应用环境下匹配的全部可投影实例；单个 Pod 无法投影时跳过                                  |
-| 与分页互斥                  | `all=true` 与 `page` 或 `pageSize` 任一同时出现时返回参数错误（400），不返回数据            |
-| 响应形态                   | `{ count, results, skippedCount, skipped }`                          |
-| `count`                | 全量：`count == len(results)`（不含跳过项）；分页：LabelSelector 匹配的 Pod 总数        |
-| `skipped*`             | 仅全量模式写入无法投影的实例；分页无跳过（解析失败即 500）；无跳过时 `skippedCount=0` 且 `skipped=[]` |
-| 投影字段                   | 复用既有 `AppInstanceOutputObj`（含 `polarisInfos`），不增删展示字段                |
-| 北极星                    | 拉取失败不阻塞 Pod 输出：分页与全量均降级为 `polarisInfos=[]`，见下                        |
-| 权限                     | 与现有 List 相同：目标应用在目标环境的查看权限                                           |
+两个接口的作用域完全一致，都以该环境/泳道的**最新部署记录**为准：集群、命名空间、LabelSelector 都取自部署记录，不从请求参数推断。鉴权、非 AppModel、无部署记录这三种拒绝也走同一套，因此 Watch 建不成连接的条件与 List 失败的条件相同。
 
-北极星是旁路信息源，它不可用不应该牵连 Pod 数据，因此拉取失败时不再整次 500，而是降级为 `polarisInfos=[]`，
-K8s 字段照常返回，失败原因只落 WARN 日志。降级结果与「该应用确实没注册北极星」同形，服务端不做区分，前端一律展示为未知。
+服务端拉集群 Pod 时可能翻多页，`resourceVersion` 固定取**第一次**响应的值，后续页不覆盖它。否则位点会往前跳，漏掉中间发生的变更。
 
-**本阶段状态**：N2 已落地全量拉取、互斥校验、全量投影失败跳过与北极星合并。
+## 3. List 全量
 
-## 3. Watch：投影事件流
+`all=true` 一次返回该应用环境下匹配的全部实例，与 `page` / `pageSize` 互斥。
 
-```http
-GET|WS /bkms/v1/bkms-server/apps/{appID}/envs/{envName}/instances/watch?trafficLaneName=
-```
+两种模式对坏数据的口径不同：全量模式下单个 Pod 投影失败只跳过该实例并记入 `skipped`，`count` 只算成功投影的条数；分页模式下当前页任一 Pod 解析失败即整次请求失败，避免 CLI 拿到残缺页。
 
-路径与 List 同级，须在路由表中注册在 `:instanceID` 通配之前。
+分页的 `page` 有上界，因为 `(page-1) * pageSize` 在极大页码下会整数溢出成负的起始下标。上界在参数校验阶段拦截，投影时不再重复判断。
 
-### 3.1 事件逻辑结构
+## 4. Watch 投影流
 
-```json5
-{
-  "type": "ADDED | MODIFIED | DELETED",
-  "object": {}
-  // AppInstanceOutputObj；DELETED 可仅含 id 等定位字段
-}
-```
+Watch 把集群 Pod 变更转成**平台投影事件**：事件里的 `object` 是 `AppInstanceOutputObj`，与 List 的元素同构，不是原生 Pod JSON。只推增量，不推首包快照。
 
-| 规则   | 说明                                                                 |
-|------|--------------------------------------------------------------------|
-| 事件类型 | `ADDED` / `MODIFIED` / `DELETED`                                   |
-| 投影   | 平台投影，对齐 `AppInstanceOutputObj`（含 `polarisInfos`），**不是**原生 Pod JSON |
-| 权限   | 与 List 同级；鉴权失败不得建立匿名流                                              |
-| 作用域  | 按 app + env（+ 可选泳道）订阅该部署 LabelSelector 匹配范围内的实例                    |
+传输用 SSE，事件类型 `ADDED` / `MODIFIED` / `DELETED` / `ENDED`。`DELETED` 只保证 `id`，其余字段不投影也不拉北极星；`ENDED` 的 `object` 为 null。
 
-### 3.2 传输形态（待定）
+`watch.Manager` 是核心：建流后进一条 select 循环，同时处理集群事件、定时 tick、连接硬上限和连接取消。异常口径为：
 
-**Q-N1-001**：最终选用 SSE 或 WebSocket，在技术方案评审前不定稿。
-OpenAPI 当前以 `GET` + 事件 JSON 模型描述逻辑结构；编码格式随传输形态而定。
+- 单个 Pod 投影失败：跳过该事件，流继续，不推 `skipped`
+- BOOKMARK：只推进位点，不向前端转发
+- 集群通道关闭或返回 Error 事件：先推 `ENDED`（`reason=cluster watch interrupted`）再收流
+- 连接达到 2 分钟硬上限：先推 `ENDED`（`reason=watch timeout`）再收流
+- 集群 Watch 建不起来（此时尚未写响应头）：位点过期（410 Gone / Expired）返回 409，其他集群故障返回 500，都不写成 200 的事件流
 
-**本阶段状态**：路由、查询参数、事件模型与 OpenAPI 已声明；handler 返回 `NOT_IMPLEMENTED`。推送代理由后续需求（N3）实现。
+### 4.1 断流后必须重新 List
 
-## 4. 承接关系
+收到 `ENDED` / `onerror` / `onclose` 后，前端**必须重新 List 拿新位点**再建 Watch，不能复用旧的。
 
-| 能力                                       | 承接             |
-|------------------------------------------|----------------|
-| List `all=true` 全量拉取、互斥校验、北极星合并与 skipped | N2（已落地）        |
-| Watch 代理集群变更并推送投影事件                      | N3             |
-| 前端 List+Watch、去轮询、本地筛排                   | 后续前端卡          |
-| 传输形态 SSE / WS 选型                         | 技术方案（Q-N1-001） |
+集群侧位点有保留窗口，过期后 apiserver 直接拒绝，拿旧位点重试只会立刻又收到 `ENDED`，形成重连死循环。重新 List 同时补回了断流期间丢失的增量，因此不需要额外的补偿机制。
 
-## 5. 代码锚点
+### 4.2 长连接超时
 
-- Watch 领域事件类型：`pkg/workload/instance/watch/types.go`（`EventType`）
-- List / Watch 查询与 API DTO：`pkg/workload/instance/serializer/instance.go`
-- List handler：`pkg/workload/instance/handler/instance.go`（`ListAppInstances` 编排）、`list.go`（绑定 / 部署记录 / 投影 /
-  北极星）
-- Watch stub：`pkg/workload/instance/handler/watch.go`（`WatchAppInstances`）
-- 路由：`pkg/workload/instance/router.go`
+有两层超时，职责不同：
+
+- **单次写 30s**：`http.Server.WriteTimeout` 是整条响应的写入上限而不是空闲超时，心跳挡不住它。每次写 SSE 前用 `http.NewResponseController` 把写超时重置为「单次写 30s」，避免客户端连着不读时写缓冲写满、goroutine 永久阻塞。
+- **连接总时长 2 分钟**：不对客户端承诺更长的 SSE。到期推 `ENDED`（`reason=watch timeout`），同时给集群 Watch 带上同样量级的 `TimeoutSeconds`。前端按 §4.1 重新 List 再建 Watch。
+
+响应头写出之后就改不了 HTTP 状态码，因此流中途的写失败只落 WARN 日志，不再向调用方返回错误。
+
+## 5. 北极星信息
+
+北极星实例状态（健康 / 权重 / 隔离）按 Pod IP + 服务端口匹配后挂到实例上，List 和 Watch 共用同一套合并算法。
+
+**它没有原生 Watch**。若只在 Pod 事件上合并，Pod 不动时页面上的状态就停住了。所以连接存活期间每 15s 补拉一次（与 SSE 心跳共用一个 ticker，间隔取自北极星 SDK 的缓存量级），只对 `polarisInfos` 相对上次推送**有变化**的实例补推一条 `MODIFIED`。不新增事件类型，K8s 展示字段沿用该实例上次已知投影。
+
+比对靠连接级的 `pushedInstances`：记下每个实例最后一次推出去的投影，`DELETED` 时移除。所以既不会补出从没推过的实例，也不会给已删除的实例补事件。它是请求级内存，随 `DELETED` 出栈因而不随事件数累积，驻留量上界是该环境存活的实例数（与一次 List 全量同量级），连接一关就整体释放。
+
+比对还依赖顺序稳定，因此构造 `polarisInfos` 时按 `(serviceNamespace, serviceName, port)` 定序输出——北极星侧返回顺序会漂移，不定序就会被误判成变化、每轮重复推送。定序发生在产出切片的那一层，Merge 只负责按 IP 匹配后赋值。
+
+Pod 事件不单独拉北极星，而是复用最近一轮结果：`polarisCache == nil`（从未成功缓存）或缓存超过一个 tick 才真拉。成功拉取即使空结果也写成空切片，与「从未缓存」区分。Pod 的 `MODIFIED` 很密（一个 Pod 从 Pending 到 Ready 就有多条，滚动更新瞬间几百条），每条都拉要多查一次无缓存的北极星配置库，而 SDK 自身有 15s 缓存，更密的拉取拿回来的是同一份数据。新实例因此可能有一轮拿不到北极星信息，由下一轮补拉补上。
+
+### 5.1 拉不到时降级为未知
+
+北极星是旁路信息源，**它不可用不应该牵连 Pod 数据**。List 不整次失败、Watch 不拆流，两边都降级为 `polarisInfos=[]`，K8s 字段照常返回，失败原因只落 WARN 日志。
+
+降级结果与「该应用确实没注册北极星」同形，服务端不做区分，前端一律展示为未知。
+
+唯一的例外是周期补拉失败：那时页面上已有上一轮拿到的真实状态，清成空是信息倒退，所以跳过本轮、保留上次已知值。
+
+## 6. 代码地图
+
+`pkg/workload/instance/` 下：
+
+- `handler/instance.go`、`handler/list.go` — List 编排：绑定校验、取部署记录、投影、合并北极星
+- `handler/watch.go` — Watch handler，把部署记录换算成订阅范围后交给 `Manager`
+- `watch/stream.go` — `Manager`，建流与事件循环
+- `watch/sse.go` — `sseStream`，SSE 写入与滚动写超时
+- `watch/polaris.go` — 北极星周期补拉、缓存与差异比对
+- `watch/pushed.go` — `pushedInstances`，连接级的已推送投影
+- `serializer/instance.go` — 查询 DTO、Pod 投影与北极星合并算法
