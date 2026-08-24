@@ -19491,6 +19491,14 @@ const docTemplate = `{
                         }
                     ]
                 },
+                "cluster": {
+                    "description": "环境绑定的业务集群信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/serializer.DeployOverviewClusterObj"
+                        }
+                    ]
+                },
                 "deployStatus": {
                     "description": "部署状态（原始枚举）",
                     "type": "string"
@@ -19513,6 +19521,10 @@ const docTemplate = `{
                 },
                 "envType": {
                     "description": "环境类型（development / test / staging / production）",
+                    "type": "string"
+                },
+                "imageTag": {
+                    "description": "部署的镜像 Tag；无部署记录时为空字符串",
                     "type": "string"
                 },
                 "instances": {
@@ -19722,6 +19734,14 @@ const docTemplate = `{
                         "$ref": "#/definitions/serializer.PolarisInstanceInfoOutputObj"
                     }
                 },
+                "resources": {
+                    "description": "主容器资源规格（集群 Pod 实际值）",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/serializer.AppInstanceResourcesObj"
+                        }
+                    ]
+                },
                 "restartCount": {
                     "description": "重启次数",
                     "type": "string",
@@ -19729,6 +19749,27 @@ const docTemplate = `{
                 },
                 "status": {
                     "description": "状态，由 pod.status.phase 等解析获得",
+                    "type": "string"
+                }
+            }
+        },
+        "serializer.AppInstanceResourcesObj": {
+            "type": "object",
+            "properties": {
+                "cpuLimits": {
+                    "description": "CPU limits（Kubernetes quantity 字符串），可选：未配置时不返回该字段",
+                    "type": "string"
+                },
+                "cpuRequests": {
+                    "description": "CPU requests，可选：未配置时不返回该字段",
+                    "type": "string"
+                },
+                "memoryLimits": {
+                    "description": "Memory limits，可选：未配置时不返回该字段",
+                    "type": "string"
+                },
+                "memoryRequests": {
+                    "description": "Memory requests，可选：未配置时不返回该字段",
                     "type": "string"
                 }
             }
@@ -22848,6 +22889,31 @@ const docTemplate = `{
                 },
                 "statusMessage": {
                     "description": "非 True condition 的汇总消息，可选：一切正常时为空字符串",
+                    "type": "string"
+                }
+            }
+        },
+        "serializer.DeployOverviewClusterObj": {
+            "type": "object",
+            "properties": {
+                "clusterID": {
+                    "description": "集群 ID",
+                    "type": "string"
+                },
+                "clusterName": {
+                    "description": "集群展示名（来自 BCS）；拉取失败时为空字符串",
+                    "type": "string"
+                },
+                "clusterType": {
+                    "description": "集群类型",
+                    "type": "string"
+                },
+                "namespace": {
+                    "description": "集群命名空间",
+                    "type": "string"
+                },
+                "projectCode": {
+                    "description": "项目 code",
                     "type": "string"
                 }
             }
