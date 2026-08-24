@@ -76,3 +76,39 @@ export const DOC_LINKS = {
   // 扩缩容稳定性
   SCALE_STABILITY: '/p/1015455438#%E6%89%A9%E7%BC%A9%E5%AE%B9%E7%A8%B3%E5%AE%9A%E6%80%A7',
 };
+
+/**
+ * iframe 内部观测参数（route-change 同步到 URL 的 apmQuery 字段内容）
+ */
+export interface ApmQueryParams {
+  dashboardId?: string;
+  'filter-app_name'?: string;
+  'filter-service_name'?: string;
+  from?: string;
+  interval?: string;
+  isGroupByLimit?: boolean;
+  method?: string;
+  preciseFilter?: boolean;
+  queryString?: string;
+  refreshInterval?: number;
+  sceneType?: string;
+  timezone?: string;
+  to?: string;
+}
+
+/**
+ * 监控平台 APM 观测页默认参数（iframe 初始化 & route-change 回写共用）
+ * 注意：dashboardId / filter-app_name / filter-service_name 等业务差异字段不在此处，由页面各自提供
+ */
+export const DEFAULT_APM_CONFIG = {
+  method: 'AVG',
+  interval: 'auto',
+  from: 'now-1h',
+  to: 'now',
+  timezone: 'Asia/Shanghai',
+  refreshInterval: -1,
+  sceneType: 'overview',
+  queryString: '',
+  preciseFilter: false,
+  isGroupByLimit: false,
+} as const;
