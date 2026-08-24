@@ -67,9 +67,12 @@
           isHover: true,
           isCurrent: true,
         }"
+        :settings="settings"
+        :show-settings="true"
         @filter-change="handleFilterChange"
         @page-limit-change="handlePageSizeChange"
         @page-value-change="handlePageChange"
+        @setting-change="handleSettingChange"
       >
         <template #empty>
           <TableException
@@ -182,6 +185,7 @@
 
         <!-- 实例列 -->
         <TableColumn
+          field="id"
           :label="$t('实例')"
           min-width="150"
           show-overflow="tooltip"
@@ -195,6 +199,7 @@
         <TableColumn
           field="image"
           :filters="showFilter ? filterOptions.image : undefined"
+          :label="$t('镜像 Tag')"
           min-width="100"
           :show-overflow="false"
         >
@@ -220,6 +225,7 @@
 
         <!-- Pod IP 列 -->
         <TableColumn
+          field="ip"
           label="Pod IP"
           min-width="100"
           show-overflow="tooltip"
@@ -231,6 +237,7 @@
 
         <!-- Node IP 列 -->
         <TableColumn
+          field="nodeIP"
           label="Node IP"
           min-width="100"
           show-overflow="tooltip"
@@ -242,6 +249,7 @@
 
         <!-- 实例状态列（条件筛选头） -->
         <TableColumn
+          field="status"
           :filters="showFilter ? filterOptions.status : undefined"
           :label="$t('实例状态')"
           min-width="100"
@@ -271,6 +279,7 @@
         <TableColumn
           field="isHealthy"
           :filters="showFilter ? filterOptions.isHealthy : undefined"
+          :label="$t('健康状态')"
           min-width="100"
           show-overflow="tooltip"
         >
@@ -299,6 +308,7 @@
         <TableColumn
           field="polarisStatus"
           :filters="showFilter ? filterOptions.polarisStatus : undefined"
+          :label="$t('北极星状态')"
           min-width="120"
         >
           <template #header>
@@ -407,6 +417,7 @@
 
         <!-- Restart 列 -->
         <TableColumn
+          field="restartCount"
           label="Restart"
           min-width="100"
           show-overflow="tooltip"
@@ -419,12 +430,41 @@
 
         <!-- Age 列 -->
         <TableColumn
+          field="age"
           label="Age"
           min-width="100"
           show-overflow="tooltip"
         >
           <template #default="{ row }: { row: AppInstanceOutputObj }">
             {{ row.age || '--' }}
+          </template>
+        </TableColumn>
+
+        <!-- 资源规格列：主容器 CPU / 内存规格，悬浮展示完整的 Requests/Limits -->
+        <TableColumn
+          field="resources"
+          :label="$t('资源规格')"
+          min-width="120"
+        >
+          <template #default="{ row }: { row: AppInstanceOutputObj }">
+            <Popover
+              v-if="getResourceText(row.resources)"
+              placement="top"
+            >
+              <span class="cursor-default border-b border-dashed border-[#979BA5]">{{
+                getResourceText(row.resources)
+              }}</span>
+              <template #content>
+                <div
+                  v-for="line in getResourceTips(row.resources)"
+                  :key="line"
+                  class="whitespace-nowrap leading-[20px]"
+                >
+                  {{ line }}
+                </div>
+              </template>
+            </Popover>
+            <span v-else>--</span>
           </template>
         </TableColumn>
 
@@ -511,7 +551,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, watch } from 'vue';
+  import { computed, reactive, ref, watch } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
   import { Button, Checkbox, Dropdown, Popover, Tag } from 'bkui-vue';
@@ -525,6 +565,7 @@
   import TableException from '~/components/table-exception.vue';
   import { envTypeMap, envTypeTagClassMap } from '~/composables/use-env-manager';
   import { useGPAConfigPolling } from '~/composables/use-gpa-config-polling';
+  import { useResourceSpecDisplay } from '~/composables/use-resource-spec-display';
   import useTableCheckbox from '~/composables/use-table-checkbox';
   import useTableEmpty from '~/composables/use-table-empty';
   import AutoScaleTag from '~/pages/application/detail/components/auto-scale-tag.vue';
@@ -539,6 +580,7 @@
     InstanceSelectionChangePayload,
     InstanceTableMode,
   } from '../types';
+  import type { ISettings } from 'node_modules/@blueking/table/typings/components/setting-column/Index.vue';
   import type { FilterItem } from '~/components/custom-filter.vue';
 
   interface Props {
@@ -585,6 +627,22 @@
 
   const appDetailStore = useAppDetail();
   const tableRef = ref();
+
+  const { getResourceText, getResourceTips } = useResourceSpecDisplay();
+
+  // 列设置：资源规格等新增列默认不勾选，用户可在表格右上角列设置中开启。
+  // 不传 size：保持表格默认行高密度；列设置面板行高选项默认值为 small，
+  // 若同步 settings.size 会在打开面板后被悄悄改小行高，产生非预期视觉变化。
+  const settings = reactive<ISettings>({
+    checked: ['id', 'image', 'ip', 'nodeIP', 'status', 'isHealthy', 'polarisStatus', 'restartCount', 'age'],
+    disabled: ['id'],
+  });
+
+  /** 同步列设置勾选状态，保证与界面一致。 */
+  function handleSettingChange(data: ISettings) {
+    settings.checked = data.checked || settings.checked;
+    settings.size = data.size;
+  }
 
   // 特性环境
   const isFeatureEnv = computed(() => props.envKind === 'feature');

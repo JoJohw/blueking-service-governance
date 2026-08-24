@@ -128,6 +128,12 @@ export interface CreateAppPolarisConfigInput {
    */
   polarisToken?: string;
   /**
+   * 注册模式，默认 on_deploy（等部署后注册）。
+   * immediate 表示绑定环境后立即下发 PolarisConfig CR 与配套 Service 完成注册，
+   * 该配置不再注入环境变量和 tRPC 框架配置。创建后不可修改
+   */
+  registerMode?: "immediate" | "on_deploy";
+  /**
    * 生效的环境列表
    */
   scopeEnvNames?: string[];
@@ -294,6 +300,10 @@ export interface PolarisConfigOutputObj {
    * 北极星 Token（敏感信息，返回时脱敏）
    */
   polarisToken?: string;
+  /**
+   * 注册模式：immediate（绑定后立即注册）| on_deploy（等部署后注册）
+   */
+  registerMode?: string;
   /**
    * 生效的环境列表
    */

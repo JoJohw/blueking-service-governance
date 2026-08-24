@@ -75,12 +75,15 @@ export interface DeployOverviewDeployTarget {
 export interface DeployOverviewRow {
   abnormalCount: null | number;
   autoScale: DeployOverviewAutoScale;
+  clusterID: string;
+  clusterName: string;
   cpuLimits: string;
   cpuRequests: string;
   deployedAt: string;
   deployStatus: string;
   desiredCount: null | number;
   displayName: string;
+  imageTag: string;
   isFeature: boolean;
   memoryLimits: string;
   memoryRequests: string;
@@ -400,12 +403,15 @@ export function useDeployOverview(envList: Ref<EnvOutput[]>) {
       // instances=null 表示后台无法提供实例数据，三个数量必须统一显示“--”。
       abnormalCount: item.instances ? (item.instances.abnormal ?? 0) : null,
       autoScale: createAutoScale(item.autoscaling),
+      clusterID: item.cluster?.clusterID || '',
+      clusterName: item.cluster?.clusterName || '',
       cpuLimits: resources.cpuLimits || '',
       cpuRequests: resources.cpuRequests || '',
       deployedAt: item.lastDeployStartedAt || '',
       deployStatus: item.deployStatus || APP_DEPLOY_STATUS.UNKNOWN,
       desiredCount: item.instances ? (item.instances.expected ?? 0) : null,
       displayName: item.envDisplayName || item.envName || '--',
+      imageTag: item.imageTag || '',
       isFeature: item.envKind === 'feature',
       memoryLimits: resources.memoryLimits || '',
       memoryRequests: resources.memoryRequests || '',
