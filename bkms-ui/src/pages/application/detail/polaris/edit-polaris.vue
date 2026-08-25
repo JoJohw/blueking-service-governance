@@ -94,10 +94,8 @@
                   :precision="0"
                   type="number"
                 />
-                <div class="text-[12px] leading-[20px] text-[#979BA5]">
-                  {{
-                    $t('服务端口会写入到应用的环境变量 {0}_serviceport 中', [formModel.instanceKey || $t('实例名称')])
-                  }}
+                <div class="mt-[4px] text-[12px] leading-[20px] text-[#979BA5]">
+                  {{ servicePortHint }}
                 </div>
                 <Alert
                   v-if="showServicePortChangeAlert"
@@ -176,42 +174,6 @@
                 />
               </Form.FormItem>
 
-              <!-- 健康检查 -->
-              <Form.FormItem
-                :label="$t('健康检查')"
-                property="enableHealthCheck"
-                required
-              >
-                <div class="flex items-center">
-                  <Switcher
-                    v-model="formModel.enableHealthCheck"
-                    theme="primary"
-                  />
-                  <span class="ml-[10px] text-[12px] text-[#63656E]">
-                    {{ $t('开启后将自动上报 tRPC 服务的健康状态到北极星') }}
-                  </span>
-                </div>
-                <Alert
-                  v-if="showHealthCheckWarning"
-                  class="mt-[12px]"
-                  theme="warning"
-                >
-                  <template #title>
-                    <span class="text-[#4D4F56] text-[12px]">
-                      {{ $t('需要在框架配置文件的 server.service 中包含该北极星服务名，健康检查才会生效：') }}
-                    </span>
-                  </template>
-                  <MsHighlightjs
-                    class="mt-[8px]"
-                    :code="healthCheckExample.code"
-                    :highlights="healthCheckExample.highlights"
-                    :show-tools="false"
-                    :title="currentFileSpec?.fileName"
-                  >
-                  </MsHighlightjs>
-                </Alert>
-              </Form.FormItem>
-
               <!-- 北极星Token (仅在从现有引入时显示) -->
               <Form.FormItem
                 v-if="!formModel.createNewService"
@@ -245,7 +207,7 @@
                   multiple
                 />
                 <template v-if="!isEditMode">
-                  <span class="text-[#979BA5]">{{ $t('创建后不可修改，请认真填写；可快捷填入') }}: </span>
+                  <span class="text-[#979BA5]">{{ $t('可快捷填入') }}: </span>
                   <Button
                     text
                     theme="primary"
@@ -273,6 +235,105 @@
                     <span class="ml-[4px]">{{ $t('所有开发者') }}</span>
                   </Button>
                 </template>
+              </Form.FormItem>
+
+              <!-- 生效方式 -->
+              <Form.FormItem
+                :label="$t('生效方式')"
+                property="registerMode"
+                required
+              >
+                <Radio.Group
+                  v-model="formModel.registerMode"
+                  class="flex w-full flex-col gap-[8px]"
+                  :disabled="isEditMode"
+                >
+                  <div
+                    class="w-full border border-solid rounded-[2px] px-[16px] py-[8px] transition-colors duration-200"
+                    :class="[
+                      formModel.registerMode === 'immediate'
+                        ? 'border-[#3A84FF] bg-[#F0F5FF]'
+                        : 'border-[#DCDEE5] bg-white',
+                      isEditMode ? 'cursor-not-allowed' : 'cursor-pointer hover:border-[#3A84FF]',
+                    ]"
+                    @click="handleSelectRegisterMode('immediate')"
+                  >
+                    <Radio
+                      class="!m-0 !h-auto !flex items-center whitespace-normal"
+                      :disabled="isEditMode"
+                      label="immediate"
+                    >
+                      {{ $t('立即生效') }}
+                    </Radio>
+                  </div>
+                  <div
+                    class="w-full border border-solid rounded-[2px] px-[16px] py-[8px] transition-colors duration-200"
+                    :class="[
+                      formModel.registerMode === 'on_deploy'
+                        ? 'border-[#3A84FF] bg-[#F0F5FF]'
+                        : 'border-[#DCDEE5] bg-white',
+                      isEditMode ? 'cursor-not-allowed' : 'cursor-pointer hover:border-[#3A84FF]',
+                    ]"
+                    @click="handleSelectRegisterMode('on_deploy')"
+                  >
+                    <Radio
+                      class="!m-0 !h-auto !flex items-center whitespace-normal"
+                      :disabled="isEditMode"
+                      label="on_deploy"
+                    >
+                      <span class="inline-flex flex-wrap items-center gap-x-[8px] leading-[20px]">
+                        <span class="shrink-0 text-[#4D4F56]">{{ $t('下次部署生效') }}</span>
+                        <span class="text-[12px] leading-[20px] text-[#979BA5]">
+                          {{ $t('部署后才将实例注册到北极星，同时注入北极星 Token、服务端口等内容到应用环境变量中') }}
+                        </span>
+                      </span>
+                    </Radio>
+                  </div>
+                </Radio.Group>
+                <div
+                  v-if="isEditMode"
+                  class="mt-[4px] text-[12px] leading-[20px] text-[#979BA5]"
+                >
+                  {{ $t('创建后不可修改') }}
+                </div>
+              </Form.FormItem>
+
+              <!-- 健康检查 -->
+              <Form.FormItem
+                :label="$t('健康检查')"
+                property="enableHealthCheck"
+                required
+              >
+                <div class="flex items-center gap-[10px]">
+                  <Switcher
+                    v-model="formModel.enableHealthCheck"
+                    class="shrink-0"
+                    theme="primary"
+                  />
+                  <div
+                    v-if="showHealthCheckTip"
+                    class="text-[12px] leading-[20px] text-[#979BA5]"
+                  >
+                    <i18n-t
+                      v-if="isImmediateRegister(formModel)"
+                      keypath="需要业务主动完成心跳上报 {0}"
+                      tag="span"
+                    >
+                      <a
+                        class="text-[#3A84FF]"
+                        :href="heartbeatDocUrl"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >
+                        {{ $t('参考文档') }}
+                        <Share class="ml-[2px] align-[-2px]" />
+                      </a>
+                    </i18n-t>
+                    <span v-else>
+                      {{ $t('平台会自动在框架配置文件追加服务注册信息，由 tRPC 框架自动完成心跳上报') }}
+                    </span>
+                  </div>
+                </div>
               </Form.FormItem>
 
               <!-- 服务标签 -->
@@ -386,7 +447,7 @@
   import { computed, ref, watch } from 'vue';
 
   import { Alert, Button, Form, Input, Message, Radio, Sideslider, Switcher } from 'bkui-vue';
-  import { Copy } from 'bkui-vue/lib/icon';
+  import { Copy, Share } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { EnvOutput } from '~/@types/v1/env';
   import {
@@ -397,17 +458,17 @@
   } from '~/@types/v1/polaris-config';
   import { EnvvarsService, PolarisConfigService } from '~/api/modules/v1';
   import { WorkspaceService } from '~/api/modules/v1/workspace';
-  import { BKMS_REGEX } from '~/common/const';
+  import { BKMS_REGEX, DOC_LINKS } from '~/common/const';
   import { copyText } from '~/common/util';
   import EnvGroupSelector from '~/components/env-group-selector.vue';
   import KeyValue from '~/components/key-value.vue';
   import { useFocusOnErrorField } from '~/composables/use-focus-on-error-field';
   import useLeaveConfirm from '~/composables/use-leave-confirm';
-  import useSpecField from '~/composables/use-spec-field';
   import { useAppDetail } from '~/stores/app-detail';
   import { useUserStore } from '~/stores/user';
 
   import PolarisRedeployTip from './polaris-redeploy-tip.vue';
+  import { isImmediateRegister } from './redeploy-utils';
 
   const expressTemplate = '${{ env.<Key> }}';
 
@@ -467,10 +528,6 @@
     }
     formModel.value.operator = [...members];
   }
-  const { specFieldName } = useSpecField();
-
-  const currentFileSpec = computed(() => appDetailStore.appDetail?.appModelSpec?.[specFieldName.value]);
-
   const formRef = ref();
   const confirmLoading = ref(false);
   const isEditMode = computed(() => !!props.editData);
@@ -483,6 +540,7 @@
   );
   // 侧栏宽度
   const sliderWidth = computed(() => (showRedeployTip.value || isCollaspeAside.value ? 960 : 1400));
+  const heartbeatDocUrl = `${window.BK_DOC_URL || 'https://iwiki.woa.com'}${DOC_LINKS.POLARIS_HEARTBEAT}`;
 
   // 北极星环境类型选项
   const polarisEnvTypes = ['Development', 'Test', 'Pre-release', 'Production'];
@@ -492,6 +550,7 @@
     servicePort: undefined,
     scopeEnvNames: [],
     createNewService: false,
+    registerMode: undefined,
     enableHealthCheck: false,
     polarisToken: '',
     polarisName: '',
@@ -501,20 +560,19 @@
   });
   const formModel = ref<FormModelType>({ ...defaultFormValue.value });
 
-  // 检测配置文件中是否包含北极星服务名
-  const hasPolarisNameInConfig = computed(() => {
-    const fileContent = currentFileSpec.value?.fileContent || '';
-    const polarisName = formModel.value.polarisName;
-    if (!polarisName || !fileContent) return false;
-    return fileContent.includes(polarisName);
-  });
+  const showHealthCheckTip = computed(
+    () => formModel.value.registerMode !== undefined && !!formModel.value.enableHealthCheck,
+  );
 
-  // 是否显示健康检查的配置文件提示（开启健康检查且配置文件中未包含北极星服务名时显示）
-  const showHealthCheckWarning = computed(() => formModel.value.enableHealthCheck && !hasPolarisNameInConfig.value);
+  const servicePortHint = computed(() =>
+    isImmediateRegister(formModel.value)
+      ? t('立即生效时，服务端口不会写入环境变量')
+      : t('服务端口会写入到应用的环境变量 {0}_serviceport 中', [formModel.value.instanceKey || t('实例名称')]),
+  );
 
-  // 编辑模式下，服务端口与原始值不一致时提示需重新部署
+  // 立即生效模式不依赖环境变量，端口与 Token 变更均无需重新部署。
   const showServicePortChangeAlert = computed(() => {
-    if (!isEditMode.value) return false;
+    if (!isEditMode.value || isImmediateRegister(formModel.value)) return false;
     const currentPort = formModel.value.servicePort ? Number(formModel.value.servicePort) : '';
     const originalPort = props.editData?.servicePort ? Number(props.editData.servicePort) : '';
     return currentPort !== originalPort;
@@ -522,23 +580,11 @@
 
   // 编辑模式下，北极星 Token 与原始值不一致时提示需重新部署
   const showPolarisTokenChangeAlert = computed(() => {
-    if (!isEditMode.value || formModel.value.createNewService) return false;
+    if (!isEditMode.value || formModel.value.createNewService || isImmediateRegister(formModel.value)) return false;
     return String(formModel.value.polarisToken || '') !== String(props.editData?.polarisToken || '');
   });
 
   const hasRedeployFieldChanged = computed(() => showServicePortChangeAlert.value || showPolarisTokenChangeAlert.value);
-
-  // 健康检查示例代码及高亮标记（服务名为空时，占位文本用醒目颜色提示）
-  const healthCheckExample = computed(() => {
-    const placeholder = t('北极星服务名需与此处一致');
-    const name = formModel.value.polarisName || placeholder;
-    return {
-      code: `server:
-    service:
-        - name: ${name}`,
-      highlights: formModel.value.polarisName ? [] : [{ text: placeholder, color: '#F59500' }],
-    };
-  });
 
   // 使用 useLeaveConfirm hook 管理表单变化检测
   const { confirmBox, forceCleanDirtyTag, withPausedWatch } = useLeaveConfirm(formModel);
@@ -559,6 +605,15 @@
         },
         message: t('请输入1-65535之间的端口号'),
         trigger: 'blur',
+      },
+    ],
+    registerMode: [
+      {
+        required: true,
+        validator: (value?: CreateAppPolarisConfigInput['registerMode']) =>
+          isEditMode.value || value === 'immediate' || value === 'on_deploy',
+        message: t('请选择生效方式'),
+        trigger: 'change',
       },
     ],
     polarisToken: [
@@ -611,6 +666,7 @@
       envName: env,
     });
   }
+
   /**
    * @description 初始化会update两次,这里的formData.selector不好用watch + once清除DirtyTag
    * 故选择让KeyValue抛出init方法，作为初始化成功的钩子，从而清除formChange的dirtyTag
@@ -622,6 +678,12 @@
   let refreshed = false;
   function handleRefreshEnvVar() {
     envVarRef.value?.reRefreshTable();
+  }
+
+  // 选择生效方式
+  function handleSelectRegisterMode(registerMode: NonNullable<CreateAppPolarisConfigInput['registerMode']>) {
+    if (isEditMode.value) return;
+    formModel.value.registerMode = registerMode;
   }
 
   async function handleToggleisCollaspeAside() {
@@ -643,6 +705,7 @@
         servicePort: props.editData?.servicePort,
         scopeEnvNames: props.editData?.scopeEnvNames || [],
         createNewService: Boolean(props.editData?.depSvcInstID),
+        registerMode: props.editData?.registerMode === 'immediate' ? 'immediate' : 'on_deploy',
         enableHealthCheck: props.editData?.enableHealthCheck ?? false,
         polarisToken: props.editData?.polarisToken,
         polarisName: props.editData?.polarisName,
@@ -847,11 +910,13 @@
   :deep(.bk-form-label) {
     color: #4d4f56;
   }
+
   :deep(.bk-checkbox-group) {
     .bk-checkbox {
-      margin-left: 0px;
+      margin-left: 0;
     }
   }
+
   :deep(.bk-alert-content) {
     padding-right: 22px;
   }
