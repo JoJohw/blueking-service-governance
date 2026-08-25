@@ -553,6 +553,10 @@ export interface AppDeployOverviewEnvObj {
    */
   autoscaling?: DeployOverviewAutoscalingObj;
   /**
+   * 环境绑定的业务集群信息
+   */
+  cluster?: DeployOverviewClusterObj;
+  /**
    * 部署状态（原始枚举）
    */
   deployStatus?: string;
@@ -576,6 +580,10 @@ export interface AppDeployOverviewEnvObj {
    * 环境类型（development / test / staging / production）
    */
   envType?: string;
+  /**
+   * 部署的镜像 Tag；无部署记录时为空字符串
+   */
+  imageTag?: string;
   /**
    * 实例数，可选：集群查询失败或缺少 workload 时为 null
    */
@@ -615,6 +623,29 @@ export interface DeployOverviewAutoscalingObj {
    * 集群 GPA CR 运行状态，可选：未启用 / CR 缺失 / 查询失败时为 null
    */
   status?: DeployOverviewAutoscalingStatusObj;
+}
+
+export interface DeployOverviewClusterObj {
+  /**
+   * 集群 ID
+   */
+  clusterID?: string;
+  /**
+   * 集群展示名（来自 BCS）；拉取失败时为空字符串
+   */
+  clusterName?: string;
+  /**
+   * 集群类型
+   */
+  clusterType?: string;
+  /**
+   * 集群命名空间
+   */
+  namespace?: string;
+  /**
+   * 项目 code
+   */
+  projectCode?: string;
 }
 
 export interface DeployOverviewInstancesObj {

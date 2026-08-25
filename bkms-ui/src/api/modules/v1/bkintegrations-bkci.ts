@@ -6,20 +6,7 @@
 import type { Config } from '~/api/interceptors';
 import type { NoInfer } from '~/api/ts-helpers';
 import { v1Fetch } from '~/api/clients';
-import type {
-  ListBkCIOAuthGitProjectsRequest,
-  BkCIOAuthGitProjectOutput,
-  GetBkCIOAuthUrlRequest,
-  ListBkCIPipelinesRequest,
-  PaginatedBkCIPipelineOutput,
-  GetBkCIPipelineRequest,
-  BkCIPipelineDetailOutput,
-  GetBkCIPipelineVariablesRequest,
-  BkCIPipelineVariableOutput,
-  ListBkCIRepositoryBranchesRequest,
-  BkCIRepositoryRefOutput,
-  ListBkCIRepositoryTagsRequest,
-} from '~/@types/v1/bkintegrations-bkci';
+import type { ListBkCIOAuthGitProjectsRequest, BkCIOAuthGitProjectOutput, GetBkCIOAuthUrlRequest, ListBkCIPipelinesRequest, PaginatedBkCIPipelineOutput, GetBkCIPipelineRequest, BkCIPipelineDetailOutput, GetBkCIPipelineVariablesRequest, BkCIPipelineVariableOutput, ListBkCIRepositoryBranchesRequest, BkCIRepositoryRefOutput, ListBkCIRepositoryTagsRequest } from '~/@types/v1/bkintegrations-bkci';
 
 export const BkintegrationsBkciService = {
   /**
@@ -33,10 +20,7 @@ export const BkintegrationsBkciService = {
    * @response 200 ListBkCIOAuthGitProjectsOutput OK
    * @response 400 GinErrorOutput Bad Request
    */
-  listBkCIOAuthGitProjects: async <
-    Request extends ListBkCIOAuthGitProjectsRequest = ListBkCIOAuthGitProjectsRequest,
-    ResponseData = BkCIOAuthGitProjectOutput[],
-  >(
+  listBkCIOAuthGitProjects: async <Request extends ListBkCIOAuthGitProjectsRequest = ListBkCIOAuthGitProjectsRequest, ResponseData = BkCIOAuthGitProjectOutput[]>(
     params?: NoInfer<Request>,
     config?: Config,
   ) => await v1Fetch.get<Request, ResponseData>('/workspaces/{workspaceID}/bkci-git-projects')(params, config),
@@ -67,10 +51,7 @@ export const BkintegrationsBkciService = {
    * @response 200 ListBkCIPipelinesOutput OK
    * @response 400 GinErrorOutput Bad Request
    */
-  listBkCIPipelines: async <
-    Request extends ListBkCIPipelinesRequest = ListBkCIPipelinesRequest,
-    ResponseData = PaginatedBkCIPipelineOutput,
-  >(
+  listBkCIPipelines: async <Request extends ListBkCIPipelinesRequest = ListBkCIPipelinesRequest, ResponseData = PaginatedBkCIPipelineOutput>(
     params?: NoInfer<Request>,
     config?: Config,
   ) => await v1Fetch.get<Request, ResponseData>('/workspaces/{workspaceID}/bkci-pipelines')(params, config),
@@ -85,14 +66,10 @@ export const BkintegrationsBkciService = {
    * @response 200 GetBkCIPipelineOutput OK
    * @response 400 GinErrorOutput Bad Request
    */
-  getBkCIPipeline: async <
-    Request extends GetBkCIPipelineRequest = GetBkCIPipelineRequest,
-    ResponseData = BkCIPipelineDetailOutput,
-  >(
+  getBkCIPipeline: async <Request extends GetBkCIPipelineRequest = GetBkCIPipelineRequest, ResponseData = BkCIPipelineDetailOutput>(
     params?: NoInfer<Request>,
     config?: Config,
-  ) =>
-    await v1Fetch.get<Request, ResponseData>('/workspaces/{workspaceID}/bkci-pipelines/{pipelineID}')(params, config),
+  ) => await v1Fetch.get<Request, ResponseData>('/workspaces/{workspaceID}/bkci-pipelines/{pipelineID}')(params, config),
   /**
    * 获取蓝盾流水线变量列表
    *
@@ -104,17 +81,10 @@ export const BkintegrationsBkciService = {
    * @response 200 GetBkCIPipelineVariablesOutput OK
    * @response 400 GinErrorOutput Bad Request
    */
-  getBkCIPipelineVariables: async <
-    Request extends GetBkCIPipelineVariablesRequest = GetBkCIPipelineVariablesRequest,
-    ResponseData = BkCIPipelineVariableOutput[],
-  >(
+  getBkCIPipelineVariables: async <Request extends GetBkCIPipelineVariablesRequest = GetBkCIPipelineVariablesRequest, ResponseData = BkCIPipelineVariableOutput[]>(
     params?: NoInfer<Request>,
     config?: Config,
-  ) =>
-    await v1Fetch.get<Request, ResponseData>('/workspaces/{workspaceID}/bkci-pipelines/{pipelineID}/variables')(
-      params,
-      config,
-    ),
+  ) => await v1Fetch.get<Request, ResponseData>('/workspaces/{workspaceID}/bkci-pipelines/{pipelineID}/variables')(params, config),
   /**
    * 获取代码仓库分支列表
    *
@@ -130,10 +100,7 @@ export const BkintegrationsBkciService = {
    * @response 200 ListBkCIRepositoryBranchesOutput OK
    * @response 400 GinErrorOutput Bad Request
    */
-  listBkCIRepositoryBranches: async <
-    Request extends ListBkCIRepositoryBranchesRequest = ListBkCIRepositoryBranchesRequest,
-    ResponseData = BkCIRepositoryRefOutput[],
-  >(
+  listBkCIRepositoryBranches: async <Request extends ListBkCIRepositoryBranchesRequest = ListBkCIRepositoryBranchesRequest, ResponseData = BkCIRepositoryRefOutput[]>(
     params?: NoInfer<Request>,
     config?: Config,
   ) => await v1Fetch.get<Request, ResponseData>('/workspaces/{workspaceID}/bkci-repositories/branches')(params, config),
@@ -152,10 +119,7 @@ export const BkintegrationsBkciService = {
    * @response 200 ListBkCIRepositoryTagsOutput OK
    * @response 400 GinErrorOutput Bad Request
    */
-  listBkCIRepositoryTags: async <
-    Request extends ListBkCIRepositoryTagsRequest = ListBkCIRepositoryTagsRequest,
-    ResponseData = BkCIRepositoryRefOutput[],
-  >(
+  listBkCIRepositoryTags: async <Request extends ListBkCIRepositoryTagsRequest = ListBkCIRepositoryTagsRequest, ResponseData = BkCIRepositoryRefOutput[]>(
     params?: NoInfer<Request>,
     config?: Config,
   ) => await v1Fetch.get<Request, ResponseData>('/workspaces/{workspaceID}/bkci-repositories/tags')(params, config),
