@@ -6,7 +6,7 @@
 import type { Config } from '~/api/interceptors';
 import type { NoInfer } from '~/api/ts-helpers';
 import { v1Fetch } from '~/api/clients';
-import type { ListEventsRequest, PaginatedEventsOutputObj, ListAppInstancesRequest, PaginatedAppInstancesOutputObj, UpdateAppInstancesRequest, EmptyOutput, ListTrpcAdminCmdsRequest, ListTrpcAdminCmdsOutputObjs, ExecuteTrpcAdminCmdRequest, ExecuteTrpcAdminCmdOutputObjs, BatchDeleteAppInstancesRequest, UpdateAppInstancePolarisRequest, ScaleAppInstancesRequest, ExecuteTafAdminCmdRequest, ExecuteTafAdminCmdOutputObjs, ListAppInstanceLogsRequest, LogEntryOutputObj, PortForwardRequest, CreateAppInstanceWebConsoleRequest, WebConsoleInfoOutputObj } from '~/@types/v1/instance';
+import type { ListEventsRequest, PaginatedEventsOutputObj, ListAppInstancesRequest, PaginatedAppInstancesOutputObj, UpdateAppInstancesRequest, EmptyOutput, ListTrpcAdminCmdsRequest, ListTrpcAdminCmdsOutputObjs, ExecuteTrpcAdminCmdRequest, ExecuteTrpcAdminCmdOutputObjs, BatchDeleteAppInstancesRequest, UpdateAppInstancePolarisRequest, ScaleAppInstancesRequest, ExecuteTafAdminCmdRequest, ExecuteTafAdminCmdOutputObjs, WatchAppInstancesRequest, AppInstanceWatchEvent, ListAppInstanceLogsRequest, LogEntryOutputObj, PortForwardRequest, CreateAppInstanceWebConsoleRequest, WebConsoleInfoOutputObj } from '~/@types/v1/instance';
 
 export const InstanceService = {
   /**
@@ -33,14 +33,17 @@ export const InstanceService = {
   /**
    * 获取应用实例列表
    *
+   * 北极星拉取失败不阻塞 Pod 输出：polarisInfos 为空数组，与未注册北极星同形，其余字段照常返回。
+   *
    * @method GET
    * @path /apps/{appID}/envs/{envName}/instances
    * @tag instance
    * @param appID path string required 应用 ID
    * @param envName path string required 部署环境名称
    * @param trafficLaneName query string 部署的泳道名称（空字符串表示不使用泳道）
-   * @param page query number required 页码，从 1 开始
-   * @param pageSize query number required 每页数量
+   * @param all query boolean 为 true 时一次返回全量实例；禁止同时带 page 或 pageSize
+   * @param page query number 页码，取值 1-10000；分页模式必填，all=true 时禁止出现
+   * @param pageSize query number 每页数量；分页模式必填，all=true 时禁止出现
    * @response 200 ListAppInstancesOutput OK
    * @response 400 GinErrorOutput Bad Request
    */
@@ -160,6 +163,25 @@ export const InstanceService = {
     params?: NoInfer<Request>,
     config?: Config,
   ) => await v1Fetch.post<Request, ResponseData>('/apps/{appID}/envs/{envName}/instances/taf-admin-cmds')(params, config),
+  /**
+   * 订阅应用实例投影变更
+   *
+   * 事件类型为 ADDED / MODIFIED / DELETED；object 对齐 AppInstanceOutputObj（含 polarisInfos）。
+   *
+   * @method GET
+   * @path /apps/{appID}/envs/{envName}/instances/watch
+   * @tag instance
+   * @param appID path string required 应用 ID
+   * @param envName path string required 部署环境名称
+   * @param trafficLaneName query string 部署的泳道名称（空字符串表示不使用泳道）
+   * @response 200 AppInstanceWatchEvent Watch 事件逻辑结构（编码格式随传输形态而定）
+   * @response 400 GinErrorOutput Bad Request
+   * @response 501 GinErrorOutput Not Implemented
+   */
+  watchAppInstances: async <Request extends WatchAppInstancesRequest = WatchAppInstancesRequest, ResponseData = AppInstanceWatchEvent>(
+    params?: NoInfer<Request>,
+    config?: Config,
+  ) => await v1Fetch.get<Request, ResponseData>('/apps/{appID}/envs/{envName}/instances/watch')(params, config),
   /**
    * 获取应用运行实例（Pod）日志
    *

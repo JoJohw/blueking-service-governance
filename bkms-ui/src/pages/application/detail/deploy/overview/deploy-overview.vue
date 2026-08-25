@@ -164,13 +164,15 @@
             :pagination="pagination"
             row-class-name="cursor-pointer"
             :row-config="{ isHover: true }"
-            :row-height="48"
+            :settings="settings"
             :show-overflow="false"
+            :show-settings="true"
             :sort-config="sortConfig"
             @filter-change="handleFilterChange"
             @page-limit-change="handlePageLimitChange"
             @page-value-change="handlePageValueChange"
             @row-click="handleRowClick"
+            @setting-change="handleSettingChange"
           >
             <!-- 区分接口异常、筛选无结果和接口成功但无数据三种空态。 -->
             <template #empty>
@@ -215,6 +217,7 @@
               field="deployStatus"
               filter-multiple
               :filters="filterOptions.deployStatus"
+              :label="$t('部署状态')"
               min-width="130"
             >
               <template #header>
@@ -236,6 +239,7 @@
               </template>
             </TableColumn>
             <TableColumn
+              field="instances"
               :label="$t('实例数（运行/期望/异常）')"
               min-width="200"
             >
@@ -283,6 +287,7 @@
               </template>
             </TableColumn>
             <TableColumn
+              field="resource"
               :label="$t('资源规格')"
               min-width="120"
             >
@@ -302,6 +307,34 @@
                     </div>
                   </template>
                 </Popover>
+                <span v-else>--</span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="imageTag"
+              :label="$t('镜像 Tag')"
+              min-width="180"
+              show-overflow="tooltip"
+            >
+              <template #default="{ row }: { row: DeployOverviewRow }">
+                <span>{{ row.imageTag || '--' }}</span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="cluster"
+              :label="$t('集群')"
+              min-width="200"
+            >
+              <template #default="{ row }: { row: DeployOverviewRow }">
+                <div v-if="row.clusterName || row.clusterID">
+                  <div class="truncate text-[#313238]">{{ row.clusterName || row.clusterID }}</div>
+                  <div
+                    v-if="row.clusterName && row.clusterID"
+                    class="truncate text-[#979BA5]"
+                  >
+                    {{ row.clusterID }}
+                  </div>
+                </div>
                 <span v-else>--</span>
               </template>
             </TableColumn>
@@ -344,6 +377,7 @@
   import { useElementHeight } from '~/composables/use-element-height';
   import { envTypeMap, envTypeTagClassMap } from '~/composables/use-env-manager';
   import { useSearchPlaceholder } from '~/composables/use-search-placeholder';
+  import { useTableSettings } from '~/composables/use-table-settings';
   import { formatRelativeTimeWithTooltip } from '~/composables/use-time';
   import AutoScaleTag from '~/pages/application/detail/components/auto-scale-tag.vue';
   import { useAppDetail } from '~/stores/app-detail';
@@ -393,6 +427,13 @@
     stats,
     visibleRows,
   } = useDeployOverview(toRef(props, 'envList'));
+
+  // 列设置：镜像 Tag、集群信息等新列默认不勾选，用户可在表格右上角列设置中开启。
+  // 列勾选与行高（size）偏好均持久化，刷新后恢复。
+  const { settings, handleSettingChange } = useTableSettings('deploy-overview', {
+    defaultChecked: ['displayName', 'type', 'deployStatus', 'instances', 'resource', 'deployedAt'],
+    disabled: ['displayName'],
+  });
 
   const { height: tableHeight } = useElementHeight(tableContentRef, { watchSource: isLoading });
 
