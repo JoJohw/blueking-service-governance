@@ -42,25 +42,9 @@
     >
       <MonitorIframe
         v-if="currentApm && !apmConfigMissing"
-        :base-query-params="{
-          needMenu: false,
-        }"
-        :observability-query="{
-          'filter-app_name': apmAppName,
-          'filter-service_name': serviceName,
-          method: 'AVG',
-          interval: 'auto',
-          dashboardId: 'service-default-overview',
-          from: 'now-1h',
-          to: 'now',
-          timezone: 'Asia/Shanghai',
-          refreshInterval: -1,
-          sceneType: 'overview',
-          queryString: '',
-          preciseFilter: false,
-          isGroupByLimit: false,
-        }"
-        type="service"
+        ref="monitorIframeRef"
+        :url="iframeUrl"
+        @route-change="handleRouteChange"
       />
       <Exception
         v-else-if="apmConfigMissing"
@@ -114,9 +98,14 @@
   import { GetEnvApmOutput } from '~/@types/v1/bkintegrations-bkmonitor';
   import { ApiServerService } from '~/api/modules/bkmsserver';
   import { BkintegrationsBkmonitorService } from '~/api/modules/v1';
-  import { DOC_LINKS } from '~/common/const';
+  import { type ApmQueryParams, DEFAULT_APM_CONFIG, DOC_LINKS } from '~/common/const';
   import FlexRow from '~/components/flex-row.vue';
   import MonitorIframe from '~/components/monitor-iframe.vue';
+  import {
+    type MonitorIframeObservabilityType,
+    type MonitorIframeSetParamsPayload,
+    useMonitorIframe,
+  } from '~/composables/use-monitor-iframe';
   import { useUrlQuerySync } from '~/composables/use-url-query-sync';
   import { useAppDetail } from '~/stores/app-detail';
   import { useDeployEnvStore } from '~/stores/deploy-env';
@@ -144,28 +133,30 @@
       queryKey: 'env',
       data: { default: envStore.currentEnv || '' },
     },
+    apmQuery: {
+      queryKey: 'apmQuery',
+      data: {
+        default: '',
+      },
+    },
   });
   const targetEnvName = fields.env;
 
   const iframeContainerRef = ref<HTMLElement | null>(null);
+
+  // monitor-iframe 组件实例（调用其暴露的 sendSetParams 下发参数）
+  const monitorIframeRef = ref<InstanceType<typeof MonitorIframe>>();
+
+  // monitor-iframe 公共能力：URL 构建（内部自取 bizId；apm_nav_list:false 隐藏 APM 导航栏面包屑，服务观测场景由页面自持导航）
+  const { buildIframeUrl } = useMonitorIframe('service', { needMenu: false, apm_nav_list: false });
+  // iframe URL：初始化（observabilityQuery 就绪）后构建，传给 monitor-iframe 渲染
+  const iframeUrl = ref('');
 
   const serviceName = ref('');
   const apmConfigMissing = ref(false);
   const isInitializingEnvFromUrl = ref(false);
 
   const currentApm = ref<GetEnvApmOutput | null>(null);
-
-  // 获取当前环境关联的 APM 实例
-  async function getEnvApm() {
-    const envID = trpcDeployStore.curEnvItem?.id;
-    if (!envID) {
-      currentApm.value = null;
-      return;
-    }
-    currentApm.value = await BkintegrationsBkmonitorService.getEnvApm({ envID }, { interceptorErr: false }).catch(
-      () => null,
-    );
-  }
 
   // 全屏 iframe 容器
   function handleFullScreen() {
@@ -195,6 +186,26 @@
     return currentApm.value?.name || curEnv.value;
   });
 
+  // 解析 URL 中的 iframe 观测参数（route-change 同步回写），异常或非对象（如 JSON.parse('null')）返回空
+  const parsedApmQuery = computed<ApmQueryParams>(() => {
+    const raw = fields.apmQuery.value;
+    if (!raw) return {};
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === 'object' ? (parsed as ApmQueryParams) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  // 观测参数：初始为静态占位（异步依赖未就绪），异步依赖（currentApm/serviceName）就绪后由主 watch 的 computeObservabilityQuery() 更新为正确值
+  // 后续参数变更通过 monitorIframeRef.sendSetParams 下发，不重载 iframe
+  const observabilityQuery = ref<MonitorIframeObservabilityType>({
+    ...DEFAULT_APM_CONFIG,
+    dashboardId: 'service-default-overview',
+    'filter-app_name': '',
+  });
+
   // APM 配置指引文档链接
   const apmGuideUrl = computed(() => {
     if (appDetailStore.appType === 'taf') {
@@ -204,6 +215,33 @@
     const docPath = language === 'cpp' ? DOC_LINKS.APM_GUIDE_TRPC_CPP : DOC_LINKS.APM_GUIDE_TRPC_GO;
     return `${import.meta.env.BK_DOC_URL}${docPath}`;
   });
+
+  /**
+   * 计算观测参数：其余字段由 URL 恢复；filter 恒用当前环境派生值（apmAppName / serviceName）
+   * 注意：改为手动调用后，调用时机决定了 iframe src 的更新时机（避免 route-change 回写导致 iframe 频繁重载）
+   */
+  function computeObservabilityQuery() {
+    const {
+      'filter-app_name': _queryAppName,
+      'filter-service_name': _queryServiceName,
+      ...restApmQuery
+    } = parsedApmQuery.value;
+    const result = {
+      ...DEFAULT_APM_CONFIG,
+      dashboardId: 'service-default-overview',
+      ...restApmQuery,
+      'filter-app_name': apmAppName.value,
+      'filter-service_name': serviceName.value,
+    };
+    return result;
+  }
+
+  /** iframe 内部状态变化：同步完整观测参数到 URL apmQuery 字段（供刷新/分享恢复） */
+  function handleRouteChange(payload: { hash: string; href: string; query: Record<string, unknown> }) {
+    const { query } = payload;
+    if (!query || Object.keys(query).length === 0) return;
+    fields.apmQuery.value = JSON.stringify(query);
+  }
 
   // 跳转到 APM 配置指引文档
   function handleViewApmGuide() {
@@ -215,23 +253,31 @@
     return Array.isArray(details) && details.some(detail => detail.code === 'APM_CONFIG_MISSING');
   }
 
-  // 获取 APM 服务名称
-  const fetchApmServiceName = async () => {
-    if (!curEnv.value || !appDetailStore.appID) return;
-    serviceName.value = '';
-    apmConfigMissing.value = false;
-    try {
-      const result = await ApiServerService.GetApmServiceName(
-        {
-          appID: appDetailStore.appID,
-          envName: curEnv.value,
-        },
+  // 当前环境变化：并发拉取 APM 实例与服务名，name/id 同取自 curEnvItem，保证 filter-app_name / filter-service_name 同时就绪（避免 set-params 多次下发）
+  // fetchSeq 序号：并发切换环境时丢弃过期请求结果，防止旧环境数据覆盖新状态
+  let fetchSeq = 0;
+  const fetchApmData = async (): Promise<null | { apmName: string; service: string }> => {
+    const seq = ++fetchSeq;
+    const env = trpcDeployStore.curEnvItem;
+    if (!env?.id || !env.name || !appDetailStore.appID) return null;
+    let configMissing = false;
+    const [apm, service] = await Promise.all([
+      BkintegrationsBkmonitorService.getEnvApm({ envID: env.id }, { interceptorErr: false }).catch(() => null),
+      ApiServerService.GetApmServiceName(
+        { appID: appDetailStore.appID, envName: env.name },
         { interceptorErr: false },
-      );
-      serviceName.value = result?.serviceName ?? '';
-    } catch (err: unknown) {
-      apmConfigMissing.value = isApmConfigMissingError(err);
-    }
+      ).catch((err: unknown) => {
+        configMissing = isApmConfigMissingError(err);
+        return null;
+      }),
+    ]);
+    // 期间又触发了新请求（环境/应用切换），丢弃本次过期结果
+    if (seq !== fetchSeq) return null;
+    apmConfigMissing.value = configMissing;
+    currentApm.value = apm;
+    const serviceNameValue = service?.serviceName ?? '';
+    serviceName.value = serviceNameValue;
+    return { apmName: apm?.name || env.name, service: serviceNameValue };
   };
 
   // URL 中的 env → 初始化当前环境（首次进入时生效）；curEnv → 写回 URL（首次默认环境与用户切换环境都写入，便于分享直达）
@@ -260,18 +306,38 @@
   );
 
   watch(
-    [curEnv, () => appDetailStore.appID],
-    () => {
-      fetchApmServiceName();
-    },
-    { immediate: true },
-  );
-
-  watch(
-    () => trpcDeployStore.curEnvItem,
-    newVal => {
-      if (newVal?.id) {
-        getEnvApm();
+    [() => trpcDeployStore.curEnvItem, () => appDetailStore.appID],
+    async () => {
+      // 1. 拉取当前环境的 APM 实例与服务名（fetchSeq 丢弃过期请求，返回 null 时直接结束）
+      const result = await fetchApmData();
+      if (!result) return;
+      // 2. 派生数据就绪后重新计算观测参数（filter 恒用派生值）
+      observabilityQuery.value = computeObservabilityQuery();
+      const merged: ApmQueryParams = {
+        ...parsedApmQuery.value,
+        'filter-app_name': result.apmName,
+        // 无条件覆盖：service 为空也显式写空串，清掉 URL 残留的旧环境服务名（避免刷新/分享串环境）
+        'filter-service_name': result.service,
+      };
+      // 3. 快照写入 URL（env + apmQuery，供刷新/分享恢复；显式携带当前 env 避免覆盖并发写入）
+      await router.replace({
+        query: {
+          ...route.query,
+          env: curEnv.value,
+          apmQuery: JSON.stringify(merged),
+        },
+      });
+      // 4. 初始化（iframe 未加载）构建 URL，iframe 首载即带正确参数；已初始化后 URL 锁定，参数变更仅走 postMessage（二者二选一）
+      // 约定：iframeUrl 非空即视为「已初始化」。buildIframeUrl 异步（await fetchBizId）期间若再次进入会重复构建，幂等且 fetchBizId 已去重，无害
+      if (iframeUrl.value) {
+        // service 为空也显式下发空串：平台语义「空串=无过滤/清除」，防止 iframe 内部残留上一环境的服务筛选（与 URL 快照/URL 构建路径一致）
+        const payload: MonitorIframeSetParamsPayload = {
+          'filter-app_name': result.apmName,
+          'filter-service_name': result.service,
+        };
+        monitorIframeRef.value?.sendSetParams(payload);
+      } else {
+        iframeUrl.value = await buildIframeUrl(observabilityQuery.value);
       }
     },
     { immediate: true },
