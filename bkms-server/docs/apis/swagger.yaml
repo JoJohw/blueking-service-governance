@@ -4924,6 +4924,32 @@ definitions:
         - $ref: '#/definitions/serializer.HelmSourceOutputObj'
         description: Helm 源配置
     type: object
+  serializer.HostPortEnvStateOutput:
+    properties:
+      appliedPorts:
+        items:
+          type: integer
+        type: array
+      pendingAddPorts:
+        items:
+          type: integer
+        type: array
+      pendingRemovePorts:
+        items:
+          type: integer
+        type: array
+    type: object
+  serializer.HostPortsOutput:
+    properties:
+      envStates:
+        additionalProperties:
+          $ref: '#/definitions/serializer.HostPortEnvStateOutput'
+        type: object
+      ports:
+        items:
+          type: integer
+        type: array
+    type: object
   serializer.ImageEmptyOutput:
     type: object
   serializer.ImageRegistryInput:
@@ -6980,6 +7006,15 @@ definitions:
         allOf:
         - $ref: '#/definitions/serializer.PolarisConfigOutputObj'
         description: 更新后的北极星配置
+    type: object
+  serializer.PutHostPortsInput:
+    properties:
+      ports:
+        items:
+          type: integer
+        type: array
+    required:
+    - ports
     type: object
   serializer.RecoverConditionInput:
     properties:
@@ -15494,6 +15529,65 @@ paths:
       summary: 更新应用 Helm Chart 配置
       tags:
       - app
+  /apps/{appID}/hostports:
+    get:
+      operationId: ListHostPorts
+      parameters:
+      - description: 应用 ID
+        in: path
+        name: appID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.HostPortsOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 获取应用 HostPort 列表及联邦环境待部署状态
+      tags:
+      - hostport
+    put:
+      consumes:
+      - application/json
+      operationId: PutHostPorts
+      parameters:
+      - description: 应用 ID
+        in: path
+        name: appID
+        required: true
+        type: string
+      - description: 请求体
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/serializer.PutHostPortsInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializer.HostPortsOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bkerrs.GinErrorOutput'
+      security:
+      - BkUserInfo: []
+      - BkUserCredential: []
+      summary: 全量保存应用 HostPort 端口列表
+      tags:
+      - hostport
   /apps/{appID}/images:
     get:
       operationId: ListAppImages

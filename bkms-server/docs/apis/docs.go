@@ -10261,6 +10261,102 @@ const docTemplate = `{
                 }
             }
         },
+        "/apps/{appID}/hostports": {
+            "get": {
+                "security": [
+                    {
+                        "BkUserInfo": []
+                    },
+                    {
+                        "BkUserCredential": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hostport"
+                ],
+                "summary": "获取应用 HostPort 列表及联邦环境待部署状态",
+                "operationId": "ListHostPorts",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用 ID",
+                        "name": "appID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/serializer.HostPortsOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BkUserInfo": []
+                    },
+                    {
+                        "BkUserCredential": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hostport"
+                ],
+                "summary": "全量保存应用 HostPort 端口列表",
+                "operationId": "PutHostPorts",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用 ID",
+                        "name": "appID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/serializer.PutHostPortsInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/serializer.HostPortsOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/{appID}/images": {
             "get": {
                 "security": [
@@ -25078,6 +25174,46 @@ const docTemplate = `{
                 }
             }
         },
+        "serializer.HostPortEnvStateOutput": {
+            "type": "object",
+            "properties": {
+                "appliedPorts": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "pendingAddPorts": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "pendingRemovePorts": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "serializer.HostPortsOutput": {
+            "type": "object",
+            "properties": {
+                "envStates": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/serializer.HostPortEnvStateOutput"
+                    }
+                },
+                "ports": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "serializer.ImageEmptyOutput": {
             "type": "object"
         },
@@ -28132,6 +28268,20 @@ const docTemplate = `{
                             "$ref": "#/definitions/serializer.PolarisConfigOutputObj"
                         }
                     ]
+                }
+            }
+        },
+        "serializer.PutHostPortsInput": {
+            "type": "object",
+            "required": [
+                "ports"
+            ],
+            "properties": {
+                "ports": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

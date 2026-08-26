@@ -40,6 +40,7 @@ import (
 	envmodel "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env/model"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/workspace"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/deploy/secret"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/hostport"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/component"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/component/devmode"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/kubernetes/gvr"
@@ -280,6 +281,23 @@ func (b *Builder) Build(
 		gd.Spec.Template.Annotations[tkeRouteEniAnnotationKey] = tkeRouteEniAnnotationValue
 	}
 
+	// Inject BCS random HostPort webhook annotations and main-container ports
+	// for federated environments (containerPort is required for the webhook to work).
+	var hostPortAppliedPorts []int32
+	if env.Cluster.IsFederation {
+		hostPortAppliedPorts, err = hostport.InjectFromStore(
+			ctx,
+			b.hostPortStore,
+			b.app.ID,
+			&gd.Spec.Template.ObjectMeta,
+			gd.Spec.Template.Spec.Containers,
+			defaults.WorkloadMainContainerName,
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "injecting hostport")
+		}
+	}
+
 	// Inject BSCP configuration management artifacts (initContainer, sidecar, volume, etc.)
 	if err = bscpcfg.InjectFromStore(
 		ctx, b.bscpCfgStore, b.app.ID, env.Name,
@@ -332,6 +350,7 @@ func (b *Builder) Build(
 		ExtraObjects:          extraObjs,
 		SensitiveEnvVarValues: sensitiveEnvVarValues,
 		UndefinedEnvVars:      collector.UndefinedEnvVars(),
+		HostPortAppliedPorts:  hostPortAppliedPorts,
 	}
 	if env.Cluster.IsFederation {
 		result.WorkloadKind = kind.Deploy
@@ -345,7 +364,10 @@ func (b *Builder) Build(
 
 func buildSensitiveEnvVarValues(appEnvVars envvartypes.EnvVariableList) map[string]string {
 	sensitiveValues := make(map[string]string)
-	for _, item := range appEnvVars {
+	// Deduplicate with the same priority rule as ToKubeObjs (list is low→high priority;
+	// last wins). Otherwise an earlier sensitive source could remain after a later
+	// non-sensitive override became the effective value.
+	for _, item := range appEnvVars.ToDeduplicatedList() {
 		if !item.IsSensitive {
 			continue
 		}

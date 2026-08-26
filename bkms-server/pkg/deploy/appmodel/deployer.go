@@ -41,6 +41,7 @@ import (
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/app/appcfg"
 	bkmsenv "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/core/env/model"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/deploy/secret"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/hostport"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/account/auth"
 	k8sclient "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/kubernetes/client"
@@ -61,15 +62,16 @@ const AnnotationKeyDeployID = "bkms.tencent.com/deploy-id"
 
 // Deployer appmodel 应用部署器
 type Deployer struct {
-	recordStore            RecordStore
-	resourceSnapshotStore  ResourceSnapshotStore
-	buildDeployStore       autodeploy.RecordStore
-	appModelStore          appmodel.AppModelStore
-	builderService         *workload.BuilderService
-	appSpecStore           appspec.AppSpecStore
-	buildConfigStore       build.ConfigStore
-	appConfigFileStore     appcfg.AppConfigFileStore
-	polarisEnvStateManager *polaris.PolarisEnvStateManager
+	recordStore             RecordStore
+	resourceSnapshotStore   ResourceSnapshotStore
+	buildDeployStore        autodeploy.RecordStore
+	appModelStore           appmodel.AppModelStore
+	builderService          *workload.BuilderService
+	appSpecStore            appspec.AppSpecStore
+	buildConfigStore        build.ConfigStore
+	appConfigFileStore      appcfg.AppConfigFileStore
+	polarisEnvStateManager  *polaris.PolarisEnvStateManager
+	hostPortEnvStateManager *hostport.EnvStateManager
 
 	app *bkmsapp.Application
 
@@ -87,20 +89,22 @@ func NewDeployer(
 	buildConfigStore build.ConfigStore,
 	appConfigFileStore appcfg.AppConfigFileStore,
 	polarisEnvStateManager *polaris.PolarisEnvStateManager,
+	hostPortEnvStateManager *hostport.EnvStateManager,
 	app *bkmsapp.Application,
 ) *Deployer {
 	return &Deployer{
-		recordStore:            recordStore,
-		resourceSnapshotStore:  resourceSnapshotStore,
-		buildDeployStore:       buildDeployStore,
-		appModelStore:          appModelStore,
-		builderService:         builderService,
-		appSpecStore:           appSpecStore,
-		buildConfigStore:       buildConfigStore,
-		appConfigFileStore:     appConfigFileStore,
-		polarisEnvStateManager: polarisEnvStateManager,
-		app:                    app,
-		podManager:             &podManager{},
+		recordStore:             recordStore,
+		resourceSnapshotStore:   resourceSnapshotStore,
+		buildDeployStore:        buildDeployStore,
+		appModelStore:           appModelStore,
+		builderService:          builderService,
+		appSpecStore:            appSpecStore,
+		buildConfigStore:        buildConfigStore,
+		appConfigFileStore:      appConfigFileStore,
+		polarisEnvStateManager:  polarisEnvStateManager,
+		hostPortEnvStateManager: hostPortEnvStateManager,
+		app:                     app,
+		podManager:              &podManager{},
 	}
 }
 
@@ -214,12 +218,19 @@ func (d *Deployer) Deploy(
 		log.Errorf(ctx, "reconcile polaris config after deploy failed, app=%s env=%s: %v",
 			d.app.ID, env.Name, err)
 	}
+	if err = d.hostPortEnvStateManager.ReconcileAfterDeploy(
+		ctx, d.app, env, buildResult.HostPortAppliedPorts,
+	); err != nil {
+		log.Errorf(ctx, "reconcile hostport after deploy failed, app=%s env=%s: %v",
+			d.app.ID, env.Name, err)
+	}
 
 	return deployID, nil
 }
 
 // Uninstall 执行卸载操作，将最新部署的相关资源从集群中删除
-func (d *Deployer) Uninstall(ctx context.Context, envName, trafficLaneName string) error {
+func (d *Deployer) Uninstall(ctx context.Context, env *bkmsenv.Environment, trafficLaneName string) error {
+	envName := env.Name
 	// 获取最新部署记录
 	record, err := d.recordStore.GetLatest(ctx, d.app.ID, envName, trafficLaneName)
 	if err != nil {
@@ -262,6 +273,15 @@ func (d *Deployer) Uninstall(ctx context.Context, envName, trafficLaneName strin
 		log.Errorf(
 			ctx,
 			"reconcile polaris env states after uninstall failed, app=%s env=%s: %v",
+			d.app.ID,
+			envName,
+			err,
+		)
+	}
+	if err = d.hostPortEnvStateManager.ReconcileAfterUninstall(ctx, d.app, env); err != nil {
+		log.Errorf(
+			ctx,
+			"reconcile hostport env states after uninstall failed, app=%s env=%s: %v",
 			d.app.ID,
 			envName,
 			err,
