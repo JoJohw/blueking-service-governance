@@ -21,11 +21,17 @@
     v-model:active-key="activeKey"
     :list="menuList"
   >
-    <RouterView
-      :key="routerViewKey"
-      :class="routerViewClass"
+    <div
+      v-bkloading="{ loading: detailLoading }"
+      class="min-h-full"
     >
-    </RouterView>
+      <RouterView
+        v-if="!detailLoading"
+        :key="routerViewKey"
+        :class="routerViewClass"
+      >
+      </RouterView>
+    </div>
     <template #side-header>
       <Select
         v-model="currentApplicationName"
@@ -125,6 +131,8 @@
       : router.currentRoute.value.params.menuName) || 'info',
   );
   const isSpacePopoverShow = ref(false);
+  // 应用列表与应用详情加载完成前，不挂载子页面，避免子页面读取到空 appID/appDetail
+  const detailLoading = ref(true);
 
   const currentApplication = computed(() =>
     applicationList.value.find(item => item.name === currentApplicationName.value),
@@ -237,14 +245,31 @@
     },
   );
 
-  // 监听应用变化，更新应用详情
+  // 监听应用变化，更新应用详情；加载完成前不挂载子页面，避免竞态
   watch(currentApplication, async app => {
-    appDetailStore.updateAppID(app?.id || '');
-    await appDetailStore.fetchAppDetail(app?.id);
+    const currentAppId = app?.id || '';
+    detailLoading.value = true;
+    appDetailStore.updateAppID(currentAppId);
+    try {
+      await appDetailStore.fetchAppDetail(currentAppId);
+    } finally {
+      // 快速切换应用 A→B 时两个 async 回调并行，仅当当前仍为本次应用时才解锁，
+      // 避免 A 先返回提前解锁读到 A 数据（串台）。
+      // 基于 appID（watch 内同步更新）判断：请求失败/清空选择时 appDetail 为 null，
+      // 用 appID 判断可正常解锁，不会卡死在 loading 态。
+      // 过期请求的覆盖由 store 层 fetchAppDetail 的 appID 校验丢弃，这里只需负责解锁。
+      if (appDetailStore.appID === currentAppId) {
+        detailLoading.value = false;
+      }
+    }
   });
 
   onMounted(async () => {
     await handleGetAppList();
+    // 列表已加载但未匹配到应用（如空列表），无需再等待详情
+    if (!currentApplication.value) {
+      detailLoading.value = false;
+    }
   });
 </script>
 
