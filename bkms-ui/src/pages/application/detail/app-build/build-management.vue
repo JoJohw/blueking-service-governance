@@ -789,6 +789,7 @@
 
   /**
    * 打开编辑构建配置侧栏
+   * appDetail 已由 detail.vue 的 detailLoading 保证就绪，直接读取 buildConfig 作为编辑初始值
    */
   function handleBeforeEditBuilder() {
     showPopConfirm.value = false; // 关闭执行构建的 Popover
@@ -800,18 +801,15 @@
 
   // 从镜像删除页「去配置」跳转过来时（通过 store 的瞬态标记 pendingBuilderSource 携带来源），
   // 自动打开编辑构建配置侧栏。
-  // 必须先等 buildConfig 就绪再打开，否则面板会以空/错误内容先渲染一帧再被替换（概率性闪烁）。
+  // appDetail 已由 detail.vue 的 detailLoading 保证就绪，挂载时直接打开不会先渲染空面板
   watch(
     [() => appDetailStore.pendingBuilderSource, isHelmLike],
-    async () => {
+    () => {
       const source = appDetailStore.pendingBuilderSource;
       if (!source || !isHelmLike.value) return;
       // 仅当真正要打开时才消费标记（清空），避免 isHelmLike 尚未就绪时提前清空导致丢失
       appDetailStore.consumePendingBuilderSource();
       lockedBuilderSource.value = source as 'codeRepository' | 'imageRegistry';
-      if (!appDetailStore.appDetail?.buildConfig) {
-        await appDetailStore.fetchAppDetail();
-      }
       nextTick(() => (showBuilderSideslider.value = true));
     },
     { immediate: true },
