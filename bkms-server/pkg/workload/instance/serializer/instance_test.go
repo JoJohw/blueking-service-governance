@@ -231,6 +231,27 @@ var _ = Describe("Instance serializer", func() {
 		})
 	})
 
+	Describe("PolarisInstanceInfoOutputObj", func() {
+		It("fills API fields from a matched domain instance", func() {
+			output := new(serializer.PolarisInstanceInfoOutputObj).FromModel(&polaris.MatchedInstance{
+				ServiceNamespace:  "Production",
+				ServiceName:       "svc-a",
+				IP:                "127.0.0.1",
+				Port:              8080,
+				IsHealthy:         true,
+				Weight:            100,
+				EnableHealthCheck: true,
+				Metadata:          map[string]string{"k": "v"},
+			})
+
+			Expect(output.ServiceNamespace).To(Equal("Production"))
+			Expect(output.ServiceName).To(Equal("svc-a"))
+			Expect(output.Port).To(Equal(uint32(8080)))
+			Expect(output.Weight).To(Equal(int64(100)))
+			Expect(output.Metadata).To(Equal(map[string]string{"k": "v"}))
+		})
+	})
+
 	Describe("MergePolarisInfoToAppInstances", func() {
 		It("attaches matched Polaris instances by pod IP and service port", func() {
 			appInstances := []*serializer.AppInstanceOutputObj{{ID: "pod-1", IP: "127.0.0.1"}}

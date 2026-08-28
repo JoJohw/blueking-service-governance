@@ -20,7 +20,6 @@
 package serializer
 
 import (
-	"cmp"
 	"fmt"
 	"slices"
 	"time"
@@ -32,7 +31,6 @@ import (
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/utils/timex"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris"
 	podstatus "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/kubernetes/status/workload/pod"
-	polarisInfra "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/infras/polaris"
 	instancelogsvc "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/observability/instancelog"
 	_ "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/ginutils/validators" // register global validators
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/workload/appmodelcore/workload/defaults"
@@ -160,17 +158,53 @@ func (q *WatchAppInstancesQueryInput) Validate() error {
 	return nil
 }
 
-// AppInstanceWatchEvent 实例 Watch 推送的平台投影事件（非原生 Pod JSON）
+// AppInstanceWatchEvent 实例 Watch 推送的 Pod 投影事件（非原生 Pod JSON）
 // DELETED 时 Object 只保证 id；ENDED 时 Object 为空、Reason 说明流结束原因
 // Type 取值对齐 watch.EventType：ADDED / MODIFIED / DELETED / ENDED
+//
+// Pod 事件不承载附属数据：Object.PolarisInfos 恒为空数组，北极星等附属信息
+// 一律由 AppInstancePluginWatchEvent 单独推送，前端不得从本事件读取
 type AppInstanceWatchEvent struct {
 	// 事件类型
 	// Enums: ADDED, MODIFIED, DELETED, ENDED
 	Type string `json:"type" enums:"ADDED,MODIFIED,DELETED,ENDED"`
 	// 流结束原因；仅 ENDED 使用
 	Reason string `json:"reason,omitempty"`
-	// 实例投影；字段集合对齐 AppInstanceOutputObj（含 polarisInfos）
+	// 实例投影；字段集合对齐 AppInstanceOutputObj，其中 polarisInfos 在 Watch 场景恒为空数组
 	Object *AppInstanceOutputObj `json:"object"`
+}
+
+// AppInstancePluginWatchEvent 实例 Watch 推送的附属数据事件
+//
+// 与 Pod 事件同流同信封，但语义不同：它不是实例的 ADDED / MODIFIED / DELETED，
+// 前端不得据此增删本地行，只能按 object.id 找到已有行后覆盖该 plugin 对应的附属数据；
+// 找不到对应行时忽略该事件
+type AppInstancePluginWatchEvent struct {
+	// 事件类型；恒为 PLUGIN，取值见 instance/watch/plugin.EventTypePlugin
+	// Enums: PLUGIN
+	Type string `json:"type" enums:"PLUGIN"`
+	// 附属数据来源插件名，如 polaris
+	Plugin string `json:"plugin"`
+	// 附属数据载荷
+	Object *AppInstancePluginObj `json:"object"`
+}
+
+// AppInstancePluginObj 单个实例的附属数据载荷
+type AppInstancePluginObj struct {
+	// 实例 ID（即 k8s pod 的 name），供前端关联本地行
+	ID string `json:"id"`
+	// 插件自有载荷；polaris 插件为 PolarisInstanceInfoOutputObj 列表，可为空列表
+	Data any `json:"data"`
+}
+
+// AppInstanceWatchStreamDoc 仅用于 OpenAPI 声明 SSE 两类事件形态，不是实际响应体
+// Watch 接口返回的是 text/event-stream，每条 data 为其中之一；swag 无法在单个
+// 响应码上声明两个模型，故用本类型把两者一并带进 definitions 供前端生成类型
+type AppInstanceWatchStreamDoc struct {
+	// Pod 投影事件：ADDED / MODIFIED / DELETED / ENDED
+	PodEvent *AppInstanceWatchEvent `json:"podEvent"`
+	// 附属数据事件：PLUGIN
+	PluginEvent *AppInstancePluginWatchEvent `json:"pluginEvent"`
 }
 
 // PolarisInstanceInfoOutputObj 关联到应用实例的北极星实例状态。
@@ -193,6 +227,41 @@ type PolarisInstanceInfoOutputObj struct {
 	EnableHealthCheck bool `json:"enableHealthCheck"`
 	// 元数据
 	Metadata map[string]string `json:"metadata"`
+}
+
+// FromModel 从领域匹配结果填充 API 投影；m 为 nil 时保持接收者为零值
+func (o *PolarisInstanceInfoOutputObj) FromModel(m *polaris.MatchedInstance) *PolarisInstanceInfoOutputObj {
+	if m == nil {
+		return o
+	}
+
+	*o = PolarisInstanceInfoOutputObj{
+		ServiceNamespace:  m.ServiceNamespace,
+		ServiceName:       m.ServiceName,
+		IP:                m.IP,
+		Port:              m.Port,
+		IsHealthy:         m.IsHealthy,
+		Weight:            m.Weight,
+		IsIsolated:        m.IsIsolated,
+		EnableHealthCheck: m.EnableHealthCheck,
+		Metadata:          m.Metadata,
+	}
+
+	return o
+}
+
+// PolarisInfosFromModels 把匹配结果投影为 API 列表；空输入返回空切片而不是 nil
+func PolarisInfosFromModels(models []*polaris.MatchedInstance) []*PolarisInstanceInfoOutputObj {
+	infos := make([]*PolarisInstanceInfoOutputObj, 0, len(models))
+	for _, m := range models {
+		if m == nil {
+			continue
+		}
+
+		infos = append(infos, new(PolarisInstanceInfoOutputObj).FromModel(m))
+	}
+
+	return infos
 }
 
 // AppInstanceResourcesObj is the main-container CPU/memory quantities from the live Pod.
@@ -312,66 +381,18 @@ func extractMainContainerResources(containers []any) AppInstanceResourcesObj {
 	return AppInstanceResourcesObj{}
 }
 
-// MergePolarisInfoToAppInstances 将北极星实例信息合并到应用实例输出对象中。
-// 按 Pod IP + 服务端口匹配；命中多个北极星服务时的顺序由 buildPolarisInfos 保证
+// MergePolarisInfoToAppInstances 将北极星匹配结果投影并挂到实例输出上
+// 匹配与定序由 addon/polaris.InstanceMatcher 完成，这里只做 FromModel
 func MergePolarisInfoToAppInstances(
 	appInstances []*AppInstanceOutputObj,
 	svcInstances []*polaris.PolarisServiceInstances,
 ) {
-	ipIndex := make(map[string][]polarisMatch)
-	for _, svc := range svcInstances {
-		for _, inst := range svc.Instances {
-			ipIndex[inst.IP] = append(ipIndex[inst.IP], polarisMatch{svc: svc, inst: inst})
-		}
-	}
+	// 索引只建一次，再按实例 IP 取匹配结果
+	matcher := polaris.NewInstanceMatcher(svcInstances)
 
 	for _, instance := range appInstances {
-		infos := buildPolarisInfos(ipIndex[instance.IP])
-		if len(infos) == 0 {
-			continue
-		}
-
-		instance.PolarisInfos = infos
+		instance.PolarisInfos = PolarisInfosFromModels(matcher.ForIP(instance.IP))
 	}
-}
-
-// polarisMatch 一条北极星实例与其所属服务的配对，供按 Pod IP 命中后再过滤端口
-type polarisMatch struct {
-	svc  *polaris.PolarisServiceInstances
-	inst *polarisInfra.Instance
-}
-
-// buildPolarisInfos 从已按 IP 命中的匹配项构造输出并按服务坐标定序
-// 北极星侧返回顺序不保证稳定；Watch 周期补拉靠前后两次结果比对，顺序漂移会被误判成变化
-func buildPolarisInfos(matches []polarisMatch) []*PolarisInstanceInfoOutputObj {
-	var infos []*PolarisInstanceInfoOutputObj
-	for _, m := range matches {
-		if int64(m.inst.Port) != int64(m.svc.ServicePort) {
-			continue
-		}
-
-		infos = append(infos, &PolarisInstanceInfoOutputObj{
-			ServiceNamespace:  m.svc.ServiceNamespace,
-			ServiceName:       m.svc.ServiceName,
-			IP:                m.inst.IP,
-			Port:              m.inst.Port,
-			IsHealthy:         m.inst.IsHealthy,
-			Weight:            int64(m.inst.Weight),
-			IsIsolated:        m.inst.IsIsolated,
-			EnableHealthCheck: m.inst.EnableHealthCheck,
-			Metadata:          m.inst.Metadata,
-		})
-	}
-
-	slices.SortFunc(infos, func(a, b *PolarisInstanceInfoOutputObj) int {
-		return cmp.Or(
-			cmp.Compare(a.ServiceNamespace, b.ServiceNamespace),
-			cmp.Compare(a.ServiceName, b.ServiceName),
-			cmp.Compare(a.Port, b.Port),
-		)
-	})
-
-	return infos
 }
 
 // SkippedAppInstanceObj 无法投影为 AppInstanceOutputObj 而被跳过的实例。
