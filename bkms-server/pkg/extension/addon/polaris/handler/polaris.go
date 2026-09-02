@@ -155,17 +155,18 @@ func (h *Handler) CreateAppPolarisConfig(c *gin.Context) {
 	config := &polaris.PolarisConfig{
 		AppID: app.ID,
 		Properties: polaris.Properties{
-			InstanceKey:       jsonInput.InstanceKey,
-			PolarisName:       jsonInput.PolarisName,
-			PolarisNamespace:  jsonInput.PolarisNamespace,
-			PolarisToken:      polarisToken,
-			ServicePort:       jsonInput.ServicePort,
-			Direct:            lo.FromPtrOr(jsonInput.Direct, true),
-			KeepNotReadyPod:   lo.FromPtrOr(jsonInput.KeepNotReadyPod, true),
-			EnableHealthCheck: lo.FromPtrOr(jsonInput.EnableHealthCheck, false),
-			ServiceLabels:     jsonInput.ServiceLabels,
-			Operator:          lo.FromPtrOr(jsonInput.Operator, ""),
-			RegisterMode:      lo.FromPtrOr(jsonInput.RegisterMode, polaris.RegisterModeOnDeploy),
+			InstanceKey:        jsonInput.InstanceKey,
+			PolarisName:        jsonInput.PolarisName,
+			PolarisNamespace:   jsonInput.PolarisNamespace,
+			PolarisToken:       polarisToken,
+			ServicePort:        jsonInput.ServicePort,
+			Direct:             lo.FromPtrOr(jsonInput.Direct, true),
+			KeepNotReadyPod:    lo.FromPtrOr(jsonInput.KeepNotReadyPod, true),
+			EnableHealthCheck:  lo.FromPtrOr(jsonInput.EnableHealthCheck, false),
+			EnableWeightFactor: lo.FromPtrOr(jsonInput.EnableWeightFactor, false),
+			ServiceLabels:      jsonInput.ServiceLabels,
+			Operator:           lo.FromPtrOr(jsonInput.Operator, ""),
+			RegisterMode:       lo.FromPtrOr(jsonInput.RegisterMode, polaris.RegisterModeOnDeploy),
 		},
 		ScopeEnvNames: jsonInput.ScopeEnvNames,
 	}
@@ -252,15 +253,16 @@ func (h *Handler) PatchAppPolarisConfig(c *gin.Context) {
 	}
 
 	updateData := &polaris.ConfigUpdateData{
-		InstanceKey:       jsonInput.InstanceKey,
-		ServicePort:       jsonInput.ServicePort,
-		Direct:            jsonInput.Direct,
-		KeepNotReadyPod:   jsonInput.KeepNotReadyPod,
-		EnableHealthCheck: jsonInput.EnableHealthCheck,
-		ServiceLabels:     jsonInput.ServiceLabels,
-		ScopeEnvNames:     jsonInput.ScopeEnvNames,
-		PolarisToken:      jsonInput.PolarisToken,
-		Operator:          jsonInput.Operator,
+		InstanceKey:        jsonInput.InstanceKey,
+		ServicePort:        jsonInput.ServicePort,
+		Direct:             jsonInput.Direct,
+		KeepNotReadyPod:    jsonInput.KeepNotReadyPod,
+		EnableHealthCheck:  jsonInput.EnableHealthCheck,
+		EnableWeightFactor: jsonInput.EnableWeightFactor,
+		ServiceLabels:      jsonInput.ServiceLabels,
+		ScopeEnvNames:      jsonInput.ScopeEnvNames,
+		PolarisToken:       jsonInput.PolarisToken,
+		Operator:           jsonInput.Operator,
 	}
 
 	updatedConfig, updateErr := h.polarisConfigService().Update(ctx, app, existingConfig, updateData)
@@ -496,7 +498,6 @@ func (h *Handler) ValidateAppPolarisConfig(c *gin.Context) {
 //	@Param		body		body		serializer.PutEnvWeightInput	true	"请求体"
 //	@Success	200			{object}	serializer.PutEnvWeightOutput
 //	@Failure	400			{object}	bkerrs.GinErrorOutput
-//	@Failure	500			{object}	bkerrs.GinErrorOutput
 //	@Router		/apps/{appID}/deps/polaris-configs/{configName}/envs/{envName}/weight [put]
 func (h *Handler) PutEnvWeight(c *gin.Context) {
 	var uriInput serializer.AppConfigEnvNameURIInput
@@ -541,7 +542,9 @@ func (h *Handler) PutEnvWeight(c *gin.Context) {
 	}
 
 	service := h.polarisConfigService()
-	updatedConfig, err := service.UpdateEnvWeight(ctx, app, config, uriInput.EnvName, *jsonInput.Weight)
+	updatedConfig, err := service.UpdateEnvWeight(
+		ctx, app, config, uriInput.EnvName, *jsonInput.Weight, jsonInput.DynamicWeight,
+	)
 	if err != nil {
 		bkerrs.AbortWithErr(c, bkerrs.Wrap(err, bkerrs.ErrCodeInternalServerError, "update env weight"))
 		return
@@ -575,7 +578,6 @@ func (h *Handler) PutEnvWeight(c *gin.Context) {
 //	@Success	200			{object}	serializer.GetEnvInstanceStatsOutput
 //	@Failure	400			{object}	bkerrs.GinErrorOutput
 //	@Failure	404			{object}	bkerrs.GinErrorOutput
-//	@Failure	500			{object}	bkerrs.GinErrorOutput
 //	@Router		/apps/{appID}/deps/polaris-configs/{configName}/env-instance-stats [get]
 func (h *Handler) GetEnvInstanceStats(c *gin.Context) {
 	var uriInput serializer.AppConfigNameURIInput
