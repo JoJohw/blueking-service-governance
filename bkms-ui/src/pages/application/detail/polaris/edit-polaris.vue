@@ -291,6 +291,18 @@
                     </Radio>
                   </div>
                 </Radio.Group>
+                <div class="mt-[4px] text-[12px] leading-[20px] text-[#979BA5]">
+                  <span>{{ $t('实例何时注册、摘除北极星，还受生命周期和健康探针影响') }}</span>
+                  <a
+                    class="ml-[8px] text-[#3A84FF]"
+                    :href="instanceLifecycleDocUrl"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    {{ $t('参考文档') }}
+                    <Share class="ml-[2px] align-[-2px]" />
+                  </a>
+                </div>
                 <div
                   v-if="isEditMode"
                   class="mt-[4px] text-[12px] leading-[20px] text-[#979BA5]"
@@ -333,6 +345,29 @@
                     <span v-else>
                       {{ $t('平台会自动在框架配置文件追加服务注册信息，由 tRPC 框架自动完成心跳上报') }}
                     </span>
+                  </div>
+                </div>
+              </Form.FormItem>
+
+              <!-- 权重因子：开启后关联环境才可配置动态权重 -->
+              <Form.FormItem :label="$t('权重因子')">
+                <div class="flex items-center gap-[10px]">
+                  <Switcher
+                    v-model="formModel.enableWeightFactor"
+                    class="shrink-0"
+                    theme="primary"
+                  />
+                  <div class="text-[12px] leading-[20px] text-[#979BA5]">
+                    <span>{{ $t('按实例机型动态分配流量。开启后，可在关联环境中打开「动态权重」') }}</span>
+                    <a
+                      class="ml-[8px] text-[#3A84FF]"
+                      :href="weightFactorDocUrl"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      {{ $t('参考文档') }}
+                      <Share class="ml-[2px] align-[-2px]" />
+                    </a>
                   </div>
                 </div>
               </Form.FormItem>
@@ -542,7 +577,9 @@
   );
   // 侧栏宽度
   const sliderWidth = computed(() => (showRedeployTip.value || isCollaspeAside.value ? 960 : 1400));
-  const heartbeatDocUrl = `${window.BK_DOC_URL || 'https://iwiki.woa.com'}${DOC_LINKS.POLARIS_HEARTBEAT}`;
+  const heartbeatDocUrl = `${window.BK_DOC_URL}${DOC_LINKS.POLARIS_HEARTBEAT}`;
+  const weightFactorDocUrl = `${window.BK_DOC_URL}${DOC_LINKS.POLARIS_DYNAMIC_WEIGHT}`;
+  const instanceLifecycleDocUrl = `${window.BK_DOC_URL}${DOC_LINKS.POLARIS_INSTANCE_LIFECYCLE}`;
 
   // 北极星环境类型选项
   const polarisEnvTypes = ['Development', 'Test', 'Pre-release', 'Production'];
@@ -554,6 +591,7 @@
     createNewService: false,
     registerMode: undefined,
     enableHealthCheck: false,
+    enableWeightFactor: false,
     polarisToken: '',
     polarisName: '',
     polarisNamespace: '' as CreateAppPolarisConfigInput['polarisNamespace'],
@@ -714,6 +752,7 @@
         createNewService: Boolean(props.editData?.depSvcInstID),
         registerMode: props.editData?.registerMode === 'immediate' ? 'immediate' : 'on_deploy',
         enableHealthCheck: props.editData?.enableHealthCheck ?? false,
+        enableWeightFactor: props.editData?.enableWeightFactor ?? false,
         polarisToken: props.editData?.polarisToken,
         polarisName: props.editData?.polarisName,
         polarisNamespace: props.editData?.polarisNamespace as CreateAppPolarisConfigInput['polarisNamespace'],
@@ -863,6 +902,7 @@
         configName: props.editData?.name || '',
         servicePort,
         enableHealthCheck: formModel.value.enableHealthCheck,
+        enableWeightFactor: formModel.value.enableWeightFactor,
         serviceLabels: formModel.value.serviceLabels,
         instanceKey: formModel.value.instanceKey || '',
         polarisToken: formModel.value.polarisToken,
