@@ -14977,6 +14977,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/workspaces/{workspaceID}/apps/resolve/{app}": {
+            "get": {
+                "security": [
+                    {
+                        "BkUserInfo": []
+                    },
+                    {
+                        "BkUserCredential": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "通过 ID 或 Name 解析应用",
+                "operationId": "ResolveApp",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "工作空间 ID",
+                        "name": "workspaceID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "应用 ID 或名称",
+                        "name": "app",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/serializer.ResolveAppOutput"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    }
+                }
+            }
+        },
         "/workspaces/{workspaceID}/apps/{appID}/bkmonitor/alert-strategies": {
             "get": {
                 "security": [
@@ -28826,6 +28876,25 @@ const docTemplate = `{
                 },
                 "type": {
                     "description": "代码仓库类型",
+                    "type": "string"
+                }
+            }
+        },
+        "serializer.ResolveAppOutput": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/serializer.ResolveAppOutputObj"
+                }
+            }
+        },
+        "serializer.ResolveAppOutputObj": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }

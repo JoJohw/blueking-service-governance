@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/cobra"
 
 	apphandler "github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/handler/app"
+	cmdutil "github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/cmd"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/console"
 )
 
@@ -77,12 +78,13 @@ Use 'app get --app myapp -o yaml' to view the current config as a reference.`,
   #     pipelineID: p-abc123
   #     params:
   #       BKMS_IMAGE_TAG: latest`,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runAppUpdateBuildConfig(cmd, appID, specFile)
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVarP(&specFile, "file", "f", "", "YAML spec file path (required)")
 
 	_ = cmd.MarkFlagRequired("app")

@@ -59,7 +59,7 @@ Use -f to write it to a file.`,
 
   # Export effective env vars to a file
   bkms-cli envvar export app --app <appID> --scope effectiveByEnv --env <env-name> -f vars.env`,
-		PreRun: cmdutil.CommonPreRun,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if scope == exportScopeEffectiveByEnv && envName == "" {
 				return errors.New("--env is required when --scope is effectiveByEnv")
@@ -77,7 +77,7 @@ Use -f to write it to a file.`,
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVar(&scope, "scope", exportScopeAppDefined,
 		"export scope: appDefined (default) or effectiveByEnv")
 	cmd.Flags().StringVar(&envName, "env", "", "environment name (required when scope=effectiveByEnv)")

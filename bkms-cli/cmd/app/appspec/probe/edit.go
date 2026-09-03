@@ -34,9 +34,8 @@ func NewEditCmd() *cobra.Command {
 	var appID, envName, specFile string
 
 	cmd := &cobra.Command{
-		Use:    "edit",
-		Short:  "Edit probe configuration from a YAML file",
-		PreRun: cmdutil.CommonPreRun,
+		Use:   "edit",
+		Short: "Edit probe configuration from a YAML file",
 		Long: `Edit the health probes configuration for the application from a YAML file.
 
 When --env is omitted, this command edits the default application-level probe config.
@@ -72,6 +71,7 @@ When --env is provided, this command edits the probe config for that specific en
 
   # Edit env-specific probe config
   bkms-cli app appspec probe edit --app my-app --env prod -f probe.yaml`,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if specFile == "" {
 				return errors.New("-f is required for edit")
@@ -90,7 +90,7 @@ When --env is provided, this command edits the probe config for that specific en
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVar(&envName, "env", "", "environment name (optional, omit for default config)")
 	cmd.Flags().StringVarP(&specFile, "file", "f", "", "YAML spec file path (required)")
 

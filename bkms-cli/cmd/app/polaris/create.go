@@ -27,17 +27,13 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/client"
+	cmdutil "github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/cmd"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/console"
 )
 
-// NewCreateCmd returns a Command instance for 'app polaris create' sub command
-func NewCreateCmd() *cobra.Command {
-	var appID, specFile string
-
-	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create a polaris config for an application",
-		Long: `Create a new polaris config for an application from a YAML spec file.
+const (
+	// createPolarisLong help text
+	createPolarisLong = `Create a new polaris config for an application from a YAML spec file.
 
 The YAML spec file structure is consistent with the backend API request body.
 
@@ -69,8 +65,10 @@ YAML spec file fields:
   enableHealthCheck:  Enable polaris health check for registered instances (bool, default false).
                       When enabled, polaris will actively probe instance health
   serviceLabels:      Labels applied to ALL registered polaris instances (map[string]string).
-                      Can be used for polaris routing rules and traffic management`,
-		Example: `  # Create a polaris config from a YAML spec file:
+                      Can be used for polaris routing rules and traffic management
+`
+	// createPolarisExample help text
+	createPolarisExample = `  # Create a polaris config from a YAML spec file:
   bkms-cli app polaris create --app my-app -f polaris.yaml
 
   # Example polaris.yaml (use existing polaris service):
@@ -90,11 +88,24 @@ YAML spec file fields:
   # polarisName: my-new-service
   # polarisNamespace: Test
   # servicePort: 9090
-  # operator: zhangsan,lisi`,
+  # operator: zhangsan,lisi
+`
+)
+
+// NewCreateCmd returns a Command instance for 'app polaris create' sub command
+func NewCreateCmd() *cobra.Command {
+	var appID, specFile string
+
+	cmd := &cobra.Command{
+		Use:     "create",
+		Short:   "Create a polaris config for an application",
+		Long:    createPolarisLong,
+		Example: createPolarisExample,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// 读取并解析 YAML 规格文件
-			if _, err := os.Stat(specFile); err != nil {
-				return errors.Wrapf(err, "polaris spec file %s not found", specFile)
+			if _, statErr := os.Stat(specFile); statErr != nil {
+				return errors.Wrapf(statErr, "polaris spec file %s not found", specFile)
 			}
 			fileContent, err := os.ReadFile(specFile)
 			if err != nil {
@@ -121,7 +132,7 @@ YAML spec file fields:
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVarP(&specFile, "file", "f", "", "polaris spec file path (YAML)")
 
 	_ = cmd.MarkFlagRequired("app")

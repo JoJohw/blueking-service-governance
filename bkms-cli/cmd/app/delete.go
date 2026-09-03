@@ -44,6 +44,7 @@ WARNING: This operation is irreversible. The application and all its configurati
 
   # Delete without confirmation prompt
   bkms-cli app delete --app myapp --yes`,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			app, err := client.New().GetApp(cmd.Context(), appID)
 			if err != nil {
@@ -71,7 +72,7 @@ WARNING: This operation is irreversible. The application and all its configurati
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().BoolVarP(&yes, "yes", "y", false, "skip confirmation prompt")
 	_ = cmd.MarkFlagRequired("app")
 

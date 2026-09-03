@@ -289,6 +289,29 @@ func (c *SvcBasedClient) DeleteEnv(ctx context.Context, envID string) error {
 	return nil
 }
 
+// ResolveApp 通过 ID 或 Name 解析应用，返回 appID
+func (c *SvcBasedClient) ResolveApp(ctx context.Context, workspaceID, input string) (string, error) {
+	url := fmt.Sprintf("/bkms/v1/bkms-server/workspaces/%s/apps/resolve/%s", workspaceID, input)
+
+	var respData struct {
+		Data struct {
+			ID string `json:"id"`
+		} `json:"data"`
+	}
+	resp, err := c.cli.R().SetContext(ctx).SetResult(&respData).Get(url)
+	if err != nil {
+		return "", errors.Wrap(err, "resolve app")
+	}
+	if resp.StatusCode() == http.StatusNotFound {
+		return "", errors.Errorf("app %s not found in workspace %s", input, workspaceID)
+	}
+	if resp.StatusCode() != http.StatusOK {
+		return "", errors.Errorf("resolve app failed: [%d] -> %s", resp.StatusCode(), truncateBody(resp.Body()))
+	}
+
+	return respData.Data.ID, nil
+}
+
 // ListApps 获取应用列表
 func (c *SvcBasedClient) ListApps(ctx context.Context, workspaceID string) ([]AppMinimal, error) {
 	url := fmt.Sprintf("/bkms/v1/bkms-server/workspaces/%s/apps", workspaceID)
@@ -851,22 +874,6 @@ func (c *SvcBasedClient) BatchUpdateInstance(
 	}
 
 	return nil
-}
-
-// GetEnvEffectiveDevMode 获取应用在某个环境下实际生效的开发模式配置
-func (c *SvcBasedClient) GetEnvEffectiveDevMode(ctx context.Context, appID, envName string) (*DevModeConfig, error) {
-	url := fmt.Sprintf("/bkms/v1/bkms-server/apps/%s/envs/%s/app-spec/dev-mode/effective", appID, envName)
-
-	var respData GetEnvEffectiveDevModeRespData
-	resp, err := c.cli.R().SetContext(ctx).SetResult(&respData).Get(url)
-	if err != nil {
-		return nil, err
-	}
-	if resp.StatusCode() != http.StatusOK {
-		return nil, errors.Errorf("get env effective dev mode failed: [%d] -> %s", resp.StatusCode(), resp.Body())
-	}
-
-	return respData.Data, nil
 }
 
 // ListAppInstances 获取应用实例列表

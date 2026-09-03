@@ -50,7 +50,7 @@ Use -o yaml or -o json to see envWeights, envStates, warnings, and serviceLabels
 
   # Output in YAML format
   bkms-cli app polaris list --app my-app -o yaml`,
-		PreRun: cmdutil.CommonPreRun,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			configs, err := client.New().ListAppPolarisConfigs(cmd.Context(), appID)
 			if err != nil {
@@ -65,7 +65,7 @@ Use -o yaml or -o json to see envWeights, envStates, warnings, and serviceLabels
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVarP(&outputFormat, "output", "o", "", output.FlagUsage)
 
 	_ = cmd.MarkFlagRequired("app")

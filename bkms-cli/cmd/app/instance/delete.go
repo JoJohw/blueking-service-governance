@@ -48,13 +48,13 @@ The fleet will have fewer instances than expected until you manually restore rep
 
   # Delete without confirmation prompt
   bkms-cli app instance delete --app myapp --env prod --instance-ids pod1,pod2 --yes`,
-		PreRun: cmdutil.CommonPreRun,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runInstanceDelete(cmd, appID, envName, instanceIDsStr, yes)
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVar(&envName, "env", "", "environment name (required)")
 	cmd.Flags().StringVar(&instanceIDsStr, "instance-ids", "", "comma-separated instance IDs (required)")
 	cmd.Flags().BoolVarP(&yes, "yes", "y", false, "skip confirmation prompt")

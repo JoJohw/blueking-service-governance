@@ -50,7 +50,7 @@ Use --sensitive to mark as sensitive, or --no-sensitive to unmark.`,
 
   # Mark as sensitive
   bkms-cli envvar update app --app <appID> --key MY_VAR --sensitive`,
-		PreRun: cmdutil.CommonPreRun,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if sensitive && noSensitive {
 				return errors.New("--sensitive and --no-sensitive cannot be used together")
@@ -92,7 +92,7 @@ Use --sensitive to mark as sensitive, or --no-sensitive to unmark.`,
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVar(&key, "key", "", "current environment variable key (required)")
 	cmd.Flags().StringVar(&updatedKey, "updated-key", "", "new environment variable key (optional, defaults to --key)")
 	cmd.Flags().StringVar(&value, "value", "", "environment variable value")

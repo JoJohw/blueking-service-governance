@@ -51,7 +51,7 @@ bkms-cli app publish --app myapp --env stage -f /path/to/binary --instance-ids p
 
 # Publish to all Running instances
 bkms-cli app publish --app myapp --env stage -f /path/to/binary --all`,
-		PreRun: cmdutil.CommonPreRun,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			specifiedInstanceIDs := params.NormalizeInstIDs(instances, ",")
 
@@ -77,7 +77,7 @@ bkms-cli app publish --app myapp --env stage -f /path/to/binary --all`,
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "Application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVar(&envName, "env", "", "Environment name (required)")
 	cmd.Flags().StringVarP(&file, "file", "f", "", "Path to the binary file to publish (required)")
 	cmd.Flags().

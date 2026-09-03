@@ -26,6 +26,7 @@ import (
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/client"
 	instancehandler "github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/handler/instance"
+	cmdutil "github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/cmd"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/console"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/params"
 )
@@ -51,6 +52,9 @@ At least one of --weight or --isolate must be specified.`,
   # Restore traffic weight
   bkms-cli app instance polaris --app myapp --env prod --instance-ids pod1 --weight 100`,
 		PreRunE: func(c *cobra.Command, a []string) error {
+			if err := cmdutil.ResolveAppPreRunE(c, a); err != nil {
+				return err
+			}
 			weightSet = c.Flags().Changed("weight")
 			isolateSet = c.Flags().Changed("isolate")
 			return nil
@@ -60,7 +64,7 @@ At least one of --weight or --isolate must be specified.`,
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVar(&envName, "env", "", "environment name (required)")
 	cmd.Flags().StringVar(&instanceIDsStr, "instance-ids", "", "comma-separated instance IDs (required)")
 	cmd.Flags().IntVar(&weight, "weight", 0, "target Polaris traffic weight (0=drain, 100=normal)")

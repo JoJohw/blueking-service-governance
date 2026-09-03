@@ -40,8 +40,8 @@ import (
 
 // NewLoginCmd create login command
 func NewLoginCmd() *cobra.Command {
-	var accessToken string
 	var useBkTicket bool
+	var useAccessToken bool
 
 	cmd := &cobra.Command{
 		Use:   "login",
@@ -50,20 +50,26 @@ func NewLoginCmd() *cobra.Command {
 			cmdutil.SkipAuthAnnotationKey: "true",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if accessToken != "" && useBkTicket {
+			if useAccessToken && useBkTicket {
 				return errors.New("cannot use both access-token and bk-ticket at the same time")
 			}
-			if accessToken != "" {
-				return login(accessToken)
-			}
 			if useBkTicket {
+				// 交互式登录
 				return loginByBkTicket()
+			}
+			if useAccessToken {
+				if len(args) > 0 {
+					// 直接登录
+					return login(args[0])
+				}
+				// 交互式登录
+				return loginByAccessToken()
 			}
 			return loginByBrowser()
 		},
 	}
 
-	cmd.Flags().StringVar(&accessToken, "access-token", "", "BlueKing AccessToken")
+	cmd.Flags().BoolVar(&useAccessToken, "access-token", false, "BlueKing AccessToken")
 	cmd.Flags().BoolVar(&useBkTicket, "bk-ticket", false, "BlueKing User Ticket")
 	return cmd
 }
@@ -123,7 +129,7 @@ func loginByBkTicket() error {
 // login 用户登录
 func login(accessToken string) error {
 	fmt.Printf("User login... ")
-	username, err := client.New().ValidateAccessToken(accessToken)
+	username, err := client.New().ValidateAccessToken(strings.TrimSpace(accessToken))
 	if err != nil {
 		return errors.Wrap(err, "login with access token")
 	}

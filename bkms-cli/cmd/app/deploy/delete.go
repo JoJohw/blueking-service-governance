@@ -49,6 +49,7 @@ For trpc and taf applications, the entire environment deployment is removed.`,
 
   # Delete without confirmation prompt
   bkms-cli app deploy delete --app myapp --env test --yes`,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			app, err := client.New().GetApp(cmd.Context(), appID)
 			if err != nil {
@@ -73,7 +74,7 @@ For trpc and taf applications, the entire environment deployment is removed.`,
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVar(&envName, "env", "", "environment name (required)")
 	cmd.Flags().StringVar(&deployID, "deploy-id", "", "deploy record ID (required for helm apps)")
 	cmd.Flags().BoolVarP(&yes, "yes", "y", false, "skip confirmation prompt")

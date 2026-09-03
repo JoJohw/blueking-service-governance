@@ -34,12 +34,12 @@ func NewResetCmd() *cobra.Command {
 	var appID, envName string
 
 	cmd := &cobra.Command{
-		Use:    "reset",
-		Short:  "Reset underlay-ip env override to default",
-		PreRun: cmdutil.CommonPreRun,
-		Long:   `Reset the environment-specific underlay IP override back to the default configuration.`,
+		Use:   "reset",
+		Short: "Reset underlay-ip env override to default",
+		Long:  `Reset the environment-specific underlay IP override back to the default configuration.`,
 		Example: `  # Reset env override to default
   bkms-cli app appspec underlay-ip reset --app my-app --env prod`,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if envName == "" {
 				return errors.New("reset requires --env to be specified")
@@ -56,7 +56,7 @@ func NewResetCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVar(&envName, "env", "", "environment name (required for reset)")
 
 	_ = cmd.MarkFlagRequired("app")

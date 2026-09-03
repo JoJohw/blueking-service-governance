@@ -65,7 +65,7 @@ is optional. Otherwise, you must specify it explicitly.`,
 
   # List deploy records for multiple environments
   bkms-cli app deploy list --app demo --env prod,staging,test`,
-		PreRun: cmdutil.CommonPreRun,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			workspaceID = cmdutil.GetWorkspaceID(workspaceID)
 			records, err := deploy.ListDeploy(cmd.Context(), workspaceID, appID, envName, trafficLaneName, keyword)
@@ -84,8 +84,8 @@ is optional. Otherwise, you must specify it explicitly.`,
 		},
 	}
 
-	cmd.Flags().StringVar(&workspaceID, "workspace", "", "workspace id")
-	cmd.Flags().StringVar(&appID, "app", "", "application ID")
+	cmdutil.AddWorkspaceFlag(cmd, &workspaceID)
+	cmd.Flags().StringVar(&appID, "app", "", "application ID or name")
 	cmd.Flags().StringVar(&envName, "env", "", "environment name")
 	cmd.Flags().StringVar(&trafficLaneName, "trafficLane", "", "traffic lane name")
 	cmd.Flags().StringVar(&keyword, "keyword", "", "filter by keyword")

@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/client"
+	cmdutil "github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/cmd"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-cli/pkg/utils/console"
 )
 
@@ -46,6 +47,7 @@ Weight range: 0-10000 (0 = drain all traffic, 100 = normal weight).`,
 
   # Restore normal weight
   bkms-cli app polaris weight --app myapp --config myconfig --env test --weight 100`,
+		PreRunE: cmdutil.ResolveAppPreRunE,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if weight < 0 || weight > 10000 {
 				return errors.New("--weight must be in range 0-10000")
@@ -63,7 +65,7 @@ Weight range: 0-10000 (0 = drain all traffic, 100 = normal weight).`,
 		},
 	}
 
-	cmd.Flags().StringVar(&appID, "app", "", "application ID (required)")
+	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVar(&configName, "config", "", "Polaris config name (required)")
 	cmd.Flags().StringVar(&envName, "env", "", "environment name (required)")
 	cmd.Flags().Int32Var(&weight, "weight", 0, "global weight for all instances (0-10000, required)")
