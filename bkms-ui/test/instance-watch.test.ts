@@ -45,6 +45,7 @@ import {
 import { useInstanceListWatch } from '~/pages/application/detail/deploy/instance-list/composables/use-instance-list-watch';
 
 import type { AppInstanceOutputObj } from '~/@types/v1/instance';
+import type { InstanceListSourceMode } from '~/pages/application/detail/deploy/instance-list/types';
 
 class VisibilityDocument extends EventTarget {
   visibilityState: DocumentVisibilityState = 'visible';
@@ -199,11 +200,12 @@ describe('instance List + Watch lifecycle', () => {
   const activeScopes: EffectScope[] = [];
   let visibilityDocument: VisibilityDocument;
 
-  function startWatch(envName = ref('prod')) {
+  function startWatch(envName = ref('prod'), getMode?: () => InstanceListSourceMode) {
     let state!: ReturnType<typeof useInstanceListWatch>;
     const scope = effectScope();
     scope.run(() => {
       state = useInstanceListWatch({
+        getMode,
         getScope: () => ({ appID: 'app-1', envName: envName.value }),
       });
     });
@@ -268,6 +270,174 @@ describe('instance List + Watch lifecycle', () => {
     resolveWatch(createControlledStream().response);
     await flushPromises();
     expect(state.isWatching.value).toBe(true);
+  });
+
+  it('polls List(all=true) every 10 seconds in polling mode without starting Watch', async () => {
+    instanceServiceMocks.listAppInstances
+      .mockResolvedValueOnce({ results: [{ id: 'pod-a' }], resourceVersion: 'rv-1' })
+      .mockResolvedValueOnce({ results: [{ id: 'pod-b' }], resourceVersion: 'rv-2' });
+
+    const state = startWatch(ref('fed'), () => 'polling');
+    await flushPromises();
+
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(1);
+    expect(instanceServiceMocks.listAppInstances.mock.calls[0][0]).toMatchObject({
+      all: true,
+      appID: 'app-1',
+      envName: 'fed',
+    });
+    expect(instanceServiceMocks.listAppInstances.mock.calls[0][0]).not.toHaveProperty('page');
+    expect(instanceServiceMocks.listAppInstances.mock.calls[0][0]).not.toHaveProperty('pageSize');
+    expect(instanceServiceMocks.watchAppInstances).not.toHaveBeenCalled();
+    expect(state.instances.value.map(instance => instance.id)).toEqual(['pod-a']);
+    expect(state.isInitialLoading.value).toBe(false);
+
+    await vi.advanceTimersByTimeAsync(9999);
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1);
+    await flushPromises();
+
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(2);
+    expect(instanceServiceMocks.watchAppInstances).not.toHaveBeenCalled();
+    expect(state.instances.value.map(instance => instance.id)).toEqual(['pod-b']);
+  });
+
+  it('backs off by 5s for consecutive slow Lists and gradually recovers after fast responses', async () => {
+    let call = 0;
+    instanceServiceMocks.listAppInstances.mockImplementation((_request: unknown, _config: { signal: AbortSignal }) => {
+      call += 1;
+      const result = { results: [{ id: `pod-${call}` }], resourceVersion: `rv-${call}` };
+      // 前五轮 List 耗时 14s（慢于一个基准周期），后续各轮立即返回。
+      if (call <= 5) {
+        return new Promise(resolve => {
+          setTimeout(() => resolve(result), 14000);
+        });
+      }
+      return Promise.resolve(result);
+    });
+
+    const state = startWatch(ref('fed'), () => 'polling');
+    // 推进到首轮 List（14s）返回；耗时 ≥ 10s 后，间隔从 10s 退避到 15s。
+    await vi.advanceTimersByTimeAsync(14000);
+    await flushPromises();
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(1);
+    expect(state.pollingIntervalMs.value).toBe(15000);
+
+    // 连续慢响应时每轮继续增加 5s，允许退避至 30s 及更长。
+    await vi.advanceTimersByTimeAsync(15000);
+    await vi.advanceTimersByTimeAsync(14000);
+    await flushPromises();
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(2);
+    expect(state.pollingIntervalMs.value).toBe(20000);
+
+    await vi.advanceTimersByTimeAsync(20000);
+    await vi.advanceTimersByTimeAsync(14000);
+    await flushPromises();
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(3);
+    expect(state.pollingIntervalMs.value).toBe(25000);
+
+    await vi.advanceTimersByTimeAsync(25000);
+    await vi.advanceTimersByTimeAsync(14000);
+    await flushPromises();
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(4);
+    expect(state.pollingIntervalMs.value).toBe(30000);
+
+    // 达到上限后继续慢响应也不再增长。
+    await vi.advanceTimersByTimeAsync(30000);
+    await vi.advanceTimersByTimeAsync(14000);
+    await flushPromises();
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(5);
+    expect(state.pollingIntervalMs.value).toBe(30000);
+
+    // 快响应每轮只恢复一个步长，避免从 30s 直接跳回 10s。
+    await vi.advanceTimersByTimeAsync(30000);
+    await flushPromises();
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(6);
+    expect(state.pollingIntervalMs.value).toBe(25000);
+
+    await vi.advanceTimersByTimeAsync(25000);
+    await flushPromises();
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(7);
+    expect(state.pollingIntervalMs.value).toBe(20000);
+
+    await vi.advanceTimersByTimeAsync(20000);
+    await flushPromises();
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(8);
+    expect(state.pollingIntervalMs.value).toBe(15000);
+
+    await vi.advanceTimersByTimeAsync(15000);
+    await flushPromises();
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(9);
+    expect(state.pollingIntervalMs.value).toBe(10000);
+  });
+
+  it('shows the List error for every polling failure and clears it after a successful List', async () => {
+    const firstError = { error: { message: 'cluster disconnected' }, status: 503 };
+    const secondError = { error: { message: 'cluster still disconnected' }, status: 503 };
+    const thirdError = { error: { message: 'cluster disconnected again' }, status: 503 };
+    instanceServiceMocks.listAppInstances
+      .mockRejectedValueOnce(firstError)
+      .mockRejectedValueOnce(secondError)
+      .mockResolvedValueOnce({ results: [{ id: 'pod-a' }], resourceVersion: 'rv-1' })
+      .mockRejectedValueOnce(thirdError);
+
+    const state = startWatch(ref('fed'), () => 'polling');
+    await flushPromises();
+
+    expect(state.lastError.value).toBe(firstError);
+    expect(notifyFailureMock).toHaveBeenCalledTimes(1);
+    expect(notifyFailureMock).toHaveBeenLastCalledWith(firstError);
+    expect(state.isInitialLoading.value).toBe(false);
+
+    await vi.advanceTimersByTimeAsync(10000);
+    await flushPromises();
+    expect(state.lastError.value).toBe(secondError);
+    expect(notifyFailureMock).toHaveBeenCalledTimes(2);
+    expect(notifyFailureMock).toHaveBeenLastCalledWith(secondError);
+
+    await vi.advanceTimersByTimeAsync(10000);
+    await flushPromises();
+    expect(state.lastError.value).toBeUndefined();
+    expect(state.instances.value.map(instance => instance.id)).toEqual(['pod-a']);
+
+    await vi.advanceTimersByTimeAsync(10000);
+    await flushPromises();
+    expect(state.lastError.value).toBe(thirdError);
+    expect(notifyFailureMock).toHaveBeenCalledTimes(3);
+    expect(notifyFailureMock).toHaveBeenLastCalledWith(thirdError);
+    expect(state.instances.value.map(instance => instance.id)).toEqual(['pod-a']);
+  });
+
+  it('stops polling while hidden and resumes with a fresh List when visible again', async () => {
+    const signals: AbortSignal[] = [];
+    let resolveFirstList!: (value: { resourceVersion: string; results: AppInstanceOutputObj[] }) => void;
+    const firstList = new Promise<{ resourceVersion: string; results: AppInstanceOutputObj[] }>(resolve => {
+      resolveFirstList = resolve;
+    });
+    instanceServiceMocks.listAppInstances.mockImplementation((_request: unknown, config: { signal: AbortSignal }) => {
+      signals.push(config.signal);
+      if (signals.length === 1) return firstList;
+      return Promise.resolve({ results: [{ id: `pod-${signals.length}` }], resourceVersion: `rv-${signals.length}` });
+    });
+
+    const state = startWatch(ref('fed'), () => 'polling');
+    await flushPromises();
+    visibilityDocument.visibilityState = 'hidden';
+    visibilityDocument.dispatchEvent(new Event('visibilitychange'));
+
+    expect(signals[0].aborted).toBe(true);
+    resolveFirstList({ results: [{ id: 'pod-stale' }], resourceVersion: 'rv-stale' });
+    await flushPromises();
+    await vi.advanceTimersByTimeAsync(10000);
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(1);
+    expect(state.instances.value).toEqual([]);
+
+    visibilityDocument.visibilityState = 'visible';
+    visibilityDocument.dispatchEvent(new Event('visibilitychange'));
+    await flushPromises();
+
+    expect(instanceServiceMocks.listAppInstances).toHaveBeenCalledTimes(2);
+    expect(state.instances.value.map(instance => instance.id)).toEqual(['pod-2']);
   });
 
   it('re-lists with a new resourceVersion after the abnormal reconnect cooldown for an unexpected EOF', async () => {
