@@ -148,6 +148,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响2/复杂度3）
 - 来源模块：`src/components/dynamic-input.vue`、`src/components/repeatable-input.vue`、`src/components/key-value.vue`
+- 实施记录：`../pilots/TEST_PILOT_S5.md`；独立评审：`../reviews/TEST_REVIEW_S5.md`（92/100 放行 + 变异验证 3/3 捕获）；用例文件 `test/scenarios/dynamic-input.test.ts`（5 用例全绿，已覆盖 dynamic-input，repeatable-input/key-value 待补）
 - 用户目标：动态增删输入项并填写内容
 - 判定分支：新增 / 删除 / 空值拦截 → **V = 3**
 - 设计方法：等价类 + 边界值（补充 emoji/注入样例，见覆盖模型检查）
@@ -160,6 +161,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：7 分（频率3/影响3/复杂度1，复用广度大）
 - 来源模块：`src/components/delete-comfirm.vue`
+- 实施记录：`../pilots/TEST_PILOT_S6.md`；独立评审：`../reviews/TEST_REVIEW_S6.md`（93/100 放行 + 变异验证 4/4 捕获）；用例文件 `test/scenarios/delete-confirm.test.ts`（4 用例全绿）
 - 用户目标：删除操作需经确认弹窗二次确认
 - 判定分支：确认删除 / 取消删除 → **V = 2**
 - 设计方法：二分支确认 + 二阶（重复确认、权限不足，推断/需确认）
@@ -229,6 +231,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：8 分（频率3/影响2~3/复杂度2~3，全局纯逻辑）
 - 来源模块：`src/modules/router.ts`（`smartGoBack` + `beforeEach` 守卫）
+- 实施记录：`../pilots/TEST_PILOT_S13.md`；独立评审：`../reviews/TEST_REVIEW_S13.md`（92/100 放行 + 变异验证 4/4 捕获）；用例文件 `test/scenarios/router-guards.test.ts`（10 用例全绿）
 - 用户目标：返回操作回到正确页面；无权限访问得到正确反馈
 - 判定分支：`smartGoBack` 4 个判定节点（有/无浏览历史 → fallback 有无 → parent.name 有无 → 默认子路由有无）→ **V = 5**；守卫 3 个判定节点（无 space 放行 / 在列表且 Ready 放行 / 不在列表 → 403 / 非 Ready → 404）→ **V = 4**
 - 设计方法：基本路径测试（分支全部显式可数，纯逻辑可直接单测）
@@ -243,6 +246,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：8 分（频率3/影响3/复杂度2）
 - 来源模块：`src/pages/application/application.vue`（路由 `:space/app/:envName?`）
+- 实施记录：`../pilots/TEST_PILOT_S14.md`（含 @blueking/table 的 jsdom 渲染垫片方案）；独立评审：`../reviews/TEST_REVIEW_S14.md`（88/100 放行 + 变异验证 2/2 捕获）；用例文件 `test/scenarios/application-list.test.ts`（4 用例全绿）
 - 用户目标：浏览应用列表并进入详情/部署等入口
 - 判定分支：加载成功（有数据）/ 加载失败 / 空列表 → **V = 4**
 - 设计方法：等价类 + 异常猜测
