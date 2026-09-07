@@ -148,6 +148,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响2/复杂度3）
 - 来源模块：`src/components/dynamic-input.vue`、`src/components/repeatable-input.vue`、`src/components/key-value.vue`
+- 实施记录：`../pilots/TEST_PILOT_S5.md`；独立评审：`../reviews/TEST_REVIEW_S5.md`（92/100 放行 + 变异验证 3/3 捕获）；用例文件 `test/scenarios/dynamic-input.test.ts`（5 用例全绿，已覆盖 dynamic-input，repeatable-input/key-value 待补）
 - 用户目标：动态增删输入项并填写内容
 - 判定分支：新增 / 删除 / 空值拦截 → **V = 3**
 - 设计方法：等价类 + 边界值（补充 emoji/注入样例，见覆盖模型检查）
