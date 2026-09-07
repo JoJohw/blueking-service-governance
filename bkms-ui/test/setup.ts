@@ -21,6 +21,9 @@
  * 组件库在模块加载阶段就可能引用这些浏览器 API。
  */
 
+// jest-dom 语义化 DOM 断言匹配器（toBeInTheDocument / toBeDisabled 等）全局注册
+import '@testing-library/jest-dom/vitest';
+
 // jsdom 未实现 ResizeObserver，bkui-vue 的 ResizeLayout setup 时依赖
 if (!globalThis.ResizeObserver) {
   globalThis.ResizeObserver = class {
