@@ -1,0 +1,37 @@
+# 试点与实施经验记录（Pilot Log）
+
+> 定位：实施过程中的问题、调整与结论的**运营记录**，与 `TEST_GUIDELINE.md`（章程）、`TEST_SCENARIOS_ROUTES.md`（枚举评估 + 场景台账）分离——保证前两个文件的"指导意见"纯度不受实施过程记录影响。
+>
+> 记录规则：
+> 1. 试点或场景实施中遇到的任何问题（环境、stub、框架限制、用例脆弱等）都记一行；
+> 2. 结论若影响指南规范或方案评分，**必须同步回写对应文件**并在「回写」列标注去向；
+> 3. 每个场景收尾时补一行"实施小结"（用例数、耗时、是否一次通过）。
+
+## 记录表
+
+| 日期 | 场景编号 | 问题 | 根因 | 结论 / 规避方式 | 回写去向 |
+|---|---|---|---|---|---|
+| 2026-09-07 | S12 | bkui-vue FormItem 字段级校验（required/rules blur）promise reject 无 catch，产生 unhandled rejection | 组件库内部缺陷，真实浏览器控制台同样出现 | `vite.config.mts` 开启 `dangerouslyIgnoreUnhandledErrors` 兜底；升级 bkui-vue 后应验证并移除 | 建议反馈组件库 |
+| 2026-09-07 | S12 | jest-dom v7 peer 要求 `@testing-library/dom >=10`，与 TL/vue 8 的 dom 9.3.4 冲突 | 生态版本错位 | 选用 jest-dom v6（6.10.0），匹配器实测正常 | — |
+| 2026-09-07 | S12 | 空值校验的提示文案不是自定义 message"请输入组件ID"，而是 rules 末条"以字母开头…"（裸文本节点） | bkui-vue 依次执行 required 与自定义 rules，展示末条失败文案 | 断言用三选一正则 + `waitFor`（文案异步渲染） | S12 卡已更新 |
+| 2026-09-07 | 全局 | `pnpm install` 对齐 lockfile 后，`deploy-env-store.test.ts` 3 条失败：`stores/space.ts:42` 在 pinia store setup 内调用 `useI18n()`，vue-i18n@11.1.12 抛 "Must be called at the top of a setup function" | 既有代码问题被环境对齐暴露（lockfile 无 vue-i18n 版本漂移，与 S12 改动无关） | 待决策：修 `space.ts` i18n 用法 或 pin vue-i18n 旧版本 | 待决策后回写 |
+| 2026-09-07 | S12 | 业务确认：HTTP 错误由 fetch interceptor 统一反馈，业务层仅成功/特殊场景手写 Message | 设计约定（非缺陷） | 「试运行接口失败」按现状行为补用例（已入 19 条），已存 Memory | 已记 Memory |
+| 2026-09-07 | S12 | 独立用例评审（子 agent 隔离执行）两次启动均被中止（code=10003），评审未产出 | 子 agent 执行环境问题 | **已完成**：新对话中重跑成功，评审报告 82/100 通过、无阻塞问题 | 结论已回写本表与台账 |
+| 2026-09-07 | S12 | 第 2 轮复审：91/100 通过；新发现 Medium——M1 用例「先等 loading 恢复」的完成信号不成立（校验失败在置 loading 前已 return，按钮从未进 loading），消极断言存在首检即过漏报窗口 | 校验失败路径无 DOM 可观察信号 | 按复审修法落地：isValid 改为可观察 vi.fn，消极断言前先等「校验方法被消费」（waitFor calledTimes）；修正中又发现 validateForm 无条件调用 outputIsValid，各分支用 mockClear 独立计数 | PILOT_S12 §3 模板要点 |
+| 2026-09-07 | S12 | 评审采纳关闭：M1 子模板校验失败（inputValid 分支）、M2 离开确认 onConfirm 分支、断言补强（编辑成功关闭对称 / 边界末段正向 / scopeWorkspaceIDs 空间隔离）、指南条款 4 白名单回写、vite.config 注释补充 | 评审报告 P1/Medium 项，逐条核实属实 | 已实施，21/21 全绿 | 指南条款 4 / vite.config 注释 / 台账 S12 卡 |
+| 2026-09-07 | S12 | ~~新发现业务缺陷~~ **更正：业务代码无缺陷**。探针误判源于 stub 契约偏差——output 模板真实 `isValid()` 为同步返回 boolean（component-output-template.vue:195），stub 误写为 `Promise.resolve()`，Promise 对象恒 truthy 造成"拦不住"假象 | stub 契约与真实 defineExpose 不一致 | stub 已按真实契约修正（input async / output sync），outputValid=false 分支断言已恢复（正确拦截），21/21 全绿 | **经验回写**：写 stub 前必须先读真实子组件的 `defineExpose` 契约（同步/异步），见 PILOT_S12 |
+| 2026-09-07 | S12 | 评审 Low 项处置：格式重排类（it 主语 / 边界拆分 / waitFor 顺序）按「黄金法则不为格式买单」砍掉；waitFor 先正后负模式在 M1 落地验证（消极断言首检即过陷阱实证） | 性价比权衡 | waitFor 先正后负已写入用例注释作为样板 | PILOT_S12 §3 |
+| 2026-09-07 | S12 | 终审（第 3 轮）92/100 放行：M1 修复核实通过（isValid 可观察 vi.fn + 先等消费信号），实测 21/21 全绿 7.84s；文档体系迁移至 `docs/vitest/`（guides/ 体系文件，pilots/、reviews/ 场景产物分夹） | — | 评审记录归档 `../reviews/TEST_REVIEW_S12.md`；backlog（M3/M4/P3）在评审记录 §7 跟踪 | 台账 S12 卡 / TEST_REVIEW_S12 |
+
+## 实施小结
+
+| 日期 | 场景编号 | 用例数 | 实际 V 值 | 是否一次通过 | 耗时 | 备注 |
+|---|---|---|---|---|---|---|
+| 2026-09-07 | S12 | 18（16 条 it，it.each 展开 3 组非法格式） | 15（与预估一致） | 否，4 轮迭代 | 首跑 7.7s；连跑 3 次 7.5~7.9s 全绿 | bkui-vue 真实渲染链在 jsdom 首次验证通过；实践细节见 `../pilots/TEST_PILOT_S12.md` |
+| 2026-09-07 | S12 | 21（评审采纳项落地后） | 15（与预估一致） | 评审闭环后 3 轮全绿 | 终审实测 7.84s（tests 4.02s） | 独立评审三轮 82→91→92 放行；详见 `../reviews/TEST_REVIEW_S12.md` |
+
+## 已知环境事实（实施前置认知，非踩坑）
+
+- `vite.config.mts` 已有 bkui-vue alias（主入口与 `lib/` 子路径）与 monaco-editor 极简 stub，仅影响 vitest 不影响构建。
+- `test/setup.ts` 已垫片 jsdom 缺失 API（ResizeObserver / PointerEvent 等），新用例直接复用，勿重复垫片。
+- `@testing-library/vue`、`@testing-library/user-event`、`@testing-library/jest-dom` 尚未安装（试点第一步）。
