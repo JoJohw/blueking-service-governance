@@ -160,6 +160,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：7 分（频率3/影响3/复杂度1，复用广度大）
 - 来源模块：`src/components/delete-comfirm.vue`
+- 实施记录：`../pilots/TEST_PILOT_S6.md`；独立评审：`../reviews/TEST_REVIEW_S6.md`（93/100 放行 + 变异验证 4/4 捕获）；用例文件 `test/scenarios/delete-confirm.test.ts`（4 用例全绿）
 - 用户目标：删除操作需经确认弹窗二次确认
 - 判定分支：确认删除 / 取消删除 → **V = 2**
 - 设计方法：二分支确认 + 二阶（重复确认、权限不足，推断/需确认）
