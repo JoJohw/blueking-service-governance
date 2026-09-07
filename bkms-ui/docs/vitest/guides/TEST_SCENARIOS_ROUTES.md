@@ -229,6 +229,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：8 分（频率3/影响2~3/复杂度2~3，全局纯逻辑）
 - 来源模块：`src/modules/router.ts`（`smartGoBack` + `beforeEach` 守卫）
+- 实施记录：`../pilots/TEST_PILOT_S13.md`；独立评审：`../reviews/TEST_REVIEW_S13.md`（92/100 放行 + 变异验证 4/4 捕获）；用例文件 `test/scenarios/router-guards.test.ts`（10 用例全绿）
 - 用户目标：返回操作回到正确页面；无权限访问得到正确反馈
 - 判定分支：`smartGoBack` 4 个判定节点（有/无浏览历史 → fallback 有无 → parent.name 有无 → 默认子路由有无）→ **V = 5**；守卫 3 个判定节点（无 space 放行 / 在列表且 Ready 放行 / 不在列表 → 403 / 非 Ready → 404）→ **V = 4**
 - 设计方法：基本路径测试（分支全部显式可数，纯逻辑可直接单测）

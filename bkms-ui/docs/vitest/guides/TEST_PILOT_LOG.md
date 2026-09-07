@@ -22,6 +22,7 @@
 | 2026-09-07 | S12 | ~~新发现业务缺陷~~ **更正：业务代码无缺陷**。探针误判源于 stub 契约偏差——output 模板真实 `isValid()` 为同步返回 boolean（component-output-template.vue:195），stub 误写为 `Promise.resolve()`，Promise 对象恒 truthy 造成"拦不住"假象 | stub 契约与真实 defineExpose 不一致 | stub 已按真实契约修正（input async / output sync），outputValid=false 分支断言已恢复（正确拦截），21/21 全绿 | **经验回写**：写 stub 前必须先读真实子组件的 `defineExpose` 契约（同步/异步），见 PILOT_S12 |
 | 2026-09-07 | S12 | 评审 Low 项处置：格式重排类（it 主语 / 边界拆分 / waitFor 顺序）按「黄金法则不为格式买单」砍掉；waitFor 先正后负模式在 M1 落地验证（消极断言首检即过陷阱实证） | 性价比权衡 | waitFor 先正后负已写入用例注释作为样板 | PILOT_S12 §3 |
 | 2026-09-07 | S12 | 终审（第 3 轮）92/100 放行：M1 修复核实通过（isValid 可观察 vi.fn + 先等消费信号），实测 21/21 全绿 7.84s；文档体系迁移至 `docs/vitest/`（guides/ 体系文件，pilots/、reviews/ 场景产物分夹） | — | 评审记录归档 `../reviews/TEST_REVIEW_S12.md`；backlog（M3/M4/P3）在评审记录 §7 跟踪 | 台账 S12 卡 / TEST_REVIEW_S12 |
+| 2026-09-07 | S13 | 纯路由逻辑场景三坑：① spy `history.back` 拿到 0 次——vue-router 的 back 底层是 `history.go(-1)`；② `smartGoBack` 内 `router.replace(fb)` 未返回 Promise，`await` 拿不到完成，须用 `waitFor` 等 currentRoute 变化；③ 「推导不出上级 → 浏览器后退」分支在真实路由表下不可达（所有路由被 `setupLayouts` 包裹，matched ≥ 2） | ① vue-router 实现；② 源码未返回值；③ 路由表结构 | ① spy 改 `history.go`；② 断言改 `waitFor`；③ 移除该用例 + 用例注释 + `ai_unsure.md` 登记 | PILOT_S13 §2 / 评审记录 §4 |
 
 ## 实施小结
 
@@ -29,6 +30,7 @@
 |---|---|---|---|---|---|---|
 | 2026-09-07 | S12 | 18（16 条 it，it.each 展开 3 组非法格式） | 15（与预估一致） | 否，4 轮迭代 | 首跑 7.7s；连跑 3 次 7.5~7.9s 全绿 | bkui-vue 真实渲染链在 jsdom 首次验证通过；实践细节见 `../pilots/TEST_PILOT_S12.md` |
 | 2026-09-07 | S12 | 21（评审采纳项落地后） | 15（与预估一致） | 评审闭环后 3 轮全绿 | 终审实测 7.84s（tests 4.02s） | 独立评审三轮 82→91→92 放行；详见 `../reviews/TEST_REVIEW_S12.md` |
+| 2026-09-07 | S13 | 10（2 组场景） | 9（台账预估 9；补 hasHistory 优先分支 +1，移除不可达路径 −1） | 否，3 轮迭代 | 首跑 16s（tests 224ms，含首次编译 8s）；连跑 3 次稳定 | 纯路由逻辑范式：经 app 取 router、`replaceState` 控制历史、`waitFor` 等跳转；详见 `../pilots/TEST_PILOT_S13.md` 与 `../reviews/TEST_REVIEW_S13.md`（92/100，变异验证 4/4 捕获） |
 
 ## 已知环境事实（实施前置认知，非踩坑）
 
