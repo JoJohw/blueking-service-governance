@@ -58,6 +58,9 @@
   "devDependencies": {
     "@blueking/bkui-lint": "0.1.8",
     "@intlify/unplugin-vue-i18n": "^4.0.0",
+    "@testing-library/jest-dom": "^6.10.0",
+    "@testing-library/user-event": "^14.6.7",
+    "@testing-library/vue": "^8.1.0",
     "@types/figlet": "^1.7.0",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash-es": "^4.17.7",
