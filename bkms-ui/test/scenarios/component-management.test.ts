@@ -33,6 +33,7 @@ import userEvent from '@testing-library/user-event';
 import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { createPinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { MockedApiError } from '../helpers/mocked-api-error';
 import ComponentManagement from '~/pages/marketplace/component-management.vue';
 
 // ── mock 与桩（vi.hoisted：vi.mock 工厂可引用） ──
@@ -395,7 +396,7 @@ describe('组件管理：新建/编辑向导', () => {
     });
 
     it('当试运行接口失败时，应停留在表单步骤且可重新发起试运行（错误反馈由请求拦截器统一处理）', async () => {
-      mocks.previewComponentDef.mockRejectedValue(new Error('network error'));
+      mocks.previewComponentDef.mockRejectedValue(new MockedApiError());
       await openWizard('component');
       await fillName('ab');
 
