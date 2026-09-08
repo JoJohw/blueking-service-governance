@@ -32,6 +32,7 @@
 | 2026-09-08 | S15 | **文件级 `vi.mock` 是全文件生效的**：同一路径既要给容器页做 stub、又要在别的用例渲染真实组件时，直接渲染会拿到 stub | mock 工厂对整个测试文件生效 | 直接渲染真实组件改用 `vi.importActual` 绕过 stub（deploy-history/preview-rollback） | PILOT_S15 §1/§2 |
 | 2026-09-08 | S15 | **bkui Dialog/Sideslider 显隐由内部 setTimeout 置位**（modal/index.js:397-406），isShow false→true 后 wrapper 延迟可见；FormItem 默认错误文案走 tooltip 不可断言 | bkui modal 源码证实；tooltip 依赖 v-bk-tooltips 指令 | 弹层查询一律 `findBy*`；校验拦截以 `is-error` 态（body 级查询，侧滑 teleport 到 body）为信号 + 负断言兜底 | PILOT_S15 §2 / REVIEW_S15 §7 |
 | 2026-09-08 | S15 | **`use-helm-deploy.ts` 导出模块级单例 ref**（deployHistoryList/chartList/latestDeployStatus），测试间状态泄漏 | 组件外共享状态设计 | beforeEach 手动重置三个 ref；同类「模块级共享 ref」场景需逐个排查 | PILOT_S15 §2 |
+| 2026-09-08 | 全局 | **`pnpm test:unit`（watch 模式）与 `pnpm vitest run` 结果不一致**：watch 只重跑变更文件、其余用历史缓存；全量并行跑时 S16 两条用例挂（默认 5s 超时在 21 文件并行抢 worker 下不够，且超时中断的新建态弹窗 DOM 残留 body，污染同文件下一条编辑态用例的全局查询） | watch 增量缓存 + 并行资源竞争 + teleport 弹窗超时残留级联 | 9 个缺 `testTimeout` 的场景文件统一补 `vi.setConfig({ testTimeout: 15_000 })`；多 worker 全量复跑 121/121 全绿；**验收口径以 `vitest run` 全量为准**，watch 结果不可作为全绿依据 | 本表 + 各场景文件 |
 
 ## 实施小结
 

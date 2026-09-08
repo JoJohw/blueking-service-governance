@@ -1,3 +1,20 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
 /**
  * 场景级测试：动态 / 重复输入项（S5 收尾：key-value）
  * 路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S5
@@ -7,9 +24,10 @@
  *
  * 说明：删除按钮是 bkui-vue 的 Del 图标（渲染为 svg 且无 role），只能通过容器查询定位，见用例注释。
  */
-import { cleanup, render, screen } from '@testing-library/vue';
-import userEvent from '@testing-library/user-event';
 import { defineComponent, h, ref } from 'vue';
+
+import userEvent from '@testing-library/user-event';
+import { cleanup, render, screen } from '@testing-library/vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const harness = vi.hoisted(() => ({
@@ -29,13 +47,16 @@ const Harness = defineComponent({
   setup() {
     const value = ref<{ key: string; value: string }[]>([...harness.value]);
     return () =>
-      h(KeyValue as never, {
-        modelValue: value.value,
-        'onUpdate:modelValue': (v: { key: string; value: string }[]) => (value.value = v),
-        minRows: harness.minRows,
-        disabled: harness.disabled,
-        keyPlaceholder: '键名',
-      } as never);
+      h(
+        KeyValue as never,
+        {
+          modelValue: value.value,
+          'onUpdate:modelValue': (v: { key: string; value: string }[]) => (value.value = v),
+          minRows: harness.minRows,
+          disabled: harness.disabled,
+          keyPlaceholder: '键名',
+        } as never,
+      );
   },
 });
 

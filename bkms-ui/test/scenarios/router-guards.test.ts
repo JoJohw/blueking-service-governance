@@ -1,3 +1,20 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
 /**
  * 场景级测试：路由智能返回 + 空间权限守卫（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S13）
  *
@@ -9,10 +26,12 @@
  * 因此断言 currentRoute 与 window.history.back 调用，而非 DOM 查询。
  */
 import { createApp } from 'vue';
-import type { Router } from 'vue-router';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { waitFor } from '@testing-library/vue';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { install as installRouter } from '~/modules/router';
+
+import type { Router } from 'vue-router';
 
 const spaceState = vi.hoisted(() => ({
   list: [] as Array<{ id: string; state: string }>,
@@ -31,18 +50,18 @@ vi.mock('~/stores/space', () => ({
   }),
 }));
 
+/** 覆写浏览器历史状态：back 非空 = 有浏览历史 */
+function setHistory(back: null | string) {
+  window.history.replaceState({ back, current: location.hash }, '', location.href);
+}
+
 /** 挂一个空 app 安装真实 router 模块，取出 router 实例（install 内部自建 router，需经 app 获取） */
-async function setup(initial?: string | Record<string, unknown>) {
+async function setup(initial?: Record<string, unknown> | string) {
   const app = createApp({ render: () => null });
   installRouter({ app } as never);
   const router = app.config.globalProperties.$router as Router;
   if (initial) await router.push(initial as string);
   return { app, router };
-}
-
-/** 覆写浏览器历史状态：back 非空 = 有浏览历史 */
-function setHistory(back: string | null) {
-  window.history.replaceState({ back, current: location.hash }, '', location.href);
 }
 
 /** 浏览器后退：vue-router 的 back 底层走 history.go(-1)，非 history.back() */

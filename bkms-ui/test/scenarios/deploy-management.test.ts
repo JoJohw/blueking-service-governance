@@ -13,9 +13,8 @@ import { createPinia } from 'pinia';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installVxeShims } from './helpers/vxe-shims';
 
-// 页面含实例列表等 vxe 表格；且为重型页面，冷启动逼近默认超时
+// 页面含实例列表等 vxe 表格
 installVxeShims();
-vi.setConfig({ testTimeout: 20_000 });
 
 beforeAll(() => {
   installVxeShims();
