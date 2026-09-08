@@ -1,3 +1,20 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
 /**
  * 场景级测试：公共环境变量管理（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S16）
  *
@@ -6,8 +23,8 @@
  *
  * 说明：列表（Sideslider 内的变量表格）与删除确认另计，本场景先覆盖表单弹窗。
  */
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
+import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const harness = vi.hoisted(() => ({
@@ -67,9 +84,7 @@ describe('公共环境变量：新建与编辑表单', () => {
     await renderDialog();
     await userEvent.type(await screen.findByPlaceholderText('字母或下划线开头，仅允许字母、数字、下划线'), '1abc');
     await userEvent.click(screen.getByRole('button', { name: '确定' }));
-    await waitFor(() =>
-      expect(screen.getByText('字母或下划线开头，仅允许字母、数字、下划线')).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText('字母或下划线开头，仅允许字母、数字、下划线')).toBeInTheDocument());
     expect(harness.success).not.toHaveBeenCalled();
   });
 

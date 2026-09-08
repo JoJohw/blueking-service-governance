@@ -33,8 +33,9 @@ import userEvent from '@testing-library/user-event';
 import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { createPinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MockedApiError } from '../helpers/mocked-api-error';
 import ComponentManagement from '~/pages/marketplace/component-management.vue';
+
+import { MockedApiError } from '../helpers/mocked-api-error';
 
 // ── mock 与桩（vi.hoisted：vi.mock 工厂可引用） ──
 

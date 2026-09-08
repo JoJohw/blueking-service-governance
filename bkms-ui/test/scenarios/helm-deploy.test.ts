@@ -1,3 +1,20 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
 /**
  * 场景级测试：Helm 部署与预览回滚（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S15）
  *
@@ -18,15 +35,14 @@
  *   - use-helm-deploy.ts 导出模块级单例 ref（deployHistoryList/chartList/latestDeployStatus），
  *     测试间会泄漏 → beforeEach 手动重置
  */
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
+import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { installVxeShims } from './helpers/vxe-shims';
 
 installVxeShims();
-vi.setConfig({ testTimeout: 15_000 });
 
 const mocks = vi.hoisted(() => ({
   listHelmDeployRecords: vi.fn(),
@@ -173,7 +189,12 @@ vi.mock('~/pages/application/components/topo/index.vue', async () => {
 
 vi.mock('~/pages/application/detail/helm-deploy/deploy-history.vue', async () => {
   const { defineComponent } = await import('vue');
-  return { default: defineComponent({ name: 'DeployHistoryStub', template: '<div data-testid="deploy-history-stub">部署历史</div>' }) };
+  return {
+    default: defineComponent({
+      name: 'DeployHistoryStub',
+      template: '<div data-testid="deploy-history-stub">部署历史</div>',
+    }),
+  };
 });
 
 // 注意：deploy-application.vue 不做文件级 mock——部署流程用例直接渲染真实组件；
@@ -200,7 +221,8 @@ vi.mock('@blueking/table', async () => {
                 'div',
                 { key: rowIndex, 'data-testid': 'table-row' },
                 columns.map((col: { children?: { default?: (s: unknown) => unknown } }, i: number) =>
-                  h('span', { key: i }, [col.children?.default ? col.children.default({ row, rowIndex }) : ''])),
+                  h('span', { key: i }, [col.children?.default ? col.children.default({ row, rowIndex }) : '']),
+                ),
               ),
             )
           : slots.empty?.();
@@ -250,14 +272,6 @@ beforeEach(() => {
 
 afterEach(cleanup);
 
-async function renderDeployApplication() {
-  const { default: DeployApplication } = await import('~/pages/application/detail/helm-deploy/deploy-application.vue');
-  return render(DeployApplication as never, {
-    props: { isShow: false, deployType: 'RollingUpdate', envItem, laneName: '' },
-    global: { plugins: [createPinia(), i18nStub] } as never,
-  });
-}
-
 /** 打开侧滑（isShow false → true 触发数据加载 watch），等数据加载完成后返回 */
 async function openDeployApplication() {
   const utils = await renderDeployApplication();
@@ -280,6 +294,14 @@ async function openFilledDeployApplication(previewResult: Record<string, unknown
   await userEvent.click(formItem.querySelector('.bk-select') as HTMLElement);
   await userEvent.click(await screen.findByText('v1.2.3'));
   return utils;
+}
+
+async function renderDeployApplication() {
+  const { default: DeployApplication } = await import('~/pages/application/detail/helm-deploy/deploy-application.vue');
+  return render(DeployApplication as never, {
+    props: { isShow: false, deployType: 'RollingUpdate', envItem, laneName: '' },
+    global: { plugins: [createPinia(), i18nStub] } as never,
+  });
 }
 
 describe('Helm 部署/更新侧滑：部署流程', () => {
@@ -338,9 +360,9 @@ describe('部署历史与回滚：入口与确认', () => {
     const oldRecord = { ...latestRecord, id: 'deploy-0', chartVersion: '1.0.0', updatedAt: '2026-09-07T10:00:00Z' };
     mocks.listHelmDeployRecords.mockResolvedValue({ count: '2', results: [latestRecord, oldRecord] });
     // deploy-history 的文件级 stub 仅供 index 场景使用，此处取真实组件
-    const { default: DeployHistory } = await vi.importActual<typeof import('~/pages/application/detail/helm-deploy/deploy-history.vue')>(
-      '~/pages/application/detail/helm-deploy/deploy-history.vue',
-    );
+    const { default: DeployHistory } = await vi.importActual<
+      typeof import('~/pages/application/detail/helm-deploy/deploy-history.vue')
+    >('~/pages/application/detail/helm-deploy/deploy-history.vue');
     render(DeployHistory as never, {
       props: { envName: 'env-1', laneName: '', skipInitialFetch: false },
       global: { plugins: [createPinia(), i18nStub] } as never,
@@ -358,9 +380,9 @@ describe('部署历史与回滚：入口与确认', () => {
   it('当用户在回滚弹窗确认时，应调用回滚接口、提示回滚成功并关闭弹窗', async () => {
     mocks.previewRollbackHelmDeploy.mockResolvedValue({ current: 'a: 1', target: 'a: 0' });
     // preview-rollback 的文件级 stub 仅供 deploy-history 场景使用，此处取真实组件
-    const { default: PreviewRollback } = await vi.importActual<typeof import('~/pages/application/detail/helm-deploy/preview-rollback.vue')>(
-      '~/pages/application/detail/helm-deploy/preview-rollback.vue',
-    );
+    const { default: PreviewRollback } = await vi.importActual<
+      typeof import('~/pages/application/detail/helm-deploy/preview-rollback.vue')
+    >('~/pages/application/detail/helm-deploy/preview-rollback.vue');
     const { emitted } = render(PreviewRollback as never, {
       props: { isShow: true, appName: 'app-a', envName: 'env-1', deployID: 'deploy-0', trafficLaneName: '' },
       global: { plugins: [createPinia(), i18nStub] } as never,

@@ -9,9 +9,10 @@
  * container-image / helm-chart 为重型子页（含表格与上传交互），此处 stub 为标记文本，
  * 其行为留待各自场景覆盖。
  */
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
+import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 
 const harness = vi.hoisted(() => ({
   appType: 'helm' as string,

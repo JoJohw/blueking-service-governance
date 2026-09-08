@@ -15,8 +15,6 @@ import { installVxeShims } from './helpers/vxe-shims';
 
 // 页面含 vxe 构建历史表格，需先装垫片（同 S14/S9）
 installVxeShims();
-// 重型列表页冷启动接近默认超时，放宽单条用例超时
-vi.setConfig({ testTimeout: 15_000 });
 
 beforeAll(() => {
   installVxeShims();

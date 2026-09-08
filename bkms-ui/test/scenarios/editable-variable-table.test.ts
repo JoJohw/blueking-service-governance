@@ -1,3 +1,20 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
 /**
  * 场景级测试：环境变量可编辑表格（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S4）
  *
@@ -7,15 +24,20 @@
  * 说明：表格本体为 vxe（@blueking/table），沿用 S14 沉淀的 stub 与垫片（见 helpers/vxe-shims）；
  * 被 stub 的是单元格绘制，行内操作（编辑/删除确认）仍为真实行为。
  */
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
+import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { installVxeShims, TableColumnStub, TableStub } from './helpers/vxe-shims';
 
 const harness = vi.hoisted(() => ({
-  list: [
-    { id: '1', key: 'APP_NAME', value: 'demo', description: '应用名', isSensitive: false },
-  ] as { id: string; key: string; value: string; description: string; isSensitive: boolean }[],
+  list: [{ id: '1', key: 'APP_NAME', value: 'demo', description: '应用名', isSensitive: false }] as {
+    description: string;
+    id: string;
+    isSensitive: boolean;
+    key: string;
+    value: string;
+  }[],
 }));
 
 installVxeShims();

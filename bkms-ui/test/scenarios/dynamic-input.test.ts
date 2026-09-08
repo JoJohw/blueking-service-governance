@@ -1,13 +1,32 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
 /**
  * 场景级测试：动态输入项（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S5）
  *
  * 覆盖五组用户可感知行为：字符串回传 / 数字框 / 布尔单选 / 文本域 / 禁用态 → V = 5
  * 说明：MAP 类型依赖 KeyValue 子组件（动态键值表格），其交互另计，本场景不覆盖。
  */
-import { cleanup, render, screen } from '@testing-library/vue';
-import userEvent from '@testing-library/user-event';
 import { defineComponent, h, ref } from 'vue';
+
+import userEvent from '@testing-library/user-event';
+import { cleanup, render, screen } from '@testing-library/vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 
 const harness = vi.hoisted(() => ({
   type: 'STRING' as string,
@@ -23,16 +42,19 @@ const Harness = defineComponent({
   setup() {
     const value = ref(harness.value);
     return () =>
-      h(DynamicInput as never, {
-        modelValue: value.value,
-        'onUpdate:modelValue': (v: unknown) => {
-          value.value = v as never;
-          harness.emitted = v;
-        },
-        type: harness.type,
-        disabled: harness.disabled,
-        placeholder: '请输入值',
-      } as never);
+      h(
+        DynamicInput as never,
+        {
+          modelValue: value.value,
+          'onUpdate:modelValue': (v: unknown) => {
+            value.value = v as never;
+            harness.emitted = v;
+          },
+          type: harness.type,
+          disabled: harness.disabled,
+          placeholder: '请输入值',
+        } as never,
+      );
   },
 });
 
