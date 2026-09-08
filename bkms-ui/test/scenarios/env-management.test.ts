@@ -15,6 +15,9 @@ import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// 同 application-list：重型列表页冷启动渲染约 5s，逼近默认超时，放宽单条用例超时。
+vi.setConfig({ testTimeout: 15_000 });
+
 const mocks = vi.hoisted(() => ({
   listEnvs: vi.fn(),
   deleteEnv: vi.fn(),

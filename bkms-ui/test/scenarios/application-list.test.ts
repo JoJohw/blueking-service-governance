@@ -11,6 +11,10 @@ import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// 本页为重型列表页（大量子组件 + vxe），冷启动下首个用例渲染约 5s，逼近默认 5s 超时，
+// 全量跑（环境/setup 更慢）会偶发超时。放宽单条用例超时，单文件总时长仍满足指南 §4.2 的 <10s。
+vi.setConfig({ testTimeout: 15_000 });
+
 const mocks = vi.hoisted(() => ({
   listApps: vi.fn(),
   push: vi.fn(),
