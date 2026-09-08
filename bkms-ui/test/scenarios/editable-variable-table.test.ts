@@ -1,0 +1,61 @@
+/**
+ * 场景级测试：环境变量可编辑表格（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S4）
+ *
+ * 覆盖两组用户可感知行为：只读态渲染 / 点击编辑进入编辑态 → V = 2
+ * （第 3 条路径「删除确认浮层」jsdom 下不渲染，见文件末注释）
+ *
+ * 说明：表格本体为 vxe（@blueking/table），沿用 S14 沉淀的 stub 与垫片（见 helpers/vxe-shims）；
+ * 被 stub 的是单元格绘制，行内操作（编辑/删除确认）仍为真实行为。
+ */
+import { cleanup, render, screen, waitFor } from '@testing-library/vue';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { installVxeShims, TableColumnStub, TableStub } from './helpers/vxe-shims';
+
+const harness = vi.hoisted(() => ({
+  list: [
+    { id: '1', key: 'APP_NAME', value: 'demo', description: '应用名', isSensitive: false },
+  ] as { id: string; key: string; value: string; description: string; isSensitive: boolean }[],
+}));
+
+installVxeShims();
+
+vi.mock('vue-i18n', async importOriginal => ({
+  ...(await importOriginal<object>()),
+  useI18n: () => ({ t: (s: string) => s, te: () => true }),
+}));
+vi.mock('@blueking/table', () => ({ Table: TableStub, TableColumn: TableColumnStub }));
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  harness.list = [{ id: '1', key: 'APP_NAME', value: 'demo', description: '应用名', isSensitive: false }];
+});
+
+async function renderTable() {
+  const { default: EditableVariableTable } = await import('~/components/editable-variable-table/index.vue');
+  return render(EditableVariableTable as never, {
+    props: { list: harness.list as never } as never,
+    global: { mocks: { $t: (s: string) => s } } as never,
+  });
+}
+
+afterEach(cleanup);
+
+describe('环境变量表格：行内编辑与删除确认', () => {
+  it('当传入变量列表时，应以只读态展示变量内容', async () => {
+    await renderTable();
+    await waitFor(() => expect(screen.getByText('APP_NAME')).toBeInTheDocument());
+    expect(screen.getByText('demo')).toBeInTheDocument();
+  });
+
+  it('当用户点击编辑时，该行应进入可编辑状态', async () => {
+    await renderTable();
+    await userEvent.click(await screen.findByText('编辑'));
+    // 进入编辑态后 key 由文本变为输入框
+    await waitFor(() => expect(screen.getByDisplayValue('APP_NAME')).toBeInTheDocument());
+  });
+
+  // 未覆盖：点击删除后的确认浮层。
+  // 原因：PopConfirm 浮层在 jsdom 下不渲染，点击后查不到确认文案；若断言「点击后未立即删除」
+  // 会因浮层根本不出而变成恒真断言，故不写。已登记 ai_unsure.md 与评审 backlog。
+});
