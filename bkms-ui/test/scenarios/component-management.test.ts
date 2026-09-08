@@ -33,8 +33,12 @@ import userEvent from '@testing-library/user-event';
 import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { createPinia } from 'pinia';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MockedApiError } from '../helpers/mocked-api-error';
+
+// 全量并行跑时 worker 资源竞争会拖慢单测，默认 5s 超时不够（2026-09-08 全量跑实证）
+vi.setConfig({ testTimeout: 15_000 });
 import ComponentManagement from '~/pages/marketplace/component-management.vue';
+
+import { MockedApiError } from '../helpers/mocked-api-error';
 
 // ── mock 与桩（vi.hoisted：vi.mock 工厂可引用） ──
 

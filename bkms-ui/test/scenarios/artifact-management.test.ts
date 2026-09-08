@@ -9,9 +9,12 @@
  * container-image / helm-chart 为重型子页（含表格与上传交互），此处 stub 为标记文本，
  * 其行为留待各自场景覆盖。
  */
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
+import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// 全量并行跑时 worker 资源竞争会拖慢单测，默认 5s 超时不够（2026-09-08 全量跑实证）
+vi.setConfig({ testTimeout: 15_000 });
 
 const harness = vi.hoisted(() => ({
   appType: 'helm' as string,

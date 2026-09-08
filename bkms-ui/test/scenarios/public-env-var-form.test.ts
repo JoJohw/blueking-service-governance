@@ -10,6 +10,9 @@ import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// 全量并行跑时 worker 资源竞争会拖慢单测，默认 5s 超时不够（2026-09-08 全量跑实证）
+vi.setConfig({ testTimeout: 15_000 });
+
 const harness = vi.hoisted(() => ({
   success: vi.fn(),
   anyService: () => new Proxy({} as Record<string, unknown>, { get: () => vi.fn().mockResolvedValue({}) }),

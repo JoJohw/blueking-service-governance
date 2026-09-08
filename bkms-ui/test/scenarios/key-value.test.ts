@@ -12,6 +12,9 @@ import userEvent from '@testing-library/user-event';
 import { defineComponent, h, ref } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// 全量并行跑时 worker 资源竞争会拖慢单测，默认 5s 超时不够（2026-09-08 全量跑实证）
+vi.setConfig({ testTimeout: 15_000 });
+
 const harness = vi.hoisted(() => ({
   value: [{ key: 'A', value: '1' }] as { key: string; value: string }[],
   minRows: 0 as number,
