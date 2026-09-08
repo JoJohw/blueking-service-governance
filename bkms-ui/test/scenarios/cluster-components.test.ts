@@ -33,8 +33,6 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import ClusterComponents from '~/pages/env/cluster-components/cluster-components.vue';
 
-vi.setConfig({ testTimeout: 15_000 });
-
 const mocks = vi.hoisted(() => ({
   listClusterAddons: vi.fn(),
   listPortPools: vi.fn(),

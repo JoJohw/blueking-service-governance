@@ -14,9 +14,6 @@ import { MockedApiError } from '../helpers/mocked-api-error';
 
 import { installVxeShims } from './helpers/vxe-shims';
 
-// 本页为重型列表页（大量子组件 + vxe），冷启动下首个用例渲染约 5s，逼近默认 5s 超时，
-// 全量跑（环境/setup 更慢）会偶发超时。放宽单条用例超时（耗时口径见指南 §4.2）。
-vi.setConfig({ testTimeout: 15_000 });
 
 const mocks = vi.hoisted(() => ({
   listApps: vi.fn(),

@@ -171,6 +171,11 @@ export default ({ mode }: { mode: string }) => {
     test: {
       include: ['test/**/*.test.ts'],
       environment: 'jsdom',
+
+      // 场景级 UI 用例的渲染耗时与机器性能/负载强相关（慢机或并行 worker 竞争下
+      // findBy* 轮询可能比快机慢 2~4 倍），统一放宽单条用例超时，
+      // 保证结果与执行机器无关；仅影响真实挂起的用例失败时长。
+      testTimeout: 30_000,
       // bkui-vue FormItem 字段级校验（required / rules blur）的 promise reject 无 catch，
       // 会产生 unhandled rejection（真实浏览器控制台同样出现，属组件库缺陷）。
       // 另：test/scenarios/component-management.test.ts 的「试运行接口失败」用例中

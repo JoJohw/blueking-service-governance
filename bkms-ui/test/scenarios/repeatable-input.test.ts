@@ -1,3 +1,20 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
 /**
  * 场景级测试：动态 / 重复输入项（S5 补齐：repeatable-input）
  * 路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S5
@@ -8,13 +25,11 @@
  * 说明：删除按钮是 bkui-vue 的 Del 图标（渲染为 svg，无可访问角色），
  * 只能通过容器查询定位，已在用例中注释说明。
  */
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
-import userEvent from '@testing-library/user-event';
 import { defineComponent, h, ref } from 'vue';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// 全量并行跑时 worker 资源竞争会拖慢单测，默认 5s 超时不够（2026-09-08 全量跑实证）
-vi.setConfig({ testTimeout: 15_000 });
+import userEvent from '@testing-library/user-event';
+import { cleanup, render, screen, waitFor } from '@testing-library/vue';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const harness = vi.hoisted(() => ({
   value: ['a', 'b'] as string[],
@@ -32,12 +47,15 @@ const Harness = defineComponent({
   setup() {
     const value = ref<string[]>([...harness.value]);
     return () =>
-      h(RepeatableInput as never, {
-        modelValue: value.value,
-        'onUpdate:modelValue': (v: string[]) => (value.value = v),
-        required: harness.required,
-        placeholder: '请输入值',
-      } as never);
+      h(
+        RepeatableInput as never,
+        {
+          modelValue: value.value,
+          'onUpdate:modelValue': (v: string[]) => (value.value = v),
+          required: harness.required,
+          placeholder: '请输入值',
+        } as never,
+      );
   },
 });
 
