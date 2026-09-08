@@ -1,3 +1,20 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
 /**
  * 场景级测试：环境管理（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S9）
  *
@@ -11,9 +28,11 @@
  * 业务约定：HTTP 错误由 fetch interceptor 统一反馈，删除失败时组件静默（仅不关闭弹窗），
  * 用例按现状行为断言，不额外要求错误提示。
  */
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
+import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { installVxeShims } from './helpers/vxe-shims';
 
 // 同 application-list：重型列表页冷启动渲染约 5s，逼近默认超时，放宽单条用例超时。
 vi.setConfig({ testTimeout: 15_000 });
@@ -25,56 +44,11 @@ const mocks = vi.hoisted(() => ({
 }));
 
 beforeAll(() => {
-  (globalThis as Record<string, unknown>).HTMLDocument = Document;
-  const size = (value: number) => ({ configurable: true, get: () => value });
-  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', size(600));
-  Object.defineProperty(HTMLElement.prototype, 'offsetWidth', size(1200));
-  Object.defineProperty(HTMLElement.prototype, 'clientHeight', size(600));
-  Object.defineProperty(HTMLElement.prototype, 'clientWidth', size(1200));
-  Element.prototype.getBoundingClientRect = function getBoundingClientRect() {
-    return { width: 1200, height: 600, top: 0, left: 0, bottom: 600, right: 1200, x: 0, y: 0, toJSON: () => ({}) } as DOMRect;
-  };
-  Element.prototype.scrollTo = function scrollTo() {};
-  globalThis.ResizeObserver = class {
-    cb: ResizeObserverCallback;
-    constructor(cb: ResizeObserverCallback) {
-      this.cb = cb;
-    }
-    observe(target: Element) {
-      this.cb([{ target } as ResizeObserverEntry], this as never);
-    }
-    unobserve() {}
-    disconnect() {}
-  } as never;
+  installVxeShims();
 });
 
 vi.mock('@blueking/table', async () => {
-  const { defineComponent, h, Comment } = await import('vue');
-  const TableColumnStub = defineComponent({
-    props: { field: { type: String, default: '' }, label: { type: String, default: '' }, type: { type: String, default: '' } },
-    setup(_props, { slots }) {
-      return () => (slots.default ? h('span', slots.default({ row: {}, rowIndex: 0 })) : h(Comment, ''));
-    },
-  });
-  const TableStub = defineComponent({
-    props: { data: { type: Array, default: () => [] } },
-    setup(props, { slots }) {
-      return () => {
-        const columns = (slots.default?.() ?? []).filter(Boolean);
-        const rows = props.data as Record<string, unknown>[];
-        const body = rows.length
-          ? rows.map((row, rowIndex) =>
-              h('div', { key: rowIndex, 'data-testid': 'table-row' },
-                columns.map((col: { props?: { field?: string }; children?: { default?: (s: unknown) => unknown } }, i: number) =>
-                  h('span', { key: i }, [
-                    col.children?.default ? col.children.default({ row, rowIndex }) : String(row?.[col.props?.field ?? ''] ?? '--'),
-                  ]))),
-            )
-          : slots.empty?.();
-        return h('div', { 'data-testid': 'table-stub' }, [body]);
-      };
-    },
-  });
+  const { TableStub, TableColumnStub } = await import('./helpers/vxe-shims');
   return { Table: TableStub, TableColumn: TableColumnStub };
 });
 
@@ -119,6 +93,15 @@ beforeEach(() => {
   mocks.deleteEnv.mockResolvedValue({});
 });
 
+/** 打开删除确认弹窗，返回弹窗内的确认按钮（页面上最后一个「删除」按钮） */
+async function openDeleteDialog() {
+  await waitFor(() => expect(screen.getByText('env-a')).toBeInTheDocument());
+  await userEvent.click(screen.getByText('删除'));
+  await waitFor(() => expect(screen.getByText(/确定删除环境/)).toBeInTheDocument());
+  const buttons = screen.getAllByRole('button', { name: '删除' });
+  return buttons[buttons.length - 1];
+}
+
 async function renderPage() {
   const { default: EnvPage } = await import('~/pages/env/env.vue');
   return render(EnvPage as never, {
@@ -133,15 +116,6 @@ async function renderPage() {
       },
     } as never,
   });
-}
-
-/** 打开删除确认弹窗，返回弹窗内的确认按钮（页面上最后一个「删除」按钮） */
-async function openDeleteDialog() {
-  await waitFor(() => expect(screen.getByText('env-a')).toBeInTheDocument());
-  await userEvent.click(screen.getByText('删除'));
-  await waitFor(() => expect(screen.getByText(/确定删除环境/)).toBeInTheDocument());
-  const buttons = screen.getAllByRole('button', { name: '删除' });
-  return buttons[buttons.length - 1];
 }
 
 afterEach(cleanup);
