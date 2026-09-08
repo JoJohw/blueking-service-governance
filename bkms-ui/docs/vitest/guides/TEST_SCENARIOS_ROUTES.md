@@ -298,6 +298,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响3/复杂度2）
 - 来源模块：`src/pages/application/detail/app-build/build-management.vue`
+- 实施记录：`../pilots/TEST_PILOT_S18.md`；独立评审：`../reviews/TEST_REVIEW_S18.md`（88/100 放行 + 变异验证 2/2 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/build-management.test.ts`（3 用例全绿）
 - 用户目标：发起构建并跟踪构建结果
 - 判定分支（预估）：构建发起成功/失败 / 构建状态流转 → **V ≈ 3~4**
 - 设计方法：基本路径 + 状态迁移（构建状态机，实施前校准）
