@@ -110,6 +110,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：9 分（频率3/影响3/复杂度3）
 - 来源模块：`src/pages/application/detail/deploy/`
+- 实施记录：`../pilots/TEST_PILOT_S2.md`；独立评审：`../reviews/TEST_REVIEW_S2.md`（80/100 通过，变异 2/2 捕获）；用例文件 `test/scenarios/deploy-management.test.ts`（2 用例全绿，**仅覆盖入口权限分发，部署提交主路径待补，见 P1 backlog**）
 - 用户目标：选择部署环境 → 提交 → 得到结果反馈
 - 判定分支：提交成功 / 提交失败 / 加载中 → **V = 4**
 - 设计方法：基本路径 + 状态迁移（部署过程状态机实施前校准）
