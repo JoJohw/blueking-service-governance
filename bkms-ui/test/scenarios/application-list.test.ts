@@ -10,6 +10,7 @@
 import userEvent from '@testing-library/user-event';
 import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { MockedApiError } from '../helpers/mocked-api-error';
 
 import { installVxeShims } from './helpers/vxe-shims';
 
@@ -106,7 +107,7 @@ describe('应用列表：数据状态与导航', () => {
   });
 
   it('当应用列表加载失败时，应结束加载状态且不渲染任何应用数据', async () => {
-    mocks.listApps.mockRejectedValue(new Error('network error'));
+    mocks.listApps.mockRejectedValue(new MockedApiError());
     await renderPage();
     // 失败后必须退出骨架屏（源码 .catch 复位 isLoading），否则用户会一直看到加载中
     await waitFor(() => expect(screen.getByText('创建应用')).toBeInTheDocument());

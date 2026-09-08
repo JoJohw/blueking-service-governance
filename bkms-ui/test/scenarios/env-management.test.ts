@@ -31,6 +31,7 @@
 import userEvent from '@testing-library/user-event';
 import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { MockedApiError } from '../helpers/mocked-api-error';
 
 import { installVxeShims } from './helpers/vxe-shims';
 
@@ -161,7 +162,7 @@ describe('环境管理：删除二次确认', () => {
   });
 
   it('当删除接口失败时，应保留弹窗让用户可重试', async () => {
-    mocks.deleteEnv.mockRejectedValue(new Error('network error'));
+    mocks.deleteEnv.mockRejectedValue(new MockedApiError());
     await renderPage();
     const confirmBtn = await openDeleteDialog();
     await userEvent.type(screen.getByPlaceholderText('请输入待删除环境名称'), 'env-a');
