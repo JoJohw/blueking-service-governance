@@ -28,6 +28,7 @@
 | 2026-09-07 | S3 | 场景族规模超出单夜预算：`app-config` 下 8 个配置模块（ProgramConfig/Lifecycle/HealthProbe/ResourcesForm/UpdateStrategyForm/MetadataConfig/NetworkAccess/DevModeForm）各有独立查看↔编辑多态与校验规则 | 场景族本身粒度大（台账已注明是「场景族而非单个场景」） | 调整实施顺序：先完成小场景（S13 已完成、S6/S5 等），S3 留后续集中攻；顺序决策已登记 ai_unsure.md | ai_unsure.md |
 | 2026-09-07 | S13 | 纯路由逻辑场景三坑：① spy `history.back` 拿到 0 次——vue-router 的 back 底层是 `history.go(-1)`；② `smartGoBack` 内 `router.replace(fb)` 未返回 Promise，`await` 拿不到完成，须用 `waitFor` 等 currentRoute 变化；③ 「推导不出上级 → 浏览器后退」分支在真实路由表下不可达（所有路由被 `setupLayouts` 包裹，matched ≥ 2） | ① vue-router 实现；② 源码未返回值；③ 路由表结构 | ① spy 改 `history.go`；② 断言改 `waitFor`；③ 移除该用例 + 用例注释 + `ai_unsure.md` 登记 | PILOT_S13 §2 / 评审记录 §4 |
 | 2026-09-08 | 全局 | 审计整改（5 项）：① **space.ts 改用全局 i18n 实例**（store setup 内调用组件级 useI18n 违反 vue-i18n ≥11.1.12 约束），deploy-env-store 3 条失败清零（其中 1 条实为 useLocalStorage pre-flush 落盘时序，用例补 `await nextTick()`）；② 尺寸垫片/表格 stub 收敛为共享模块 `test/scenarios/helpers/vxe-shims.ts`（S9/S14 引用，消除复制漂移）；③ S14 引入表格 stub 补空态断言（`table-empty` 区块，降级口径），空态缺口关闭；④ 指南 §4.2 耗时口径精化（tests 段 <10s，冷启动编译开销不计入，实测数据已登记）；⑤ S9 用例数口径统一（7 条：列表 2 + 删除 5） | 2026-09-08 审计报告 | 全部完成，套件恢复全绿 | 指南 §4.2 / 台账 / 本表 |
+| 2026-09-08 | S17 | `i18n-setup` 注入路径不存在导致模块解析失败；分组头无语义化定位手段 | 新用例误引不存在的模块；源码分组头仅靠 `.cursor-pointer` 样式类 | 改用 component-management 已验证的 `$t` 直译插件 + `useI18n` mock 组合；分组头用 `.cursor-pointer` 类定位（脆弱点已记评审 Low） | PILOT_S17 §3 / REVIEW_S17 §4 |
 
 ## 实施小结
 
@@ -43,6 +44,7 @@
 | 2026-09-08 | S11 | 2 | 2（第 3 条「切换页签」jsdom 下不可行：activeTab 经 useUrlQuerySync 与路由 query 双向同步，mock 路由不回写 → 组件不切换） | 否，2 轮迭代 | 约 3s/次，连跑 3 次稳定 | 类型分发型容器页测法：stub 重型子页为标记文本，只测「按类型决定显示什么」；详见 `../pilots/TEST_PILOT_S11.md` 与 `../reviews/TEST_REVIEW_S11.md`（85/100，变异 2/2） |
 | 2026-09-07 | S5 | 5 | 5（台账预估 3；补数字形态、文本域、禁用态） | 否，4 轮迭代（含变异反推的断言整改） | 约 250ms | **变异验证反证断言强度**：INT 用例原用 `Number()` 宽松断言，「类型分发失效」变异漏报，整改后捕获数 2→3。详见 `../pilots/TEST_PILOT_S5.md` 与 `../reviews/TEST_REVIEW_S5.md`（92/100，变异验证 3/3 捕获） |
 | 2026-09-08 | S9 | 7（列表 2 + 删除 5，撤下重建） | 7（与台账一致） | 否（vxe 纯字段列不渲染，方案 A：stub 表格 + 垫片并用） | 连跑 3 次稳定，变异 2/2 捕获 | 详见 `../pilots/TEST_PILOT_S9.md` 与 `../reviews/TEST_REVIEW_S9.md`（86/100） |
+| 2026-09-08 | S17 | 3 | 3（暂无组件空态 / 分组展开显示组件名与安装入口 / 点击安装弹出侧滑） | 否，3 轮迭代（i18n 注入路径、分组头定位） | 约 4.2~6s/次，连跑 3 次稳定 | **自定义 div 列表（非 vxe）无需表格垫片**；重型动态表单侧滑 stub 为按 `visible` 渲染标记的占位（契约对齐 v-model:visible）。详见 `../pilots/TEST_PILOT_S17.md` 与 `../reviews/TEST_REVIEW_S17.md`（88/100，变异 3/3） |
 
 ## 已知环境事实（实施前置认知，非踩坑）
 

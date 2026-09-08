@@ -292,6 +292,7 @@
 - 状态：`✅ 入选` ｜ 评分依据：7 分（频率1/影响3/复杂度3）
 - 来源模块：`src/pages/env/cluster-components/`（install-sideslider、components-config、config-forms）
 - 备注：路由挂载待确认
+- 实施记录：`../pilots/TEST_PILOT_S17.md`；独立评审：`../reviews/TEST_REVIEW_S17.md`（88/100 放行 + 变异验证 3/3 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/cluster-components.test.ts`（3 用例全绿，覆盖空态/分组展开/安装侧滑弹出；侧滑内表单提交见 backlog）
 - 用户目标：安装集群组件并维护其配置
 - 判定分支（预估）：安装成功/失败 / 配置校验通过/不通过 → **V ≈ 3~4**
 - 设计方法：基本路径 + 等价类（配置表单）+ 二阶（安装中断/重复安装，推断/需确认）
