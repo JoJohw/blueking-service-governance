@@ -186,6 +186,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响3/复杂度2）
 - 来源模块：`src/pages/env/env.vue`、`create-env.vue`、`delete-env-dialog.vue`
+- 实施记录：`../pilots/TEST_PILOT_S9.md`（列表类场景的表格 stub 方案）；独立评审：`../reviews/TEST_REVIEW_S9.md`（86/100 放行 + 变异验证 2/2 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/env-management.test.ts`（7 用例全绿，连跑 3 次稳定）
 - 用户目标：管理环境列表，创建或删除环境
 - 判定分支：创建校验通过/不通过 / 删除确认/取消 / 列表三态 → **V = 4**
 - 设计方法：基本路径 + 二阶风险（破坏性操作规则）
