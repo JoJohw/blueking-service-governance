@@ -246,6 +246,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：8 分（频率3/影响3/复杂度2）
 - 来源模块：`src/pages/application/application.vue`（路由 `:space/app/:envName?`）
+- 实施记录：`../pilots/TEST_PILOT_S14.md`（含 @blueking/table 的 jsdom 渲染垫片方案）；独立评审：`../reviews/TEST_REVIEW_S14.md`（88/100 放行 + 变异验证 2/2 捕获）；用例文件 `test/scenarios/application-list.test.ts`（4 用例全绿）
 - 用户目标：浏览应用列表并进入详情/部署等入口
 - 判定分支：加载成功（有数据）/ 加载失败 / 空列表 → **V = 4**
 - 设计方法：等价类 + 异常猜测
