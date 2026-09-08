@@ -37,6 +37,7 @@
 | 2026-09-07 | S12 | 21（评审采纳项落地后） | 15（与预估一致） | 评审闭环后 3 轮全绿 | 终审实测 7.84s（tests 4.02s） | 独立评审三轮 82→91→92 放行；详见 `../reviews/TEST_REVIEW_S12.md` |
 | 2026-09-07 | S13 | 10（2 组场景） | 9（台账预估 9；补 hasHistory 优先分支 +1，移除不可达路径 −1） | 否，3 轮迭代 | 首跑 16s（tests 224ms，含首次编译 8s）；连跑 3 次稳定 | 纯路由逻辑范式：经 app 取 router、`replaceState` 控制历史、`waitFor` 等跳转；详见 `../pilots/TEST_PILOT_S13.md` 与 `../reviews/TEST_REVIEW_S13.md`（92/100，变异验证 4/4 捕获） |
 | 2026-09-07 | S6 | 4 | 4（台账预估 2；补「展示内容」与「删除进行中禁用取消」2 条） | 否，2 轮迭代（cleanup 缺失） | 约 200ms | `defineModel` 弹层组件范式：Harness 承载 v-model + `afterEach(cleanup)`；详见 `../pilots/TEST_PILOT_S6.md` 与 `../reviews/TEST_REVIEW_S6.md`（93/100，变异验证 4/4 捕获） |
+| 2026-09-08 | S11 | 2 | 2（第 3 条「切换页签」jsdom 下不可行：activeTab 经 useUrlQuerySync 与路由 query 双向同步，mock 路由不回写 → 组件不切换） | 否，2 轮迭代 | 约 3s/次，连跑 3 次稳定 | 类型分发型容器页测法：stub 重型子页为标记文本，只测「按类型决定显示什么」；详见 `../pilots/TEST_PILOT_S11.md` 与 `../reviews/TEST_REVIEW_S11.md`（85/100，变异 2/2） |
 | 2026-09-07 | S5 | 5 | 5（台账预估 3；补数字形态、文本域、禁用态） | 否，4 轮迭代（含变异反推的断言整改） | 约 250ms | **变异验证反证断言强度**：INT 用例原用 `Number()` 宽松断言，「类型分发失效」变异漏报，整改后捕获数 2→3。详见 `../pilots/TEST_PILOT_S5.md` 与 `../reviews/TEST_REVIEW_S5.md`（92/100，变异验证 3/3 捕获） |
 | 2026-09-08 | S9 | 7（列表 2 + 删除 5，撤下重建） | 7（与台账一致） | 否（vxe 纯字段列不渲染，方案 A：stub 表格 + 垫片并用） | 连跑 3 次稳定，变异 2/2 捕获 | 详见 `../pilots/TEST_PILOT_S9.md` 与 `../reviews/TEST_REVIEW_S9.md`（86/100） |
 
