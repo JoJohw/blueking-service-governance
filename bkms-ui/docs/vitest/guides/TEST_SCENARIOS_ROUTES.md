@@ -274,6 +274,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响3/复杂度2）
 - 来源模块：`src/pages/env/public-env-vars/`（env-var-form-dialog、delete-env-var-dialog、public-env-vars-sideslider）
+- 实施记录：`../pilots/TEST_PILOT_S16.md`；独立评审：`../reviews/TEST_REVIEW_S16.md`（91/100 放行 + 变异验证 3/3 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/public-env-var-form.test.ts`（4 用例全绿，覆盖表单弹窗；列表与删除见 backlog）
 - 用户目标：维护公共环境变量的增删改
 - 判定分支（预估）：新建/编辑校验通过/不通过 / 删除确认/取消 → **V ≈ 4**
 - 设计方法：等价类 + 判定表 + 二阶（删除被引用变量的行为，推断/需确认）
