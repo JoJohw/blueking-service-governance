@@ -69,10 +69,31 @@
 4. 查询以 `getByRole` / `getByText` / `findBy*`（异步）为主；允许补充 `getByPlaceholderText` / `getByDisplayValue`（用户可感知属性）与 `getByTestId`（仅限 stub 契约标记）；禁止依赖 CSS 类名与内部 DOM 结构。
 5. 交互用 `@testing-library/user-event`；断言用户可见行为，禁止断言内部状态（如 `data.count === 1`）。
 6. API 一律 `vi.mock` 隔离，禁止真实请求；复用 `test/setup.ts` 垫片与现有 stub 链。
-7. P0/P1 场景必须同时具备正向 + 反向 + 边界/异常用例（QA Skill-Suite 规则）。
-8. 推断的业务规则（如重复提交拦截）在用例中标注 `推断/需确认`，先确认再固化断言。
-9. **目录约定**：场景级用例统一放 `test/scenarios/`（`vite.config.mts` 的 include 已覆盖），一个场景族一个文件，文件名 = 业务模块名（不带 S 编号前缀），编号与文件的映射关系维护在 `TEST_SCENARIOS_ROUTES.md` 台账。
-10. **执行时间口径**：单文件**用例执行时间**（Vitest 输出的 tests 段）< 10s；文件总 Duration 含 transform/collect 编译开销，重型页面冷启动 7~13s 属正常，不计入场景执行口径。实测数据见 `TEST_PILOT_LOG.md` 审计记录。
+7. **共享 mock helpers（禁止重复造轮子）**：i18n / vue-router / vxe-table / anyService 四类高频 mock 已抽取到 `test/helpers/` 目录，新场景**必须从共享 helpers 导入，禁止在文件内重新手写**。由于 Vitest 会将 `vi.mock` 提升到文件顶部（hoisting），在 `vi.mock` 内引用 helpers 时**必须使用动态 `import()`**，避免 Temporal Dead Zone 导致 `ReferenceError`。示例：
+   ```typescript
+   // ✅ 正确：动态 import 避免 hoisting TDZ
+   vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
+   vi.mock('vue-router', async () => {
+     const { createRouterMock } = await import('../helpers/mock-router');
+     return createRouterMock({ route: { path: '/ws-1/app', name: 'app' } });
+   });
+
+   // ❌ 错误：静态 import + 直接传引用会被 hoisting 导致 ReferenceError
+   import { i18nMockFactory } from '../helpers/mock-i18n';
+   vi.mock('vue-i18n', i18nMockFactory);  // 💥 hoisting 后 i18nMockFactory 还未初始化
+   ```
+   现有共享 helpers 清单：
+   | 文件 | 导出 | 用途 |
+   |------|------|------|
+   | `test/helpers/mock-i18n.ts` | `i18nMockFactory`, `i18nGlobalMocks`, `i18nPlugin`, `I18nTStub` | vue-i18n mock + $t 全局注入 |
+   | `test/helpers/mock-router.ts` | `createRouterMock` | vue-router mock（支持自定义路由属性和 push/replace 断言） |
+   | `test/helpers/mock-table.ts` | `installVxeShims`, `tableMockFactory`, `TableStub`, `TableColumnStub` | vxe-table jsdom 垫片 + 表格 stub |
+   | `test/helpers/mock-service.ts` | `createAnyServiceMock` | Proxy 兜底 service mock（带 warning 追踪） |
+8. **全局 cleanup 已接管，不要手写**：`test/setup.ts` 已注册全局 `afterEach(cleanup)`，每个用例结束后自动清理 Testing Library 创建的 DOM。新文件**不需要**再手动 `import { cleanup }` 或编写 `afterEach(cleanup)`。如果 `afterEach` 中有其他逻辑（如 `vi.clearAllMocks()`），只写该逻辑即可，不用加 `cleanup()`。
+9. P0/P1 场景必须同时具备正向 + 反向 + 边界/异常用例（QA Skill-Suite 规则）。
+10. 推断的业务规则（如重复提交拦截）在用例中标注 `推断/需确认`，先确认再固化断言。
+11. **目录约定**：场景级用例统一放 `test/scenarios/`（`vite.config.mts` 的 include 已覆盖），一个场景族一个文件，文件名 = 业务模块名（不带 S 编号前缀），编号与文件的映射关系维护在 `TEST_SCENARIOS_ROUTES.md` 台账。
+12. **执行时间口径**：单文件**用例执行时间**（Vitest 输出的 tests 段）< 10s；文件总 Duration 含 transform/collect 编译开销，重型页面冷启动 7~13s 属正常，不计入场景执行口径。实测数据见 `TEST_PILOT_LOG.md` 审计记录。
 
 ## 4. 场景实施流程与验收标准
 
@@ -91,7 +112,7 @@
 - [ ] 路径清单先通过审批，用例与路径清单一一对应
 - [ ] 用例 100% 符合 §3 规范条款（可逐条对照检查）
 - [ ] `pnpm test:unit` 全绿且连跑 3 次无 flaky
-- [ ] 单文件用例执行时间满足 §3 条款 10 的执行时间口径
+- [ ] 单文件用例执行时间满足 §3 条款 12 的执行时间口径
 - [ ] **变异验证**：向被测代码注入至少 2 处错误逻辑（条件取反 / 删状态变更等），相关用例必须全部变红，验证后立即恢复业务代码并核对 diff
 - [ ] **文档性验收**：把用例标题清单给一位不熟悉该模块的同事看，能复述出该功能的交互行为，即算"用例即文档"达成
 

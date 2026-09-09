@@ -7,9 +7,9 @@
  * 稳定策略：本轮只证明 TabHeader 上「特性环境入口」的 appType 分发，
  * 环境选择器 / 实例列表 / 拓扑 / 侧栏等重型子树一律 stub，避免冷编译与真实请求把用例推近 testTimeout。
  */
-import { cleanup, render, waitFor, within } from '@testing-library/vue';
+import { render, waitFor, within } from '@testing-library/vue';
 import { createPinia } from 'pinia';
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const harness = vi.hoisted(() => ({
   appType: 'trpc' as string,
@@ -22,23 +22,15 @@ const markStub = async (name: string) => {
   return { default: defineComponent({ name, template: `<div data-testid="${name}"></div>` }) };
 };
 
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
-vi.mock('vue-router', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), currentRoute: { value: { query: {} } } }),
-  useRoute: () => ({
-    path: '/ws-1/app/app-a/detail/deploy',
-    fullPath: '/ws-1/app/app-a/detail/deploy',
-    name: 'deploy',
-    query: {},
-    params: { space: 'ws-1' },
-    meta: {},
-    matched: [],
-  }),
-}));
+import { i18nGlobalMocks, I18nTStub } from '../helpers/mock-i18n';
+
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
+vi.mock('vue-router', async () => {
+  const { createRouterMock } = await import('../helpers/mock-router');
+  return createRouterMock({
+    route: { path: '/ws-1/app/app-a/detail/deploy', name: 'deploy', params: { space: 'ws-1' } },
+  });
+});
 
 // Vitest 对命名导出不会走 Proxy.get，须显式给出 EnvService / AppSpecService
 vi.mock('~/api/modules/v1', () => ({
@@ -50,11 +42,10 @@ vi.mock('~/api/modules/v1', () => ({
     getEnvEffectiveAppSpecResources: vi.fn().mockResolvedValue(null),
   },
 }));
-vi.mock('~/api/modules/bkmsserver', () => ({
-  ApiServerService: new Proxy({} as Record<string, unknown>, {
-    get: () => vi.fn().mockResolvedValue({ list: [], total: 0 }),
-  }),
-}));
+vi.mock('~/api/modules/bkmsserver', async () => {
+  const { createAnyServiceMock } = await import('../helpers/mock-service');
+  return { ApiServerService: createAnyServiceMock('ApiServerService') };
+});
 
 vi.mock('~/stores/app-detail', () => ({
   useAppDetail: () => ({
@@ -140,19 +131,12 @@ async function renderPage() {
   return render(DeployPage as never, {
     global: {
       plugins: [createPinia()],
-      mocks: { $t: (s: string) => s },
+      mocks: i18nGlobalMocks,
       // 直译 keypath，保证「应用关联的特性环境」可被断言
-      components: {
-        'i18n-t': {
-          props: { keypath: { type: String, default: '' } },
-          template: '<span>{{ keypath }}</span>',
-        },
-      },
+      components: { 'i18n-t': I18nTStub },
     } as never,
   });
 }
-
-afterEach(cleanup);
 
 describe('部署管理：特性环境入口按应用类型分发', () => {
   // 全量并行时首包仍可能偏慢，单条放宽避免级联污染下一条

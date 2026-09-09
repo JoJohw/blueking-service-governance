@@ -28,9 +28,8 @@
  * → 侧滑可见」这一用户可感知行为（侧滑内容的动态表单由 ComponentsConfig 单测负责）。
  */
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen } from '@testing-library/vue';
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-
+import { render, screen } from '@testing-library/vue';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import ClusterComponents from '~/pages/env/cluster-components/cluster-components.vue';
 
 const mocks = vi.hoisted(() => ({
@@ -52,11 +51,10 @@ vi.mock('~/pages/env/cluster-components/install-sideslider.vue', () => ({
   },
 }));
 
+import { i18nPlugin } from '../helpers/mock-i18n';
+
 // i18n 不在测试范围：useI18n 直译、$t 直译
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
 
 // Message / InfoBox 为命令式 API，mock 避免 jsdom 下弹窗副作用
 vi.mock('bkui-vue', async importOriginal => ({
@@ -65,17 +63,10 @@ vi.mock('bkui-vue', async importOriginal => ({
   InfoBox: vi.fn(),
 }));
 
-vi.mock('vue-router', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), currentRoute: { value: { query: {} } } }),
-}));
-
-// 模板 $t 直译占位（与 component-management.test.ts 同模式）
-const i18nStub = {
-  install(app: { config: { globalProperties: Record<string, unknown> } }) {
-    app.config.globalProperties.$t = (s: string) => s;
-  },
-};
+vi.mock('vue-router', async () => {
+  const { createRouterMock } = await import('../helpers/mock-router');
+  return createRouterMock();
+});
 
 const oneAddon = [
   {
@@ -92,11 +83,13 @@ const oneAddon = [
 function renderPage(addons: unknown[] = []) {
   mocks.listClusterAddons.mockResolvedValue({ addons });
   mocks.listPortPools.mockResolvedValue({ portPools: [] });
-  return render(ClusterComponents, { props: { envId: 'env-1', hasClusterConfig: true }, global: { plugins: [i18nStub] } });
+  return render(ClusterComponents, {
+    props: { envId: 'env-1', hasClusterConfig: true },
+    global: { plugins: [i18nPlugin] },
+  });
 }
 
 afterEach(() => {
-  cleanup();
   vi.clearAllMocks();
 });
 

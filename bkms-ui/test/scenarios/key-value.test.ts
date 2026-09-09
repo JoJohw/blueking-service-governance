@@ -27,8 +27,10 @@
 import { defineComponent, h, ref } from 'vue';
 
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen } from '@testing-library/vue';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/vue';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { i18nGlobalMocks } from '../helpers/mock-i18n';
 
 const harness = vi.hoisted(() => ({
   value: [{ key: 'A', value: '1' }] as { key: string; value: string }[],
@@ -36,10 +38,7 @@ const harness = vi.hoisted(() => ({
   disabled: false as boolean,
 }));
 
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
 
 const KeyValue = await import('~/components/key-value.vue').then(m => m.default);
 
@@ -66,16 +65,14 @@ beforeEach(() => {
   harness.disabled = false;
 });
 
-afterEach(cleanup);
-
 describe('键值输入项：增删与约束', () => {
   it('当存在初始键值时应渲染对应的键输入框', () => {
-    render(Harness, { global: { mocks: { $t: (s: string) => s } } as never });
+    render(Harness, { global: { mocks: i18nGlobalMocks } as never });
     expect(screen.getByPlaceholderText('键名')).toHaveValue('A');
   });
 
   it('当用户点击添加时，应新增一对键值输入', async () => {
-    render(Harness, { global: { mocks: { $t: (s: string) => s } } as never });
+    render(Harness, { global: { mocks: i18nGlobalMocks } as never });
     await userEvent.click(screen.getByText('添加'));
     expect(screen.getAllByPlaceholderText('键名')).toHaveLength(2);
   });
@@ -87,7 +84,7 @@ describe('键值输入项：增删与约束', () => {
 
   it('当组件被禁用时，键输入应不可编辑', () => {
     harness.disabled = true;
-    render(Harness, { global: { mocks: { $t: (s: string) => s } } as never });
+    render(Harness, { global: { mocks: i18nGlobalMocks } as never });
     expect(screen.getByPlaceholderText('键名')).toBeDisabled();
   });
 });

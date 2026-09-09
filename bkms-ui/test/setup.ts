@@ -28,7 +28,8 @@
 //   ② 调用链归属：栈里出现 test/ 或 src/ 的帧 → 是我们的锅（如传错 props 把组件库干崩）→ 非预期；
 //      纯组件库栈或无栈（如 bkui-vue 校验 promise reject、modal 卸载后定时器回调）→ 预期。
 // 默认 fail-closed：无法归为「预期」的一律计入非预期，由 afterAll 抛错让 CI 变红。
-import { afterAll } from 'vitest';
+import { cleanup } from '@testing-library/vue';
+import { afterAll, afterEach } from 'vitest';
 
 import { MockedApiError } from './helpers/mocked-api-error';
 // jest-dom 语义化 DOM 断言匹配器（toBeInTheDocument / toBeDisabled 等）全局注册
@@ -101,3 +102,9 @@ if (!globalThis.ResizeObserver) {
 if (!globalThis.PointerEvent) {
   globalThis.PointerEvent = class PointerEvent extends MouseEvent {} as unknown as typeof PointerEvent;
 }
+
+// ── 全局 cleanup：每个用例结束后自动清理 Testing Library 创建的 DOM ──────────────
+// 各测试文件不再需要手写 afterEach(cleanup)
+afterEach(() => {
+  cleanup();
+});

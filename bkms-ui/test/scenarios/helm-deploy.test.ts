@@ -36,13 +36,16 @@
  *     测试间会泄漏 → beforeEach 手动重置
  */
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
+import { render, screen, waitFor } from '@testing-library/vue';
 import { createPinia, setActivePinia } from 'pinia';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { installVxeShims } from './helpers/vxe-shims';
+import { i18nPlugin } from '../helpers/mock-i18n';
+import { installVxeShims } from '../helpers/mock-table';
 
-installVxeShims();
+beforeAll(() => {
+  installVxeShims();
+});
 
 const mocks = vi.hoisted(() => ({
   listHelmDeployRecords: vi.fn(),
@@ -94,19 +97,12 @@ vi.mock('vue-i18n', async importOriginal => ({
   }),
 }));
 
-vi.mock('vue-router', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useRoute: () => ({
-    path: '/ws-1/app/app-a/detail/helm-deploy',
-    fullPath: '/ws-1/app/app-a/detail/helm-deploy',
-    name: 'detail',
-    query: {},
-    params: { space: 'ws-1' },
-    meta: {},
-    matched: [],
-  }),
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), resolve: () => ({ href: '' }) }),
-}));
+vi.mock('vue-router', async () => {
+  const { createRouterMock } = await import('../helpers/mock-router');
+  return createRouterMock({
+    route: { path: '/ws-1/app/app-a/detail/helm-deploy', name: 'detail', params: { space: 'ws-1' } },
+  });
+});
 
 vi.mock('bkui-vue', async importOriginal => ({
   ...(await importOriginal<object>()),
@@ -236,12 +232,7 @@ vi.mock('@blueking/table', async () => {
 import { useHelmDeploy } from '~/pages/application/detail/helm-deploy/use-helm-deploy';
 import { useAppDetail } from '~/stores/app-detail';
 
-// 全局 $t 直译
-const i18nStub = {
-  install(app: { config: { globalProperties: Record<string, unknown> } }) {
-    app.config.globalProperties.$t = (s: string) => s;
-  },
-};
+// 全局 $t 直译（使用共享 i18nPlugin）
 
 const envItem = { name: 'env-1', displayName: '环境一', type: 'dev' };
 
@@ -269,8 +260,6 @@ beforeEach(() => {
   chartList.value = [];
   latestDeployStatus.value = '';
 });
-
-afterEach(cleanup);
 
 /** 打开侧滑（isShow false → true 触发数据加载 watch），等数据加载完成后返回 */
 async function openDeployApplication() {
@@ -300,7 +289,7 @@ async function renderDeployApplication() {
   const { default: DeployApplication } = await import('~/pages/application/detail/helm-deploy/deploy-application.vue');
   return render(DeployApplication as never, {
     props: { isShow: false, deployType: 'RollingUpdate', envItem, laneName: '' },
-    global: { plugins: [createPinia(), i18nStub] } as never,
+    global: { plugins: [createPinia(), i18nPlugin] } as never,
   });
 }
 
@@ -365,7 +354,7 @@ describe('部署历史与回滚：入口与确认', () => {
     >('~/pages/application/detail/helm-deploy/deploy-history.vue');
     render(DeployHistory as never, {
       props: { envName: 'env-1', laneName: '', skipInitialFetch: false },
-      global: { plugins: [createPinia(), i18nStub] } as never,
+      global: { plugins: [createPinia(), i18nPlugin] } as never,
     });
     // 表格行渲染完成（stub 表格 + 插槽列）
     const rows = await screen.findAllByTestId('table-row');
@@ -385,7 +374,7 @@ describe('部署历史与回滚：入口与确认', () => {
     >('~/pages/application/detail/helm-deploy/preview-rollback.vue');
     const { emitted } = render(PreviewRollback as never, {
       props: { isShow: true, appName: 'app-a', envName: 'env-1', deployID: 'deploy-0', trafficLaneName: '' },
-      global: { plugins: [createPinia(), i18nStub] } as never,
+      global: { plugins: [createPinia(), i18nPlugin] } as never,
     });
     // 打开即拉取回滚预览（Dialog @shown），diff 就绪后确定按钮可用
     await waitFor(() => expect(mocks.previewRollbackHelmDeploy).toHaveBeenCalled());
@@ -414,7 +403,7 @@ describe('Helm 部署容器页：更新入口状态机', () => {
     });
     const { default: HelmDeploy } = await import('~/pages/application/detail/helm-deploy/index.vue');
     render(HelmDeploy as never, {
-      global: { plugins: [i18nStub] } as never,
+      global: { plugins: [i18nPlugin] } as never,
     });
     // 环境选择 stub 自动 emit → 拉泳道与部署历史 → latestDeployStatus = pending-upgrade
     const updateBtn = await screen.findByRole('button', { name: '更新' });
