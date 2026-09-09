@@ -4,16 +4,16 @@
  * 覆盖：有数据 / 空列表（含空态区块）/ 加载失败 / 进入详情 → V = 4
  *
  * 表格处理：vxe（@blueking/table）依赖元素尺寸与纯字段列 DOM，jsdom 下均不可用，
- * 采用「共享垫片 installVxeShims + 表格 stub」方案（见 ./helpers/vxe-shims.ts），
+ * 采用「共享垫片 installVxeShims + 表格 stub」方案（见 test/helpers/mock-table.ts），
  * 垫片仅在本文件 beforeAll 安装，不改全局 setup，避免影响既有测试。
  */
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/vue';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { i18nGlobalMocks, I18nTStub } from '../helpers/mock-i18n';
+import { installVxeShims } from '../helpers/mock-table';
 import { MockedApiError } from '../helpers/mocked-api-error';
-
-import { installVxeShims } from './helpers/vxe-shims';
-
 
 const mocks = vi.hoisted(() => ({
   listApps: vi.fn(),
@@ -23,32 +23,16 @@ const mocks = vi.hoisted(() => ({
 vi.mock('~/api/modules/bkmsserver', () => ({
   ApiServerService: { ListApps: mocks.listApps },
 }));
-
-vi.mock('@blueking/table', async () => {
-  const { TableStub, TableColumnStub } = await import('./helpers/vxe-shims');
-  return { Table: TableStub, TableColumn: TableColumnStub };
+vi.mock('@blueking/table', async () => (await import('../helpers/mock-table')).tableMockFactory());
+vi.mock('vue-router', async () => {
+  const { createRouterMock } = await import('../helpers/mock-router');
+  return createRouterMock({ route: { path: '/ws-1/app', name: 'app', params: { space: 'ws-1' } }, push: mocks.push });
 });
-vi.mock('vue-router', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useRouter: () => ({ push: mocks.push, currentRoute: { value: { query: {} } } }),
-  useRoute: () => ({
-    path: '/ws-1/app',
-    fullPath: '/ws-1/app',
-    name: 'app',
-    query: {},
-    params: { space: 'ws-1' },
-    meta: {},
-    matched: [],
-  }),
-}));
 vi.mock('~/stores/space', () => ({ useSpaceStore: () => ({ currentSpace: 'ws-1' }) }));
 vi.mock('~/stores/app-detail', () => ({
   useAppDetail: () => ({ updateAppName: vi.fn(), updateAppID: vi.fn() }),
 }));
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
 
 beforeAll(() => {
   installVxeShims();
@@ -74,19 +58,12 @@ async function renderPage() {
   return render(Application as never, {
     props: { space: 'ws-1' } as never,
     global: {
-      mocks: { $t: (s: string) => s },
+      mocks: i18nGlobalMocks,
       // 空态/异常态文案由 <i18n-t> 插值组件渲染，直译为 keypath 供断言
-      components: {
-        'i18n-t': {
-          props: { keypath: { type: String, default: '' } },
-          template: '<span>{{ keypath }}</span>',
-        },
-      },
+      components: { 'i18n-t': I18nTStub },
     } as never,
   });
 }
-
-afterEach(cleanup);
 
 describe('应用列表：数据状态与导航', () => {
   it('当应用列表加载完成时，应展示应用名称', async () => {

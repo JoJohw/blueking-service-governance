@@ -24,8 +24,8 @@
 import { defineComponent, h, ref } from 'vue';
 
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen } from '@testing-library/vue';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/vue';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 
 const harness = vi.hoisted(() => ({
@@ -64,8 +64,6 @@ beforeEach(() => {
   harness.disabled = false;
   harness.emitted = undefined;
 });
-
-afterEach(cleanup);
 
 describe('动态输入项：按类型分发与回传', () => {
   it('当类型为字符串时，用户输入的值应回传给父组件', async () => {

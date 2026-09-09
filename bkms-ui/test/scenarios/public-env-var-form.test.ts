@@ -24,21 +24,20 @@
  * 说明：列表（Sideslider 内的变量表格）与删除确认另计，本场景先覆盖表单弹窗。
  */
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/vue';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { i18nGlobalMocks } from '../helpers/mock-i18n';
 
 const harness = vi.hoisted(() => ({
   success: vi.fn(),
-  anyService: () => new Proxy({} as Record<string, unknown>, { get: () => vi.fn().mockResolvedValue({}) }),
 }));
 
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
-vi.mock('~/api/modules/v1', () => ({
-  EnvvarsService: harness.anyService(),
-}));
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
+vi.mock('~/api/modules/v1', async () => {
+  const { createAnyServiceMock } = await import('../helpers/mock-service');
+  return { EnvvarsService: createAnyServiceMock('EnvvarsService', {}) };
+});
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -53,11 +52,9 @@ async function renderDialog(editData: null | Record<string, unknown> = null) {
       editData: editData as never,
     } as never,
     attrs: { 'onUpdate:isShow': () => {}, onSuccess: harness.success } as never,
-    global: { mocks: { $t: (s: string) => s } } as never,
+    global: { mocks: i18nGlobalMocks } as never,
   });
 }
-
-afterEach(cleanup);
 
 describe('公共环境变量：新建与编辑表单', () => {
   it('当新建环境变量时，应展示新增标题并可选取作用域', async () => {

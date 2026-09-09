@@ -30,9 +30,9 @@ import { defineComponent, h, ref } from 'vue';
 import type { Component } from 'vue';
 
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
+import { render, screen, waitFor } from '@testing-library/vue';
 import { createPinia } from 'pinia';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ComponentManagement from '~/pages/marketplace/component-management.vue';
 
 import { MockedApiError } from '../helpers/mocked-api-error';
@@ -77,18 +77,10 @@ vi.mock('bkui-vue', async importOriginal => ({
   InfoBox: mocks.infoBox,
 }));
 
-// i18n 不在测试范围：useI18n 直译、$t 直译
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
+import { i18nPlugin } from '../helpers/mock-i18n';
 
-/** 模板 $t 直译占位 */
-const i18nStub = {
-  install(app: { config: { globalProperties: Record<string, unknown> } }) {
-    app.config.globalProperties.$t = (s: string) => s;
-  },
-};
+// i18n 不在测试范围：useI18n 直译、$t 直译
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
 
 // 输入/输出模板桩：仅提供被测组件依赖的契约方法（getValue/isValid/getFormData/resetData/getOutputData）
 vi.mock('~/pages/marketplace/components/component-input/component-input-template.vue', async () => {
@@ -243,7 +235,7 @@ async function gotoStep2(mode: 'component' | 'edit' = 'component') {
 
 /** 打开弹层并等待步骤 1 内容（试运行按钮）就绪；额外等待脏检查快照完成 */
 async function openWizard(mode: 'component' | 'edit' = 'component') {
-  render(Harness, { global: { plugins: [createPinia(), i18nStub] } });
+  render(Harness, { global: { plugins: [createPinia(), i18nPlugin] } });
   harness.open?.(mode, mode === 'edit' ? EDIT_COMPONENT : undefined);
   await screen.findByRole('button', { name: '试运行' });
   // 快照 watch（flush post + nextTick）需两个微任务后才完成，避免"未修改却弹确认"的时序误判
@@ -266,8 +258,6 @@ beforeEach(() => {
   mocks.patchComponentDef.mockResolvedValue({});
   mocks.infoBox.mockImplementation(() => undefined);
 });
-
-afterEach(cleanup);
 
 describe('组件管理：新建/编辑向导', () => {
   describe('打开与模式回显', () => {

@@ -29,11 +29,12 @@
  * 用例按现状行为断言，不额外要求错误提示。
  */
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/vue';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { i18nGlobalMocks, I18nTStub } from '../helpers/mock-i18n';
+import { installVxeShims } from '../helpers/mock-table';
 import { MockedApiError } from '../helpers/mocked-api-error';
-import { installVxeShims } from './helpers/vxe-shims';
 
 const mocks = vi.hoisted(() => ({
   listEnvs: vi.fn(),
@@ -45,34 +46,18 @@ beforeAll(() => {
   installVxeShims();
 });
 
-vi.mock('@blueking/table', async () => {
-  const { TableStub, TableColumnStub } = await import('./helpers/vxe-shims');
-  return { Table: TableStub, TableColumn: TableColumnStub };
-});
-
+vi.mock('@blueking/table', async () => (await import('../helpers/mock-table')).tableMockFactory());
 vi.mock('~/api/modules/v1', () => ({
   EnvService: { listEnvs: mocks.listEnvs, getEnv: mocks.getEnv, deleteEnv: mocks.deleteEnv },
   WorkspaceService: { getWorkspace: vi.fn().mockResolvedValue({}) },
   BkintegrationsBkmonitorService: { listApms: vi.fn().mockResolvedValue([]) },
 }));
-vi.mock('vue-router', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useRouter: () => ({ push: vi.fn(), currentRoute: { value: { query: {} } } }),
-  useRoute: () => ({
-    path: '/ws-1/env',
-    fullPath: '/ws-1/env',
-    name: 'env',
-    query: {},
-    params: { space: 'ws-1' },
-    meta: {},
-    matched: [],
-  }),
-}));
+vi.mock('vue-router', async () => {
+  const { createRouterMock } = await import('../helpers/mock-router');
+  return createRouterMock({ route: { path: '/ws-1/env', name: 'env', params: { space: 'ws-1' } } });
+});
 vi.mock('~/stores/space', () => ({ useSpaceStore: () => ({ currentSpace: 'ws-1' }) }));
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
 
 // 各字段取不同值，避免多列渲染出相同文本导致查询歧义
 const env = (name: string) => ({
@@ -105,18 +90,11 @@ async function renderPage() {
   return render(EnvPage as never, {
     props: { space: 'ws-1' } as never,
     global: {
-      mocks: { $t: (s: string) => s },
-      components: {
-        'i18n-t': {
-          props: { keypath: { type: String, default: '' } },
-          template: '<span>{{ keypath }}</span>',
-        },
-      },
+      mocks: i18nGlobalMocks,
+      components: { 'i18n-t': I18nTStub },
     } as never,
   });
 }
-
-afterEach(cleanup);
 
 describe('环境管理：列表状态', () => {
   it('当环境列表加载完成时，应展示环境名称', async () => {

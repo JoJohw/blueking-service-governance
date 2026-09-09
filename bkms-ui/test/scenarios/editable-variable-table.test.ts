@@ -21,14 +21,15 @@
  * 覆盖两组用户可感知行为：只读态渲染 / 点击编辑进入编辑态 → V = 2
  * （第 3 条路径「删除确认浮层」jsdom 下不渲染，见文件末注释）
  *
- * 说明：表格本体为 vxe（@blueking/table），沿用 S14 沉淀的 stub 与垫片（见 helpers/vxe-shims）；
+ * 说明：表格本体为 vxe（@blueking/table），沿用 S14 沉淀的 stub 与垫片（见 test/helpers/mock-table.ts）；
  * 被 stub 的是单元格绘制，行内操作（编辑/删除确认）仍为真实行为。
  */
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/vue';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { installVxeShims, TableColumnStub, TableStub } from './helpers/vxe-shims';
+import { i18nGlobalMocks } from '../helpers/mock-i18n';
+import { installVxeShims } from '../helpers/mock-table';
 
 const harness = vi.hoisted(() => ({
   list: [{ id: '1', key: 'APP_NAME', value: 'demo', description: '应用名', isSensitive: false }] as {
@@ -40,13 +41,12 @@ const harness = vi.hoisted(() => ({
   }[],
 }));
 
-installVxeShims();
+beforeAll(() => {
+  installVxeShims();
+});
 
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
-vi.mock('@blueking/table', () => ({ Table: TableStub, TableColumn: TableColumnStub }));
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
+vi.mock('@blueking/table', async () => (await import('../helpers/mock-table')).tableMockFactory());
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -57,11 +57,9 @@ async function renderTable() {
   const { default: EditableVariableTable } = await import('~/components/editable-variable-table/index.vue');
   return render(EditableVariableTable as never, {
     props: { list: harness.list as never } as never,
-    global: { mocks: { $t: (s: string) => s } } as never,
+    global: { mocks: i18nGlobalMocks } as never,
   });
 }
-
-afterEach(cleanup);
 
 describe('环境变量表格：行内编辑与删除确认', () => {
   it('当传入变量列表时，应以只读态展示变量内容', async () => {

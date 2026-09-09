@@ -24,18 +24,14 @@
 import { defineComponent, h, ref } from 'vue';
 
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
+import { render, screen, waitFor } from '@testing-library/vue';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   confirm: vi.fn(),
 }));
 
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
 
 const harness = vi.hoisted(() => ({
   loading: false,
@@ -67,8 +63,6 @@ beforeEach(() => {
   vi.clearAllMocks();
   harness.loading = false;
 });
-
-afterEach(cleanup);
 
 describe('删除确认：二次确认流程', () => {
   it('当删除确认弹窗打开时，应展示标题与风险说明', async () => {

@@ -28,18 +28,17 @@
 import { defineComponent, h, ref } from 'vue';
 
 import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/vue';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { i18nGlobalMocks } from '../helpers/mock-i18n';
 
 const harness = vi.hoisted(() => ({
   value: ['a', 'b'] as string[],
   required: false as boolean,
 }));
 
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
 
 const RepeatableInput = await import('~/components/repeatable-input.vue').then(m => m.default);
 
@@ -64,22 +63,20 @@ beforeEach(() => {
   harness.required = false;
 });
 
-afterEach(cleanup);
-
 describe('重复输入项：增删与校验', () => {
   it('当存在初始值时应渲染对应数量的输入项', () => {
-    render(Harness, { global: { mocks: { $t: (s: string) => s } } as never });
+    render(Harness, { global: { mocks: i18nGlobalMocks } as never });
     expect(screen.getAllByPlaceholderText('请输入值')).toHaveLength(2);
   });
 
   it('当用户点击添加时，应新增一个空输入项', async () => {
-    render(Harness, { global: { mocks: { $t: (s: string) => s } } as never });
+    render(Harness, { global: { mocks: i18nGlobalMocks } as never });
     await userEvent.click(screen.getByText('添加'));
     expect(screen.getAllByPlaceholderText('请输入值')).toHaveLength(3);
   });
 
   it('当用户删除某项时，仅该项被移除', async () => {
-    const { container } = render(Harness, { global: { mocks: { $t: (s: string) => s } } as never });
+    const { container } = render(Harness, { global: { mocks: i18nGlobalMocks } as never });
     // Del 为 bkui-vue 图标组件，渲染为 svg 且无 role，只能按标签查询
     const delIcons = container.querySelectorAll('svg');
     await userEvent.click(delIcons[0]);

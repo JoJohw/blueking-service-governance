@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "server": "http-server ./dist -p 5000",
     "test:unit": "vitest",
+    "test:ci": "vitest run --reporter=verbose",
     "typecheck": "vue-tsc --noEmit --incremental",
     "typecheck:staged": "node scripts/typecheck-staged.mjs",
     "up": "taze major -I",

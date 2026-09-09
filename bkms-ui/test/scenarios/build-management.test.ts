@@ -7,53 +7,42 @@
  * 说明：构建历史为列表（vxe），本场景聚焦「构建入口」的判定与弹层；
  * RepoRefSelect 为重型子件（依赖代码仓库接口），stub 为标记元素。
  */
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
 import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from '@testing-library/vue';
 import { createPinia } from 'pinia';
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { installVxeShims } from './helpers/vxe-shims';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { i18nGlobalMocks } from '../helpers/mock-i18n';
+import { installVxeShims } from '../helpers/mock-table';
 
 // 页面含 vxe 构建历史表格，需先装垫片（同 S14/S9）
-installVxeShims();
-
 beforeAll(() => {
   installVxeShims();
 });
 
 const harness = vi.hoisted(() => ({
   sourceType: 'imageRegistry' as string,
-  /** 任意 service：任何方法调用都返回 resolved（列表类返回空列表），避免逐个猜方法名 */
-  anyService: () =>
-    new Proxy({} as Record<string, unknown>, {
-      get: () => vi.fn().mockResolvedValue({ list: [], total: 0 }),
-    }),
 }));
 
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
-vi.mock('vue-router', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), currentRoute: { value: { query: {} } } }),
-  useRoute: () => ({
-    path: '/ws-1/app/app-a/detail/app-build',
-    fullPath: '/ws-1/app/app-a/detail/app-build',
-    name: 'app-build',
-    query: {},
-    params: { space: 'ws-1' },
-    meta: {},
-    matched: [],
-  }),
-}));
-vi.mock('~/api/modules/v1', () => ({
-  BuildsService: harness.anyService(),
-  BkintegrationsBkciService: harness.anyService(),
-}));
-vi.mock('~/api/modules/bkmsserver', () => ({
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
+vi.mock('vue-router', async () => {
+  const { createRouterMock } = await import('../helpers/mock-router');
+  return createRouterMock({
+    route: { path: '/ws-1/app/app-a/detail/app-build', name: 'app-build', params: { space: 'ws-1' } },
+  });
+});
+vi.mock('~/api/modules/v1', async () => {
+  const { createAnyServiceMock } = await import('../helpers/mock-service');
+  return {
+    BuildsService: createAnyServiceMock('BuildsService'),
+    BkintegrationsBkciService: createAnyServiceMock('BkintegrationsBkciService'),
+  };
+});
+vi.mock('~/api/modules/bkmsserver', async () => {
+  const { createAnyServiceMock } = await import('../helpers/mock-service');
   // 页面经 use-recommend-tag 拉取推荐镜像 tag，需 mock 否则发起真实请求
-  ApiServerService: harness.anyService(),
-}));
+  return { ApiServerService: createAnyServiceMock('ApiServerService') };
+});
 vi.mock('~/stores/app-detail', () => ({
   useAppDetail: () => ({
     appID: 'app-a',
@@ -74,15 +63,11 @@ beforeEach(() => {
 });
 
 async function renderPage() {
-  const { default: BuildManagement } = await import(
-    '~/pages/application/detail/app-build/build-management.vue'
-  );
+  const { default: BuildManagement } = await import('~/pages/application/detail/app-build/build-management.vue');
   return render(BuildManagement as never, {
-    global: { plugins: [createPinia()], mocks: { $t: (s: string) => s } } as never,
+    global: { plugins: [createPinia()], mocks: i18nGlobalMocks } as never,
   });
 }
-
-afterEach(cleanup);
 
 describe('构建管理：构建入口按镜像来源分发', () => {
   it('当应用镜像来源为镜像仓库时，执行构建应被禁用', async () => {
