@@ -9,32 +9,22 @@
  * container-image / helm-chart 为重型子页（含表格与上传交互），此处 stub 为标记文本，
  * 其行为留待各自场景覆盖。
  */
-import userEvent from '@testing-library/user-event';
-import { cleanup, render, screen, waitFor } from '@testing-library/vue';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
+import { render, screen, waitFor } from '@testing-library/vue';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const harness = vi.hoisted(() => ({
   appType: 'helm' as string,
 }));
 
-vi.mock('vue-i18n', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useI18n: () => ({ t: (s: string) => s, te: () => true }),
-}));
-vi.mock('vue-router', async importOriginal => ({
-  ...(await importOriginal<object>()),
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), currentRoute: { value: { query: {} } } }),
-  useRoute: () => ({
-    path: '/ws-1/app/app-a/detail/artifact',
-    fullPath: '/ws-1/app/app-a/detail/artifact',
-    name: 'artifact',
-    query: {},
-    params: { space: 'ws-1' },
-    meta: {},
-    matched: [],
-  }),
-}));
+import { i18nGlobalMocks } from '../helpers/mock-i18n';
+
+vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
+vi.mock('vue-router', async () => {
+  const { createRouterMock } = await import('../helpers/mock-router');
+  return createRouterMock({
+    route: { path: '/ws-1/app/app-a/detail/artifact', name: 'artifact', params: { space: 'ws-1' } },
+  });
+});
 vi.mock('~/stores/app-detail', () => ({
   useAppDetail: () => ({
     appType: harness.appType,
@@ -60,11 +50,9 @@ beforeEach(() => {
 async function renderPage() {
   const { default: ArtifactPage } = await import('~/pages/application/detail/artifact/index.vue');
   return render(ArtifactPage as never, {
-    global: { mocks: { $t: (s: string) => s } } as never,
+    global: { mocks: i18nGlobalMocks } as never,
   });
 }
-
-afterEach(cleanup);
 
 describe('制品管理：按应用类型分发视图', () => {
   it('当应用为 Helm-like 类型时，应展示容器镜像与 Helm Chart 两个制品页签', async () => {
