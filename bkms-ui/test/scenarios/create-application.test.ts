@@ -40,6 +40,8 @@ const mocks = vi.hoisted(() => ({
   appValidate: vi.fn(),
   appGetValue: vi.fn(),
   resetStatus: vi.fn(),
+  routerBack: vi.fn(),
+  infoBox: vi.fn(),
 }));
 
 /** 按用例切换的路由状态（步骤条读取 route.name 决定步数） */
@@ -47,11 +49,19 @@ const routeState = vi.hoisted(() => ({ name: 'createTrpcTemplateApp', params: { 
 
 vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
 
+// use-leave-confirm 用 InfoBox 弹离开确认（命令式 API），mock 后即可断言「是否弹过」
+vi.mock('bkui-vue', async importOriginal => ({
+  ...(await importOriginal<object>()),
+  InfoBox: mocks.infoBox,
+}));
+
 vi.mock('vue-router', async () => {
   const { createRouterMock } = await import('../helpers/mock-router');
   const base = await createRouterMock({ push: mocks.push, route: { params: routeState.params } });
   return {
     ...base,
+    // 向导取消走 router.back()（trpc/index.vue:198），共享 helper 未暴露 back，此处补上
+    useRouter: () => ({ ...base.useRouter(), back: mocks.routerBack }),
     // 共享 mock 的 route 为静态对象；本场景需按用例切换 route.name（create.vue:101 依此取步骤配置）
     useRoute: () => ({
       name: routeState.name,
@@ -223,6 +233,17 @@ describe('创建应用向导：tRPC 参数与应用配置', () => {
     await waitFor(() => expect(mocks.paramValidate).toHaveBeenCalledTimes(1));
     expect(screen.queryByRole('button', { name: '创建' })).toBeNull();
     expect(mocks.createApp).not.toHaveBeenCalled();
+  });
+
+  it('当用户在向导中点击取消时，应直接回退上一步且不弹离开确认', async () => {
+    mocks.paramValidate.mockResolvedValue(true);
+    mocks.paramGetValue.mockReturnValue({});
+    renderTrpcWizard();
+    await userEvent.click(await screen.findByRole('button', { name: '取消' }));
+    // 正向消费信号：trpc/index.vue:194-199 cancel → router.back()
+    await waitFor(() => expect(mocks.routerBack).toHaveBeenCalledTimes(1));
+    // 现状：useLeaveConfirm() 未传 formModel（:103），isDirty 恒 false → 不会弹 InfoBox
+    expect(mocks.infoBox).not.toHaveBeenCalled();
   });
 
   it('当参数配置校验通过时，应进入应用配置步骤并展示创建按钮', async () => {

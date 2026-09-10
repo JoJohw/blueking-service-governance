@@ -94,7 +94,7 @@
 
 - 状态：`✅ 入选` ｜ 评分依据：9 分（频率3/影响3/复杂度3）
 - 来源模块：`src/pages/application/create.vue` + 模板子路由（默认/trpc/helm/taf/agones）
-- 实施记录：`../pilots/TEST_PILOT_S1.md`；独立评审：`../reviews/TEST_REVIEW_S1.md`（88/100 放行 + 变异验证 4/4 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/create-application.test.ts`（8 用例全绿，V 由 4~5 校准为 8：步骤条两种模板配置/搜索空态/模板跳转/校验拦截/步骤前进/创建成功/创建失败；其余模板向导与子件表单规则见 backlog）
+- 实施记录：`../pilots/TEST_PILOT_S1.md`；独立评审：`../reviews/TEST_REVIEW_S1.md`（88/100 放行 + 变异验证 4/4 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/create-application.test.ts`（9 用例全绿，V 由 4~5 校准为 9：步骤条两种模板配置/搜索空态/模板跳转/校验拦截/步骤前进/取消回退/创建成功/创建失败；其余模板向导与子件表单规则见 backlog）
 - 用户目标：从选择模板、填写信息到提交成功的完整路径
 - 判定分支（校准）：模板类型选择（路由级分支：步骤条三步 vs 两步）/ 搜索空态 / 模板跳转 / 表单校验通过·不通过 / 提交成功·失败 → **V = 8**
 - 设计方法：基本路径 + 等价类 + 边界值 + 恶意输入
