@@ -212,9 +212,9 @@
 - 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响3/复杂度2）
 - 来源模块：`src/pages/application/detail/artifact/`
 - 用户目标：上传制品 → 部署制品的完整路径
-- 判定分支：上传合法 / 非法（实施前校准）→ **V ≈ 3**
+- 判定分支（校准）：类型分发 2 + 页签切换 1 → **V = 3**（上传合法/非法属子页交互，见 backlog）
 - 设计方法：等价类 + 恶意输入（文件名/文件类型规则实施前校准）
-- 实施记录：`../pilots/TEST_PILOT_S11.md`；独立评审：`../reviews/TEST_REVIEW_S11.md`（85/100 放行 + 变异验证 2/2 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/artifact-management.test.ts`（2 用例全绿，覆盖 index 的类型分发；两个子页见 backlog）
+- 实施记录：`../pilots/TEST_PILOT_S11.md`；独立评审：`../reviews/TEST_REVIEW_S11.md`（85/100 放行 + 变异验证 2/2 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/artifact-management.test.ts`（3 用例全绿：类型分发 2 + 页签切换 1；页签切换原判「jsdom 不可测」经复核证伪，改造 mock 路由后已覆盖；两个子页见 backlog）
 - 用例草稿（实施前校准）：
   - `it('当用户上传合法制品时，应出现在制品列表中')`
   - `it('当用户上传非法制品时，应显示失败提示且不入列表')`

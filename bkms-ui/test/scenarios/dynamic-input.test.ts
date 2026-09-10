@@ -76,8 +76,10 @@ describe('动态输入项：按类型分发与回传', () => {
     harness.type = 'INT';
     render(Harness);
     const input = screen.getByPlaceholderText('请输入值');
-    // 数字形态（数字键盘 / 浏览器数字校验）是用户可感知差异；组件当前回传字符串，
-    // 该数据类型契约是否需调整待业务确认
+    // 数字形态（数字键盘 / 浏览器数字校验）是用户可感知差异；组件当前回传字符串（'12' 而非 12）。
+    // 已复核：下游无隐患——接口类型 properties 为 Record<string, unknown>（app.d.ts:1020），
+    // 消费方定义的值类型为 boolean | number | string（components-sideSlider.vue:606），
+    // 且模块内无任何数值转换（Number/parseInt/parseFloat），故按现状断言。
     expect(input).toHaveAttribute('type', 'number');
     await userEvent.type(input, '12');
     expect(harness.emitted).toBe('12');

@@ -1,14 +1,16 @@
 /**
  * 场景级测试：制品管理（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S11）
  *
- * 覆盖两组用户可感知行为：
- *   Helm-like 应用显示双页签 / 非 Helm-like 不显示页签直接展示容器镜像 → V = 2
- *   （第 3 条路径「切换页签」在 jsdom 下不可行，见文件末注释）
+ * 覆盖三组用户可感知行为：Helm-like 应用显示双页签 / 非 Helm-like 不显示页签
+ *   直接展示容器镜像 / 点击页签切换到对应制品内容 → V = 3
+ *   （页签切换曾判为「jsdom 不可行」，复核后证伪：让 mock 路由的 query 可写且
+ *     replace 写回即可，见本文件 vue-router mock 注释）
  *
  * 说明：被测核心是 index.vue 的「应用类型 → 视图分发」与 Tab 切换逻辑；
  * container-image / helm-chart 为重型子页（含表格与上传交互），此处 stub 为标记文本，
  * 其行为留待各自场景覆盖。
  */
+import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/vue';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -21,9 +23,26 @@ import { i18nGlobalMocks } from '../helpers/mock-i18n';
 vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
 vi.mock('vue-router', async () => {
   const { createRouterMock } = await import('../helpers/mock-router');
-  return createRouterMock({
+  const { reactive } = await import('vue');
+  const base = await createRouterMock({
     route: { path: '/ws-1/app/app-a/detail/artifact', name: 'artifact', params: { space: 'ws-1' } },
   });
+  // useUrlQuerySync 写侧走 router.replace({ query })、读侧读 route.query（use-url-query-sync.ts:74-80）；
+  // 让两者共享同一个响应式 query 对象，页签切换即可在 jsdom 下驱动
+  const query = reactive<Record<string, string>>({});
+  const route = { ...base.useRoute(), query };
+  return {
+    ...base,
+    useRoute: () => route,
+    useRouter: () => ({
+      ...base.useRouter(),
+      replace: (target: { query?: Record<string, unknown> }) => {
+        Object.keys(query).forEach(key => delete query[key]);
+        Object.assign(query, target?.query ?? {});
+        return Promise.resolve();
+      },
+    }),
+  };
 });
 vi.mock('~/stores/app-detail', () => ({
   useAppDetail: () => ({
@@ -70,9 +89,13 @@ describe('制品管理：按应用类型分发视图', () => {
     expect(screen.queryByText('Helm Chart')).not.toBeInTheDocument();
   });
 
-  // 未覆盖：点击页签切换内容（V 的第 3 条路径）。
-  // 原因：activeTab 经 useUrlQuerySync 与路由 query 双向同步，mock 路由下点击后 URL 不回写，
-  // 组件不切换（jsdom 下非缺陷表现，需真实路由或改写同步方式才能测）。
-  // 原因：页签经 useUrlQuerySync 与路由 query 双向同步，mock 路由下点击后 query 不回写，组件不切换；
-  // 真实浏览器可正常切换（非业务缺陷）。改造 mock 路由为「query 可写 + replace 写回」后可覆盖。
+  it('当用户点击 Helm Chart 页签时，应展示 Helm Chart 制品内容', async () => {
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('container-image-content')).toBeInTheDocument());
+    await userEvent.click(screen.getByText('Helm Chart'));
+    // 正向消费信号：页签切换后渲染目标子页（原「jsdom 不可测」结论已证伪，
+    // 关键是让 mock 路由的 query 可写且 replace 写回，见本文件 vue-router mock 注释）
+    await waitFor(() => expect(screen.getByText('helm-chart-content')).toBeInTheDocument());
+    expect(screen.queryByText('container-image-content')).not.toBeInTheDocument();
+  });
 });
