@@ -53,6 +53,7 @@
 | 2026-09-08 | S17 | 3 | 3（暂无组件空态 / 分组展开显示组件名与安装入口 / 点击安装弹出侧滑） | 否，3 轮迭代（i18n 注入路径、分组头定位） | 约 4.2~6s/次，连跑 3 次稳定 | **自定义 div 列表（非 vxe）无需表格垫片**；重型动态表单侧滑 stub 为按 `visible` 渲染标记的占位（契约对齐 v-model:visible）。详见 `../pilots/TEST_PILOT_S17.md` 与 `../reviews/TEST_REVIEW_S17.md`（88/100，变异 3/3） |
 | 2026-09-08 | S15 | 7 | 7（更新入口禁用/校验拦截/部署正向主路径/预检仍部署/预检取消/回滚入口约束/回滚确认，台账预估 4~5 校准） | 否，4 轮迭代（文件级 mock 与真实组件并存、bkui 弹层延迟显隐、i18n 插值、tooltip 文案不可断言） | 约 5.5~7.5s/次，连跑 3 次稳定 | **两条新打法**：① 同路径 stub + 真实组件并存用 `vi.importActual`；② bkui 弹层 isShow 切换经 setTimeout 置位，查询必须 `findBy*`，Form 错误文案走 tooltip 时用 `is-error` 态信号。详见 `../pilots/TEST_PILOT_S15.md` 与 `../reviews/TEST_REVIEW_S15.md`（88/100，变异 4/4） |
 | 2026-09-10 | S1 | 8 | 8（步骤条 tRPC 三步/Helm 两步、搜索空态、模板跳转、校验拦截、步骤前进、创建成功、创建失败；台账预估 4~5 校准） | 否，3 轮迭代（RouterView 全局注册不走模块 mock、插槽参数回传、searchbox role） | 约 4.4~5.6s/次，连跑 3 次稳定 | **新打法**：全局注册组件（RouterView）须在 render 的 `global.components` 注册桩，且带 v-slot 的桩要回传参数；向导 step 由父容器持有 → harness 复现流转。详见 `../pilots/TEST_PILOT_S1.md` 与 `../reviews/TEST_REVIEW_S1.md`（88/100，变异 4/4） |
+| 2026-09-10 | S3 | 6 | 6（进入编辑态/取消回滚/保存失败/默认环境写入/普通环境写入/恢复默认配置；台账 V=3 校准） | 否，5 轮迭代（父容器驱动加载、vxe 垫片、spinbutton 定位、min 兜底致校验不可达、mock 计数跨用例） | 约 5.7~7.0s/次，连跑 3 次稳定 | **新打法**：多态切换类场景**不 mock 通用 composable**（判定逻辑都在里面），用代表性子模块 + harness 驱动 `defineExpose` 契约；默认/环境双写入路径为必测分支。详见 `../pilots/TEST_PILOT_S3.md` 与 `../reviews/TEST_REVIEW_S3.md`（87/100，变异 4/4） |
 
 ## 已知环境事实（实施前置认知，非踩坑）
 
