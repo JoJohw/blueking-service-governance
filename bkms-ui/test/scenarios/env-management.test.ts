@@ -148,13 +148,16 @@ describe('环境管理：删除二次确认', () => {
     expect(screen.getByText(/确定删除环境/)).toBeInTheDocument();
   });
 
-  it('当环境已部署应用时，应先提示部署情况而不直接弹出删除确认', async () => {
+  it('当环境已部署应用时，应拦截删除并提示先卸载应用', async () => {
     mocks.getEnv.mockResolvedValue({ appDeployStatuses: [{ name: 'app-a' }] });
     await renderPage();
     await waitFor(() => expect(screen.getByText('env-a')).toBeInTheDocument());
     await userEvent.click(screen.getByText('删除'));
-    await waitFor(() => expect(mocks.getEnv).toHaveBeenCalled());
-    // 推断/需确认：当前实现为「不打开删除弹窗、转由部署告警承接」，业务规则待确认
+    // 正向消费信号：env.vue:574-578 命中「有已部署应用」分支 → 弹出无法删除提示（含卸载引导文案）
+    expect(await screen.findByText('无法删除环境')).toBeInTheDocument();
+    expect(screen.getByText('该环境已部署应用，请先卸载后再删除环境')).toBeInTheDocument();
+    // 删除确认弹窗不应出现（硬拦截，非警告后仍可继续）
     expect(screen.queryByText(/确定删除环境/)).not.toBeInTheDocument();
+    expect(mocks.deleteEnv).not.toHaveBeenCalled();
   });
 });
