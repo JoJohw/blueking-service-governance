@@ -50,6 +50,7 @@
 | 2026-09-08 | S9 | 7（列表 2 + 删除 5，撤下重建） | 7（与台账一致） | 否（vxe 纯字段列不渲染，方案 A：stub 表格 + 垫片并用） | 连跑 3 次稳定，变异 2/2 捕获 | 详见 `../pilots/TEST_PILOT_S9.md` 与 `../reviews/TEST_REVIEW_S9.md`（86/100） |
 | 2026-09-08 | S17 | 3 | 3（暂无组件空态 / 分组展开显示组件名与安装入口 / 点击安装弹出侧滑） | 否，3 轮迭代（i18n 注入路径、分组头定位） | 约 4.2~6s/次，连跑 3 次稳定 | **自定义 div 列表（非 vxe）无需表格垫片**；重型动态表单侧滑 stub 为按 `visible` 渲染标记的占位（契约对齐 v-model:visible）。详见 `../pilots/TEST_PILOT_S17.md` 与 `../reviews/TEST_REVIEW_S17.md`（88/100，变异 3/3） |
 | 2026-09-08 | S15 | 7 | 7（更新入口禁用/校验拦截/部署正向主路径/预检仍部署/预检取消/回滚入口约束/回滚确认，台账预估 4~5 校准） | 否，4 轮迭代（文件级 mock 与真实组件并存、bkui 弹层延迟显隐、i18n 插值、tooltip 文案不可断言） | 约 5.5~7.5s/次，连跑 3 次稳定 | **两条新打法**：① 同路径 stub + 真实组件并存用 `vi.importActual`；② bkui 弹层 isShow 切换经 setTimeout 置位，查询必须 `findBy*`，Form 错误文案走 tooltip 时用 `is-error` 态信号。详见 `../pilots/TEST_PILOT_S15.md` 与 `../reviews/TEST_REVIEW_S15.md`（88/100，变异 4/4） |
+| 2026-09-10 | S19 | 4 | 4（trim 立即同步 / 无变化不确认 / 变化防抖确认 / 空串不确认） | 否（初评 Request Changes 后整改：立项、移目录、testid、定时器 2×） | tests 约 115~127ms，连跑 3 次稳定 | 组件 Input 契约 + fake timers；防抖推进取 2× 常量；VTU 须显式 unmount。详见 `../pilots/TEST_PILOT_S19.md` 与 `../reviews/TEST_REVIEW_S19.md`（90/100，变异 2/2） |
 
 ## 已知环境事实（实施前置认知，非踩坑）
 
