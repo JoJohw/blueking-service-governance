@@ -89,6 +89,12 @@
    | `test/helpers/mock-router.ts` | `createRouterMock` | vue-router mock（支持自定义路由属性和 push/replace 断言） |
    | `test/helpers/mock-table.ts` | `installVxeShims`, `tableMockFactory`, `TableStub`, `TableColumnStub` | vxe-table jsdom 垫片 + 表格 stub |
    | `test/helpers/mock-service.ts` | `createAnyServiceMock` | Proxy 兜底 service mock（带 warning 追踪） |
+
+   **模块级 stub（`test/stubs/`）**：体积大或 vitest SSR 无法解析入口的第三方包，用 stub 文件 + `vite.config.mts` `test.alias` / 用例内 `vi.mock` 指向。新增 stub 须登记本表，禁止散落在场景文件旁。
+   | 文件 | 用途 |
+   |------|------|
+   | `test/stubs/monaco-editor.ts` | monaco-editor 极简 stub（`vite.config.mts` test.alias） |
+   | `test/stubs/bkui-vue-lite.ts` | RepoRefSelect Input 路径轻量 bkui stub（S19 用例内 `vi.mock`） |
 8. **全局 cleanup 已接管，不要手写**：`test/setup.ts` 已注册全局 `afterEach(cleanup)`，每个用例结束后自动清理 Testing Library 创建的 DOM。新文件**不需要**再手动 `import { cleanup }` 或编写 `afterEach(cleanup)`。如果 `afterEach` 中有其他逻辑（如 `vi.clearAllMocks()`），只写该逻辑即可，不用加 `cleanup()`。
 9. P0/P1 场景必须同时具备正向 + 反向 + 边界/异常用例（QA Skill-Suite 规则）。
 10. 推断的业务规则（如重复提交拦截）在用例中标注 `推断/需确认`，先确认再固化断言。
