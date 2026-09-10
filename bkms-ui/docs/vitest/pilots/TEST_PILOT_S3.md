@@ -49,6 +49,6 @@
 
 ## 6. 遗留项
 
-- **P2**：其余配置子模块（健康探针、生命周期、更新策略、元数据、网络访问、程序配置）是否与资源规格完全同构——「推断/需确认」，已登记 ai_unsure。
+- **P2**：其余配置子模块（健康探针、生命周期、更新策略、元数据、网络访问、程序配置）——复核确认**并非同构**：仅 `update-strategy-form.vue` 复用 `useAppSpecSection`，`health-probe.vue` 等各有自己的编辑态实现，需按子件分别设计用例。
 - **P2**：字段级「已修改」标识与重置单字段（ResetIcon）、环境切换时的脏离开确认。
 - **P2**：app-config/index.vue 的 Tab 与 URL query 同步（`useUrlQuerySync`）。

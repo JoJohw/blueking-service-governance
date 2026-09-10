@@ -17,7 +17,7 @@
 | 1 | 4/5 | INT 用例断言 `getByRole('spinbutton')` 找不到：bkui-vue 数字输入框未暴露该 role | 改为行为断言 |
 | 2 | 5/5 | — | — |
 | 3 | 4/5 | 变异验证（类型分发失效）暴露 INT 用例是**弱断言**：`Number('12') === 12` 对字符串也成立，捕获不到类型降级 | 收紧为 `toBe(12)` |
-| 4 | 4/5 | 源码现状是**回传字符串 `'12'` 而非数字**（`v-model.trim` + bkui-vue number input），严格数值断言不成立 | 改为「数字输入形态」断言（`toHaveAttribute('type','number')`）+ 字符串回传；行为细节登记 `ai_unsure.md` |
+| 4 | 4/5 | 源码现状是**回传字符串 `'12'` 而非数字**（`v-model.trim` + bkui-vue number input），严格数值断言不成立 | 改为「数字输入形态」断言（`toHaveAttribute('type','number')`）+ 字符串回传；数据类型契约是否需调整待业务确认 |
 
 ## 3. 可复用模式
 

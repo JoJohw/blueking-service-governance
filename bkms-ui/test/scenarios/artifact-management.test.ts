@@ -73,5 +73,6 @@ describe('制品管理：按应用类型分发视图', () => {
   // 未覆盖：点击页签切换内容（V 的第 3 条路径）。
   // 原因：activeTab 经 useUrlQuerySync 与路由 query 双向同步，mock 路由下点击后 URL 不回写，
   // 组件不切换（jsdom 下非缺陷表现，需真实路由或改写同步方式才能测）。
-  // 已登记 ai_unsure.md 与评审 backlog，待专项处理。
+  // 原因：页签经 useUrlQuerySync 与路由 query 双向同步，mock 路由下点击后 query 不回写，组件不切换；
+  // 真实浏览器可正常切换（非业务缺陷）。改造 mock 路由为「query 可写 + replace 写回」后可覆盖。
 });

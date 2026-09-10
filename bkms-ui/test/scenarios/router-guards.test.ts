@@ -19,7 +19,9 @@
  * 场景级测试：路由智能返回 + 空间权限守卫（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S13）
  *
  * 覆盖两组用户可感知行为：
- * A. 智能返回（smartGoBack）：有/无浏览历史 × fallback × 上级路由推导 → V = 4（第 5 条路径在真实路由表下不可达，见文件内说明）
+ * A. 智能返回（smartGoBack）：有/无浏览历史 × fallback × 上级路由推导 → V = 4
+ *    （第 5 条路径「推导不出上级路由 → 浏览器后退」需构造「父级路由记录无 name 且无默认子路由」
+ *     的场景才能覆盖，本轮未构造）
  * B. 空间权限守卫（beforeEach）：无空间参数 / 就绪 / 无权限 / 未就绪 / 空列表先拉取 → V = 5
  *
  * 说明：本场景为纯路由逻辑（无 DOM 交互），用户可感知结果 = 最终停留的路由与浏览器历史行为，
@@ -41,7 +43,8 @@ const spaceState = vi.hoisted(() => ({
 vi.mock('~/stores/space', () => ({
   useSpaceStore: () => ({
     list: spaceState.list,
-    spaceState: { Ready: 'ready' },
+    // 与 src/stores/space.ts:44-47 的真实枚举保持一致（Ready / Disabled，首字母大写）
+    spaceState: { Ready: 'Ready', Disabled: 'Disabled' },
     handleGetWorkspaceList: async () => {
       const next = await spaceState.fetch();
       spaceState.list = next;
@@ -70,8 +73,8 @@ function spyBrowserBack() {
 }
 
 beforeEach(() => {
-  spaceState.list = [{ id: 'ws-1', state: 'ready' }];
-  spaceState.fetch.mockResolvedValue([{ id: 'ws-1', state: 'ready' }]);
+  spaceState.list = [{ id: 'ws-1', state: 'Ready' }];
+  spaceState.fetch.mockResolvedValue([{ id: 'ws-1', state: 'Ready' }]);
 });
 
 describe('路由：智能返回', () => {
@@ -116,8 +119,9 @@ describe('路由：智能返回', () => {
   });
 
   // 说明：smartGoBack 中「推导不出上级 → 退回浏览器后退」的分支在真实路由表下不可达——
-  // 所有路由均被 setupLayouts 包裹（matched.length ≥ 2），resolveParent 总能取到上级或默认子路由。
-  // 该分支的取舍已登记 docs/vitest/ai_unsure.md，故不为其单独立用例。
+  // resolveParent 在 matched.length < 2（router.ts:303）或「父级记录无 name 且无默认子路由」
+  // （router.ts:311-316）时返回 undefined 才会走到该分支；真实路由表下后者需专门构造，
+  // 本轮未构造，故不为其单独立用例。
 });
 
 describe('路由：空间权限守卫', () => {
@@ -144,7 +148,8 @@ describe('路由：空间权限守卫', () => {
   });
 
   it('当用户访问的空间尚未就绪时，应跳转 404', async () => {
-    spaceState.list = [{ id: 'ws-1', state: 'creating' }];
+    // 未就绪态用真实枚举值 Disabled（原用 'creating' 非真实取值，已按复核修正）
+    spaceState.list = [{ id: 'ws-1', state: 'Disabled' }];
     const { router } = await setup();
     await router.push('/ws-1/app');
     expect(router.currentRoute.value.name).toBe('404');
@@ -152,7 +157,7 @@ describe('路由：空间权限守卫', () => {
 
   it('当空间列表尚未加载时，应先拉取列表再判定放行', async () => {
     spaceState.list = [];
-    spaceState.fetch.mockResolvedValue([{ id: 'ws-1', state: 'ready' }]);
+    spaceState.fetch.mockResolvedValue([{ id: 'ws-1', state: 'Ready' }]);
     const { router } = await setup();
     await router.push('/ws-1/app');
     // 守卫在一次导航中可能执行多次（重定向链），此处断言「确实拉取过列表」而非具体次数

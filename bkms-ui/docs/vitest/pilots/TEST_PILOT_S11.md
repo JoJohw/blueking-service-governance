@@ -17,7 +17,7 @@
 
 | 轮次 | 结果 | 根因 | 修复 |
 |---|---|---|---|
-| 1 | 2/3 | 「点击页签切换内容」失败：页签经 `useUrlQuerySync` 与路由 query 双向同步，mock 路由下点击后 URL 不回写，组件不切换 | 移除该用例（jsdom 下非缺陷表现），登记 `ai_unsure.md` 与评审 backlog 待专项处理 |
+| 1 | 2/3 | 「点击页签切换内容」失败：页签经 `useUrlQuerySync` 与路由 query 双向同步（写侧 `router.replace`、读侧 `route.query`），mock 路由下点击后 query 不回写，组件不切换 | 移除该用例（jsdom 下非缺陷表现，真实浏览器可切换）；改造 mock 路由为「query 可写 + replace 写回」后可覆盖 |
 | 2 | 2/2 | — | 连跑 3 次稳定（约 3s/次） |
 
 ## 3. 可复用模式
