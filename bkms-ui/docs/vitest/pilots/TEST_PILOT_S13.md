@@ -25,12 +25,12 @@
 | 轮次 | 结果 | 根因 | 修复 |
 |---|---|---|---|
 | 1 | 4/10 | ① spy `history.back` 拿到 0 次调用：vue-router 的 back = `go(-1)`；② 三组跳转断言失败：`router.replace` 未返回 Promise，`await` 拿不到完成；③ 空列表用例期望 fetch 1 次，实际 3 次 | spy 改为 `history.go` 并断言 `toHaveBeenCalledWith(-1)`；断言改 `waitFor` 等路由变化；拉取次数改为 `toHaveBeenCalled()`（一次导航可能多次触发守卫，次数是实现细节） |
-| 2 | 9/10 | 「推导不出上级 → 退回浏览器后退」用例失败：所有路由被 `setupLayouts` 包裹，`matched.length ≥ 2`，`resolveParent` 恒能取到上级或默认子路由，该分支在真实路由表下不可达 | 移除该用例（V 回归台账的 9），在用例文件与 `ai_unsure.md` 双处留痕 |
+| 2 | 9/10 | 「推导不出上级 → 退回浏览器后退」用例失败：`resolveParent` 只有在 `matched.length < 2`（router.ts:303）或「父级记录无 name 且无默认子路由」（:311-316）时才返回 undefined，真实路由表未覆盖到后者 | 移除该用例（V 回归台账的 9），原因写入用例文件注释 |
 | 3 | **10/10** | 评审补 `hasHistory` 优先于 fallback 的分支（原路径清单未列，源码 `if (hasHistory)` 早于 fallback 判断） | 新增 1 条用例，连跑 3 次稳定 |
 
 ## 3. 发现的问题（非测试问题）
 
-1. **`smartGoBack` 的退化分支（`resolveParent` 返回 undefined → 退回浏览器后退）在当前路由表下不可达**：所有路由经 `setupLayouts` 包裹，matched 至少 2 层。属「防御性代码」，暂不判定为缺陷，已在 `ai_unsure.md` 登记待业务确认是否保留。
+1. **`smartGoBack` 的退化分支（`resolveParent` 返回 undefined → 退回浏览器后退）未覆盖**：触发条件是「父级路由记录无 name 且无默认子路由」（router.ts:311-316），真实路由表下需专门构造该场景。属防御性代码，暂不判定为缺陷。
 
 ## 4. 验收结果（对照指南 §4.2）
 

@@ -24,14 +24,14 @@
 | 准确性 | 24 | 25 | 断言与源码核实一致（index.vue:238-241 禁用状态机、deploy-application.vue:387-388 校验拦截、deploy-history.vue:259-261 首行禁用、preview-rollback.vue:153-179 确认链）；部署参数断言含回填值 -1 |
 | 有效性 | 15 | 15 | 变异 4/4 捕获且每变异仅命中 1 条对应用例；校验拦截为「错误态出现 + 预览未调用」双断言 |
 | 可执行性 | 10 | 10 | 约 5.5~7.5s/次，连跑 3 次稳定，无 sleep；`findBy*` 承载 bkui 延迟显隐 |
-| 规范性 | 9 | 10 | 标题模板、cleanup、beforeEach 重置单例 ref；2 处类名查询（`.bk-select` 触发器 / `.is-error` 信号）已在 ai_unsure 登记 -1 |
+| 规范性 | 9 | 10 | 标题模板、cleanup、beforeEach 重置单例 ref；2 处类名查询（`.bk-select` 触发器 / `.is-error` 信号）——bkui 无测试 id 可用，属必要代价 -1 |
 | 可维护性 | 8 | 10 | `openFilledDeployApplication` 工厂与 stub 契约注释清晰；文件级 mock + importActual 的双态组件需读者理解成本 -2 |
 
 ## 4. 问题闭环总表
 
 | 级别 | 内容 | 状态 |
 |---|---|---|
-| Low | `.bk-select` / `.is-error` 类名查询（bkui 无测试 id 可用） | ⏸ 维持（ai_unsure 登记，组件库升级时复查） |
+| Low | `.bk-select` / `.is-error` 类名查询（bkui 无测试 id 可用） | ⏸ 维持（组件库升级时需复查这两处类名） |
 | Low | stub 与真实组件并存（importActual），文件内有注释说明 | ⏸ 维持（S15 特有的容器/子件分层需求所致） |
 
 ## 5. 运行实证

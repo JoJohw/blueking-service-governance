@@ -300,7 +300,7 @@ describe('Helm 部署/更新侧滑：部署流程', () => {
     // 侧滑 wrapper 显隐由 bkui modal 内部 setTimeout 置位，findBy 自带重试
     await userEvent.click(await screen.findByRole('button', { name: '下一步：预览部署' }));
     // 正向消费信号：表单项进入错误态（bkui 错误文案经 tooltip 展示，jsdom 不可断言，
-    // 以 form-item 的 is-error 态为可见信号，详见 ai_unsure 登记）
+    // 以 form-item 的 is-error 态为可见信号）
     await waitFor(() => expect(document.body.querySelector('.bk-form-item.is-error')).toBeTruthy(), { timeout: 5000 });
     expect(mocks.previewHelmDeploy).not.toHaveBeenCalled();
   });
