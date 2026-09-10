@@ -32,6 +32,8 @@
 | 2026-09-08 | S15 | **文件级 `vi.mock` 是全文件生效的**：同一路径既要给容器页做 stub、又要在别的用例渲染真实组件时，直接渲染会拿到 stub | mock 工厂对整个测试文件生效 | 直接渲染真实组件改用 `vi.importActual` 绕过 stub（deploy-history/preview-rollback） | PILOT_S15 §1/§2 |
 | 2026-09-08 | S15 | **bkui Dialog/Sideslider 显隐由内部 setTimeout 置位**（modal/index.js:397-406），isShow false→true 后 wrapper 延迟可见；FormItem 默认错误文案走 tooltip 不可断言 | bkui modal 源码证实；tooltip 依赖 v-bk-tooltips 指令 | 弹层查询一律 `findBy*`；校验拦截以 `is-error` 态（body 级查询，侧滑 teleport 到 body）为信号 + 负断言兜底 | PILOT_S15 §2 / REVIEW_S15 §7 |
 | 2026-09-08 | S15 | **`use-helm-deploy.ts` 导出模块级单例 ref**（deployHistoryList/chartList/latestDeployStatus），测试间状态泄漏 | 组件外共享状态设计 | beforeEach 手动重置三个 ref；同类「模块级共享 ref」场景需逐个排查 | PILOT_S15 §2 |
+| 2026-09-10 | S1 | **全局注册组件（如 `<RouterView>`，由 `app.use(router)` 注入）不走模块解析，`vi.mock('vue-router')` 换不掉**；且 create.vue 用 `v-slot="{ Component }"`，桩不回传插槽参数会直接崩渲染 | 模板 `resolveComponent` 解析路径与模块 mock 不同 | render 时 `global.components` 注册 RouterView 桩并回传 `{ Component: 占位组件 }`；与 S15 的 `vi.importActual` 同属「mock 边界」问题 | PILOT_S1 §2 / REVIEW_S1 §7 |
+| 2026-09-10 | S1 | `input[type=search]` 的 ARIA role 是 `searchbox`；结果页 `$t('{name} 应用创建成功', name)` 直译后保留 `{name}` 占位 | ARIA 规范映射；i18n 直译 mock 不插值 | 查询用 `getByRole('searchbox')`；断言用正则匹配固定文案片段 | PILOT_S1 §2 |
 | 2026-09-08 | 全局 | **`pnpm test:unit`（watch 模式）与 `pnpm vitest run` 结果不一致**：watch 只重跑变更文件、其余用历史缓存；全量并行跑时 S16 两条用例挂（默认 5s 超时在 21 文件并行抢 worker 下不够，且超时中断的新建态弹窗 DOM 残留 body，污染同文件下一条编辑态用例的全局查询） | watch 增量缓存 + 并行资源竞争 + teleport 弹窗超时残留级联 | 9 个缺 `testTimeout` 的场景文件统一补 `vi.setConfig({ testTimeout: 15_000 })`；多 worker 全量复跑 121/121 全绿；**验收口径以 `vitest run` 全量为准**，watch 结果不可作为全绿依据 | 本表 + 各场景文件 |
 
 ## 实施小结
@@ -50,6 +52,7 @@
 | 2026-09-08 | S9 | 7（列表 2 + 删除 5，撤下重建） | 7（与台账一致） | 否（vxe 纯字段列不渲染，方案 A：stub 表格 + 垫片并用） | 连跑 3 次稳定，变异 2/2 捕获 | 详见 `../pilots/TEST_PILOT_S9.md` 与 `../reviews/TEST_REVIEW_S9.md`（86/100） |
 | 2026-09-08 | S17 | 3 | 3（暂无组件空态 / 分组展开显示组件名与安装入口 / 点击安装弹出侧滑） | 否，3 轮迭代（i18n 注入路径、分组头定位） | 约 4.2~6s/次，连跑 3 次稳定 | **自定义 div 列表（非 vxe）无需表格垫片**；重型动态表单侧滑 stub 为按 `visible` 渲染标记的占位（契约对齐 v-model:visible）。详见 `../pilots/TEST_PILOT_S17.md` 与 `../reviews/TEST_REVIEW_S17.md`（88/100，变异 3/3） |
 | 2026-09-08 | S15 | 7 | 7（更新入口禁用/校验拦截/部署正向主路径/预检仍部署/预检取消/回滚入口约束/回滚确认，台账预估 4~5 校准） | 否，4 轮迭代（文件级 mock 与真实组件并存、bkui 弹层延迟显隐、i18n 插值、tooltip 文案不可断言） | 约 5.5~7.5s/次，连跑 3 次稳定 | **两条新打法**：① 同路径 stub + 真实组件并存用 `vi.importActual`；② bkui 弹层 isShow 切换经 setTimeout 置位，查询必须 `findBy*`，Form 错误文案走 tooltip 时用 `is-error` 态信号。详见 `../pilots/TEST_PILOT_S15.md` 与 `../reviews/TEST_REVIEW_S15.md`（88/100，变异 4/4） |
+| 2026-09-10 | S1 | 8 | 8（步骤条 tRPC 三步/Helm 两步、搜索空态、模板跳转、校验拦截、步骤前进、创建成功、创建失败；台账预估 4~5 校准） | 否，3 轮迭代（RouterView 全局注册不走模块 mock、插槽参数回传、searchbox role） | 约 4.4~5.6s/次，连跑 3 次稳定 | **新打法**：全局注册组件（RouterView）须在 render 的 `global.components` 注册桩，且带 v-slot 的桩要回传参数；向导 step 由父容器持有 → harness 复现流转。详见 `../pilots/TEST_PILOT_S1.md` 与 `../reviews/TEST_REVIEW_S1.md`（88/100，变异 4/4） |
 
 ## 已知环境事实（实施前置认知，非踩坑）
 
