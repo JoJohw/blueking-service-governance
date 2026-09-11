@@ -1,138 +1,122 @@
 # Vitest 交互测试指南
 
-> 本文件是本次 Vitest 测试需求的**最高基准（章程）**。下述两层方案文件必须符合本指南；方案与本指南冲突时，以本指南为准修订方案。
+> 本文件是 Vitest 场景测试的**最高基准（章程）**。与本指南冲突时，以本指南为准。
 >
-> 文件体系（均位于 `docs/vitest/`，按 guides / pilots / reviews 分夹）：
+> 文件体系（均位于 `docs/vitest/`）：
 >
 > ```
-> guides/TEST_GUIDELINE.md          ← 本文件：设计目的 + 方法依据 + 规范约束 + 试点策略（章程层）
-> guides/TEST_SCENARIOS_ROUTES.md   ← 路由级全量枚举评分 + 场景台账（完备性枚举层 / 执行层，审批入口）
-> guides/TEST_PILOT_LOG.md          ← 试点与实施经验记录（运营层，实施问题与回写去向）
-> pilots/TEST_PILOT_SXX.md          ← 每场景实施记录（实施过程、模板要点、验收结果）
-> reviews/TEST_REVIEW_SXX.md        ← 每场景独立评审记录（评分、问题闭环、放行结论、backlog）
-> test/scenarios/*.test.ts          ← 最终用例（落地层，产出物）
+> guides/TEST_GUIDELINE.md          ← 本文件：目的 + 方法 + 规范 + 流程（章程）
+> guides/TEST_SCENARIOS_ROUTES.md   ← 路由全量枚举评分 + 场景台账（审批与验收摘要）
+> guides/TEST_PLAYBOOK.md          ← 跨场景可复用打法（按主题，不按 S 编号）
+> guides/TEST_PILOT_LOG.md          ← 已知问题速查（仅影响后续写法的环境事实）
+> archive/pilots|reviews/           ← 历史过程稿（冻结，不再更新、新场景禁止续写）
+> test/scenarios/*.test.ts          ← 用例落地层（文件头注释 = 场景说明）
 > ```
+>
+> **新场景默认零新增 md**：只更新台账场景卡 + 测试文件头；禁止再建 `TEST_PILOT_SXX` / `TEST_REVIEW_SXX`。仅当沉淀出**新的跨场景打法**时，追加一行到 `TEST_PLAYBOOK.md`。
 
-## 1. 设计目的（为什么做这件事）
+## 1. 设计目的
 
-1. **固化复杂交互（回归保护网）**：本系统交互密度高（多步表单、多态切换、异步多状态）。新同事在不熟悉业务的情况下改动代码，容易无意破坏既有交互。场景级用例将「用户可感知的正确行为」固化为可执行断言，一旦行为被破坏，对应用例立即失败。
-2. **用例即文档**：用例标题全部使用业务语言（「当用户____时，应____」），按业务模块分组。新同事跑一遍 `pnpm test:unit`，输出的用例清单就是一份可运行的功能说明书——比读源码快，比口头交接可靠。
-3. **降低回归成本**：没有测试时，每次改动需要人工回归所有相关功能；有测试时，回归成本 = 跑一次测试套件的时间。
-4. **提升重构与升级信心**：断言的是用户看到的行为而非内部实现，内部重写、依赖升级，只要用户可见行为不变，用例不用改。
+1. **固化复杂交互（回归保护网）**：场景级用例将「用户可感知的正确行为」固化为可执行断言。
+2. **用例即文档**：`it` 标题使用业务语言；跑 `pnpm test:unit` 的输出即功能说明书。
+3. **降低回归成本 / 提升重构信心**：断言用户可见行为，不绑内部实现。
 
-### 非目标（明确不做的，防止过度设计）
+### 非目标
 
-- 不追求 100% 覆盖率，只覆盖入选场景（评分依据见下层文件）。
-- **不测「直线逻辑」**（V=1：无分支、纯展示、单步提示）——为它们写路径用例属于"为指标而测试"，且简单 UI 随视觉走查频繁微调，上路径用例会让样式调整直接打红测试。简单交互靠人工走查，至多补一条冒烟用例保证不报错。
-- 不测样式细节（颜色、间距、像素级布局）。
-- 不做整页端到端链路（Vitest 与 e2e 职责分离，互不参照）。
-- 不测纯展示组件（无交互逻辑）。
+- 不追求 100% 覆盖率；不测直线逻辑（V=1）、样式细节、整页 E2E、纯展示组件。
 
-## 2. 方法依据（本方案的可信度来源）
+## 2. 方法依据
 
-> 本章回答：本方案以什么为依据；挑选与颗粒度为何有数据支持，而非主观判断。
-
-### 2.1 依据链（从代码事实到测试设计）
+### 2.1 依据链
 
 ```
-① 权威枚举基线：src/modules/router.ts 路由表
-   └─ 用户可达页面的权威清单，来自代码而非人工回忆 → 保证"不遗漏"
-② 风险评分：使用频率 × 出错影响 × 交互复杂度（各 1~3 分）
-   └─ 总分 ≥7 必做候选 / 4~6 备选 / ≤3 落选 → 保证"做与不做都有据"
-③ 测试设计方法（专业测试方法论，见 2.2）→ 保证"单个场景内部覆盖全"
+① src/modules/router.ts 路由表 → 不遗漏
+② 频率 × 影响 × 复杂度（各 1~3）→ ≥7 入选 / 落选须留理由
+③ 基本路径 / 等价类 / 判定表 / 状态迁移 → 场景内 V 定量
 ```
 
-### 2.2 测试设计方法与适用对象
+### 2.2 挑选与颗粒度
 
-| 方法 | 出处 | 适用对象 | 带来的数据支持 |
-|---|---|---|---|
-| **基本路径测试法**（McCabe 圈复杂度） | 经典白盒方法，本项目落地为「数用户可感知的结果分支」 | 功能流程、状态机、路由逻辑 | **V = 判定分支数 + 1**，直接给出一个场景最少要写的用例数，颗粒度由此定量确定 |
-| 等价类划分 + 边界值分析 | 经典黑盒方法 | 输入校验（表单、命名规则） | 合法/非法/边界三类输入各至少一例 |
-| 判定表 | 经典黑盒方法 | 多条件组合（如 key 重复 × 值为空） | 条件组合逐行对应期望行为 |
-| 状态迁移 | 经典黑盒方法 | 查看/编辑多态、新建/编辑双模式 | 状态 × 动作矩阵，覆盖每条迁移边 |
-| 错误猜测 / 二阶风险清单 | QA Skill-Suite（`.codebuddy/skills/suite-chain2026-hujiu1992__skillhub`） | 破坏性操作、输入上传、异步流程 | P0/P1 必须正反+边界；重复提交/超时/取消/权限等二阶风险显式标注（推断/需确认） |
-| 覆盖模型检查 | QA Skill-Suite 测试设计模板 | 每份方案文件末尾 | 正向/反向/边界/权限/异常/状态等维度逐项检查缺口 |
+- 只做评分表入选对象；禁止未经评分直接新增场景。
+- **黄金法则**：含 ≥1 个判定节点才建场景；破坏性操作例外。
+- **V = 用户可感知判定分支数 + 1**（基本路径法）；写入路径清单交审批，用例数 ≈ V。
+- 一个 `it` = 一个用户可感知目标；`describe` =「模块：交互主题」。
 
-> 另两个已装 skill：`软件测试标准`（ISO/IEC/IEEE 29119，术语与流程标准）、`软件测试全场景`（21 领域方法库）——在需要标准引用或专项方法时按需加载，不作为日常流程强制项。
+## 3. 规范约束（违反即打回）
 
-### 2.3 挑选与颗粒度的直接答案
+1. 场景必须来自评分表入选对象；新增先补评分再立项。
+2. 写用例前先产出路径清单（含校准 V）交审批。
+3. `it` 标题：**「当用户____时，应____」**；`describe`：**「模块：交互主题」**。
+4. 查询以 `getByRole` / `getByText` / `findBy*` 为主；允许 placeholder / displayValue / `getByTestId`（仅 stub 契约）；禁止依赖 CSS 类名与内部 DOM 结构。
+5. 交互用 `@testing-library/user-event`；断言用户可见行为（组件契约单测可用 VTU emit，见 PLAYBOOK）。
+6. API 一律 `vi.mock`，禁止真实请求；复用 `test/setup.ts`。
+7. **共享 helpers（禁止重复造轮子）**：`vi.mock` 内须动态 `import()`，避免 hoisting TDZ。
 
-- **如何挑选**：只做评分表入选对象（总分 ≥7 或经审批批准的候选）；落选对象必须在完备性对照表中留有评分与理由；禁止未经评分直接新增场景。
-- **黄金法则（场景准入门槛）**：交互含 **≥1 个判定节点**（if/else、异步状态、权限分支）→ 用路径法覆盖；「点击 → 弹提示」式直线逻辑 → 不建场景。唯一例外：**破坏性/不可逆操作**（如删除确认）影响权重优先于节点数。原则：用 20% 的路径用例覆盖 80% 最易出错的业务分支，剩余简单逻辑靠人工走查。
-- **颗粒度多大**：一个 `it` = 一个用户可感知目标；一个场景的用例数 = 该场景的 V 值（独立路径数）；一个 `describe` = 一个模块的一个交互主题。不做单函数级、不做整页级。
+   | 文件                           | 用途                      |
+   | ------------------------------ | ------------------------- |
+   | `test/helpers/mock-i18n.ts`    | vue-i18n                  |
+   | `test/helpers/mock-router.ts`  | vue-router                |
+   | `test/helpers/mock-table.ts`   | vxe 垫片 + 表格 stub      |
+   | `test/helpers/mock-service.ts` | Proxy anyService          |
+   | `test/stubs/monaco-editor.ts`  | monaco alias              |
+   | `test/stubs/bkui-vue-lite.ts`  | 轻量 bkui（按需 vi.mock） |
 
-## 3. 规范约束（所有方案与用例的强制基准，违反即打回）
+8. 全局 `afterEach(cleanup)` 已在 `test/setup.ts`；勿重复手写。VTU 场景须自行 `unmount`（见 PLAYBOOK）。
+9. P0/P1 须正向 + 反向 + 边界/异常。
+10. 推断规则标 `推断/需确认`。
+11. 场景用例放 `test/scenarios/`，文件名 = 业务模块名（无 S 前缀）；编号映射见台账。
+12. 单文件 **tests 段** < 10s（不含冷启动编译）。
+13. **场景文件头注释**（强制，见 §4.4）：编号 + 台账链接、V 与路径、stub 边界、backlog；禁止写过程轮次与评审分数。
 
-1. 场景必须来自评分表入选对象；新增场景先补评分再立项。
-2. 每个场景写用例前，必须先产出「路径清单（含校准后的 V 值）」交审批，批准后才写代码。
-3. `it` 标题统一模板：**「当用户____时，应____」**；`describe` 格式「模块：交互主题」。
-4. 查询以 `getByRole` / `getByText` / `findBy*`（异步）为主；允许补充 `getByPlaceholderText` / `getByDisplayValue`（用户可感知属性）与 `getByTestId`（仅限 stub 契约标记）；禁止依赖 CSS 类名与内部 DOM 结构。
-5. 交互用 `@testing-library/user-event`；断言用户可见行为，禁止断言内部状态（如 `data.count === 1`）。
-6. API 一律 `vi.mock` 隔离，禁止真实请求；复用 `test/setup.ts` 垫片与现有 stub 链。
-7. **共享 mock helpers（禁止重复造轮子）**：i18n / vue-router / vxe-table / anyService 四类高频 mock 已抽取到 `test/helpers/` 目录，新场景**必须从共享 helpers 导入，禁止在文件内重新手写**。由于 Vitest 会将 `vi.mock` 提升到文件顶部（hoisting），在 `vi.mock` 内引用 helpers 时**必须使用动态 `import()`**，避免 Temporal Dead Zone 导致 `ReferenceError`。示例：
-   ```typescript
-   // ✅ 正确：动态 import 避免 hoisting TDZ
-   vi.mock('vue-i18n', async () => (await import('../helpers/mock-i18n')).i18nMockFactory());
-   vi.mock('vue-router', async () => {
-     const { createRouterMock } = await import('../helpers/mock-router');
-     return createRouterMock({ route: { path: '/ws-1/app', name: 'app' } });
-   });
+## 4. 场景实施与验收
 
-   // ❌ 错误：静态 import + 直接传引用会被 hoisting 导致 ReferenceError
-   import { i18nMockFactory } from '../helpers/mock-i18n';
-   vi.mock('vue-i18n', i18nMockFactory);  // 💥 hoisting 后 i18nMockFactory 还未初始化
-   ```
-   现有共享 helpers 清单：
-   | 文件 | 导出 | 用途 |
-   |------|------|------|
-   | `test/helpers/mock-i18n.ts` | `i18nMockFactory`, `i18nGlobalMocks`, `i18nPlugin`, `I18nTStub` | vue-i18n mock + $t 全局注入 |
-   | `test/helpers/mock-router.ts` | `createRouterMock` | vue-router mock（支持自定义路由属性和 push/replace 断言） |
-   | `test/helpers/mock-table.ts` | `installVxeShims`, `tableMockFactory`, `TableStub`, `TableColumnStub` | vxe-table jsdom 垫片 + 表格 stub |
-   | `test/helpers/mock-service.ts` | `createAnyServiceMock` | Proxy 兜底 service mock（带 warning 追踪） |
+> 链路可行性已由历史试点验证；过程稿见 `archive/pilots/`（冻结）。打法见 `TEST_PLAYBOOK.md`。
 
-   **模块级 stub（`test/stubs/`）**：体积大或 vitest SSR 无法解析入口的第三方包，用 stub 文件 + `vite.config.mts` `test.alias` / 用例内 `vi.mock` 指向。新增 stub 须登记本表，禁止散落在场景文件旁。
-   | 文件 | 用途 |
-   |------|------|
-   | `test/stubs/monaco-editor.ts` | monaco-editor 极简 stub（`vite.config.mts` test.alias） |
-   | `test/stubs/bkui-vue-lite.ts` | RepoRefSelect Input 路径轻量 bkui stub（S19 用例内 `vi.mock`） |
-8. **全局 cleanup 已接管，不要手写**：`test/setup.ts` 已注册全局 `afterEach(cleanup)`，每个用例结束后自动清理 Testing Library 创建的 DOM。新文件**不需要**再手动 `import { cleanup }` 或编写 `afterEach(cleanup)`。如果 `afterEach` 中有其他逻辑（如 `vi.clearAllMocks()`），只写该逻辑即可，不用加 `cleanup()`。
-9. P0/P1 场景必须同时具备正向 + 反向 + 边界/异常用例（QA Skill-Suite 规则）。
-10. 推断的业务规则（如重复提交拦截）在用例中标注 `推断/需确认`，先确认再固化断言。
-11. **目录约定**：场景级用例统一放 `test/scenarios/`（`vite.config.mts` 的 include 已覆盖），一个场景族一个文件，文件名 = 业务模块名（不带 S 编号前缀），编号与文件的映射关系维护在 `TEST_SCENARIOS_ROUTES.md` 台账。
-12. **执行时间口径**：单文件**用例执行时间**（Vitest 输出的 tests 段）< 10s；文件总 Duration 含 transform/collect 编译开销，重型页面冷启动 7~13s 属正常，不计入场景执行口径。实测数据见 `TEST_PILOT_LOG.md` 审计记录。
+### 4.1 实施流程
 
-## 4. 场景实施流程与验收标准
+1. 摸底源码与 `defineExpose` 契约 → 再写 stub。
+2. 路径清单（V + it 草稿）→ 审批。
+3. 写用例（规范 §3 + PLAYBOOK）。
+4. 验证（§4.2）。
+5. 收尾（§4.3）：**只改台账场景卡 + 测试文件头**；有新打法则改 PLAYBOOK 一行。
 
-> 首个场景（S12 试点）已验证整条链路可行（依赖 → 渲染 → 交互 → mock → 断言 → 规范合规），试点过程、选定理由与结论见 `../pilots/TEST_PILOT_S12.md`。后续每个场景按下述流程实施。
+### 4.2 验收标准
 
-### 4.1 实施流程（每个场景）
+- [ ] 路径清单已审批，与用例一一对应
+- [ ] 符合 §3
+- [ ] `vitest run` 全绿且连跑 3 次无 flaky（watch 结果不作全绿依据）
+- [ ] tests 段耗时符合条款 12
+- [ ] 变异 ≥2 处注入后对应用例变红，并立即恢复业务代码
+- [ ] 文档性验收：不熟模块的同事能从 `it` 标题复述交互（可人工）
 
-1. **摸底**：通读被测组件源码，识别查看/编辑态、判定分支、事件流与子组件契约；**先读真实 `defineExpose` 契约（同步/异步）再写 stub**。
-2. **路径清单**：数「用户可感知判定分支」得独立路径数 V，列出 it 草稿（业务语言，见 §2.2 方法表）。
-3. **审批**：路径清单交业务负责人确认后再写用例，用例与清单一一对应。
-4. **写用例**：按 §3 规范与既有场景沉淀的模板实施（Harness 驱动、可观察 `vi.fn`、消极断言先等消费信号，见 §3 条款与 pilots 各文档）。
-5. **验证**：全绿 + 连跑 3 次无 flaky + 变异验证（见 4.2）。
-
-### 4.2 验收标准（逐场景）
-
-- [ ] 路径清单先通过审批，用例与路径清单一一对应
-- [ ] 用例 100% 符合 §3 规范条款（可逐条对照检查）
-- [ ] `pnpm test:unit` 全绿且连跑 3 次无 flaky
-- [ ] 单文件用例执行时间满足 §3 条款 12 的执行时间口径
-- [ ] **变异验证**：向被测代码注入至少 2 处错误逻辑（条件取反 / 删状态变更等），相关用例必须全部变红，验证后立即恢复业务代码并核对 diff
-- [ ] **文档性验收**：把用例标题清单给一位不熟悉该模块的同事看，能复述出该功能的交互行为，即算"用例即文档"达成
+**不要求**撰写独立六维评审 md 或多轮复审报告；验收字段写入台账场景卡即可。
 
 ### 4.3 场景收尾
 
-- 通过 → 台账场景卡更新状态；实施小结与问题记入 `TEST_PILOT_LOG.md`；可复用模式沉淀至本场景 pilot 文档；影响规范的结论必须回写本文件对应条款。
-- 不通过（用例脆弱 / 规范难落地）→ 停下修订指南或方案，**不强行铺开**；结论同样记入 `TEST_PILOT_LOG.md`。
+- 通过 → 更新 `TEST_SCENARIOS_ROUTES.md` 场景卡（用例路径、V、连跑、变异、backlog、打法指针）；仅影响后续写法的问题记入 `TEST_PILOT_LOG.md`；新打法追加 `TEST_PLAYBOOK.md`；规范变更回写本文件。
+- 不通过 → 修订指南或缩小范围，**不强行铺开**。
+
+### 4.4 测试文件头约定
+
+```typescript
+/**
+ * 场景级测试：<模块>（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md Sxx）
+ *
+ * 覆盖：… → V = n
+ * stub/mock：…
+ * backlog：…（可选）
+ */
+```
 
 ## 5. 文件职责边界
 
-| 文件 | 职责 | 内容纪律 |
-|---|---|---|
-| `TEST_GUIDELINE.md`（本文件） | 章程：目的、方法依据、强制规范、实施流程与验收标准 | 只放稳定的原则与规则，不放实施过程记录 |
-| `TEST_SCENARIOS_ROUTES.md` | 完备性枚举 + 场景台账：路由级全量评分、页面级基本路径预估、S 编号场景卡与入选/落选结论 | 只放评估结论与场景明细，实施进度不入台账（归 PILOT_LOG） |
-| `TEST_PILOT_LOG.md` | 运营记录：实施问题、实施小结、回写去向 | 实施过程记录集中于此 |
-| `pilots/TEST_PILOT_SXX.md` | 每场景实施记录：依赖选型、mock 边界、迭代过程、可复用模式、验收结果 | 与 `reviews/` 成对，每场景各一份 |
-| `reviews/TEST_REVIEW_SXX.md` | 每场景独立评审记录：六维评分、问题闭环表、放行结论、遗留 backlog | 评审结论定稿后不再追加，新问题走 PILOT_LOG |
+| 文件                       | 职责                     | 纪律                          |
+| -------------------------- | ------------------------ | ----------------------------- |
+| `TEST_GUIDELINE.md`        | 章程                     | 只放稳定规则                  |
+| `TEST_SCENARIOS_ROUTES.md` | 枚举 + 台账 + 验收摘要   | 不放过程轮次                  |
+| `TEST_PLAYBOOK.md`         | 跨场景打法               | 按主题；每条 ≤3 句 + 示例路径 |
+| `TEST_PILOT_LOG.md`        | 已知问题速查             | 只记会影响后续写法的事实      |
+| `archive/**`               | 历史 pilot/review/元文档 | **冻结**；新场景禁止新增      |
+| `test/scenarios/*.test.ts` | 用例 + 文件头说明        | 头注释不含评审分              |
+
+历史元文档（冻结）：`archive/reviews/VITEST_SCHEME_REVIEW.md`。

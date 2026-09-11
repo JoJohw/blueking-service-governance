@@ -1,14 +1,14 @@
 # 路由级测试评估与场景台账
 
-> 定位：本文件是唯一的**完备性枚举层 + 场景执行台账**——以 `src/modules/router.ts` 的权威路由表为基准逐页面评估「做/不做」，并集中维护全部场景（S 编号）的明细。
+> 定位：唯一的**完备性枚举层 + 场景执行台账**——以 `src/modules/router.ts` 为基准评估「做/不做」，并维护 S 编号场景卡（含验收摘要）。
 >
-> 评估方法：按 `TEST_GUIDELINE.md` 三步法（全量枚举 → 风险评分 → 场景展开）执行，并遵循 QA Skill-Suite 测试设计规则：**P0/P1 功能必须有正向 + 反向 + 边界/异常场景**；状态型流程覆盖二阶风险（重试/取消/超时/重复提交）；输入上传型模块覆盖恶意输入（特殊字符/emoji/长文本/注入/危险文件名）；破坏性操作推断生命周期约束（标 `推断/需确认`）。
+> 评估方法见 `TEST_GUIDELINE.md`。打法见 `TEST_PLAYBOOK.md`。已知问题见 `TEST_PILOT_LOG.md`。
 >
-> **状态仅两值**：`✅ 入选`（建场景，持 S 编号）/ `❌ 落选`（不建场景；原因与升级路径一律入备注）。实施进度属运营信息不入台账，见 `TEST_PILOT_LOG.md` 与各场景卡的记录引用。
+> **状态仅两值**：`✅ 入选` / `❌ 落选`。新场景**零新增 md**：只更新本文件场景卡 + 测试文件头；历史过程稿在 `archive/`（冻结）。
 
 ## 1. 路由全量清单与评分（权威枚举）
 
-> 枚举来源：`src/modules/router.ts` routes 表（唯一用户可达页面清单）。评分三维度：使用频率 / 出错影响 / 交互复杂度（各 1~3 分，标准见指南）。
+> 枚举来源：`src/modules/router.ts`。评分：频率 / 影响 / 复杂度（各 1~3）。
 
 | 路由 | 名称 | 页面 | 频率 | 影响 | 复杂度 | 总分 | 状态 |
 |---|---|---|---|---|---|---|---|
@@ -23,323 +23,258 @@
 | ↳ `detail/` 其余（overview/observation/polaris/network-access/alert-record/operation-history/base-info） | — | 查看/监控展示型子页 | 2 | 1 | 1 | 4 | ❌ 落选（只读展示，无判定节点） |
 | ↳ `application/components/`（topo、image-select、pipeline-params-form、fields、repo-selector 等构建/创建子件） | — | 创建/构建流程子组件 | — | — | — | — | ❌ 落选（不单独建场景，随 S1/S2/S18 连带覆盖） |
 | ↳ `application/components/delete-app-dialog.vue` | — | 删除应用确认弹窗 | 2 | 3 | 1 | 6 | ❌ 落选（不单独建场景，随 S6 连带覆盖） |
-| ↳ `application/global-view.vue`、`result.vue` | — | 全局视图 / 创建结果页 | — | — | — | — | ❌ 落选（已摸底：result 为创建结果反馈页，随 S1 连带；global-view 评分 6（频2/影2/复2），浏览+筛选型，筛选复杂化可复评） |
+| ↳ `application/global-view.vue`、`result.vue` | — | 全局视图 / 创建结果页 | — | — | — | — | ❌ 落选（result 随 S1；global-view 评分 6 落选） |
 | `:space/component` | component | 组件市场列表（浏览部分） | 2 | 1 | 1 | **4** | ❌ 落选（浏览型，无判定节点） |
-| ↳ `component-management.vue` 弹层 + `marketplace/components/`（detail/params-table/ref-var-panel） | — | 组件新建/编辑向导及其子件 | 2 | 3 | 3 | **8** | ✅ 入选（S12） |
+| ↳ `component-management.vue` 弹层 + `marketplace/components/` | — | 组件新建/编辑向导及其子件 | 2 | 3 | 3 | **8** | ✅ 入选（S12） |
 | `:space/env` | env | 环境管理列表（浏览 + 创建/删除入口） | 2 | 3 | 2 | **7** | ✅ 入选（S9） |
-| ↳ `env/public-env-vars/`（env-var-form-dialog/delete-env-var-dialog/sideslider） | — | 公共环境变量增删改 | 2 | 3 | 2 | **7** | ✅ 入选（S16） |
-| ↳ `env/cluster-components/`（install-sideslider/components-config/config-forms） | — | 集群组件安装与配置 | 1 | 3 | 3 | **7** | ✅ 入选（S17） |
-| ↳ `env/` 其余子页（detail/setting/lane-config/apm-instance/basic-info） | — | 环境详情/设置/泳道配置等 | 1~2 | 2 | 2 | 5~6 | ❌ 落选（查看/配置为主，低频可复评） |
-| `:space/env/:envId/health` | clusterHealthDiagnosis | 集群健康诊断 | 1 | 2 | 2 | **5** | ❌ 落选（低频运维诊断，可复评） |
-| `:space/env/:envId/port-pool` | clusterPortPool | 端口池管理 | 1 | 2 | 2 | **5** | ❌ 落选（低频配置页，可复评） |
-| `:space/basic`（app-default-config/deploy-config） | basicItem | 应用默认配置编辑 | 2 | 2 | 2 | **6** | ❌ 落选（低频配置编辑，可复评） |
-| `:space/basic`（base-info/operation-history） | basicItem | 基础信息/操作历史 | 2 | 1 | 1 | **4** | ❌ 落选（只读，无判定节点） |
-| `:space/plugin/:menuName`（component-config 等） | componentList | 插件配置 | 1 | 2 | 2 | **5** | ❌ 落选（低频插件配置，可复评） |
-| `/platform`（administrator/workspace） | platform 等 | 平台管理（管理员） | 1 | 2 | 2 | **5** | ❌ 落选（低频管理员页，可复评） |
-| `/home`、`/space-list` | home/spaceList | 首页 / 空间列表 | 1 | 1 | 2 | **4** | ❌ 落选（浏览/选择型） |
-| `/403`、`/:pathMatch(.*)*` | 403/404 | 静态页 | — | — | — | — | ❌ 落选（静态页；跳转触发逻辑已入选 S13） |
-| — | — | `smartGoBack` 智能返回（router.back 覆写） | 3 | 2 | 3 | **8** | ✅ 入选（S13） |
+| ↳ `env/public-env-vars/` | — | 公共环境变量增删改 | 2 | 3 | 2 | **7** | ✅ 入选（S16） |
+| ↳ `env/cluster-components/` | — | 集群组件安装与配置 | 1 | 3 | 3 | **7** | ✅ 入选（S17） |
+| ↳ `env/` 其余子页 | — | 环境详情/设置/泳道等 | 1~2 | 2 | 2 | 5~6 | ❌ 落选（低频可复评） |
+| `:space/env/:envId/health` | clusterHealthDiagnosis | 集群健康诊断 | 1 | 2 | 2 | **5** | ❌ 落选 |
+| `:space/env/:envId/port-pool` | clusterPortPool | 端口池管理 | 1 | 2 | 2 | **5** | ❌ 落选 |
+| `:space/basic`（app-default-config/deploy-config） | basicItem | 应用默认配置编辑 | 2 | 2 | 2 | **6** | ❌ 落选 |
+| `:space/basic`（base-info/operation-history） | basicItem | 基础信息/操作历史 | 2 | 1 | 1 | **4** | ❌ 落选 |
+| `:space/plugin/:menuName` | componentList | 插件配置 | 1 | 2 | 2 | **5** | ❌ 落选 |
+| `/platform` | platform 等 | 平台管理 | 1 | 2 | 2 | **5** | ❌ 落选 |
+| `/home`、`/space-list` | home/spaceList | 首页 / 空间列表 | 1 | 1 | 2 | **4** | ❌ 落选 |
+| `/403`、`/:pathMatch(.*)*` | 403/404 | 静态页 | — | — | — | — | ❌ 落选（跳转逻辑入选 S13） |
+| — | — | `smartGoBack` | 3 | 2 | 3 | **8** | ✅ 入选（S13） |
 | — | — | `beforeEach` 空间权限守卫 | 3 | 3 | 2 | **8** | ✅ 入选（并入 S13） |
-| — | — | `src/components/` 各选择器（git/user/env-group/cluster/namespace/pipeline/lane-select） | 2 | 2 | 2 | 6 | ❌ 落选（随使用处连带覆盖，暴露高风险可复评） |
-| — | — | `src/components/repo-ref-select/`（分支/Tag 选择与流水线手动输入） | 2 | 3 | 3 | **8** | ✅ 入选（S19；S18 仅 stub 入口，trim/防抖独立可测） |
-| — | — | `src/components/` 其余交互组件（env-vars-import-sideslider、tag-config-form、default-value-input、check-container、custom-filter、view-default-env-vars） | 2 | 2 | 2~3 | 6~7 | ❌ 落选（候选池：逐个补评分后可升级） |
-| — | — | `src/components/` 纯展示组件（svg-icon/flex-row/divider-header/markdown-viewer 等） | — | — | — | — | ❌ 落选（无交互逻辑） |
+| — | — | `src/components/` 各选择器（git/user/env-group 等） | 2 | 2 | 2 | 6 | ❌ 落选（随使用处连带） |
+| — | — | `src/components/repo-ref-select/` | 2 | 3 | 3 | **8** | ✅ 入选（S19） |
+| — | — | `src/components/` 其余交互组件 | 2 | 2 | 2~3 | 6~7 | ❌ 落选（候选池） |
+| — | — | `src/components/` 纯展示组件 | — | — | — | — | ❌ 落选 |
 
-### 覆盖口径（回答「S1~S19 是否覆盖整个项目」）
+### 覆盖口径
 
-- **S1~S19 是评分 ≥7 的第一梯队候选，不等于全项目覆盖。**
-- **S 编号是「场景族」而非单个场景**：每个族在摸底后按实际交互展开为若干**子场景**（如 S3 的 `app-config` 下每个配置项各有查看↔编辑多态与独立校验规则，S1 的 5 个模板各有独立表单），族规模 ≠ 用例规模。预估 18 个族展开后约 60~90 个子场景，最终用例数 = 各子场景 V 值之和（随摸底逐族校准，不预估定死）。
-- 全项目覆盖的定义：§1 表中**每个枚举对象都有两值结论之一**（✅ 入选 / ❌ 落选），细分原因一律入备注，不允许存在"没被看到"的代码区域。
-- "涵盖整个项目"的达成判据：① 枚举无盲区（已达成）；② 每个入选族完成子场景展开并逐一实施；③ 备注含「可复评/可升级」的落选对象全部处理（复评入选或明确放弃）。
-- **升级路径**：落选对象在备注标注复评条件（补评分 / 摸底 / 暴露高风险），复评总分 ≥7 即可升为 `✅ 入选` 并新增 S 编号。
-- 组件级落选对象（↳ 行）不单独建场景，其交互行为通过使用它的场景（S1/S2/S6/S12/S18）连带覆盖；若连带不足再单独立项。
+- S1~S19 是评分 ≥7 的第一梯队，不等于全项目覆盖；S 编号是场景族。
+- 全项目覆盖 = §1 每个枚举对象均有入选/落选结论。
+- 升级：落选对象复评总分 ≥7 可升入选并新增 S 编号。
 
-**评估过程中已修正/补漏的记录**：
-1. **修正**：`marketplace` 由整体落选改为拆分评估——列表浏览落选，component-management 新建/编辑向导入选（S12）。
-2. **补漏**：应用列表页（最高频入口）补列为 S14。
-3. **补漏**：路由层全局逻辑（智能返回 + 权限守卫）为纯逻辑 + 路由行为，Vitest 适配，补列为 S13。
-4. **升级**：S9 创建/删除环境随环境列表页评估升至 7 分，由暂缓转候选。
-5. **补全（二轮枚举）**：补回首轮遗漏的行——`src/components/` 选择器/交互组件/纯展示三层、`env/` 其余子页、`detail/` 展示型子页、basic 子模块拆分。
-6. **补全（二轮枚举）**：新评估 4 个未覆盖的交互模块 → S15 Helm 部署与回滚、S16 公共环境变量、S17 集群组件安装与配置、S18 构建管理；`delete-app-dialog` 归并 S6。
-7. **收敛（2026-09-07）**：状态体系由五值收敛为 `✅ 入选 / ❌ 落选` 两值，实施进度移出台账；S10、`global-view.vue`、`result.vue` 摸底完毕，**未评估项清零**（S10 随 S1 连带、global-view 评分 6 落选、result 随 S1 连带）。
-8. **升级（2026-09-10）**：`repo-ref-select` 由「选择器类随使用处归并」复评为 8 分入选 S19——S18 仅 stub 该组件，trim/防抖确认有独立判定分支且用例已落地。
-
-## 2. 场景台账（S 编号索引）
+## 2. 场景台账
 
 ### 2.1 索引总表
 
 | 编号 | 场景 | 评分 | 状态 |
 |---|---|---|---|
-| S1 | 创建应用向导（含模板选择分支） | 9 | `✅ 入选` |
+| S1 | 创建应用向导 | 9 | `✅ 入选` |
 | S2 | 提交部署 | 9 | `✅ 入选` |
-| S3 | 配置编辑保存（多态切换）· **指南推荐试点** | 9 | `✅ 入选` |
+| S3 | 配置编辑保存（多态切换） | 9 | `✅ 入选` |
 | S4 | 环境变量可编辑表格 | 8 | `✅ 入选` |
 | S5 | 动态 / 重复输入项 | 7 | `✅ 入选` |
 | S6 | 删除二次确认 | 7 | `✅ 入选` |
-| S7 | 异步异常与空态（横切） | 7 | `✅ 入选` |
+| S7 | 异步异常与空态（横切） | 7 | `✅ 入选`（附带覆盖，不独立验收） |
 | S9 | 环境管理（列表 + 创建/删除） | 7 | `✅ 入选` |
-| S10 | 应用模板 | — | `❌ 落选`（随 S1 连带覆盖，见场景卡摸底结论） |
+| S10 | 应用模板 | — | `❌ 落选`（随 S1） |
 | S11 | 制品管理 | 7 | `✅ 入选` |
-| S12 | 组件新建/编辑向导 · **试点场景** | 8 | `✅ 入选` |
-| S13 | 路由智能返回 + 空间权限守卫 · **指南备选试点** | 8 | `✅ 入选` |
+| S12 | 组件新建/编辑向导 | 8 | `✅ 入选` |
+| S13 | 路由智能返回 + 空间权限守卫 | 8 | `✅ 入选` |
 | S14 | 应用列表页 | 8 | `✅ 入选` |
 | S15 | Helm 部署与预览回滚 | 8 | `✅ 入选` |
 | S16 | 公共环境变量管理 | 7 | `✅ 入选` |
 | S17 | 集群组件安装与配置 | 7 | `✅ 入选` |
 | S18 | 构建管理 | 7 | `✅ 入选` |
-| S19 | RepoRefSelect（分支/Tag 选择 · Input 路径） | 8 | `✅ 入选` |
+| S19 | RepoRefSelect（Input 路径） | 8 | `✅ 入选` |
 
-> S8 编号未使用（保留编号空位，避免与既有讨论引用冲突）。
+> S8 编号未使用。场景卡模板：状态/评分/来源/目标/V → 用例 → 验收 → backlog → 打法。
 
 ### 2.2 场景卡
 
 #### S1 创建应用向导
 
-- 状态：`✅ 入选` ｜ 评分依据：9 分（频率3/影响3/复杂度3）
-- 来源模块：`src/pages/application/create.vue` + 模板子路由（默认/trpc/helm/taf/agones）
-- 实施记录：`../pilots/TEST_PILOT_S1.md`；独立评审：`../reviews/TEST_REVIEW_S1.md`（88/100 放行 + 变异验证 4/4 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/create-application.test.ts`（9 用例全绿，V 由 4~5 校准为 9：步骤条两种模板配置/搜索空态/模板跳转/校验拦截/步骤前进/取消回退/创建成功/创建失败；其余模板向导与子件表单规则见 backlog）
-- 用户目标：从选择模板、填写信息到提交成功的完整路径
-- 判定分支（校准）：模板类型选择（路由级分支：步骤条三步 vs 两步）/ 搜索空态 / 模板跳转 / 表单校验通过·不通过 / 提交成功·失败 → **V = 8**
-- 设计方法：基本路径 + 等价类 + 边界值 + 恶意输入
-- 用例草稿：
-  - `it('当用户选择不同应用模板时，应进入对应模板的创建向导')`
-  - `it('当用户填写完应用信息并提交时，应创建成功并跳转')`
-  - `it('当用户提交缺少必填项的表单时，应显示校验提示且不提交')`
-  - 边界：名称长度与字符集边界（对照 component-management 同类规则：2-20 字符、字母开头，需确认各表单具体规则）
-  - 恶意输入：特殊字符 / emoji / 超长文本 / HTML 注入样例
-  - 二阶：重复提交拦截（推断/需确认）、提交中禁用
-- 连带覆盖：`application/components/` 下创建流程子组件（image-select、pipeline-params-form、fields、repo-selector、go-build-args 等）随本场景连带测试，不单独建场景
+- 状态：`✅ 入选` ｜ 评分：9 ｜ 来源：`src/pages/application/create.vue` + 模板子路由
+- 用户目标：选模板 → 填信息 → 提交成功
+- V（校准）= 8：步骤条配置（tRPC 三步 / Helm 两步计入口差异）/ 搜索空态 / 模板跳转 / 校验拦截 / 步骤前进 / 取消回退 / 创建成功 / 创建失败
+- 用例：`test/scenarios/create-application.test.ts`（9 全绿；V=8 + 1 条入口差异 it）
+- 验收：连跑 3 稳定；变异 4/4；评审 88/100（存档）
+- backlog：其余模板向导与子件表单规则
+- 打法：PLAYBOOK「全局注册组件打桩」
+- 历史：`archive/pilots/TEST_PILOT_S1.md`、`archive/reviews/TEST_REVIEW_S1.md`
 
 #### S2 提交部署
 
-- 状态：`✅ 入选` ｜ 评分依据：9 分（频率3/影响3/复杂度3）
-- 来源模块：`src/pages/application/detail/deploy/`
-- 实施记录：`../pilots/TEST_PILOT_S2.md`；独立评审：`../reviews/TEST_REVIEW_S2.md`（80/100 通过，变异 2/2 捕获）；用例文件 `test/scenarios/deploy-management.test.ts`（2 用例全绿，**仅覆盖入口权限分发，部署提交主路径待补，见 P1 backlog**）
-- 用户目标：选择部署环境 → 提交 → 得到结果反馈
-- 判定分支：提交成功 / 提交失败 / 加载中 → **V = 4**
-- 设计方法：基本路径 + 状态迁移（部署过程状态机实施前校准）
-- 用例草稿：
-  - `it('当用户选择环境并提交部署时，应显示部署已发起并进入进行中状态')`
-  - `it('当用户提交部署失败时，应显示失败提示且可重新提交')`
-  - `it('当部署请求进行中时，应显示加载状态且禁止重复提交')`
+- 状态：`✅ 入选` ｜ 评分：9 ｜ 来源：`src/pages/application/detail/deploy/`
+- 用户目标：选环境 → 提交 → 结果反馈
+- V（当前）= 2（仅入口权限分发；台账原估 4）
+- 用例：`test/scenarios/deploy-management.test.ts`（2 全绿）
+- 验收：连跑稳定；变异 2/2；评审 80/100（存档）
+- backlog：P1 部署提交主路径；真实请求噪音待补 mock
+- 打法：PLAYBOOK「Proxy service / pinia / vxe」
+- 历史：`archive/pilots/TEST_PILOT_S2.md`、`archive/reviews/TEST_REVIEW_S2.md`
 
 #### S3 配置编辑保存（多态切换）
 
-- 状态：`✅ 入选` ｜ 评分依据：9 分（频率3/影响3/复杂度3）
-- 来源模块：`src/pages/application/detail/app-config/`
-- 实施记录：`../pilots/TEST_PILOT_S3.md`；独立评审：`../reviews/TEST_REVIEW_S3.md`（87/100 放行 + 变异验证 4/4 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/app-config-resources.test.ts`（6 用例全绿，以资源规格子模块为通用模板代表；其余子模块见 backlog）
-- 用户目标：进入编辑态修改配置，保存或取消
-- 判定分支（校准）：进入编辑态 / 取消回滚 / 保存失败 / 默认环境写入 / 普通环境写入 / 恢复默认配置 → **V = 6**（原估 3，摸底校准）
-- 设计方法：状态迁移（查看态/编辑态 × 动作矩阵）
-- 用例草稿：
-  - `it('当用户点击编辑时，应进入编辑态并显示可修改的表单项')`
-  - `it('当用户编辑后点击取消时，应回到查看态且保留原配置')`
-  - `it('当用户提交无效配置时，应显示校验提示且配置不变')`
-  - `it('当用户提交有效配置时，应保存成功并回到查看态展示新配置')`
-- 说明：此写法为 `app-config` 下探针、策略等子模块的通用模板
+- 状态：`✅ 入选` ｜ 评分：9 ｜ 来源：`src/pages/application/detail/app-config/`
+- 用户目标：编辑态改配置并保存/取消
+- V（校准）= 6：进入编辑 / 取消回滚 / 保存失败 / 默认环境写入 / 普通环境写入 / 恢复默认
+- 用例：`test/scenarios/app-config-resources.test.ts`（6 全绿，资源规格为代表）
+- 验收：连跑 3 稳定；变异 4/4；评审 87/100（存档）
+- backlog：其余配置子模块
+- 打法：PLAYBOOK「多态配置子模块」
+- 历史：`archive/pilots/TEST_PILOT_S3.md`、`archive/reviews/TEST_REVIEW_S3.md`
 
 #### S4 环境变量可编辑表格
 
-- 状态：`✅ 入选` ｜ 评分依据：8 分（频率3/影响3/复杂度2）
-- 来源模块：`src/components/editable-variable-table/`
-- 用户目标：对变量表格进行增行、删行、改值
-- 判定分支：行内容合法 / 非法（必填缺失、key 重复）→ **V = 3~4**
-- 设计方法：等价类 + 判定表（key 重复 × 值为空组合）
-- 实施记录：用例文件 `test/scenarios/editable-variable-table.test.ts`（**V 实测 = 2**，连跑 3 次稳定；变异验证 2/2 捕获；覆盖「只读态渲染」+「点击编辑进入编辑态」两条用户可感知路径）；表格本体为 vxe（`@blueking/table`），沿用 S14 沉淀的 stub 与垫片，被 stub 的是单元格绘制，行内操作（编辑）仍为真实行为
-- 裁剪说明：原草稿「删除确认浮层」因 PopConfirm 浮层在 jsdom 下不渲染、断言不稳定已裁剪（见用例文件末注释）；「新增空行」「改值保存」「key 重复校验」分支依赖真实 API mock 与浮层，待补，见 P1 backlog
-- 用例草稿（部分已落地，剩余待补）：
-  - `it('当用户点击编辑时，该行应进入可编辑状态')` ✅
-  - `it('当用户新增一行变量时，应出现空行且可输入键值')`
-  - `it('当用户删除一行变量时，该行应从表格中消失')`
-  - `it('当用户填写重复的变量名时，应显示重复校验提示')`
+- 状态：`✅ 入选` ｜ 评分：8 ｜ 来源：`src/components/editable-variable-table/`
+- 用户目标：变量表格增删改
+- V（当前）= 2：只读渲染 + 进入编辑态
+- 用例：`test/scenarios/editable-variable-table.test.ts`（2 全绿）
+- 验收：连跑 3 稳定；变异 2/2
+- backlog：P1 新增空行 / 改值保存 / key 重复；PopConfirm 浮层 jsdom 不稳已裁剪
+- 打法：PLAYBOOK「vxe 垫片 + 表格 stub」
+- 历史：无独立 pilot/review 过程稿（验收摘要仅在本卡）
 
 #### S5 动态 / 重复输入项
 
-- 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响2/复杂度3）
-- 来源模块：`src/components/dynamic-input.vue`、`src/components/repeatable-input.vue`、`src/components/key-value.vue`
-- 实施记录：`../pilots/TEST_PILOT_S5.md`；独立评审：`../reviews/TEST_REVIEW_S5.md`（92/100 放行 + 变异验证 3/3 捕获）；用例文件 `test/scenarios/dynamic-input.test.ts`（5 用例全绿，已覆盖 dynamic-input，repeatable-input/key-value 待补）
-- 用户目标：动态增删输入项并填写内容
-- 判定分支：新增 / 删除 / 空值拦截 → **V = 3**
-- 设计方法：等价类 + 边界值（补充 emoji/注入样例，见覆盖模型检查）
-- 用例草稿：
-  - `it('当用户点击新增项时，应增加一个可输入的条目')`
-  - `it('当用户删除某个条目时，仅该条目被移除')`
-  - `it('当用户提交空条目时，应显示校验提示')`
+- 状态：`✅ 入选` ｜ 评分：7 ｜ 来源：`dynamic-input` / `repeatable-input` / `key-value`
+- 用户目标：动态增删输入项
+- V（校准）= 5（dynamic-input；含数字/文本域/禁用）
+- 用例：`test/scenarios/dynamic-input.test.ts`（5 全绿）；另有 `repeatable-input` / `key-value` 文件
+- 验收：变异 3/3；评审 92/100（存档）
+- backlog：emoji/注入样例；repeatable/key-value 补齐口径
+- 打法：PLAYBOOK「Harness / 消极断言」中的 Harness 包装（勿套用「弹窗表单」）；类型分发细节见用例文件头
+- 历史：`archive/pilots/TEST_PILOT_S5.md`、`archive/reviews/TEST_REVIEW_S5.md`
 
 #### S6 删除二次确认
 
-- 状态：`✅ 入选` ｜ 评分依据：7 分（频率3/影响3/复杂度1，复用广度大）
-- 来源模块：`src/components/delete-comfirm.vue`
-- 实施记录：`../pilots/TEST_PILOT_S6.md`；独立评审：`../reviews/TEST_REVIEW_S6.md`（93/100 放行 + 变异验证 4/4 捕获）；用例文件 `test/scenarios/delete-confirm.test.ts`（4 用例全绿）
-- 用户目标：删除操作需经确认弹窗二次确认
-- 判定分支：确认删除 / 取消删除 → **V = 2**
-- 设计方法：二分支确认 + 二阶（重复确认、权限不足，推断/需确认）
-- 业务级删除入口（连带）：`application/components/delete-app-dialog.vue` 删除应用等使用处随本场景连带覆盖
-- 用例草稿：
-  - `it('当用户点击确认删除时，应触发删除并关闭弹窗')`
-  - `it('当用户点击取消时，应关闭弹窗且不删除')`
+- 状态：`✅ 入选` ｜ 评分：7 ｜ 来源：`src/components/delete-comfirm.vue`
+- 用户目标：删除二次确认
+- V（校准）= 4：展示 / 确认 / 取消 / loading 禁取消
+- 用例：`test/scenarios/delete-confirm.test.ts`（4 全绿）
+- 验收：变异 4/4；评审 93/100（存档）
+- backlog：业务级删除入口随列表场景连带
+- 打法：PLAYBOOK「弹窗表单直接测本体」
+- 历史：`archive/pilots/TEST_PILOT_S6.md`、`archive/reviews/TEST_REVIEW_S6.md`
 
 #### S7 异步异常与空态（横切）
 
-- 状态：`✅ 入选` ｜ 评分依据：7 分（频率3/影响2/复杂度2，随 S1~S4 附带）
-- 来源模块：随 S1~S3 附带（列表 / 详情页的加载、失败、空数据）
-- 用户目标：在接口失败或无数据时得到清晰反馈
-- 判定分支：加载中 / 加载失败（含重试入口）/ 空数据 → **V = 3**
-- 设计方法：异常猜测 + 状态三态全覆盖
-- 用例草稿：
-  - `it('当数据加载中时，应显示加载状态')`
-  - `it('当接口请求失败时，应显示失败提示且提供重试')`
-  - `it('当无数据时，应显示空状态引导')`
+- 状态：`✅ 入选`（附带覆盖，**不独立验收**）｜ 评分：7 ｜ 来源：随 S1~S3/S14 附带
+- 用户目标：加载失败/空数据有清晰反馈
+- V ≈ 3：加载中 / 失败 / 空数据
+- 用例：无独立文件；随各场景附带（不要求独立连跑/变异）
+- 验收：不单独过门；以宿主场景失败/空态分支为准
+- backlog：专项横切用例可复评单独立项
 
 #### S9 环境管理（列表 + 创建/删除）
 
-- 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响3/复杂度2）
-- 来源模块：`src/pages/env/env.vue`、`create-env.vue`、`delete-env-dialog.vue`
-- 实施记录：`../pilots/TEST_PILOT_S9.md`（列表类场景的表格 stub 方案）；独立评审：`../reviews/TEST_REVIEW_S9.md`（86/100 放行 + 变异验证 2/2 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/env-management.test.ts`（7 用例全绿，连跑 3 次稳定）
-- 用户目标：管理环境列表，创建或删除环境
-- 判定分支：创建校验通过/不通过 / 删除确认/取消 / 列表三态 → **V = 4**
-- 设计方法：基本路径 + 二阶风险（破坏性操作规则）
-- 用例草稿：
-  - `it('当用户创建环境并提交合法信息时，应创建成功并出现在列表')`
-  - `it('当用户提交无效环境信息时，应显示校验提示且不创建')`
-  - `it('当用户取消删除时，应关闭弹窗且不删除')`
-  - 二阶：删除存在关联应用的环境的行为（推断/需确认：是否拦截或二次警示）、删除中重复提交、权限不足反馈
+- 状态：`✅ 入选` ｜ 评分：7 ｜ 来源：`env.vue` + 创建/删除弹窗
+- 用户目标：环境列表管理
+- V = 7（列表 2 + 删除 5）
+- 用例：`test/scenarios/env-management.test.ts`（7 全绿）
+- 验收：连跑 3 稳定；变异验证 4/4 捕获；评审 90/100 放行（存档，初评 86 补缺口后复评）
+- backlog：P2 新建环境弹窗（CreateEnv，不判 N/A）；P3 搜索筛选 / 排序（写前先校准台账 V）
+- 打法：PLAYBOOK「vxe 垫片 + 表格 stub」
+- 历史：`archive/pilots/TEST_PILOT_S9.md`、`archive/reviews/TEST_REVIEW_S9.md`
 
 #### S10 应用模板
 
-- 状态：`❌ 落选`（2026-09-07 摸底后确认） ｜ 来源模块：`src/pages/application/template/`
-- 摸底结论：`template/index.vue` 为 S1 创建向导第一步的模板选择卡片页（搜索过滤 / 卡片单选 / 下一步），`trpc/`、`helm-chart/`、`taf/` 等子页是向导的多步表单实体（上一步/下一步/创建）——整个目录即 S1 场景的组成部分，「模板类型选择」分支与各模板表单已由 S1 卡覆盖，不单独建场景
+- 状态：`❌ 落选` ｜ 摸底：即 S1 向导组成部分，不单独建场景
 
 #### S11 制品管理
 
-- 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响3/复杂度2）
-- 来源模块：`src/pages/application/detail/artifact/`
-- 用户目标：上传制品 → 部署制品的完整路径
-- 判定分支（校准）：类型分发 2 + 页签切换 1 → **V = 3**（上传合法/非法属子页交互，见 backlog）
-- 设计方法：等价类 + 恶意输入（文件名/文件类型规则实施前校准）
-- 实施记录：`../pilots/TEST_PILOT_S11.md`；独立评审：`../reviews/TEST_REVIEW_S11.md`（85/100 放行 + 变异验证 2/2 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/artifact-management.test.ts`（3 用例全绿：类型分发 2 + 页签切换 1；页签切换原判「jsdom 不可测」经复核证伪，改造 mock 路由后已覆盖；两个子页见 backlog）
-- 用例草稿（实施前校准）：
-  - `it('当用户上传合法制品时，应出现在制品列表中')`
-  - `it('当用户上传非法制品时，应显示失败提示且不入列表')`
+- 状态：`✅ 入选` ｜ 评分：7 ｜ 来源：`detail/artifact/`
+- 用户目标：按类型分发制品页
+- V = 3：类型分发 2 + 页签切换 1
+- 用例：`test/scenarios/artifact-management.test.ts`（3 全绿）
+- 验收：连跑 3 稳定；变异 2/2；评审 85/100（存档）
+- backlog：两个子页上传交互
+- 历史：`archive/pilots/TEST_PILOT_S11.md`、`archive/reviews/TEST_REVIEW_S11.md`
 
 #### S12 组件新建/编辑向导
 
-- 状态：`✅ 入选` ｜ 评分依据：8 分（频率2/影响3/复杂度3）
-- 来源模块：`src/pages/marketplace/component-management.vue`
-- 实施记录：`../pilots/TEST_PILOT_S12.md`；独立评审：`../reviews/TEST_REVIEW_S12.md`（三轮评审 92/100 放行 + 变异验证 4/4 捕获）；用例文件 `test/scenarios/component-management.test.ts`（21 用例全绿）
-- 用户目标：新建组件或编辑既有组件并保存
-- 判定分支：新建 vs 编辑（isEditMode）/ 步骤切换（currentStep）/ 校验通过/不通过（name 2-20 字符字母数字中划线、字母开头）/ 保存成功/失败 → **V = 5**
-- 设计方法：状态迁移（双模式 × 步骤）+ 等价类 + 边界值
-- 用例草稿：
-  - `it('当用户新建组件并提交合法信息时，应创建成功并出现在组件列表')`
-  - `it('当用户提交的组件 ID 不符合 2-20 字符规则时，应显示校验提示且不提交')`
-  - `it('当用户编辑组件时，组件 ID 应不可修改且回显原信息')`（回显字段范围：推断/需确认）
-  - `it('当用户关闭弹层未保存时，不应产生任何修改')`（before-close 行为：推断/需确认）
-  - 边界：ID 恰好 2 字符 / 20 字符 / 21 字符；字母开头规则下中划线的合法位置
-  - 恶意输入：同 S1 输入型规则
+- 状态：`✅ 入选` ｜ 评分：8 ｜ 来源：`component-management.vue`
+- 用户目标：新建/编辑组件并保存
+- V ≈ 15（21 条 it，含 it.each）
+- 用例：`test/scenarios/component-management.test.ts`（21 全绿）
+- 验收：连跑稳定；变异 4/4；评审 92/100（存档）
+- backlog：M3 loading 重复提交（推断/需确认）、M4 编辑×脏检查组合态、P3 空态/注入样例
+- 打法：PLAYBOOK「Harness / 消极断言」「写 stub 前读契约」
+- 历史：`archive/pilots/TEST_PILOT_S12.md`、`archive/reviews/TEST_REVIEW_S12.md`
 
 #### S13 路由智能返回 + 空间权限守卫
 
-- 状态：`✅ 入选` ｜ 评分依据：8 分（频率3/影响2~3/复杂度2~3，全局纯逻辑）
-- 来源模块：`src/modules/router.ts`（`smartGoBack` + `beforeEach` 守卫）
-- 实施记录：`../pilots/TEST_PILOT_S13.md`；独立评审：`../reviews/TEST_REVIEW_S13.md`（92/100 放行 + 变异验证 4/4 捕获）；用例文件 `test/scenarios/router-guards.test.ts`（10 用例全绿）
-- 用户目标：返回操作回到正确页面；无权限访问得到正确反馈
-- 判定分支：`smartGoBack` 4 个判定节点（有/无浏览历史 → fallback 有无 → parent.name 有无 → 默认子路由有无）→ **V = 5**；守卫 3 个判定节点（无 space 放行 / 在列表且 Ready 放行 / 不在列表 → 403 / 非 Ready → 404）→ **V = 4**
-- 设计方法：基本路径测试（分支全部显式可数，纯逻辑可直接单测）
-- 用例草稿：
-  - `it('当用户有浏览历史时，点击返回应回到上一页')`
-  - `it('当用户无浏览历史时，点击返回应自动回到上级页面')`
-  - `it('当上级路由无名称且无默认子路由时，应退回原始返回行为')`（退化路径业务预期：推断/需确认）
-  - `it('当用户直接访问无权限的空间时，应跳转 403 并携带回跳地址')`
-  - `it('当空间尚未就绪时，应跳转 404')`
+- 状态：`✅ 入选` ｜ 评分：8 ｜ 来源：`src/modules/router.ts`
+- 用户目标：正确返回；无权限正确反馈
+- V ≈ 9（smartGoBack + 守卫）
+- 用例：`test/scenarios/router-guards.test.ts`（10 全绿）
+- 验收：变异 4/4；评审 92/100（存档）
+- 打法：PLAYBOOK「纯路由逻辑」
+- 历史：`archive/pilots/TEST_PILOT_S13.md`、`archive/reviews/TEST_REVIEW_S13.md`
 
 #### S14 应用列表页
 
-- 状态：`✅ 入选` ｜ 评分依据：8 分（频率3/影响3/复杂度2）
-- 来源模块：`src/pages/application/application.vue`（路由 `:space/app/:envName?`）
-- 实施记录：`../pilots/TEST_PILOT_S14.md`（含 @blueking/table 的 jsdom 渲染垫片方案）；独立评审：`../reviews/TEST_REVIEW_S14.md`（88/100 放行 + 变异验证 2/2 捕获）；用例文件 `test/scenarios/application-list.test.ts`（4 用例全绿）
-- 用户目标：浏览应用列表并进入详情/部署等入口
-- 判定分支：加载成功（有数据）/ 加载失败 / 空列表 → **V = 4**
-- 设计方法：等价类 + 异常猜测
-- 用例草稿：
-  - `it('当应用列表加载完成时，应展示全部应用并可进入详情')`
-  - `it('当应用列表为空时，应显示空状态引导创建')`
-  - `it('当接口请求失败时，应显示失败提示且可重试')`
-  - 状态：筛选/搜索后列表正确刷新（是否含筛选交互：推断/需确认）
+- 状态：`✅ 入选` ｜ 评分：8 ｜ 来源：`application.vue`
+- 用户目标：浏览列表并进入入口
+- V = 4
+- 用例：`test/scenarios/application-list.test.ts`（4 全绿）
+- 验收：连跑稳定；变异 2/2；评审 88/100（存档）
+- 打法：PLAYBOOK「vxe 垫片 + 表格 stub」
+- 历史：`archive/pilots/TEST_PILOT_S14.md`、`archive/reviews/TEST_REVIEW_S14.md`
 
 #### S15 Helm 部署与预览回滚
 
-- 状态：`✅ 入选` ｜ 评分依据：8 分（频率2/影响3/复杂度3，目录级推断，实施前校准）
-- 来源模块：`src/pages/application/detail/helm-deploy/`（deploy-application、deploy-history、preview-rollback、remove-infoxBox）
-- 实施记录：`../pilots/TEST_PILOT_S15.md`；独立评审：`../reviews/TEST_REVIEW_S15.md`（88/100 放行 + 变异验证 4/4 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/helm-deploy.test.ts`（7 用例全绿，V 校准 = 7：更新入口禁用/校验拦截/部署正向主路径/预检仍部署/预检取消/回滚入口约束/回滚确认；移除部署等见 backlog）
-- 用户目标：执行 Helm 部署、查看部署历史、必要时回滚版本
-- 判定分支（校准）：更新按钮禁用状态机 / 部署表单校验拦截 / 两步流转与提交 / 未定义变量预检三分支 / 回滚入口约束与回滚确认 → **V = 7**
-- 设计方法：基本路径 + 状态迁移（部署进行中禁用状态机）+ 二阶风险（回滚属破坏性操作：当前版本保护已由首行禁用实现）
-- 备注：回滚中（pending-rollback）操作拦截由更新按钮禁用状态机覆盖
+- 状态：`✅ 入选` ｜ 评分：8 ｜ 来源：`detail/helm-deploy/`
+- 用户目标：部署 / 历史 / 回滚
+- V = 7：更新禁用 / 校验拦截 / 部署主路径 / 预检仍部署 / 预检取消 / 回滚入口 / 回滚确认
+- 用例：`test/scenarios/helm-deploy.test.ts`（7 全绿）
+- 验收：连跑 3 稳定；变异 4/4；评审 88/100（存档）
+- backlog：移除部署等
+- 打法：PLAYBOOK「stub 与真实并存」「bkui 弹层」
+- 历史：`archive/pilots/TEST_PILOT_S15.md`、`archive/reviews/TEST_REVIEW_S15.md`
 
 #### S16 公共环境变量管理
 
-- 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响3/复杂度2）
-- 来源模块：`src/pages/env/public-env-vars/`（env-var-form-dialog、delete-env-var-dialog、public-env-vars-sideslider）
-- 实施记录：`../pilots/TEST_PILOT_S16.md`；独立评审：`../reviews/TEST_REVIEW_S16.md`（91/100 放行 + 变异验证 3/3 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/public-env-var-form.test.ts`（4 用例全绿，覆盖表单弹窗；列表与删除见 backlog）
-- 用户目标：维护公共环境变量的增删改
-- 判定分支（预估）：新建/编辑校验通过/不通过 / 删除确认/取消 → **V ≈ 4**
-- 设计方法：等价类 + 判定表 + 二阶（删除被引用变量的行为，推断/需确认）
-- 用例草稿（实施前校准）：
-  - `it('当用户新建公共环境变量并提交合法值时，应创建成功并出现在列表')`
-  - `it('当用户提交无效变量时，应显示校验提示且不创建')`
-  - `it('当用户删除公共环境变量时，应经确认后移除')`
+- 状态：`✅ 入选` ｜ 评分：7 ｜ 来源：`env/public-env-vars/`
+- 用户目标：公共变量增删改
+- V（当前）= 4（表单弹窗）
+- 用例：`test/scenarios/public-env-var-form.test.ts`（4 全绿）
+- 验收：连跑 3 稳定；变异 3/3；评审 91/100（存档）
+- backlog：列表与删除
+- 打法：PLAYBOOK「弹窗表单直接测本体」
+- 历史：`archive/pilots/TEST_PILOT_S16.md`、`archive/reviews/TEST_REVIEW_S16.md`
 
 #### S17 集群组件安装与配置
 
-- 状态：`✅ 入选` ｜ 评分依据：7 分（频率1/影响3/复杂度3）
-- 来源模块：`src/pages/env/cluster-components/`（install-sideslider、components-config、config-forms）
-- 备注：路由挂载待确认
-- 实施记录：`../pilots/TEST_PILOT_S17.md`；独立评审：`../reviews/TEST_REVIEW_S17.md`（88/100 放行 + 变异验证 3/3 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/cluster-components.test.ts`（3 用例全绿，覆盖空态/分组展开/安装侧滑弹出；侧滑内表单提交见 backlog）
-- 用户目标：安装集群组件并维护其配置
-- 判定分支（预估）：安装成功/失败 / 配置校验通过/不通过 → **V ≈ 3~4**
-- 设计方法：基本路径 + 等价类（配置表单）+ 二阶（安装中断/重复安装，推断/需确认）
-- 用例草稿（实施前校准）：
-  - `it('当用户安装集群组件时，应发起安装并展示安装结果')`
-  - `it('当用户提交组件配置时，应按校验规则保存或提示')`
+- 状态：`✅ 入选` ｜ 评分：7 ｜ 来源：`env/cluster-components/`
+- 用户目标：安装组件并维护配置
+- V（当前）= 3：空态 / 分组展开 / 安装侧滑
+- 用例：`test/scenarios/cluster-components.test.ts`（3 全绿）
+- 验收：连跑 3 稳定；变异 3/3；评审 88/100（存档）
+- backlog：侧滑内表单提交
+- 历史：`archive/pilots/TEST_PILOT_S17.md`、`archive/reviews/TEST_REVIEW_S17.md`
 
 #### S18 构建管理
 
-- 状态：`✅ 入选` ｜ 评分依据：7 分（频率2/影响3/复杂度2）
-- 来源模块：`src/pages/application/detail/app-build/build-management.vue`
-- 实施记录：`../pilots/TEST_PILOT_S18.md`；独立评审：`../reviews/TEST_REVIEW_S18.md`（88/100 放行 + 变异验证 2/2 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/build-management.test.ts`（3 用例全绿）
-- 用户目标：发起构建并跟踪构建结果
-- 判定分支（预估）：构建发起成功/失败 / 构建状态流转 → **V ≈ 3~4**
-- 设计方法：基本路径 + 状态迁移（构建状态机，实施前校准）
-- 用例草稿（实施前校准）：
-  - `it('当用户发起构建时，应创建构建任务并进入构建中状态')`
-  - `it('当构建失败时，应展示失败信息且可重新构建')`
+- 状态：`✅ 入选` ｜ 评分：7 ｜ 来源：`build-management.vue`
+- 用户目标：按镜像来源控制构建入口并弹出执行配置
+- V = 3：镜像仓库禁用 / 代码仓库可用 / 点击弹出执行配置
+- 用例：`test/scenarios/build-management.test.ts`（3 全绿）
+- 验收：连跑 3 稳定；变异 2/2；评审 88/100（存档）
+- backlog：P2 提交成功/失败；P3 构建历史列表交互；流水线参数配置
+- 打法：PLAYBOOK「Proxy service / pinia / vxe」
+- 历史：`archive/pilots/TEST_PILOT_S18.md`、`archive/reviews/TEST_REVIEW_S18.md`
 
-#### S19 RepoRefSelect（分支/Tag 选择 · Input 路径）
+#### S19 RepoRefSelect（Input 路径）
 
-- 状态：`✅ 入选` ｜ 评分依据：8 分（频率2/影响3/复杂度3）
-- 来源模块：`src/components/repo-ref-select/repo-ref-select.vue`（+ `use-repo-ref-select.ts`）
-- 实施记录：`../pilots/TEST_PILOT_S19.md`；独立评审：`../reviews/TEST_REVIEW_S19.md`（90/100 放行 + 变异验证 2/2 捕获 + 连跑 3 次稳定）；用例文件 `test/scenarios/repo-ref-select.test.ts`（4 用例全绿，Input 路径）
-- 用户目标：在流水线手动输入模式下选择/输入代码分支，trim 后同步绑定值，并在实际变化时防抖确认以拉取推荐 Tag
-- 判定分支（校准后）：trim 立即同步 / trim 后无变化不确认 / 实际变化防抖确认 / 空串不确认 → **V = 4**
-- 设计方法：等价类 + 边界值（空串）+ 时序（防抖）
-- 备注：下拉（Select / repositoryId 非空）路径依赖代码仓库接口，**待补**；S18 对该组件为 stub，不连带覆盖本场景
-- 用例草稿（与实现一一对应）：
-  - `it('当用户输入带首尾空格的分支名时，应立即同步去空格后的绑定值')`
-  - `it('当用户输入仅含首尾空格且 trim 后与当前值相同时，防抖后不应触发分支确认')`
-  - `it('当用户输入实际变化的分支名时，防抖结束后应触发分支确认')`
-  - `it('当用户输入仅空格（trim 后为空）时，防抖结束后仍不应触发分支确认')`
+- 状态：`✅ 入选` ｜ 评分：8 ｜ 来源：`src/components/repo-ref-select/`
+- 用户目标：流水线手动输入分支；trim + 防抖确认
+- V = 4：trim 同步 / 无变化不确认 / 变化确认 / 空串不确认
+- 用例：`test/scenarios/repo-ref-select.test.ts`（4 全绿）
+- 验收：连跑 3 稳定；变异 2/2；评审 90/100（存档）
+- backlog：P2 Select 下拉路径
+- 打法：PLAYBOOK「防抖 + VTU 契约」
+- 历史：`archive/pilots/TEST_PILOT_S19.md`、`archive/reviews/TEST_REVIEW_S19.md`
 
-## 3. 覆盖模型检查（对照 QA Skill-Suite 模板）
+## 3. 覆盖模型检查
 
 | 维度 | 覆盖状态 | 缺口 |
 |---|---|---|
-| 正向流程 | 部分 | S1 模板分支、S12 双模式待批准后补全 |
+| 正向流程 | 部分 | 各场景 backlog |
 | 反向流程 | 完整 | — |
-| 边界 | 部分 | 各表单字符规则边界需摸底源码后统一校准 |
-| 权限 | 部分 | 仅覆盖空间守卫（S13）；页面内权限反馈（如 apply-perm）未立项 |
+| 边界 | 部分 | 表单字符规则边界待统一校准 |
+| 权限 | 部分 | 仅 S13；页面内 apply-perm 未立项 |
 | 异常 | 完整 | S7 横切 + 各场景失败分支 |
-| 状态 | 部分 | S3 多态、S12 双模式已覆盖；部署过程状态机（S2）待校准 |
-| 数据 | 部分 | 列表空态/多数据分页未专项立项（随 S14 附带） |
-| 恶意输入 | 部分 | S1/S12 纳入规则；其余输入组件（S5）未含 emoji/注入样例 |
-| 业务合理外推 | 部分 | 重复提交/超时/并发标注在 S2/S9/S12（推断/需确认） |
+| 状态 | 部分 | S2 部署状态机待补 |
+| 数据 | 部分 | 分页等随列表附带 |
+| 恶意输入 | 部分 | S5 等未含 emoji/注入 |
+| 业务合理外推 | 部分 | 重复提交等标推断/需确认 |
