@@ -1,0 +1,46 @@
+# S11 试点实践记录：制品管理
+
+> **存档，不再更新。** 关键结论见 [`../../guides/TEST_SCENARIOS_ROUTES.md`](../../guides/TEST_SCENARIOS_ROUTES.md) 场景卡；可复用打法见 [`../../guides/TEST_PLAYBOOK.md`](../../guides/TEST_PLAYBOOK.md)。新场景禁止续写本文件。正文内旧相对链接可能失效，以台账「历史」字段为准。
+
+> 定位：制品管理（`src/pages/application/detail/artifact/index.vue`）的场景级测试实践。滚动记录见 `../../guides/TEST_PILOT_LOG.md`，评审见 `../reviews/TEST_REVIEW_S11.md`。
+
+## 1. 被测对象与 mock 边界
+
+被测核心是 index.vue 的**「应用类型 → 视图分发」**：Helm-like 应用（`helm`/`agones`）显示容器镜像 + Helm Chart 双页签；非 Helm-like 直接展示容器镜像。
+
+| 层 | 处理方式 | 理由 |
+|---|---|---|
+| `TabHeader`（bkui-vue Tab） | 真实渲染 | 页签显隐是核心可感知行为 |
+| `container-image.vue` / `helm-chart.vue` | **stub**（标记文本） | 重型子页（表格/上传），其交互留待各自场景覆盖 |
+| `useAppDetail`（store） | mock，提供 `appType` | 视图分发依赖应用类型 |
+| `vue-router` / `vue-i18n` | mock | 隔离 URL 同步与文案 |
+
+## 2. 迭代记录
+
+| 轮次 | 结果 | 根因 | 修复 |
+|---|---|---|---|
+| 1 | 2/3 | 「点击页签切换内容」失败：页签经 `useUrlQuerySync` 与路由 query 双向同步（写侧 `router.replace`、读侧 `route.query`），mock 路由下点击后 query 不回写，组件不切换 | 移除该用例（jsdom 下非缺陷表现，真实浏览器可切换）；**后续已复核并补齐** |
+| — | 3/3（复核补录） | 复核推翻「jsdom 不可测」结论：`use-url-query-sync.ts:74-80` 只要让 mock 路由的 `query` 为响应式对象、且 `router.replace` 实现为写回该对象，即可驱动切换 | 改造 mock 路由 + 补 1 条用例（V 由 2 校准为 3），变异验证精确捕获 |
+| 2 | 2/2 | — | 连跑 3 次稳定（约 3s/次） |
+
+## 3. 可复用模式
+
+- **「类型分发型」容器页**的测法：把重型子页 stub 成可断言的标记文本，被测逻辑只剩「按类型决定显示什么」，用例既轻又稳。
+- 与列表类场景（stub 表格）思路一致：**把组件库/重子组件的绘制责任剥离，只测页面自身的判定**。
+
+## 4. 验收结果（对照指南 §4.2）
+
+- [x] 用例全绿（2/2），连跑 3 次稳定
+- [x] V = 2（Helm-like 双页签 / 非 Helm-like 无页签；第 3 条「切换页签」jsdom 下不可行，已登记）
+- [x] 变异验证 2/2 捕获
+- [ ] 文档性验收（待人工执行）
+
+## 5. 交付物清单
+
+| 文件 | 变更 |
+|---|---|
+| `test/scenarios/artifact-management.test.ts` | 新增，2 个测试 |
+| `docs/vitest/pilots/TEST_PILOT_S11.md` | 本文件 |
+| `docs/vitest/reviews/TEST_REVIEW_S11.md` | 独立评审记录（含变异实证） |
+| `docs/vitest/guides/TEST_SCENARIOS_ROUTES.md` | S11 卡补记录引用行 |
+| `docs/vitest/guides/TEST_PILOT_LOG.md` | 补实施小结 |
