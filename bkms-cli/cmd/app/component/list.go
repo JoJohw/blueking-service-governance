@@ -67,7 +67,7 @@ Use --kind to filter. Only trpc and taf apps are supported.`,
 
 	cmdutil.AddAppFlags(cmd, &appID)
 	cmd.Flags().StringVar(&kind, "kind", "", "filter by kind: ref | inst")
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "", output.FlagUsage)
+	output.AddFormatFlag(cmd, &outputFormat)
 
 	_ = cmd.MarkFlagRequired("app")
 
