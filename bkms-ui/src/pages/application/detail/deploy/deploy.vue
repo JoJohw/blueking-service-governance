@@ -66,7 +66,7 @@
                 :mode="envSelectMode"
                 :multi-selectable="isEnvMultiSelectable"
                 preserve-missing-model-value
-                @update:deploy-status-list="deployStatusList = $event"
+                @update:deploy-status-list="handleDeployStatusListUpdate"
                 @update:env-list="envList = $event"
                 @update:item="handleEnvChange"
                 @update:items="handleEnvsChange"
@@ -186,6 +186,7 @@
           :env-list="envList"
           @create-feature-env="handleShowCreateFeatureEnv"
           @deploy="handleOverviewDeploy"
+          @refresh-env-list="refreshEnvSelectPanel"
           @update:deploy-targets="handleOverviewDeployTargetsUpdate"
           @view-instances="handleViewEnvInstances"
         />
@@ -304,6 +305,7 @@
       :is-prod-env="isProdEnv"
       :target-envs="overviewDeployTargets"
       @update="handleQuickDeploySuccess"
+      @update:deploy-status-list="handleDeployStatusListUpdate"
     />
     <!-- 移除部署 -->
     <RemoveDeploy
@@ -433,7 +435,11 @@
   } = useDeployPrecheck();
 
   // 环境列表（从 EnvSelect 组件 emit 获取）
-  const envSelectPanelRef = ref<null | { refreshDeployStatuses?: () => Promise<void> }>(null);
+  const envSelectPanelRef = ref<null | {
+    refresh?: () => Promise<void>;
+    refreshDeployStatuses?: () => Promise<void>;
+    refreshEnvList?: () => Promise<void>;
+  }>(null);
   const envList = ref<EnvOutput[]>([]);
   const envSelectRefreshKey = ref(0);
   const envListLoading = ref(true);
@@ -456,10 +462,16 @@
     const envName = curEnv.value;
     const curEnvItemName = trpcDeployStore.curEnvItem?.name;
     if (activeTab.value === TAB_NAMES.overview) return;
-    if (!appID || !envName || trpcDeployStore.curEnvItem?.status === 'NotReady') return;
+    if (!appID || !envName || trpcDeployStore.curEnvItem?.status === 'NotReady') {
+      effectiveDeploySpec.value = undefined;
+      return;
+    }
     if (envName !== curEnvItemName) return;
     // 非 trpc/taf 类型应用不请求该接口
-    if (isHelmLikeAppType(appDetailStore.appType)) return;
+    if (isHelmLikeAppType(appDetailStore.appType)) {
+      effectiveDeploySpec.value = undefined;
+      return;
+    }
     const res = await AppSpecService.getEnvEffectiveAppSpecResources(
       {
         appID,
@@ -476,9 +488,7 @@
     ) {
       return;
     }
-    if (res) {
-      effectiveDeploySpec.value = res;
-    }
+    effectiveDeploySpec.value = res || undefined;
   }
 
   const envStore = useDeployEnvStore();
@@ -844,6 +854,13 @@
   }
 
   const deployOverviewRef = ref<InstanceType<typeof DeployOverview>>();
+
+  /** 环境选择器刷新部署状态后，同步检查总览表格是否需要重新拉取。 */
+  function handleDeployStatusListUpdate(list: AppDeployedEnvOutputObj[]) {
+    deployStatusList.value = list;
+    deployOverviewRef.value?.syncDeployStatuses?.(list);
+  }
+
   // undefined 表示从实例列表打开；数组（包括空数组）表示从总览打开并启用目标环境选择器。
   const overviewDeployTargets = ref<DeployOverviewDeployTarget[] | undefined>();
 
@@ -863,12 +880,12 @@
   /** 部署成功后按入口刷新：总览刷新聚合数据，实例页刷新当前环境及环境选择器的部署状态。 */
   async function handleQuickDeploySuccess() {
     if (overviewDeployTargets.value !== undefined) {
-      await Promise.all([envSelectPanelRef.value?.refreshDeployStatuses?.(), deployOverviewRef.value?.load()]);
+      await Promise.all([refreshEnvSelectPanel(), deployOverviewRef.value?.load()]);
       fetchFeatureEnvList();
       return;
     }
     // 首次部署从实例页发起，成功后需同步更新顶部环境选择器的部署状态图标和“仅显示已部署环境”筛选结果。
-    await Promise.all([handleGetLatestDeployStatus(), envSelectPanelRef.value?.refreshDeployStatuses?.()]);
+    await Promise.all([handleGetLatestDeployStatus(), refreshEnvSelectPanel()]);
     fetchFeatureEnvList();
   }
 
@@ -881,6 +898,9 @@
     try {
       const precheckPassed = await precheck(envName, trpcDeployStore.curEnvItem);
       if (!precheckPassed) return;
+      if (trpcDeployStore.curEnvItem?.name !== envName) return;
+
+      await fetchEffectiveDeploySpec();
       if (trpcDeployStore.curEnvItem?.name !== envName) return;
 
       // 清空总览目标是入口标记，保证实例列表仍读取当前环境，不显示目标环境选择器。
@@ -1075,6 +1095,11 @@
     isShowCreateFeatureEnv.value = true;
   }
 
+  /** 重新拉取环境列表和部署状态，避免部署侧栏使用 EnvSelect 的旧缓存。 */
+  async function refreshEnvSelectPanel() {
+    await envSelectPanelRef.value?.refresh?.();
+  }
+
   /** 重新创建环境选择器并刷新总览、特性环境列表，确保三处数据一致。 */
   function refreshFeatureEnvData() {
     envSelectRefreshKey.value += 1;
@@ -1101,7 +1126,7 @@
       status: APP_DEPLOY_STATUS.UNINSTALLED,
     };
     initLoading.value = false;
-    await envSelectPanelRef.value?.refreshDeployStatuses?.();
+    await refreshEnvSelectPanel();
     deployOverviewRef.value?.load();
     fetchFeatureEnvList();
     stop();

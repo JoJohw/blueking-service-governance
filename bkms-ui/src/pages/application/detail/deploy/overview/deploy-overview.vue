@@ -179,7 +179,7 @@
               <TableException
                 :type="isError ? 'error' : hasFilter ? 'search' : 'empty'"
                 @clear="clearFilters"
-                @refresh="load"
+                @refresh="refreshOverview()"
               />
             </template>
             <TableColumn
@@ -368,6 +368,7 @@
   import { Table, TableColumn } from '@blueking/table';
   import { Button, Popover, Radio, SearchSelect, Tag } from 'bkui-vue';
   import { Plus } from 'bkui-vue/lib/icon';
+  import { APP_DEPLOY_STATUS } from '~/common/enums/deploy';
   import CustomFilter from '~/components/custom-filter.vue';
   import Layout from '~/components/skeleton/skeleton-layout';
   import Skeleton from '~/components/skeleton/skeleton.vue';
@@ -384,13 +385,16 @@
 
   import StatIcon from './stat-icon.vue';
   import { type DeployOverviewDeployTarget, type DeployOverviewRow, useDeployOverview } from './use-deploy-overview';
+  import { useDeployOverviewPolling } from './use-deploy-overview-polling';
 
+  import type { AppDeployedEnvOutputObj } from '~/@types/v1/app';
   import type { EnvOutput } from '~/@types/v1/env';
 
   const props = defineProps<{ envList: EnvOutput[] }>();
   const emit = defineEmits<{
     'create-feature-env': [];
     deploy: [targets: DeployOverviewDeployTarget[]];
+    'refresh-env-list': [];
     'update:deploy-targets': [targets: DeployOverviewDeployTarget[]];
     'view-instances': [envName: string];
   }>();
@@ -421,6 +425,8 @@
     isLoading,
     load,
     pagination,
+    pollingIntervalMs,
+    rows,
     searchData,
     searchValue,
     sortConfig,
@@ -436,6 +442,11 @@
   });
 
   const { height: tableHeight } = useElementHeight(tableContentRef, { watchSource: isLoading });
+  const { refresh: refreshOverview, stop: stopPolling } = useDeployOverviewPolling({
+    getAppID: () => appDetailStore.appID,
+    getInterval: () => pollingIntervalMs.value,
+    load,
+  });
 
   /** 将最近部署时间转换为相对时间，并保留完整时间作为 tooltip。 */
   function formatDeployedAt(deployedAt: string) {
@@ -445,7 +456,8 @@
   /** 刷新过程中忽略重复点击，避免并发请求总览接口。 */
   function handleRefresh() {
     if (isLoading.value) return;
-    load();
+    emit('refresh-env-list');
+    void refreshOverview('manual');
   }
 
   /** 点击总览表格任意数据单元格时进入对应环境的实例列表。 */
@@ -453,11 +465,44 @@
     emit('view-instances', row.name);
   }
 
+  /** deploy-statuses 返回默认泳道状态变化时，刷新总览唯一数据源。 */
+  function syncDeployStatuses(list: AppDeployedEnvOutputObj[]) {
+    if (!rows.value.length) return;
+
+    const statusByEnvID = new Map<string, AppDeployedEnvOutputObj>();
+    const statusByEnvNameWithoutID = new Map<string, AppDeployedEnvOutputObj>();
+    list.forEach(item => {
+      if (item.trafficLaneName) return;
+      if (item.id) {
+        statusByEnvID.set(item.id, item);
+      } else if (item.name) {
+        statusByEnvNameWithoutID.set(item.name, item);
+      }
+    });
+
+    const hasStatusChanged = rows.value.some(row => {
+      const latest = row.envID ? statusByEnvID.get(row.envID) : statusByEnvNameWithoutID.get(row.name);
+      if (!latest) return false;
+      return (latest.deployStatus || APP_DEPLOY_STATUS.UNKNOWN) !== row.deployStatus;
+    });
+    if (hasStatusChanged) void refreshOverview('automatic', { queueWhenLoading: true });
+  }
+
   // 部署、移除部署等父级操作完成后，通过暴露的 load 主动刷新总览。
-  defineExpose({ load });
+  defineExpose({ load: refreshOverview, syncDeployStatuses });
 
   // 应用或应用类型变化时重新请求；composable 内部会丢弃上一应用的迟到响应。
-  watch([() => appDetailStore.appID, () => appDetailStore.appType], load, { immediate: true });
+  watch(
+    [() => appDetailStore.appID, () => appDetailStore.appType],
+    () => {
+      if (document.visibilityState === 'hidden') {
+        stopPolling();
+        return;
+      }
+      void refreshOverview('initial');
+    },
+    { immediate: true },
+  );
 
   // 环境列表可能晚于总览接口返回，持续把最新部署目标同步给已打开的新增部署侧栏。
   watch(deployTargets, targets => emit('update:deploy-targets', targets));

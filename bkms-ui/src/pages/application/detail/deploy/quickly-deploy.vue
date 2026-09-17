@@ -49,6 +49,7 @@
       >
         <!-- 目标环境选择器 -->
         <EnvSelectPanel
+          ref="targetEnvSelectPanelRef"
           v-model="targetFormModel.envName"
           :aria-disabled="confirmLoading"
           class="w-full"
@@ -57,6 +58,7 @@
           :show-env-prefix="false"
           :show-only-deployed-filter="false"
           :sync-env-store="false"
+          @update:deploy-status-list="handleDeployStatusListUpdate"
           @update:item="handleTargetEnvItemChange"
         />
       </Form.FormItem>
@@ -104,6 +106,7 @@
 
   import QuicklyDeployForm from './quickly-deploy-form.vue';
 
+  import type { AppDeployedEnvOutputObj } from '~/@types/v1/app';
   import type { EnvOutput } from '~/@types/v1/env';
 
   type OverviewDeployTarget = {
@@ -114,6 +117,7 @@
   const isShow = defineModel<boolean>('isShow');
   const emits = defineEmits<{
     update: [envName?: string];
+    'update:deployStatusList': [list: AppDeployedEnvOutputObj[]];
   }>();
   const props = defineProps<{
     effectiveReplicas?: number;
@@ -128,6 +132,7 @@
 
   const deployFormRef = ref<InstanceType<typeof QuicklyDeployForm>>();
   const targetEnvFormRef = ref();
+  const targetEnvSelectPanelRef = ref<null | { refresh?: () => Promise<void> }>(null);
   const confirmLoading = ref(false);
   const targetFormModel = reactive({ envName: '' });
   const targetFormRules = {
@@ -171,6 +176,10 @@
     selectedEnvItem.value = undefined;
   }
 
+  function handleDeployStatusListUpdate(list: AppDeployedEnvOutputObj[]) {
+    emits('update:deployStatusList', list);
+  }
+
   /** 校验目标环境与部署表单，提交成功后关闭侧栏并通知父组件刷新对应入口的数据。 */
   async function handleSubmit() {
     try {
@@ -206,12 +215,15 @@
     }
   }
 
-  // 每次从总览打开时保持目标环境未选择，由用户明确指定部署环境。
-  watch(isShow, newVal => {
+  // 首次挂载由环境选择器自动加载；再次打开时刷新已有选择器的数据。
+  watch(isShow, async newVal => {
     if (newVal) {
       if (hasTargetSelector.value) {
+        const wasTargetSelectorMounted = targetEnvSelectPanelRef.value !== null;
         targetFormModel.envName = '';
         selectedEnvItem.value = undefined;
+        await nextTick();
+        if (wasTargetSelectorMounted) await targetEnvSelectPanelRef.value?.refresh?.();
       }
       nextTick(() => {
         targetEnvFormRef.value?.clearValidate?.();

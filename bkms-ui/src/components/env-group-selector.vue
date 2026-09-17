@@ -143,14 +143,31 @@
   const appDetailStore = useAppDetail();
   const FEATURE_ENV_KIND = 'feature';
 
-  /** 环境名称 -> 部署状态 映射（仅 showDeployIcon 时请求） */
-  const appDeployStatusMap = ref<Map<string, AppDeployedEnvOutputObj>>(new Map());
+  /** 部署状态分别按环境 ID 和名称索引，ID 未命中时按名称兜底。 */
+  const appDeployStatusByID = ref<Map<string, AppDeployedEnvOutputObj>>(new Map());
+  const appDeployStatusByName = ref<Map<string, AppDeployedEnvOutputObj>>(new Map());
+  let deployStatusesRequest = 0;
 
   /** 获取当前应用在各环境的部署状态 */
   async function fetchDeployStatuses(appID: string) {
+    const requestToken = ++deployStatusesRequest;
     const res = await AppService.getAppDeployStatuses({ appID }).catch(() => []);
-    const list = (res || []) as AppDeployedEnvOutputObj[];
-    appDeployStatusMap.value = new Map(list.filter(item => item.name).map(item => [item.name!, item]));
+    if (requestToken !== deployStatusesRequest || appID !== appDetailStore.appID || !props.showDeployIcon) return;
+    const byID = new Map<string, AppDeployedEnvOutputObj>();
+    const byName = new Map<string, AppDeployedEnvOutputObj>();
+    ((res || []) as AppDeployedEnvOutputObj[]).forEach(status => {
+      if (status.id) byID.set(status.id, status);
+      if (status.name) byName.set(status.name, status);
+    });
+    appDeployStatusByID.value = byID;
+    appDeployStatusByName.value = byName;
+  }
+
+  function getEnvDeployStatus(env: EnvOutput) {
+    return (
+      (env.id ? appDeployStatusByID.value.get(env.id) : undefined) ||
+      (env.name ? appDeployStatusByName.value.get(env.name) : undefined)
+    );
   }
 
   /** 仅当开启图标且存在 appID 时才发起部署状态请求 */
@@ -160,7 +177,9 @@
       if (showDeployIcon && appID) {
         fetchDeployStatuses(appID);
       } else {
-        appDeployStatusMap.value = new Map();
+        deployStatusesRequest += 1;
+        appDeployStatusByID.value = new Map();
+        appDeployStatusByName.value = new Map();
       }
     },
     { immediate: true },
@@ -168,7 +187,7 @@
 
   /** 根据环境获取部署状态对应的 ColorIcon 图标名（与 env-select-panel.vue 保持一致） */
   function getEnvStatusIcon(env: EnvOutput): string {
-    const deployStatus = env.name ? appDeployStatusMap.value.get(env.name)?.deployStatus : undefined;
+    const deployStatus = getEnvDeployStatus(env)?.deployStatus;
     if (!deployStatus) return 'status-unknown';
     return getDeployStatusInfo(appDetailStore.appType || null, deployStatus).icon || 'status-unknown';
   }
