@@ -115,11 +115,17 @@ func (s *Service) Create(ctx context.Context, app *bkmsapp.Application, params *
 	if err != nil {
 		return errors.Wrap(err, "resolve application defaults")
 	}
-
 	// 设置配置文件内容
 	var fileContent *string
 	if params.TrpcConfig != nil && params.TrpcConfig.FileContent != "" {
 		fileContent = &params.TrpcConfig.FileContent
+	}
+
+	// framework def 使用 tRPC 配置中的实际文件名（如 trpc_go.yaml），
+	// 保持 def.Name 与 app model 中的 FileName 一致。
+	cfgFileName := appcfg.DefaultAppConfigFileName
+	if params.TrpcConfig != nil && params.TrpcConfig.FileName != "" {
+		cfgFileName = params.TrpcConfig.FileName
 	}
 
 	if _, err = s.appConfigFileService.Create(
@@ -127,7 +133,7 @@ func (s *Service) Create(ctx context.Context, app *bkmsapp.Application, params *
 		appcfg.CreateCfgFileParams{
 			AppID:             app.ID,
 			EnvName:           appcfg.EnvNameDefault,
-			Name:              appcfg.DefaultAppConfigFileName,
+			Name:              cfgFileName,
 			Type:              appcfg.AppConfigFileTypeNormal,
 			ContentSourceType: appcfg.ContentSourceTypeLocal,
 			Format:            appcfg.FileFormatYAML,
@@ -160,29 +166,30 @@ func (s *Service) Create(ctx context.Context, app *bkmsapp.Application, params *
 			Language: params.TrpcConfig.Language,
 		}
 	}
-	// 将平台默认 AppSpec 应用到 AppModel。
-	appspec.ApplyToAppModel(&resolved.Default, appModel)
+	return s.persistCreatedApp(ctx, app, appModel, resolved)
+}
 
-	// 创建 AppModel
-	if err = s.appModelStore.CreateAppModel(ctx, appModel); err != nil {
+func (s *Service) persistCreatedApp(
+	ctx context.Context,
+	app *bkmsapp.Application,
+	appModel *appmodel.AppModel,
+	resolved *appdefaults.ResolvedAppSpec,
+) error {
+	appspec.ApplyToAppModel(&resolved.Default, appModel)
+	if err := s.appModelStore.CreateAppModel(ctx, appModel); err != nil {
 		return errors.Wrapf(err, "create app(%s) model", app.Name)
 	}
-
-	// 插入 appspec 初始配置
-	if err = s.appSpecStore.Upsert(ctx, &resolved.Default); err != nil {
+	if err := s.appSpecStore.Upsert(ctx, &resolved.Default); err != nil {
 		return errors.Wrap(err, "create default app spec")
 	}
 	for _, spec := range resolved.Environments {
-		if err = s.appSpecStore.Upsert(ctx, spec); err != nil {
+		if err := s.appSpecStore.Upsert(ctx, spec); err != nil {
 			return errors.Wrapf(err, "create app spec for environment %q", spec.EnvName)
 		}
 	}
-
-	// 创建应用基础数据
 	if err := s.appStore.CreateApp(ctx, app); err != nil {
 		return errors.Wrap(err, "create app")
 	}
-
 	return nil
 }
 

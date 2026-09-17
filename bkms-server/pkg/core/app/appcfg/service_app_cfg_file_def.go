@@ -75,7 +75,7 @@ func (s *AppCfgFileDefService) Create(
 		return nil, errors.Wrap(err, "kind-specific content validation")
 	}
 
-	def, err := s.createDef(ctx, params, kind)
+	def, err := s.createDef(ctx, params, kind, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (s *AppCfgFileDefService) Create(
 }
 
 func (s *AppCfgFileDefService) createDef(
-	ctx context.Context, params CreateCfgFileParams, kind ConfigKind,
+	ctx context.Context, params CreateCfgFileParams, kind ConfigKind, policy ConfigKindPolicy,
 ) (*AppConfigFileDef, error) {
 	def := AppConfigFileDef{
 		AppID:      params.AppID,
@@ -100,7 +100,8 @@ func (s *AppCfgFileDefService) createDef(
 			// 初始创建默认为统一配置
 			IsUnifiedConfig: true,
 		},
-		Creator: params.Creator,
+		EnableEnvVarRender: policy.DefaultEnableEnvVarRender(),
+		Creator:            params.Creator,
 	}
 	defID, err := s.DefStore.Add(ctx, def)
 	if err != nil {
@@ -155,13 +156,18 @@ func (s *AppCfgFileDefService) UpdateAppCfgFileDef(
 		return errors.New("def is required")
 	}
 
-	if update.MountDir != nil {
+	// 按策略区分
+	if update.MountDir != nil || update.EnableEnvVarRender != nil {
 		policy, err := s.policyFor(def.ConfigKind)
 		if err != nil {
-			return errors.Wrap(err, "loading config kind policy for mountDir update")
+			return errors.Wrap(err, "loading config kind policy for def update")
 		}
-		if !policy.AllowMountDirUpdate() {
+		if update.MountDir != nil && !policy.AllowMountDirUpdate() {
 			return errors.Wrap(ErrInvalidConfigSpec, "this config kind does not support modifying mountDir via def")
+		}
+		if update.EnableEnvVarRender != nil && !policy.AllowEnableEnvVarRenderUpdate() {
+			return errors.Wrap(ErrInvalidConfigSpec,
+				"this config kind does not allow modifying enableEnvVarRender")
 		}
 	}
 

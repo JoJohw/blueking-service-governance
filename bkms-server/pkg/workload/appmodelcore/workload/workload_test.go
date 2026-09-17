@@ -554,7 +554,13 @@ var _ = Describe("Builder Shared Tests", func() {
 			var configMap corev1.ConfigMap
 			err = runtime.DefaultUnstructuredConverter.FromUnstructured(extraObjs[0].Object, &configMap)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(configMap.Data[tc.ConfigFileName]).To(Equal(tc.ConfigContent))
+			Expect(configMap.Data).To(HaveLen(1))
+			var actualContent string
+			for _, content := range configMap.Data {
+				actualContent = content
+				break
+			}
+			Expect(actualContent).To(Equal(tc.ConfigContent))
 		},
 		Entry("TRPC workload", workloadTestCases[0]),
 		Entry("TAF workload", workloadTestCases[1]),
@@ -1280,5 +1286,102 @@ spec:
 		},
 		Entry("TRPC workload", workloadTestCases[0]),
 		Entry("TAF workload", workloadTestCases[1]),
+	)
+
+	// Plain 默认 EnableEnvVarRender=false，走 {workload}-plain-direct，无 init。
+	// 打开开关后走 {workload}-plain-cfg + plain-cfg-init。
+	DescribeTable("Build with plain config files",
+		func(tc WorkloadTestCase, enableRender bool) {
+			app, appModel := createApplication(ctx, tc, stores, nil, nil)
+			testEnv := dbfactory.Env(ctx, envSvc, app.WorkspaceID)
+
+			cfgSvc := appcfg.NewAppConfigFileService(
+				stores.AppConfigFileStore, stores.AppConfigFileDefStore, stores.AppConfigFileVersionStore,
+			)
+			plainContent := "worker_processes 4;\n"
+			created, err := cfgSvc.Create(ctx, appcfg.CreateCfgFileParams{
+				AppID:             app.ID,
+				EnvName:           appcfg.EnvNameDefault,
+				Name:              "nginx.conf",
+				Type:              appcfg.AppConfigFileTypeNormal,
+				ContentSourceType: appcfg.ContentSourceTypeLocal,
+				Format:            appcfg.FileFormatYAML,
+				Content:           &plainContent,
+				MountDir:          "/etc/nginx",
+				Creator:           appcfg.CfgSystemUser,
+				Description:       "plain file test",
+				ConfigKind:        appcfg.ConfigKindPlain,
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			if enableRender {
+				def, err := stores.AppConfigFileDefStore.GetByID(ctx, created.DefID)
+				Expect(err).NotTo(HaveOccurred())
+				err = cfgSvc.UpdateAppCfgFileDef(ctx, def, appcfg.FileDefUpdate{
+					EnableEnvVarRender: lo.ToPtr(true),
+					Operator:           appcfg.CfgSystemUser,
+				})
+				Expect(err).NotTo(HaveOccurred())
+			}
+
+			builder := workload.NewBuilder(builderSvc, app, appModel)
+			result, err := builder.Build(ctx, testEnv)
+			Expect(err).NotTo(HaveOccurred())
+
+			gd := asGameDeployment(result)
+
+			cmNamePart := "plain-direct"
+			if enableRender {
+				cmNamePart = "plain-cfg"
+			}
+			By("should have the expected plain ConfigMap in extra resources")
+			var plainCM *unstructured.Unstructured
+			for i := range result.ExtraObjects {
+				obj := &result.ExtraObjects[i]
+				if obj.GetKind() == "ConfigMap" && strings.Contains(obj.GetName(), cmNamePart) {
+					plainCM = obj
+					break
+				}
+			}
+			Expect(plainCM).NotTo(BeNil(), "%s ConfigMap should exist in extra resources", cmNamePart)
+
+			By("should have plain file content in ConfigMap data")
+			data := plainCM.Object["data"].(map[string]any)
+			Expect(data).To(HaveLen(1))
+			for _, v := range data {
+				Expect(v).To(Equal("worker_processes 4;\n"))
+			}
+
+			By("should have plain file volume mount in main container")
+			mainContainer := gd.Spec.Template.Spec.Containers[0]
+			var plainMount *corev1.VolumeMount
+			for i := range mainContainer.VolumeMounts {
+				if mainContainer.VolumeMounts[i].MountPath == "/etc/nginx/nginx.conf" {
+					plainMount = &mainContainer.VolumeMounts[i]
+					break
+				}
+			}
+			Expect(plainMount).NotTo(BeNil(), "plain file mount at /etc/nginx/nginx.conf should exist")
+
+			var plainInit *corev1.Container
+			for i := range gd.Spec.Template.Spec.InitContainers {
+				if strings.Contains(gd.Spec.Template.Spec.InitContainers[i].Name, "plain-cfg") {
+					plainInit = &gd.Spec.Template.Spec.InitContainers[i]
+					break
+				}
+			}
+			if enableRender {
+				By("should have plain-cfg init container when render is enabled")
+				Expect(plainInit).NotTo(BeNil(), "plain-cfg init container should exist")
+				Expect(plainInit.Env).NotTo(BeEmpty(), "init container should have env vars injected")
+			} else {
+				By("should not have plain-cfg init container when render is disabled")
+				Expect(plainInit).To(BeNil())
+			}
+		},
+		Entry("TRPC workload with plain files (direct mount)", workloadTestCases[0], false),
+		Entry("TAF workload with plain files (direct mount)", workloadTestCases[1], false),
+		Entry("TRPC workload with plain files (runtime render)", workloadTestCases[0], true),
+		Entry("TAF workload with plain files (runtime render)", workloadTestCases[1], true),
 	)
 })
