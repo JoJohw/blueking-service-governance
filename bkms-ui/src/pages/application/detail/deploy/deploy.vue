@@ -324,6 +324,7 @@
     <!-- 普通部署在打开侧栏前统一执行“资源规格”和“环境变量”预检查 -->
     <EnvVarPrecheckDialog
       v-model:is-show="isShowPrecheckDialog"
+      :env-id="precheckEnvId"
       :env-name="precheckEnvName"
       :mismatches="federationMismatches"
       :missing-required-cluster-addons="missingRequiredClusterAddons"
@@ -431,6 +432,7 @@
     missingRequiredClusterAddons,
     precheck,
     precheckEnvName,
+    precheckEnvId,
     undefinedVars,
   } = useDeployPrecheck();
 
@@ -1017,7 +1019,7 @@
 
     precheckLoading.value = true;
     try {
-      const precheckPassed = await precheck(env.name);
+      const precheckPassed = await precheck(env.name, env);
       if (!precheckPassed) return;
 
       isShowFeatureEnvSideslider.value = false;

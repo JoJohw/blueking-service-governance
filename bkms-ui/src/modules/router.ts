@@ -31,6 +31,7 @@ import createTRPCTemplate from '~/pages/application/template/trpc/index.vue';
 import SpaceLayout from '~/pages/basic/space-layout.vue';
 import clusterPortPool from '~/pages/env/cluster-components/port-pool/index.vue';
 import clusterHealthDiagnosis from '~/pages/env/cluster-health-diagnosis/cluster-health-diagnosis.vue';
+import EnvLayout from '~/pages/env/env-layout.vue';
 import EnvManage from '~/pages/env/env.vue';
 import HomeView from '~/pages/home/home.vue';
 import SpaceListView from '~/pages/home/space-list.vue';
@@ -170,6 +171,31 @@ const routes = setupLayouts([
         meta: {
           menuId: 'ENV',
         },
+      },
+      {
+        path: ':space/env/:envId',
+        name: 'envDetail',
+        component: EnvLayout,
+        redirect: to => ({
+          name: 'envDetailItem',
+          params: { ...to.params, menuName: 'basicInfo' },
+          query: to.query,
+        }),
+        meta: {
+          layout: 'empty',
+          menuId: 'ENV',
+        },
+        children: [
+          {
+            path: ':menuName',
+            name: 'envDetailItem',
+            component: CustomRouterComponent,
+            meta: {
+              layout: 'empty',
+              menuId: 'ENV',
+            },
+          },
+        ],
       },
       {
         path: ':space/component',
@@ -342,8 +368,41 @@ export const install: UserModule = ({ app }) => {
   router.originalBack = originalBack;
   // ---- 覆写结束 ----
 
+  /** 观测页专用参数只允许存在于对应观测页，避免跨页面污染 URL。 */
+  function isObservabilityRoute(route: RouteLocationNormalized): boolean {
+    return (
+      (route.name === 'envDetailItem' && route.params.menuName === 'observability') ||
+      (route.name === 'detail' && route.params.menuName === 'observation')
+    );
+  }
+
   // 全局前置守卫
-  router.beforeEach(async (to, _from, next) => {
+  router.beforeEach(async (to, from, next) => {
+    // 观测页专用参数按目标页逐个判断：apmQuery 允许存在于任一观测页，env 仅允许存在于应用观测页。
+    const keepApmQuery = isObservabilityRoute(to);
+    const keepEnv = to.name === 'detail' && to.params.menuName === 'observation';
+    if ((!keepApmQuery && 'apmQuery' in to.query) || (!keepEnv && 'env' in to.query)) {
+      const query = { ...to.query };
+      if (!keepApmQuery) {
+        delete query.apmQuery;
+      }
+      // env 是应用观测页的环境选择快照；仅允许停留在该页，避免影响其他页面的同名参数。
+      if (!keepEnv) {
+        delete query.env;
+      }
+      next({ ...to, query, replace: true });
+      return;
+    }
+    // 空间切换会重建布局，必须在挂载新详情前清除原空间的环境上下文。
+    if (
+      to.name === 'envDetailItem' &&
+      from.name === 'envDetailItem' &&
+      to.params.envId === from.params.envId &&
+      to.params.space !== from.params.space
+    ) {
+      next({ name: 'env', params: { space: to.params.space }, replace: true });
+      return;
+    }
     // 访问空间路由时
     if (to.params.space) {
       const spaceStore = useSpaceStore();
