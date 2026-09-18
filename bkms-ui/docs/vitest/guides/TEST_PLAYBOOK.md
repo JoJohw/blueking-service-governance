@@ -37,7 +37,8 @@
 
 - **问题**：Dialog/Sideslider 经 `setTimeout` 置位；FormItem 错误常走 tooltip。
 - **做法**：弹层用 `findBy*`；校验用 body 级 `is-error` + 负断言兜底。
-- **示例**：`test/scenarios/helm-deploy.test.ts`
+- **关闭断言**：未传 `render-directive="if"` 的 Dialog 关闭后 DOM 仅 v-show 隐藏不销毁，「消失」断言会超时；用 `not.toBeVisible()` 断言关闭。
+- **示例**：`test/scenarios/helm-deploy.test.ts`、`test/scenarios/env-management.test.ts`
 
 ## 7. 全局注册组件打桩（S1）
 

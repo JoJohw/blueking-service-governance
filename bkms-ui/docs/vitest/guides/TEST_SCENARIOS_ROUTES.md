@@ -151,13 +151,13 @@
 
 #### S9 环境管理（列表 + 创建/删除）
 
-- 状态：`✅ 入选` ｜ 评分：7 ｜ 来源：`env.vue` + 创建/删除弹窗
+- 状态：`✅ 入选` ｜ 评分：7 ｜ 来源：`env.vue`（列表）+ 删除域 `basic-info.vue` → `components/delete-env-action.vue`
 - 用户目标：环境列表管理
-- V = 7（列表 2 + 删除 5）
-- 用例：`test/scenarios/env-management.test.ts`（7 全绿）
-- 验收：连跑 3 稳定；变异验证 4/4 捕获；评审 90/100 放行（初评 86 补缺口后复评）
+- V = 9（列表 2 + 删除 7；2026-09-18 随 #208「去宽窄表」重构校准，删除域入口从列表行移至详情页，新增「获取详情失败提示」「删除中防重」两条可感知路径）
+- 用例：`test/scenarios/env-management.test.ts`（9 全绿；删除域以 harness 复刻 `basic-info.vue:457-482` 接线，DeleteEnvAction/Dialog/Warning 真实渲染）
+- 验收（重构适配轮）：连跑 3 稳定；变异 4/4 捕获（无部署不弹确认 / 有部署不弹告警 / 不 emit deleted / 移除 deleting 守卫）；tests 段 1.3s
 - backlog：P2 新建环境弹窗（CreateEnv，不判 N/A）；P3 搜索筛选 / 排序（写前先校准台账 V）
-- 打法：PLAYBOOK「vxe 垫片 + 表格 stub」
+- 打法：PLAYBOOK「vxe 垫片 + 表格 stub」+ harness 驱动（defineExpose 命令式入口）
 
 #### S10 应用模板
 

@@ -89,7 +89,9 @@ export const TableColumnStub = defineComponent({
 export const TableStub = defineComponent({
   name: 'TableStub',
   props: { data: { type: Array, default: () => [] } },
-  setup(props, { slots }) {
+  setup(props, { slots, expose }) {
+    // 契约：页面可能经 ref 调用 getVxeTableInstance().scrollTo()（如 env.vue:545 恢复滚动位置）
+    expose({ getVxeTableInstance: () => ({ scrollTo: () => Promise.resolve() }) });
     return () => {
       const columns = (slots.default?.() ?? []).filter(Boolean);
       const rows = props.data as Record<string, unknown>[];

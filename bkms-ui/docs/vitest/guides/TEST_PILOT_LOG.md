@@ -21,6 +21,9 @@
 | Proxy anyService 静默吞调用 | 兜底过宽 | 用 `createAnyServiceMock`（带 warning）；`Failed to parse URL` 须补 mock | mock-service |
 | watch 模式与 `vitest run` 结果不一致 | 增量缓存 + 并行超时 | **验收以 `vitest run` 全量为准** | GUIDELINE §4.2 |
 | pinia store setup 内 `useI18n()` 抛错 | vue-i18n ≥11.1.12 约束 | 改用全局 i18n 实例（space.ts 已修） | stores/space |
+| 页面经 ref 调用 `getVxeTableInstance().scrollTo()` 逃逸成 unhandled error | TableStub 未暴露该契约 | TableStub 已 `expose({ getVxeTableInstance })`；列表页 stub 后缺 ref 方法先查页面 watch/回调 | mock-table |
+| getEnv mock 返回 `undefined` 走「获取详情失败」分支 | 组件直接解引用 `detail.appDeployStatuses` | mock 接口返回值须按真实 shape 给对象（空对象即可） | delete-env-action.vue:81 |
+| bkui Dialog 关闭后 `getByText` 仍查得到、waitFor 消失断言超时 | 未传 `render-directive="if"` 时默认 'show' 模式，关闭仅 v-show 隐藏不销毁 DOM（modal/index.js:473-476）；getByText 不筛隐藏元素 | 断言关闭用 `not.toBeVisible()`；需「消失」语义则组件显式传 `render-directive="if"` | PLAYBOOK §6 / delete-comfirm.vue:25 |
 
 ## 环境事实（前置）
 
