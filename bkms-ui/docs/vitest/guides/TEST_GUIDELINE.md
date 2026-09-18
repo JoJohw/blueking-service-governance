@@ -9,7 +9,6 @@
 > guides/TEST_SCENARIOS_ROUTES.md   ← 路由全量枚举评分 + 场景台账（审批与验收摘要）
 > guides/TEST_PLAYBOOK.md          ← 跨场景可复用打法（按主题，不按 S 编号）
 > guides/TEST_PILOT_LOG.md          ← 已知问题速查（仅影响后续写法的环境事实）
-> archive/pilots|reviews/           ← 历史过程稿（冻结，不再更新、新场景禁止续写）
 > test/scenarios/*.test.ts          ← 用例落地层（文件头注释 = 场景说明）
 > ```
 >
@@ -70,7 +69,7 @@
 
 ## 4. 场景实施与验收
 
-> 链路可行性已由历史试点验证；过程稿见 `archive/pilots/`（冻结）。打法见 `TEST_PLAYBOOK.md`。
+> 打法见 `TEST_PLAYBOOK.md`。
 
 ### 4.1 实施流程
 
@@ -116,7 +115,4 @@
 | `TEST_SCENARIOS_ROUTES.md` | 枚举 + 台账 + 验收摘要   | 不放过程轮次                  |
 | `TEST_PLAYBOOK.md`         | 跨场景打法               | 按主题；每条 ≤3 句 + 示例路径 |
 | `TEST_PILOT_LOG.md`        | 已知问题速查             | 只记会影响后续写法的事实      |
-| `archive/**`               | 历史 pilot/review/元文档 | **冻结**；新场景禁止新增      |
 | `test/scenarios/*.test.ts` | 用例 + 文件头说明        | 头注释不含评审分              |
-
-历史元文档（冻结）：`archive/reviews/VITEST_SCHEME_REVIEW.md`。
