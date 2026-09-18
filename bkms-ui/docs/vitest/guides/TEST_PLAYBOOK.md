@@ -1,6 +1,6 @@
 # Vitest 场景测试 Playbook
 
-> 跨场景可复用打法（按主题）。过程轮次与评审长文见 `archive/`（冻结）。
+> 跨场景可复用打法（按主题）。
 > 新打法：追加本节一行即可，**不要**新建 pilot/review。
 
 ## 1. Harness / hoisted / 消极断言（S12）

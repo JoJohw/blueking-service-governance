@@ -18,7 +18,7 @@
 
 /**
  * 列表类场景（S9/S11/S14/S15/S18）的 vxe（@blueking/table）jsdom 垫片与表格 stub。
- * 背景与打法见 docs/vitest/guides/TEST_PLAYBOOK.md「vxe 垫片 + 表格 stub」；过程存档 archive/pilots/TEST_PILOT_S9|S14：
+ * 背景与打法见 docs/vitest/guides/TEST_PLAYBOOK.md「vxe 垫片 + 表格 stub」：
  *  - vxe-table 依赖元素尺寸决定渲染，jsdom 中 offsetHeight/clientHeight 恒为 0 → 表格不渲染行（需尺寸垫片）；
  *  - 纯字段列（非插槽渲染）在 jsdom 下不产出 DOM，无法断言 → 需表格 stub（方案 A）；
  *  - 页面上的 CustomFilter / useElementHeight 仍触碰 vxe DOM 工具 → 垫片与 stub 并用。

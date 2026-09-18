@@ -17,7 +17,7 @@
  */
 
 /**
- * S12 试点：组件新建/编辑向导（component-management.vue）场景级测试。
+ * S12：组件新建/编辑向导（component-management.vue）场景级测试。
  *
  * 覆盖六组用户可感知行为（路径清单见 docs/vitest/guides/TEST_SCENARIOS_ROUTES.md S12）：
  * A 模式回显 / B 表单校验 / C 试运行流转 / D 提交成败 / E 未保存离开确认 / F 可引用变量面板。
@@ -70,7 +70,7 @@ vi.mock('~/stores/space', () => ({
 }));
 
 // InfoBox / Message 是命令式 API，mock 后由用例控制弹窗与断言调用参数；
-// 其余 bkui-vue 组件保持真实渲染（本试点的核心验证目标之一）。
+// 其余 bkui-vue 组件保持真实渲染（本场景的核心验证目标之一）。
 vi.mock('bkui-vue', async importOriginal => ({
   ...(await importOriginal<object>()),
   Message: mocks.message,
