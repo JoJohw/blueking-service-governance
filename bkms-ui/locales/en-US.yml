@@ -2096,3 +2096,4 @@ HostPort 目前仅对绑定联邦集群的环境生效: HostPort currently only 
 目标实例: Target Instance
 字段: Field
 值: Value
+"集群 {0} 的命名空间 {1} 已被工作空间 {2} 下的环境 {3} 占用": "Namespace {1} in cluster {0} is already used by environment {3} in workspace {2}"

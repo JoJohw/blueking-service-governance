@@ -210,7 +210,6 @@
   import { BKMS_REGEX } from '~/common/const';
   import useClusterSelector from '~/components/cluster-selector/use-cluster-selector';
   import { envTypeMap } from '~/composables/use-env-manager';
-  import { useErrorHandler } from '~/composables/use-error-handler';
   import useLeaveConfirm from '~/composables/use-leave-confirm';
   import { useSpaceStore } from '~/stores/space';
 
@@ -349,9 +348,6 @@
         isShow.value = false;
         emit('confirm');
       });
-    } catch (err: unknown) {
-      const { handleError } = useErrorHandler();
-      handleError((err as { error: { code?: string; message?: string } }).error);
     } finally {
       isLoading.value = false;
     }

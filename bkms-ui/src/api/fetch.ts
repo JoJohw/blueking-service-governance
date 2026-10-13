@@ -46,6 +46,28 @@ type ResponseData = Record<string, unknown> & {
   traceId?: string;
 };
 
+/**
+ * 解析 409「命名空间已被占用」错误，将 extras 中的占用信息格式化为可读文案
+ * @returns 未命中错误码或信息不完整时返回 undefined
+ */
+function getOccupiedNamespaceError(status: number, res: ResponseData) {
+  if (status !== 409 || !Array.isArray(res.error?.details)) return;
+
+  const extras = res.error.details.find(item => item?.code === 'ENV_CLUSTER_NAMESPACE_OCCUPIED')?.extras;
+  if (!extras?.clusterID || !extras.namespace || !extras.occupiedByWorkspaceID || !extras.occupiedByEnvName) return;
+
+  const { clusterID, namespace, occupiedByWorkspaceID, occupiedByEnvName } = extras;
+  return {
+    overview: window.i18n.t('集群 {0} 的命名空间 {1} 已被工作空间 {2} 下的环境 {3} 占用', [
+      clusterID,
+      namespace,
+      occupiedByWorkspaceID,
+      occupiedByEnvName,
+    ]),
+    details: extras,
+  };
+}
+
 interceptors.response.use(
   async (response: Response, config: Config) => {
     // 流式响应和文件下载需要立即返回原始 Response，不能预先读取成功响应体。
@@ -127,6 +149,7 @@ interceptors.response.use(
 
     // 其他异常状态
     if (response.status < 200 || response.status >= 300) {
+      const occupiedNamespaceError = getOccupiedNamespaceError(response.status, res);
       config.interceptorErr &&
         Message({
           theme: 'error',
@@ -138,10 +161,13 @@ interceptors.response.use(
           ],
           message: {
             code: response.status,
-            overview: appendTraceId(res?.error?.message || window.i18n.t('请求异常'), traceId),
+            overview: appendTraceId(
+              occupiedNamespaceError?.overview || res?.error?.message || window.i18n.t('请求异常'),
+              traceId,
+            ),
             suggestion: '',
             type: 'json',
-            details: appendTraceIdToDetails(res?.error || {}, traceId),
+            details: appendTraceIdToDetails(occupiedNamespaceError?.details || res?.error || {}, traceId),
           },
         });
       // 关闭默认拦截时，调用方仍可从拒绝对象中取得 Trace ID。

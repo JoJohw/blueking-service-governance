@@ -469,11 +469,6 @@
             message: t('空间创建成功'),
           });
         });
-      } else {
-        Message({
-          theme: 'error',
-          message: t('空间创建失败'),
-        });
       }
     } finally {
       isLoading.value = false;
