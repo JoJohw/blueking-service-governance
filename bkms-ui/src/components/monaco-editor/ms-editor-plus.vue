@@ -44,7 +44,7 @@
         <div class="relative h-full">
           <EditorStatus :message="editorErr" />
           <Error
-            class="absolute top-[8px] right-[8px] cursor-pointer text-[#979BA5] hover:text-[#C4C6CC]"
+            class="absolute top-[8px] right-[8px] cursor-pointer text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-navy-5)]"
             :height="18"
             :width="18"
             @click="isCollapsed = true"
@@ -217,14 +217,14 @@
           position: absolute;
           width: 2px;
           height: 2px;
-          color: #c4c6cc;
-          background: #c4c6cc;
+          color: var(--bkms-neutral-4);
+          background: var(--bkms-neutral-4);
           content: '';
           box-shadow:
-            0 4px 0 0 #c4c6cc,
-            0 8px 0 0 #c4c6cc,
-            0 -4px 0 0 #c4c6cc,
-            0 -8px 0 0 #c4c6cc;
+            0 4px 0 0 var(--bkms-neutral-4),
+            0 8px 0 0 var(--bkms-neutral-4),
+            0 -4px 0 0 var(--bkms-neutral-4),
+            0 -8px 0 0 var(--bkms-neutral-4);
           top: 4px;
           left: 50%;
           transform: translate3d(-50%, 0, 0) rotate(90deg);
@@ -255,12 +255,12 @@
       }
 
       .bk-resize-collapse {
-        background-color: #4d4f56;
+        background-color: var(--bkms-neutral-2);
         display: inline-flex !important;
         bottom: calc(100% - 1px);
 
         &:hover {
-          background-color: #3a84ff;
+          background-color: var(--bkms-brand-2);
         }
       }
     }

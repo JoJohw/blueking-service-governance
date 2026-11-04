@@ -13,11 +13,11 @@
         <template v-if="showTargetInfo">
           <Divider
             class="h-[14px] mx-[0] text-[12px]"
-            color="#DCDEE5"
+            color="var(--bkms-neutral-5)"
             direction="vertical"
             type="solid"
           />
-          <span class="text-[12px] font-normal text-[#979BA5]">
+          <span class="text-[12px] font-normal text-[var(--bkms-neutral-3)]">
             {{ targetLabel || $t('环境') }}：{{ targetName || '--' }}
           </span>
           <Tag
@@ -46,14 +46,14 @@
         @error="handleUploadError"
         @success="handlePreviewSuccess"
       >
-        <div class="flex h-[92px] flex-col items-center justify-center text-[14px] text-[#63656E]">
+        <div class="flex h-[92px] flex-col items-center justify-center text-[14px] text-[var(--bkms-neutral-2)]">
           <UploadIcon
-            class="mb-[8px] text-[32px] text-[#979BA5]"
+            class="mb-[8px] text-[32px] text-[var(--bkms-neutral-3)]"
             height="32"
             width="32"
           />
           <span class="text-[12px]">
-            {{ $t('将文件拖到此处或') }} <span class="text-[#3A84FF]">{{ $t('点击上传') }}</span>
+            {{ $t('将文件拖到此处或') }} <span class="text-[var(--bkms-brand-2)]">{{ $t('点击上传') }}</span>
           </span>
         </div>
       </Upload>
@@ -72,8 +72,8 @@
         v-if="previewLoading"
         class="flex min-h-[360px] flex-col items-center justify-center"
       >
-        <Loading class="animate-spin text-[52px] text-[#3A84FF]" />
-        <div class="mt-[20px] text-[20px] text-[#313238]">{{ $t('文件正在解析中...') }}</div>
+        <Loading class="animate-spin text-[52px] text-[var(--bkms-brand-2)]" />
+        <div class="mt-[20px] text-[20px] text-[var(--bkms-neutral-1)]">{{ $t('文件正在解析中...') }}</div>
       </div>
       <section
         v-else-if="previewData"
@@ -91,7 +91,7 @@
               <span class="inline-flex items-center">
                 <i
                   class="bkms-icon bkms-icon-quanbu-xuanzhong mr-[4px]"
-                  :class="activeFilter === 'all' ? 'text-[#3A84FF]' : 'text-[#979BA5]'"
+                  :class="activeFilter === 'all' ? 'text-[var(--bkms-brand-2)]' : 'text-[var(--bkms-neutral-3)]'"
                 ></i>
                 {{ $t('全部') }} {{ totalCount }}
               </span>
@@ -126,7 +126,9 @@
             <template #default="{ row }">
               <template v-if="row.action === 'overwrite'">
                 <div class="leading-[20px]">{{ row.value || '--' }}</div>
-                <div class="text-[#979BA5] leading-[20px]">{{ $t('原值') }}：{{ row.originalValue || '--' }}</div>
+                <div class="text-[var(--bkms-neutral-3)] leading-[20px]">
+                  {{ $t('原值') }}：{{ row.originalValue || '--' }}
+                </div>
               </template>
               <template v-else>{{ row.value || '--' }}</template>
             </template>
@@ -147,7 +149,9 @@
             <template #default="{ row }">
               <template v-if="!row.effectiveScope?.type">
                 <Tag theme="danger">{{ $t('缺失') }}</Tag>
-                <div class="text-[#979BA5] text-[12px] leading-[20px]">{{ $t('默认设置为「所有」') }}</div>
+                <div class="text-[var(--bkms-neutral-3)] text-[12px] leading-[20px]">
+                  {{ $t('默认设置为「所有」') }}
+                </div>
               </template>
               <Tag
                 v-else
@@ -374,12 +378,12 @@
   }
 
   .env-var-action-icon-new {
-    background-color: #2caf5e;
+    background-color: var(--bkms-success-2);
     border-color: rgb(44 175 94 / 20%);
   }
 
   .env-var-action-icon-overwrite {
-    background-color: #f59500;
+    background-color: var(--bkms-warning-2);
     border-color: rgb(245 149 0 / 20%);
   }
 </style>

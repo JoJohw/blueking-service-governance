@@ -35,14 +35,14 @@
 
 <style lang="postcss" scoped>
   .default {
-    background-color: #fafbfd;
-    color: #4d4f56;
-    border-color: #dcdee5;
+    background-color: var(--bkms-neutral-8);
+    color: var(--bkms-neutral-2);
+    border-color: var(--bkms-neutral-5);
   }
   .success {
-    background-color: #daf6e5;
-    color: #299e56;
-    border-color: #a1e3ba;
+    background-color: var(--bkms-success-6);
+    color: var(--bkms-success-2);
+    border-color: var(--bkms-success-4);
   }
   .danger {
     background-color: #fbe9e7;
@@ -55,8 +55,8 @@
     border-color: #e02020;
   }
   .info {
-    background-color: #e8f8ff;
-    color: #0052d9;
-    border-color: #a1e3ba;
+    background-color: var(--bkms-brand-6);
+    color: var(--bkms-brand-2);
+    border-color: var(--bkms-success-4);
   }
 </style>

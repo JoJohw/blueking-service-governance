@@ -22,7 +22,7 @@
     <!-- 占位状态 -->
     <div
       v-if="isUnchanged"
-      class="flex items-center h-[32px] px-[10px] border border-solid border-[#c4c6cc] rounded-[2px] cursor-text bg-white hover:border-[#979ba5]"
+      class="flex items-center h-[32px] px-[10px] border border-solid border-[var(--bkms-neutral-4)] rounded-[2px] cursor-text bg-white hover:border-[var(--bkms-neutral-3)]"
       @click="handlePlaceholderClick"
     >
       <SensitiveValuePlaceholder :count="unchangedDotCount" />
@@ -53,7 +53,7 @@
             <i
               v-if="showResetIcon"
               v-bk-tooltips="$t('恢复')"
-              class="bkms-icon bkms-icon-redo cursor-pointer text-[16px] hover:text-[#3a84ff]"
+              class="bkms-icon bkms-icon-redo cursor-pointer text-[16px] hover:text-[var(--bkms-brand-2)]"
               @click.stop.prevent="reset"
               @mousedown.stop.prevent
             />
@@ -64,7 +64,7 @@
         v-if="isSelected"
         class="pointer-events-none absolute left-[1px] top-[1px] z-[100] flex h-[30px] items-center px-[9px]"
       >
-        <div class="flex h-[24px] items-center bg-[#e1ecff] px-[4px]">
+        <div class="flex h-[24px] items-center bg-[var(--bkms-brand-6)] px-[4px]">
           <SensitiveValuePlaceholder :count="unchangedDotCount" />
         </div>
       </div>

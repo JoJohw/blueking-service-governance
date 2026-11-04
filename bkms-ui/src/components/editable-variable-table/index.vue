@@ -77,7 +77,7 @@
               <InfoLine
                 v-if="hasConflict(row)"
                 v-bk-tooltips="buildEnvVarConflictTooltip(row.conflictedInfo!)"
-                class="text-[#979BA5] shrink-0"
+                class="text-[var(--bkms-neutral-3)] shrink-0"
                 :height="14"
                 :width="14"
               />
@@ -88,7 +88,7 @@
                 @click="copyText(row.key)"
               >
                 <Copy
-                  class="group-hover:opacity-100 opacity-0 transition text-[#3A84FF]"
+                  class="group-hover:opacity-100 opacity-0 transition text-[var(--bkms-brand-2)]"
                   :title="$t('复制')"
                 />
               </Button>
@@ -102,7 +102,7 @@
           <template #header>
             <span
               v-bk-tooltips="$t('敏感环境变量的值将在页面上以脱敏形式展示，只有应用进程内能够获取到这些变量的明文值。')"
-              class="border-b border-dashed border-[#979ba5]"
+              class="border-b border-dashed border-[var(--bkms-neutral-3)]"
             >
               {{ $t('是否敏感') }}
             </span>
@@ -117,7 +117,11 @@
             />
             <Tag
               v-else
-              :class="row.isSensitive ? 'text-[#2CAF5E] bg-[#DAF6E5]' : 'text-[#979BA5] bg-[#F0F1F5]'"
+              :class="
+                row.isSensitive
+                  ? 'text-[var(--bkms-success-2)] bg-[var(--bkms-success-6)]'
+                  : 'text-[var(--bkms-neutral-3)] bg-[var(--bkms-neutral-6)]'
+              "
               :theme="row.isSensitive ? 'success' : 'default'"
             >
               {{ row.isSensitive ? $t('是') : $t('否') }}
@@ -163,7 +167,7 @@
               >
                 <div
                   class="whitespace-nowrap overflow-hidden text-ellipsis"
-                  :class="{ 'text-[#DCDEE5]': !row?.value }"
+                  :class="{ 'text-[var(--bkms-neutral-5)]': !row?.value }"
                 >
                   {{ row?.value || '--' }}
                 </div>
@@ -174,7 +178,7 @@
                   @click="copyText(row.value)"
                 >
                   <Copy
-                    class="group-hover:opacity-100 opacity-0 transition text-[#3A84FF]"
+                    class="group-hover:opacity-100 opacity-0 transition text-[var(--bkms-brand-2)]"
                     :title="$t('复制')"
                   />
                 </Button>

@@ -6,7 +6,7 @@
  * 用法：
  *   node codemod.mjs bkui   扫描 bkui dist style.variable.css，输出未覆盖色清单（供 pending-design）
  *   node codemod.mjs scan   只扫 src/**，输出报告，不写文件
- *   node codemod.mjs apply  扫 src/** 并写回替换
+ *   node codemod.mjs apply [dir]  扫指定目录（默认 src/**）并写回替换
  *
  * 口径（docs/THEME-v4.md 第四节）：
  * - 先小写化再匹配；仅 6 位 hex（词边界），8 位 hex（带 alpha）整体跳过
@@ -26,21 +26,24 @@ const PENDING_FILE = path.join(__dirname, 'pending-design.json');
 const PENDING = fs.existsSync(PENDING_FILE) ? JSON.parse(fs.readFileSync(PENDING_FILE, 'utf8')) : {};
 
 const mode = process.argv[2] || 'scan';
+const targetArg = process.argv[3] || 'src';
 const HEX6 = /#([0-9a-f]{6})(?![0-9a-f])/gi;
 const HEX3 = /#([0-9a-f]{3})(?![0-9a-f])/gi;
 const HEX8 = /#([0-9a-f]{8})(?![0-9a-f])/gi;
 const EXTS = new Set(['.vue', '.css', '.ts', '.js', '.scss', '.less']);
+const TOKENS_FILE = path.join(ROOT, 'src/theme/tokens.css');
 
 function applyReplacements() {
-  const files = walk(path.join(ROOT, 'src'));
+  const files = sourceFiles();
   let changed = 0;
   for (const file of files) {
     const text = fs.readFileSync(file, 'utf8');
     let next = text;
     const doMap = (m, hex6) => {
-      const cls = classify(hex6);
-      if (cls !== 'mapping') return m[0];
-      return `var(${MAPPING[hex6]})`;
+      const normalizedHex = hex6.toLowerCase();
+      const cls = classify(normalizedHex);
+      if (cls !== 'mapping') return m;
+      return `var(${MAPPING[normalizedHex]})`;
     };
     next = next.replace(HEX6, doMap);
     next = next.replace(HEX3, (m, h3) => {
@@ -108,7 +111,7 @@ function scanBkui() {
 }
 
 function scanSource() {
-  const files = walk(path.join(ROOT, 'src'));
+  const files = sourceFiles();
   const perFile = [];
   const distinct = new Map(); // hex6 -> { count, classify }
   let occurrences = 0;
@@ -143,6 +146,11 @@ function scanSource() {
     if (fileHits > 0) perFile.push({ file: rel, hits: fileHits });
   }
   return { total: files.length, perFile, distinct, occurrences, hex8Count };
+}
+
+function sourceFiles(target = targetArg) {
+  const targetPath = path.resolve(ROOT, target);
+  return walk(targetPath).filter(file => path.resolve(file) !== TOKENS_FILE);
 }
 
 function walk(dir, files = []) {

@@ -28,8 +28,8 @@
       <span>
         <span class="bkms-custom-filter-title">{{ label }}</span>
         <i
-          class="cursor-pointer hover:text-[#606266] relative text-[#c0c4cc] top-[1px] left-[4px] vxe-filter--btn vxe-table-icon-funnel"
-          :class="appliedFilters.length > 0 ? '!text-[#3a84ff]' : ''"
+          class="cursor-pointer hover:text-[#606266] relative text-[var(--bkms-navy-5)] top-[1px] left-[4px] vxe-filter--btn vxe-table-icon-funnel"
+          :class="appliedFilters.length > 0 ? '!text-[var(--bkms-brand-2)]' : ''"
         ></i>
       </span>
     </slot>
@@ -67,7 +67,7 @@
                 <Checkbox
                   :key="getFilterItem(item).value"
                   :checked="getFilterItem(item).checked"
-                  class="!ml-0 w-full text-[12px] text-[#63656e]"
+                  class="!ml-0 w-full text-[12px] text-[var(--bkms-neutral-2)]"
                   :indeterminate="getFilterItem(item).value === 'all' ? isIndeterminate : false"
                   :label="getFilterItem(item).value"
                 >
@@ -79,7 +79,7 @@
             </RecycleScroller>
           </Checkbox.Group>
         </div>
-        <div class="flex items-center justify-end h-[42px] border-t px-[8px] border-[#dcdee5]">
+        <div class="flex items-center justify-end h-[42px] border-t px-[8px] border-[var(--bkms-neutral-5)]">
           <Button
             class="mr-[8px]"
             :disabled="activeFilters.length === 0"
@@ -295,7 +295,7 @@
   :deep(.bk-input.is-simplicity) {
     &.is-focused {
       .custom-filter-search-icon {
-        color: #3a84ff;
+        color: var(--bkms-brand-2);
       }
     }
     &:hover:not(.is-disabled) {
@@ -320,10 +320,10 @@
     padding: 8px 10px 8px 12px;
     display: inline-block;
     &:hover {
-      background-color: #f5f7fa;
+      background-color: var(--bkms-neutral-7);
       .bk-checkbox-input {
-        border-color: #3a84ff;
-        box-shadow: 0 0 0 1px #699df4;
+        border-color: var(--bkms-brand-2);
+        box-shadow: 0 0 0 1px var(--bkms-brand-3);
       }
     }
     align-self: start;
@@ -331,8 +331,8 @@
       width: 14px;
       height: 14px;
       border-radius: 3px;
-      border-color: #dcdee5;
-      box-shadow: 0 0 0 1px #dcdee5;
+      border-color: var(--bkms-neutral-5);
+      box-shadow: 0 0 0 1px var(--bkms-neutral-5);
     }
     .bk-checkbox-label {
       width: calc(100% - 22px);
@@ -343,7 +343,7 @@
   }
   :deep(.bk-checkbox.is-checked) {
     .bk-checkbox-label {
-      color: #3a84ff;
+      color: var(--bkms-brand-2);
     }
   }
 </style>

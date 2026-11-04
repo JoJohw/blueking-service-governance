@@ -19,9 +19,9 @@
 <template>
   <div
     :class="[
-      'p-[12px] border border-[#DCDEE5] rounded-[2px] text-[#4D4F56] hover:bg-[#F0F5FF] hover:border-[#3A84FF] group',
-      { 'bg-[#FAFBFD] border-[#DCDEE5]': disabled },
-      active ? '!border-[#3A84FF]' : 'border-[#C4C6CC]',
+      'p-[12px] border border-[var(--bkms-neutral-5)] rounded-[2px] text-[var(--bkms-neutral-2)] hover:bg-[var(--bkms-brand-7)] hover:border-[var(--bkms-brand-2)] group',
+      { 'bg-[var(--bkms-neutral-8)] border-[var(--bkms-neutral-5)]': disabled },
+      active ? '!border-[var(--bkms-brand-2)]' : 'border-[var(--bkms-navy-5)]',
     ]"
   >
     <FlexRow class="mb-[4px]">
@@ -47,8 +47,8 @@
       </template>
     </FlexRow>
     <div class="flex">
-      <span class="text-[#979BA5] mr-[4px] shrink-0">{{ $t('说明') }} : </span>
-      <div class="text-[#313238]">{{ curCom?.description || '--' }}</div>
+      <span class="text-[var(--bkms-neutral-3)] mr-[4px] shrink-0">{{ $t('说明') }} : </span>
+      <div class="text-[var(--bkms-neutral-1)]">{{ curCom?.description || '--' }}</div>
     </div>
   </div>
 </template>

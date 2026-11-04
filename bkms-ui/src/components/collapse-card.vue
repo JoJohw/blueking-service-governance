@@ -26,7 +26,7 @@
       <slot name="icon">
         <RightShape
           :class="['mr-[8px] transition duration-300', collapseStatus ? 'rotate-90' : '']"
-          fill="#313238"
+          fill="var(--bkms-neutral-1)"
           :height="12"
           :width="12"
           @click.stop="collapseStatus = !collapseStatus"
@@ -67,7 +67,7 @@
       margin: 0 16px;
       padding: unset;
       width: calc(100% - 32px);
-      border-color: #dcdee5;
+      border-color: var(--bkms-neutral-5);
       cursor: auto;
     }
     & :deep(.bk-card-body) {

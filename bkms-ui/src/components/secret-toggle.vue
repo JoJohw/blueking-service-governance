@@ -21,15 +21,15 @@
     <template v-if="!isShow">
       <div class="flex-1 font-mono tracking-wider">{{ placeholder }}</div>
       <Eye
-        class="ml-[4px] cursor-pointer hover:text-[#3A84FF]"
+        class="ml-[4px] cursor-pointer hover:text-[var(--bkms-brand-2)]"
         :fill="iconFill"
         @click="handleToggle"
       />
     </template>
     <template v-else>
-      <span class="text-[#313238]">{{ value || emptyValuePlaceholder }}</span>
+      <span class="text-[var(--bkms-neutral-1)]">{{ value || emptyValuePlaceholder }}</span>
       <Unvisible
-        class="ml-[4px] cursor-pointer hover:text-[#3A84FF]"
+        class="ml-[4px] cursor-pointer hover:text-[var(--bkms-brand-2)]"
         :fill="iconFill"
         @click="handleToggle"
       />
@@ -54,7 +54,7 @@
     showValue: false,
     placeholder: '********',
     emptyValuePlaceholder: '--',
-    iconFill: '#979BA5',
+    iconFill: 'var(--bkms-neutral-3)',
   });
   const emit = defineEmits(['toggle']);
 

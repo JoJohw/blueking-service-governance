@@ -87,7 +87,7 @@
     }
     .message {
       margin-left: 8px;
-      color: #dcdee5;
+      color: var(--bkms-neutral-5);
       line-height: 20px;
       font-size: 12px;
       white-space: wrap;

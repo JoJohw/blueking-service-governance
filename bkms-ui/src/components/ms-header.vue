@@ -42,7 +42,7 @@
   }
 
   const props = withDefaults(defineProps<Props>(), {
-    backColor: '#3a84ff',
+    backColor: 'var(--bkms-brand-2)',
   });
 
   const router = useRouter();

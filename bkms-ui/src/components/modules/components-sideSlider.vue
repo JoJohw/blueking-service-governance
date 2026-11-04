@@ -85,7 +85,7 @@
                       <h2 class="text-[14px] font-bold flex items-center">
                         <span class="mr-[6px]">{{ $t('请选择一个组件') }}</span>
                         <i
-                          class="bkms-icon bkms-icon-refresh cursor-pointer text-[#3A84FF]"
+                          class="bkms-icon bkms-icon-refresh cursor-pointer text-[var(--bkms-brand-2)]"
                           @click="handleRefresh"
                         ></i>
                       </h2>
@@ -141,7 +141,10 @@
                       v-for="(item, index) in curComponentList"
                       :key="`${index}-${item?.name}`"
                       :active="item.name === curComponent?.name"
-                      :class="['mt-[16px]', { 'bg-[#F0F5FF] !border-[#3A84FF]': activeIndex === index }]"
+                      :class="[
+                        'mt-[16px]',
+                        { 'bg-[var(--bkms-brand-7)] !border-[var(--bkms-brand-2)]': activeIndex === index },
+                      ]"
                       :data="item"
                       :disabled="disabledFn?.(item)"
                       :disabled-text="$t('应用必须且只有一个部署类组件，无法新增部署组件。')"
@@ -167,7 +170,7 @@
                       direction="vertical"
                       type="solid"
                     />
-                    <span class="text-[#979BA5]">{{ curInstanceObj?.name || '--' }}</span>
+                    <span class="text-[var(--bkms-neutral-3)]">{{ curInstanceObj?.name || '--' }}</span>
                   </div>
                   <div class="mt-[24px] flex-1 overflow-auto">
                     <ToggleCard
@@ -225,7 +228,7 @@
                 </div>
               </template>
             </Popover>
-            <p class="mb-[8px] text-[14px]">{{ $t('组件') }}<i class="text-[#EA3636] pl-[6px]">*</i></p>
+            <p class="mb-[8px] text-[14px]">{{ $t('组件') }}<i class="text-[var(--bkms-danger-2)] pl-[6px]">*</i></p>
             <Button
               v-if="!curComponent"
               theme="primary"
@@ -274,8 +277,8 @@
                     {{ $t('引用空间配置的实例') }}
                     <span
                       :class="[
-                        'text-[#979BA5] rounded-[8px] px-[8px] transition',
-                        isUseInstance ? 'bg-[#3A84FF] text-[#fff]' : 'bg-[#F0F1F5]',
+                        'text-[var(--bkms-neutral-3)] rounded-[8px] px-[8px] transition',
+                        isUseInstance ? 'bg-[var(--bkms-brand-2)] text-[#fff]' : 'bg-[var(--bkms-neutral-6)]',
                       ]"
                     >
                       {{ curInstanceList.length }}
@@ -462,7 +465,7 @@
                   </Table>
                   <p
                     v-if="isInstanceMissing && !instanceDetail.type"
-                    class="text-[#EA3636] is-error"
+                    class="text-[var(--bkms-danger-2)] is-error"
                   >
                     {{ instanceTips }}
                   </p>
@@ -706,7 +709,7 @@
   ]);
 
   function getInstanceRowClass({ row }: { row: WorkspaceComponentOutputObj }) {
-    return row.name === curInstanceObj.value?.name ? 'bg-[#F0F5FF]' : '';
+    return row.name === curInstanceObj.value?.name ? 'bg-[var(--bkms-brand-7)]' : '';
   }
 
   /**

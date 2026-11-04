@@ -36,7 +36,7 @@
           :cy="center"
           fill="none"
           :r="circleRadius"
-          stroke="#F0F1F5"
+          stroke="var(--bkms-neutral-6)"
           :stroke-width="STROKE_WIDTH"
         />
         <!-- 致命问题圆环（红色） -->
@@ -45,7 +45,7 @@
           :cy="center"
           fill="none"
           :r="circleRadius"
-          stroke="#EA3636"
+          stroke="var(--bkms-danger-2)"
           :stroke-dasharray="circumference"
           :stroke-dashoffset="riskDashOffset"
           :stroke-width="STROKE_WIDTH"
@@ -56,7 +56,7 @@
           :cy="center"
           fill="none"
           :r="circleRadius"
-          stroke="#F59500"
+          stroke="var(--bkms-warning-2)"
           :stroke-dasharray="warnDashArray"
           :stroke-dashoffset="0"
           :stroke-width="STROKE_WIDTH"
@@ -68,13 +68,13 @@
         <div
           class="progress-value font-bold leading-none"
           :style="{
-            color: count?.RISK != null ? '#EA3636' : '#979BA5',
+            color: count?.RISK != null ? 'var(--bkms-danger-2)' : 'var(--bkms-neutral-3)',
             fontSize: `${valueSize}px`,
           }"
         >
           {{ count?.RISK ?? '--' }}
         </div>
-        <div class="text-[10px] text-[#979BA5] mt-[4px]">
+        <div class="text-[10px] text-[var(--bkms-neutral-3)] mt-[4px]">
           {{ $t('致命问题') }}
         </div>
       </div>
@@ -86,12 +86,12 @@
       class="flex flex-col gap-[12px]"
     >
       <div class="flex items-center gap-[8px]">
-        <span class="inline-block w-[8px] h-[8px] rounded-full bg-[#EA3636]"></span>
-        <span class="text-[12px] text-[#63656E]">{{ $t('致命问题') }}：{{ count?.RISK ?? '--' }}</span>
+        <span class="inline-block w-[8px] h-[8px] rounded-full bg-[var(--bkms-danger-2)]"></span>
+        <span class="text-[12px] text-[var(--bkms-neutral-2)]">{{ $t('致命问题') }}：{{ count?.RISK ?? '--' }}</span>
       </div>
       <div class="flex items-center gap-[8px]">
-        <span class="inline-block w-[8px] h-[8px] rounded-full bg-[#F59500]"></span>
-        <span class="text-[12px] text-[#63656E]">{{ $t('预警问题') }}：{{ count?.WARN ?? '--' }}</span>
+        <span class="inline-block w-[8px] h-[8px] rounded-full bg-[var(--bkms-warning-2)]"></span>
+        <span class="text-[12px] text-[var(--bkms-neutral-2)]">{{ $t('预警问题') }}：{{ count?.WARN ?? '--' }}</span>
       </div>
     </div>
   </div>

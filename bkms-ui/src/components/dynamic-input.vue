@@ -66,8 +66,8 @@
       v-if="selectedOption?.value"
       #tag
     >
-      <span class="text-[14px] text-[#313238]">{{ selectedOption?.value }}</span>
-      <span class="text-[14px] text-[#979BA5]">（{{ selectedOption?.label }}）</span>
+      <span class="text-[14px] text-[var(--bkms-neutral-1)]">{{ selectedOption?.value }}</span>
+      <span class="text-[14px] text-[var(--bkms-neutral-3)]">（{{ selectedOption?.label }}）</span>
     </template>
     <Select.Option
       v-for="(item, index) in selectOptions"
@@ -76,10 +76,10 @@
     >
       <span
         class="text-[14px]"
-        :class="item.value === localValue ? 'text-[#3A84FF]' : 'text-[#313238]'"
+        :class="item.value === localValue ? 'text-[var(--bkms-brand-2)]' : 'text-[var(--bkms-neutral-1)]'"
         >{{ item.value }}</span
       >
-      <span class="text-[14px] text-[#979BA5]">（{{ item.label }}）</span>
+      <span class="text-[14px] text-[var(--bkms-neutral-3)]">（{{ item.label }}）</span>
     </Select.Option>
   </Select>
   <KeyValue
