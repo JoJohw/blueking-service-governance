@@ -231,10 +231,10 @@
 <style scoped lang="postcss">
   :deep(.vxe-body--row.last-row) {
     .active-cell {
-      border-bottom: 2px solid #3a84ff;
+      border-bottom: 2px solid var(--bkms-brand-2);
     }
   }
   .col--current {
-    --vxe-ui-table-border-color: #3a84ff;
+    --vxe-ui-table-border-color: var(--bkms-brand-2);
   }
 </style>

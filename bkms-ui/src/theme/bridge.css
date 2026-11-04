@@ -1,0 +1,79 @@
+/*
+ * bkui 组件库变量桥接：重声明 style.variable.css :root 同名变量指向 --bkms-* 令牌。
+ * 变量清单实抓（128 个，见 scripts/theme-codemod/reports/root-vars.txt），禁止凭记忆增删；
+ * 未重声明项及原因见 scripts/theme-codemod/bridge-notes.md。
+ * 语义映射口径（THEME-v4 写死）：white→neutral-10、whitesmoke→neutral-8、gray→neutral-3、light-gray→neutral-4。
+ */
+:root {
+  --primary-color: var(--bkms-brand-2);
+  --success-color: var(--bkms-success-2);
+  --warning-color: var(--bkms-warning-2);
+  --danger-color: var(--bkms-danger-2);
+  --default-color: var(--bkms-neutral-2);
+  --gray-color: var(--bkms-neutral-3);
+  --light-gray: var(--bkms-neutral-4);
+  --white-color: var(--bkms-neutral-10);
+  --whitesmoke-color: var(--bkms-neutral-8);
+  --disable-color: var(--bkms-neutral-5);
+  --disable-bg-color: var(--bkms-neutral-8);
+  --border-color: var(--bkms-neutral-5);
+
+  --input-disabled-bg: var(--bkms-neutral-8);
+  --input-shadow-color: var(--bkms-brand-4);
+  --input-block-color: var(--bkms-neutral-7);
+  --input-block-hover-color: var(--bkms-neutral-6);
+  --input-maxlength-color: var(--bkms-neutral-3);
+
+  --button-primary-hover-color: var(--bkms-brand-3);
+  --button-danger-hover-color: var(--bkms-danger-3);
+  --button-warning-hover-color: var(--bkms-warning-3);
+  --button-default-hover-border-color: var(--bkms-neutral-3);
+  --button-primary-active-color: var(--bkms-brand-1);
+  --button-selected-bg-color: var(--bkms-brand-6);
+  --button-disabled-selected-bg-color: var(--bkms-neutral-6);
+
+  --radio-font-color: var(--bkms-neutral-2);
+  --radio-active-color: var(--bkms-brand-2);
+  --radio-hover-border-color: var(--bkms-neutral-3);
+  --radio-disabled-border: var(--bkms-neutral-5);
+  --radio-disabled-font-color: var(--bkms-neutral-4);
+  --radio-disabled-checked-bg: var(--bkms-brand-4);
+  --radio-button-checked-bg: var(--bkms-brand-6);
+  --radio-button-disabled-checked-bg: var(--bkms-neutral-8);
+  --checkbox-disabled-checked-bg: var(--bkms-brand-4);
+
+  --switch-grey-color: var(--bkms-neutral-4);
+  --breadcrumb-black-color: var(--bkms-neutral-3);
+  --breadcrumb-primary-hover-color: var(--bkms-brand-2);
+  --breadcrumb-fn-main-color: var(--bkms-neutral-2);
+
+  --link-default-hover-color: var(--bkms-neutral-3);
+  --link-primary-hover-color: var(--bkms-brand-3);
+  --link-danger-hover-color: var(--bkms-danger-3);
+  --link-default-disabled-color: var(--bkms-neutral-5);
+  --link-primary-disabled-color: var(--bkms-brand-4);
+
+  --message-primary-border-color: var(--bkms-brand-6);
+  --message-warning-border-color: var(--bkms-warning-5);
+
+  --slider-default-bg: var(--bkms-neutral-5);
+  --slider-disable-bar-bg: var(--bkms-neutral-3);
+
+  --menu-color: var(--bkms-navy-4);
+
+  --table-border-color: var(--bkms-neutral-5);
+  --table-strip-color: var(--bkms-neutral-8);
+  --table-head-bg-color: var(--bkms-neutral-8);
+  --table-head-font-color: var(--bkms-neutral-1);
+  --table-body-font-color: var(--bkms-neutral-2);
+  --table-row-hover-bg-color: var(--bkms-neutral-7);
+  --table-row-active-bg-color: var(--bkms-neutral-6);
+
+  --cascader-panel-border-color: var(--bkms-neutral-5);
+  --cascader-panel-hover: var(--bkms-neutral-7);
+  --cascader-panel-active: var(--bkms-brand-6);
+
+  --search-select-focus-color: var(--bkms-brand-3);
+  --select-active-color: var(--bkms-brand-6);
+  --select-hover-color: var(--bkms-neutral-7);
+}

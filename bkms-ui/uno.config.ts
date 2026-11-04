@@ -25,7 +25,14 @@ import {
   transformerVariantGroup,
 } from 'unocss';
 
+import { bkmsColorTokens } from './uno.bkms-theme';
+
 export default defineConfig({
+  theme: {
+    colors: {
+      bkms: bkmsColorTokens,
+    },
+  },
   shortcuts: [
     [
       'btn',
@@ -35,10 +42,11 @@ export default defineConfig({
       'icon-btn',
       'inline-block cursor-pointer select-none opacity-75 transition duration-200 ease-in-out hover:opacity-100 hover:text-teal-600',
     ],
-    ['env-tag-development', '!border-none !bg-[#E1ECFF] !text-[#1768EF]'],
-    ['env-tag-test', '!border-none !bg-[#E5FEFF] !text-[#0399D4]'],
-    ['env-tag-staging', '!border-none !bg-[#FDEED8] !text-[#E38B02]'],
-    ['env-tag-production', '!border-none !bg-[#DAF6E5] !text-[#299E56]'],
+    ['env-tag-development', '!border-none !bg-bkms-brand-6 !text-bkms-brand-2'],
+    // #E5FEFF 无规范映射（pending-design 建议 cyan-6，待设计拍板后改 !bg-bkms-cyan-6）
+    ['env-tag-test', '!border-none !bg-[#E5FEFF] !text-bkms-cyan-2'],
+    ['env-tag-staging', '!border-none !bg-bkms-warning-6 !text-bkms-warning-1'],
+    ['env-tag-production', '!border-none !bg-bkms-success-6 !text-bkms-success-2'],
   ],
   presets: [presetUno(), presetAttributify(), presetTypography()],
   transformers: [transformerDirectives(), transformerVariantGroup()],

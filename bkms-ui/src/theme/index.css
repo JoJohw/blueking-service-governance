@@ -1,0 +1,6 @@
+/* 补丁层统一入口：patches 按域加载，最后于 main.css 末尾引入，选择器级兜底 */
+@import './patches/form.css';
+@import './patches/table.css';
+@import './patches/dialog.css';
+@import './patches/feedback.css';
+@import './patches/navigation.css';

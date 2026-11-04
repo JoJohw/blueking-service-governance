@@ -1,0 +1,23 @@
+/* bkui/vxe 补丁 - table 域：仅层级与布局/尺寸修正；颜色归 tokens/bridge/编译替换，不在此出现 */
+.vxe-table--tooltip-wrapper {
+  z-index: 3000 !important;
+}
+
+/* 表格最后一行斑马纹背景残留清除（vxe 按行绘制背景图） */
+.vxe-table--render-default .vxe-table--body .vxe-body--row:nth-last-child(1) {
+  .vxe-body--column {
+    background-size: 100% 0px;
+  }
+}
+
+.vxe-table--filter-wrapper {
+  min-width: unset !important;
+
+  .vxe-checkbox--label {
+    padding-left: 0px;
+  }
+
+  .vxe-table--filter-body {
+    max-height: 280px !important;
+  }
+}

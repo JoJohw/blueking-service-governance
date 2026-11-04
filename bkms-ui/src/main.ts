@@ -56,6 +56,10 @@ import './styles/main.css';
 import '@blueking/table/vue3/vue3.css';
 import '@unocss/reset/tailwind.css';
 import 'uno.css';
+// tokens.css 只定义 --bkms-* 唯一变量、无级联冲突，放 CSS 组末尾以满足 import 排序；
+// patches（index.css）须在 main.css / uno 之后最后加载
+import '~/theme/index.css';
+import '~/theme/tokens.css';
 
 getUser({}, { needRes: true }).then(res => {
   const app = createApp(App);

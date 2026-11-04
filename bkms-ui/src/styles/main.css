@@ -17,7 +17,6 @@
  */
 
 @import '@/fonts/style.css';
-@import './bk-patch.css';
 
 html,
 body,
@@ -42,12 +41,12 @@ body,
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #dcdee5;
+  background-color: var(--bkms-neutral-5);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #979BA5;
+  background-color: var(--bkms-neutral-3);
 }
 
 ::-webkit-scrollbar-track {
@@ -55,7 +54,7 @@ body,
 }
 
 ::-webkit-scrollbar-track:hover {
-  background-color: #F0F1F5;
+  background-color: var(--bkms-neutral-6);
 }
 
 /* vxe表格滚动条样式 */
@@ -86,6 +85,32 @@ body,
   -webkit-box-orient: vertical;
 }
 
+/* 迁自 bk-patch.css：业务通用工具类（非组件库补丁） */
+.content-hover {
+  .content-item {
+    display: none !important;
+  }
+}
+
+.content-hover:hover {
+  .content-item {
+    display: block !important;
+  }
+}
+
+.scrollbar-stable {
+  scrollbar-gutter: stable;
+}
+
+.bfc::before,
+.bfc::after {
+  display: block;
+  clear: both;
+  content: '';
+  visibility: hidden;
+  overflow: hidden;
+}
+
 .bkms-full-screen {
   position: fixed !important;
   top: 0;
@@ -102,25 +127,25 @@ body,
   height: 32px;
   line-height: 32px;
   padding: 0 16px;
-  color: #63656e;
+  color: var(--bkms-text-body);
   font-size: 12px;
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
 
   &:hover:not(.disabled) {
-    background-color: #f5f7fa;
-    color: #3a84ff;
+    background-color: var(--bkms-bg-hover);
+    color: var(--bkms-text-brand);
   }
 
   &.disabled {
-    color: #dcdee5;
+    color: var(--bkms-text-disabled);
     cursor: not-allowed;
   }
 
   &.active {
-    background-color: #eaf3ff;
-    color: #3a84ff;
+    background-color: var(--bkms-bg-active);
+    color: var(--bkms-text-brand);
   }
 }
 
@@ -132,7 +157,7 @@ body,
 }
 
 .row--current {
-  background-color: #E1ECFF !important;
+  background-color: var(--bkms-bg-active) !important;
 }
 
 .bkms-skeleton {

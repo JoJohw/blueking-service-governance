@@ -524,14 +524,14 @@
   }
 
   :deep(.bk-dialog-footer) {
-    border-top-color: #eaebf0;
+    border-top-color: var(--bkms-neutral-6);
   }
 
   :deep(.deploy-precheck-dialog-table) {
-    --vxe-ui-table-border-color: #dcdee5;
+    --vxe-ui-table-border-color: var(--bkms-neutral-5);
     --vxe-ui-table-header-font-weight: 400;
-    --vxe-ui-table-header-font-color: #4d4f56;
-    --vxe-ui-table-header-background-color: #fafbfd;
-    --vxe-ui-font-color: #4d4f56;
+    --vxe-ui-table-header-font-color: var(--bkms-neutral-2);
+    --vxe-ui-table-header-background-color: var(--bkms-neutral-8);
+    --vxe-ui-font-color: var(--bkms-neutral-2);
   }
 </style>
