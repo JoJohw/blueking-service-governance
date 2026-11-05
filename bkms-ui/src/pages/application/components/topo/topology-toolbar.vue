@@ -26,7 +26,7 @@
       class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]"
       @click="zoomToOriginal"
     >
-      <i class="bkms-icon bkms-icon-reset-1_1 text-[#F5F7FA] text-[16px]" />
+      <i class="bkms-icon bkms-icon-reset-1_1 text-[var(--bkms-neutral-7)] text-[16px]" />
     </span>
 
     <Divider
@@ -42,7 +42,7 @@
       class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]"
       @click="zoomOut"
     >
-      <i class="bkms-icon bkms-icon-jianhao text-[#F5F7FA] text-[16px]" />
+      <i class="bkms-icon bkms-icon-jianhao text-[var(--bkms-neutral-7)] text-[16px]" />
     </span>
 
     <!-- 缩放比例 -->
@@ -54,7 +54,7 @@
       class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]"
       @click="zoomIn"
     >
-      <i class="bkms-icon bkms-icon-jiahao text-[#F5F7FA] text-[16px]" />
+      <i class="bkms-icon bkms-icon-jiahao text-[var(--bkms-neutral-7)] text-[16px]" />
     </span>
 
     <Divider
@@ -69,12 +69,12 @@
       v-bk-tooltips="minimapDisabled ? $t('节点数量过多，已禁用缩略图') : $t('缩略图')"
       :class="[
         'flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]',
-        showMinimap ? '!bg-[#3A84FF]' : '',
+        showMinimap ? '!bg-[var(--bkms-brand-2)]' : '',
         minimapDisabled ? 'opacity-50 cursor-not-allowed hover:bg-transparent' : '',
       ]"
       @click="!minimapDisabled && changeShowMinimap()"
     >
-      <i class="bkms-icon bkms-icon-map text-[#F5F7FA] text-[16px]" />
+      <i class="bkms-icon bkms-icon-map text-[var(--bkms-neutral-7)] text-[16px]" />
     </span>
 
     <div

@@ -28,7 +28,7 @@
         :title="t('版本详情')"
         :title-size="16"
       >
-        <span class="text-[14px] text-[#979BA5]">{{ `${t('版本号')}: ${chartVersion}` }}</span>
+        <span class="text-[14px] text-[var(--bkms-neutral-3)]">{{ `${t('版本号')}: ${chartVersion}` }}</span>
       </DividerHeader>
     </template>
     <Loading
@@ -54,10 +54,10 @@
           >
             <template #nodeType="node">
               <template v-if="node.isDir">
-                <i class="bkms-icon bkms-icon-folder text-[#c4c6cc] text-[16px] mr-[12px]"></i>
+                <i class="bkms-icon bkms-icon-folder text-[var(--bkms-navy-5)] text-[16px] mr-[12px]"></i>
               </template>
               <template v-else>
-                <i class="bkms-icon bkms-icon-file text-[#c4c6cc] text-[16px] mr-[12px]"></i>
+                <i class="bkms-icon bkms-icon-file text-[var(--bkms-navy-5)] text-[16px] mr-[12px]"></i>
               </template>
             </template>
           </Tree>
@@ -220,11 +220,11 @@
     font-size: 12px;
     transition: all 0.3s ease;
     &.is-selected {
-      color: #3a84ff;
-      background-color: #e1ecff;
+      color: var(--bkms-brand-2);
+      background-color: var(--bkms-brand-6);
     }
     &:hover {
-      background-color: #e1ecff;
+      background-color: var(--bkms-brand-6);
     }
 
     .bk-node-content {

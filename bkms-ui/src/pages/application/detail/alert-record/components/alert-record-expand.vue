@@ -4,7 +4,7 @@
       :container-height="32"
       :field-value="t('级别')"
       :field-width="100"
-      value-color="#313238"
+      value-color="var(--bkms-neutral-1)"
     >
       <template #value>
         <SeverityLabel :severity="row.severity" />
@@ -15,39 +15,41 @@
       :field-value="t('处理状态')"
       :field-width="100"
       :value="statusLabel"
-      value-color="#313238"
+      value-color="var(--bkms-neutral-1)"
     />
     <FieldItem
       :container-height="32"
       :field-value="t('开始时间')"
       :field-width="100"
       :value="row.beginTime ? formatDateString(row.beginTime * 1000) : '--'"
-      value-color="#313238"
+      value-color="var(--bkms-neutral-1)"
     />
     <FieldItem
       :container-height="32"
       :field-value="t('负责人')"
       :field-width="100"
       :value="ownerText"
-      value-color="#313238"
+      value-color="var(--bkms-neutral-1)"
     />
     <FieldItem
       :container-height="32"
       :field-value="t('持续时间')"
       :field-width="100"
       :value="row.duration || '--'"
-      value-color="#313238"
+      value-color="var(--bkms-neutral-1)"
     />
     <FieldItem
       class="!min-h-[32px] !h-auto !items-start"
-      value-color="#313238"
+      value-color="var(--bkms-neutral-1)"
     >
       <template #field>
-        <div class="w-[100px] min-h-[32px] leading-[32px] text-align-end text-[#979BA5]">{{ t('告警内容') }}：</div>
+        <div class="w-[100px] min-h-[32px] leading-[32px] text-align-end text-[var(--bkms-neutral-3)]">
+          {{ t('告警内容') }}：
+        </div>
       </template>
       <template #value>
         <div
-          class="pt-[8px] pb-[4px] text-[12px] text-[#313238] break-all whitespace-pre-wrap"
+          class="pt-[8px] pb-[4px] text-[12px] text-[var(--bkms-neutral-1)] break-all whitespace-pre-wrap"
           style="max-height: 120px; overflow: auto"
         >
           {{ row.description || '--' }}

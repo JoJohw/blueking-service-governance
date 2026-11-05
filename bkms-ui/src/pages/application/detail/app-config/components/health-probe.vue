@@ -526,6 +526,6 @@
 
 <style lang="postcss" scoped>
   :deep(.bkms-content-title) {
-    background-color: #eaebf0;
+    background-color: var(--bkms-neutral-6);
   }
 </style>

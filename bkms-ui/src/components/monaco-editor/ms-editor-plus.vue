@@ -267,6 +267,6 @@
   }
 
   :deep(.monaco-editor) {
-    outline-color: #1e1e1e;
+    outline-color: var(--bkms-neutral-1);
   }
 </style>

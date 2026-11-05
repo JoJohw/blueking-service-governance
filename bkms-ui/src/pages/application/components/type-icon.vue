@@ -65,11 +65,11 @@
     }
   > = {
     trpc: {
-      icon: 'bkms-icon bkms-icon-trpc text-[#1B44C8] text-[8px]',
+      icon: 'bkms-icon bkms-icon-trpc text-[var(--bkms-brand-1)] text-[8px]',
       label: 'trpc',
     },
     taf: {
-      icon: 'bkms-icon bkms-icon-taf text-[#1b44c8] text-[20px]',
+      icon: 'bkms-icon bkms-icon-taf text-[var(--bkms-brand-1)] text-[20px]',
       label: 'taf',
     },
     helm: {

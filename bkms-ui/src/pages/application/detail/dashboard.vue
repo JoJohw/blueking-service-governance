@@ -21,7 +21,7 @@
     <div
       class="flex h-[52px] flex-shrink-0 items-center justify-between bg-white px-[24px] shadow-[0_3px_4px_0_#0000000a]"
     >
-      <div class="text-[16px] text-[#313238]">{{ $t('仪表盘') }}</div>
+      <div class="text-[16px] text-[var(--bkms-neutral-1)]">{{ $t('仪表盘') }}</div>
       <Button
         text
         theme="primary"
@@ -47,7 +47,7 @@
           <img src="/empty.svg" />
         </template>
         <template #description>
-          <div class="text-[24px] text-[#313238]">{{ $t('暂未配置仪表盘') }}</div>
+          <div class="text-[24px] text-[var(--bkms-neutral-1)]">{{ $t('暂未配置仪表盘') }}</div>
           <DashboardSetupGuide class="mt-[16px] inline-block text-left" />
         </template>
         <Button
@@ -63,7 +63,9 @@
         v-else
         class="flex min-h-0 flex-1 flex-col px-[24px] py-[20px]"
       >
-        <FlexRow class="mb-[16px] flex-shrink-0 bg-[#EAEBF0] px-[12px] py-[8px] shadow-[0_2px_4px_0_#0000001a]">
+        <FlexRow
+          class="mb-[16px] flex-shrink-0 bg-[var(--bkms-neutral-6)] px-[12px] py-[8px] shadow-[0_2px_4px_0_#0000001a]"
+        >
           <template #left>
             <Select
               ref="dashboardSelectRef"
@@ -98,7 +100,7 @@
           </template>
           <template #right>
             <i
-              class="bkms-icon bkms-icon-full-screen cursor-pointer rounded-[4px] bg-[#fafbfd] p-[4px] text-[16px] hover:text-[#3A84FF]"
+              class="bkms-icon bkms-icon-full-screen cursor-pointer rounded-[4px] bg-[var(--bkms-neutral-8)] p-[4px] text-[16px] hover:text-[var(--bkms-brand-2)]"
               @click="handleFullScreen"
             ></i>
           </template>

@@ -181,7 +181,7 @@
 
   // 事件级别样式
   function eventLevelClass(level: string) {
-    return level === 'Warning' ? 'text-[#EA3636]' : 'text-[#2DCB56]';
+    return level === 'Warning' ? 'text-[var(--bkms-danger-2)]' : 'text-[var(--bkms-success-2)]';
   }
 
   // 获取事件列表

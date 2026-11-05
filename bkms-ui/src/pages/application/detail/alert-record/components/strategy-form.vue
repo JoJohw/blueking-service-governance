@@ -68,7 +68,7 @@
             <div class="flex items-center gap-[8px]">
               <span>
                 {{ $t('告警级别') }}
-                <span class="text-[#EA3636]">*</span>
+                <span class="text-[var(--bkms-danger-2)]">*</span>
               </span>
               <Select
                 v-model="formModel.severity"
@@ -76,7 +76,7 @@
               >
                 <template #trigger="{ selected }">
                   <div
-                    class="simplicity-trigger flex items-center gap-[8px] h-[32px] px-[8px] border-b border-[#C4C6CC] bg-transparent transition-colors cursor-pointer hover:bg-[#F5F7FA]"
+                    class="simplicity-trigger flex items-center gap-[8px] h-[32px] px-[8px] border-b border-[var(--bkms-navy-5)] bg-transparent transition-colors cursor-pointer hover:bg-[var(--bkms-neutral-7)]"
                   >
                     <div class="flex-1 min-w-0 truncate">
                       <SeverityLabel
@@ -85,13 +85,13 @@
                       />
                       <span
                         v-else
-                        class="text-[#c4c6cc] text-[12px]!"
+                        class="text-[var(--bkms-navy-5)] text-[12px]!"
                       >
                         {{ $t('请选择告警级别') }}
                       </span>
                     </div>
                     <AngleDown
-                      class="simplicity-trigger-arrow shrink-0 text-[#979BA5] transition-transform"
+                      class="simplicity-trigger-arrow shrink-0 text-[var(--bkms-neutral-3)] transition-transform"
                       :height="20"
                       :width="20"
                     />
@@ -117,9 +117,9 @@
             <div class="flex items-center gap-[8px]">
               <span>
                 {{ $t('告警条件') }}
-                <span class="text-[#EA3636]">*</span>
+                <span class="text-[var(--bkms-danger-2)]">*</span>
               </span>
-              <div class="flex-1 flex items-center gap-[8px] text-[#63656E]">
+              <div class="flex-1 flex items-center gap-[8px] text-[var(--bkms-neutral-2)]">
                 <i18n-t :keypath="thresholdKeypath">
                   <Select
                     v-model="formModel.thresholdMethod"
@@ -160,9 +160,9 @@
             <div class="flex items-center gap-[8px]">
               <span>
                 {{ $t('触发条件') }}
-                <span class="text-[#EA3636]">*</span>
+                <span class="text-[var(--bkms-danger-2)]">*</span>
               </span>
-              <div class="flex-1 flex items-center gap-[8px] flex-wrap text-[#63656E]">
+              <div class="flex-1 flex items-center gap-[8px] flex-wrap text-[var(--bkms-neutral-2)]">
                 <i18n-t keypath="在 {0} 个周期内累计满足 {1} 次检测条件时，触发告警通知">
                   <Input
                     v-model="formModel.triggerCheckWindow"
@@ -189,9 +189,9 @@
             <div class="flex items-center gap-[8px]">
               <span>
                 {{ $t('恢复条件') }}
-                <span class="text-[#EA3636]">*</span>
+                <span class="text-[var(--bkms-danger-2)]">*</span>
               </span>
-              <div class="flex-1 flex items-center gap-[8px] flex-wrap text-[#63656E]">
+              <div class="flex-1 flex items-center gap-[8px] flex-wrap text-[var(--bkms-neutral-2)]">
                 <i18n-t keypath="连续 {0} 个周期内不满足触发条件">
                   <Input
                     v-model="formModel.recoverCheckWindow"
@@ -211,7 +211,7 @@
             <div class="flex items-center gap-[8px]">
               <span class="shrink-0">
                 {{ $t('生效时间段') }}
-                <span class="text-[#EA3636]">*</span>
+                <span class="text-[var(--bkms-danger-2)]">*</span>
               </span>
               <TimePicker
                 v-model="formModel.effectiveTimeRange"
@@ -245,20 +245,22 @@
           >
             <Radio label="all"
               ><span class="text-[14px]">{{ $t('所有环境') }}</span>
-              <span class="text-[#979BA5] text-[14px]">{{ $t('( 所有环境都生效，包括新增的环境也会生效 )') }}</span>
+              <span class="text-[var(--bkms-neutral-3)] text-[14px]">{{
+                $t('( 所有环境都生效，包括新增的环境也会生效 )')
+              }}</span>
             </Radio>
             <Radio
               class="ml-0!"
               label="env_type"
               ><span class="text-[14px]">{{ $t('按环境类型') }}</span>
-              <span class="text-[#979BA5] text-[14px]">{{
+              <span class="text-[var(--bkms-neutral-3)] text-[14px]">{{
                 $t('( 针对环境类型生效，包括新增的环境也会生效 )')
               }}</span></Radio
             >
             <!-- 按环境类型：多选 -->
             <div
               v-if="formModel.scopeType === 'env_type'"
-              class="flex items-center px-[12px] bg-[#F5F7FA] rounded-[2px]"
+              class="flex items-center px-[12px] bg-[var(--bkms-neutral-7)] rounded-[2px]"
             >
               <Checkbox.Group v-model="formModel.envTypes">
                 <Checkbox
@@ -274,7 +276,7 @@
               class="ml-0!"
               label="specific_envs"
               ><span class="text-[14px]">{{ $t('特定环境') }}</span>
-              <span class="text-[#979BA5] text-[14px]">{{
+              <span class="text-[var(--bkms-neutral-3)] text-[14px]">{{
                 $t('( 针对指定的环境生效，新增同类环境不会自动生效 )')
               }}</span></Radio
             >
@@ -308,7 +310,7 @@
             <div class="flex items-start gap-[8px]">
               <span>
                 {{ $t('告警组') }}
-                <span class="text-[#EA3636]">*</span>
+                <span class="text-[var(--bkms-danger-2)]">*</span>
               </span>
               <div class="flex-1 flex flex-col gap-[8px]">
                 <div class="flex items-center gap-[8px] flex-wrap min-h-[20px]">
@@ -318,7 +320,7 @@
                     closable
                     @close="handleRemoveNoticeGroup(id)"
                   >
-                    <i class="bkms-icon bkms-icon-usergroup text-[#979BA5] text-[14px] mr-[2px]"></i>
+                    <i class="bkms-icon bkms-icon-usergroup text-[var(--bkms-neutral-3)] text-[14px] mr-[2px]"></i>
                     {{ getNoticeGroupName(id) }}
                   </Tag>
                   <Button
@@ -330,7 +332,7 @@
                     <span>{{ $t('添加告警组') }}</span>
                   </Button>
                 </div>
-                <span class="text-[#979BA5] text-[12px]">{{
+                <span class="text-[var(--bkms-neutral-3)] text-[12px]">{{
                   $t('通知渠道在告警组内配置，选择告警组即关联其通知方式。')
                 }}</span>
               </div>
@@ -738,7 +740,7 @@
   /* trigger 插槽模拟 behavior="simplicity" 的展开/聚焦态：底边框高亮为主色 */
   :deep(.bk-select.popover-show) .simplicity-trigger,
   :deep(.bk-select.is-focus) .simplicity-trigger {
-    border-bottom-color: #3a84ff;
+    border-bottom-color: var(--bkms-brand-2);
   }
 
   /* 下拉展开时右侧箭头旋转 180° */

@@ -26,13 +26,13 @@
     <slot />
     <template #content>
       <div class="push-guide-content w-[520px] p-[4px]">
-        <div class="text-[14px] font-bold text-[#313238] leading-[22px] mb-[16px]">
+        <div class="text-[14px] font-bold text-[var(--bkms-neutral-1)] leading-[22px] mb-[16px]">
           {{ $t('推送指引') }}
         </div>
-        <div class="text-[12px] text-[#4D4F56] leading-[20px] mb-[4px]">
+        <div class="text-[12px] text-[var(--bkms-neutral-2)] leading-[20px] mb-[4px]">
           {{ $t('请将镜像推送至当前空间绑定仓库后使用。凭证可在「空间设置 → 基本信息」查看。') }}
         </div>
-        <div class="bg-[#F6F7FB] px-[16px] py-[12px]">
+        <div class="bg-[var(--bkms-neutral-8)] px-[16px] py-[12px]">
           <FieldItem
             class="leading-[20px]"
             :container-height="20"
@@ -40,15 +40,16 @@
             :field-width="60"
           >
             <template #value>
-              <span class="push-guide-command-string push-guide-mono text-[14px] font-mono break-all !text-[#313238]">{{
-                repositoryAddress
-              }}</span>
+              <span
+                class="push-guide-command-string push-guide-mono text-[14px] font-mono break-all !text-[var(--bkms-neutral-1)]"
+                >{{ repositoryAddress }}</span
+              >
               <Copy
                 v-bk-tooltips="{
                   content: $t('复制仓库地址'),
                 }"
-                class="ml-[6px] cursor-pointer hover:text-[#3A84FF] shrink-0"
-                fill="#979BA5"
+                class="ml-[6px] cursor-pointer hover:text-[var(--bkms-brand-2)] shrink-0"
+                fill="var(--bkms-neutral-3)"
                 :title="$t('复制')"
                 @click="copyText(repositoryAddress)"
               >
@@ -64,7 +65,7 @@
             <template #value>
               <SecretToggle
                 :empty-value-placeholder="$t('暂无凭证')"
-                icon-fill="#979BA5"
+                icon-fill="var(--bkms-neutral-3)"
                 :placeholder="'********'"
                 :value="password"
                 @click.stop
@@ -75,8 +76,8 @@
                 v-bk-tooltips="{
                   content: $t('复制凭证'),
                 }"
-                class="ml-[6px] cursor-pointer hover:text-[#3A84FF] shrink-0"
-                fill="#979BA5"
+                class="ml-[6px] cursor-pointer hover:text-[var(--bkms-brand-2)] shrink-0"
+                fill="var(--bkms-neutral-3)"
                 :title="$t('复制')"
                 @click="copyText(password)"
               >
@@ -89,7 +90,7 @@
         <div class="mt-[18px] flex items-center justify-between">
           <div class="flex items-center">
             <span class="push-guide-step-circle">1</span>
-            <span class="ml-[8px] text-[12px] font-bold text-[#4D4F56]">{{ $t('登录镜像仓库') }}</span>
+            <span class="ml-[8px] text-[12px] font-bold text-[var(--bkms-neutral-2)]">{{ $t('登录镜像仓库') }}</span>
           </div>
           <Button
             text
@@ -100,7 +101,7 @@
             {{ $t('复制') }}
           </Button>
         </div>
-        <div class="bg-[#F5F7FA] mt-[6px] px-[12px] ml-[28px] py-[16px]">
+        <div class="bg-[var(--bkms-neutral-7)] mt-[6px] px-[12px] ml-[28px] py-[16px]">
           <pre
             v-bk-xss-html="highlightedLoginCommand"
             class="push-guide-mono push-guide-pre m-0 whitespace-pre-wrap break-all"
@@ -111,7 +112,7 @@
         <div class="mt-[6px] flex items-center justify-between">
           <div class="flex items-center">
             <span class="push-guide-step-circle">2</span>
-            <span class="ml-[8px] text-[12px] font-bold text-[#4D4F56]">{{ $t('推送到空间仓库') }}</span>
+            <span class="ml-[8px] text-[12px] font-bold text-[var(--bkms-neutral-2)]">{{ $t('推送到空间仓库') }}</span>
           </div>
           <Button
             text
@@ -122,7 +123,7 @@
             {{ $t('复制') }}
           </Button>
         </div>
-        <div class="bg-[#F5F7FA] mt-[6px] px-[12px] ml-[28px] py-[16px]">
+        <div class="bg-[var(--bkms-neutral-7)] mt-[6px] px-[12px] ml-[28px] py-[16px]">
           <pre
             v-bk-xss-html="highlightedPushCommand"
             class="push-guide-mono push-guide-pre m-0 whitespace-pre-wrap break-all"
@@ -188,9 +189,9 @@
 
   // ========== 高亮 HTML（用于渲染）==========
   // 颜色约定（与设计稿对齐）：
-  //   push-guide-command-keyword  → 关键字 docker、命令名 login/push（蓝 #3A84FF）
+  //   push-guide-command-keyword  → 关键字 docker、命令名 login/push（蓝 var(--bkms-brand-2)）
   //   push-guide-command-string   → 仓库地址、用户名、镜像路径等字符串（绿 #2EAD98）
-  //   基础文本（容器）                    → 灰 #4D4F56
+  //   基础文本（容器）                    → 灰 var(--bkms-neutral-2)
   // 命令通过 v-bk-xss-html 渲染，拼接高亮标签前先转义所有动态文本（参照 dev-mode-steps.vue 先例）
   function escapeHtml(text: string) {
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -204,7 +205,7 @@
       : escapeHtml('<仓库凭证>');
     return [
       '<span class="push-guide-command-keyword">docker login</span>',
-      // 仓库地址弱化显示为灰色（继承 .push-guide-mono 容器色 #4D4F56），与用户名/密码的绿色高亮区分
+      // 仓库地址弱化显示为灰色（继承 .push-guide-mono 容器色 var(--bkms-neutral-2)），与用户名/密码的绿色高亮区分
       `<span>${escapeHtml(props.repositoryAddress || '')}</span>`,
       '<span class="push-guide-command-keyword">-u</span>',
       `<span class="push-guide-command-string">${username}</span>`,
@@ -230,7 +231,7 @@
 
 <style lang="postcss" scoped>
   .push-guide-mono {
-    color: #4d4f56;
+    color: var(--bkms-neutral-2);
     font-family: Consolas, 'Courier New', monospace;
   }
 
@@ -248,18 +249,18 @@
     width: 20px;
     height: 22px;
     border-radius: 50%;
-    background-color: #eaebf0;
-    color: #4d4f56;
+    background-color: var(--bkms-neutral-6);
+    color: var(--bkms-neutral-2);
     font-size: 14px;
     font-weight: 700;
     line-height: 22px;
   }
 
   .push-guide-content :deep(.push-guide-command-keyword) {
-    color: #3a84ff;
+    color: var(--bkms-brand-2);
   }
 
   .push-guide-content :deep(.push-guide-command-string) {
-    color: #14a38b;
+    color: var(--bkms-cyan-1);
   }
 </style>

@@ -77,7 +77,7 @@
                 </div>
                 <span
                   v-if="!appModelSpec?.command?.length"
-                  class="text-[12px] text-[#313238]"
+                  class="text-[12px] text-[var(--bkms-neutral-1)]"
                   >--</span
                 >
               </div>
@@ -101,7 +101,7 @@
                 </div>
                 <span
                   v-if="!appModelSpec?.args?.length"
-                  class="text-[12px] text-[#313238]"
+                  class="text-[12px] text-[var(--bkms-neutral-1)]"
                   >--
                 </span>
               </div>
@@ -216,6 +216,6 @@
 
 <style lang="postcss" scoped>
   :deep(.bkms-content-title) {
-    background-color: #eaebf0;
+    background-color: var(--bkms-neutral-6);
   }
 </style>

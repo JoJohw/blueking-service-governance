@@ -22,16 +22,16 @@
     class="pending-redeploy-panel mb-[16px] overflow-hidden rounded-[2px] border border-[#F9D090]"
   >
     <div
-      class="flex cursor-pointer items-center justify-between bg-[#FDF4E8] px-[16px] py-[8px]"
+      class="flex cursor-pointer items-center justify-between bg-[var(--bkms-warning-7)] px-[16px] py-[8px]"
       @click="isExpanded = !isExpanded"
     >
       <div class="flex min-w-0 items-center">
-        <i class="bkms-icon bkms-icon-triangle-warning shrink-0 text-[14px] text-[#F59500]"></i>
-        <span class="ml-[8px] text-[12px] font-bold text-[#F59500]">
+        <i class="bkms-icon bkms-icon-triangle-warning shrink-0 text-[14px] text-[var(--bkms-warning-2)]"></i>
+        <span class="ml-[8px] text-[12px] font-bold text-[var(--bkms-warning-2)]">
           {{ $t('北极星配置待重新部署生效') }}
         </span>
         <span
-          class="ml-[8px] shrink-0 rounded-[2px] bg-[#FCE5C0] px-[8px] py-[1px] text-[12px] leading-[18px] text-[#E38B02]"
+          class="ml-[8px] shrink-0 rounded-[2px] bg-[var(--bkms-warning-5)] px-[8px] py-[1px] text-[12px] leading-[18px] text-[var(--bkms-warning-1)]"
         >
           <i18n-t keypath="涉及 {0} 个环境">
             <span>{{ pendingRedeployEnvCount }}</span>
@@ -51,7 +51,7 @@
         </Button>
         <AngleDown
           :class="[
-            'ml-[8px] text-[22px] text-[#979BA5] transition-transform duration-200',
+            'ml-[8px] text-[22px] text-[var(--bkms-neutral-3)] transition-transform duration-200',
             { 'rotate-180': isExpanded },
           ]"
         />
@@ -62,7 +62,9 @@
       v-if="isExpanded"
       class="bg-[#fff] px-[16px] pb-[4px]"
     >
-      <div class="pending-redeploy-grid border-b border-[#F0E3C8] py-[8px] text-[12px] text-[#979BA5]">
+      <div
+        class="pending-redeploy-grid border-b border-[var(--bkms-warning-6)] py-[8px] text-[12px] text-[var(--bkms-neutral-3)]"
+      >
         <span>{{ $t('待部署环境') }}</span>
         <span>{{ $t('北极星服务名') }}</span>
         <span>{{ $t('修改内容') }}</span>
@@ -71,11 +73,11 @@
       <div
         v-for="group in pendingRedeployGroups"
         :key="group.envName"
-        class="pending-redeploy-grid border-b border-[#F5F7FA] last:border-b-0"
+        class="pending-redeploy-grid border-b border-[var(--bkms-neutral-7)] last:border-b-0"
       >
         <div class="flex min-w-0 items-center">
           <OverflowTitle
-            class="min-w-0 text-[12px] text-[#313238]"
+            class="min-w-0 text-[12px] text-[var(--bkms-neutral-1)]"
             :content="group.envDisplayName"
             placement="top-start"
             resizeable
@@ -93,19 +95,19 @@
           <div
             v-for="item in group.items"
             :key="item.configName"
-            class="pending-redeploy-item-grid border-b border-[#F5F7FA] py-[10px] last:border-b-0"
+            class="pending-redeploy-item-grid border-b border-[var(--bkms-neutral-7)] py-[10px] last:border-b-0"
           >
             <div class="w-full min-w-0 overflow-hidden">
               <OverflowTitle
                 :key="item.polarisName || '--'"
-                class="w-full min-w-0 text-[12px] text-[#313238]"
+                class="w-full min-w-0 text-[12px] text-[var(--bkms-neutral-1)]"
                 :content="item.polarisName || '--'"
                 placement="top-start"
                 resizeable
                 type="tips"
               />
             </div>
-            <div class="min-w-0 text-[12px] leading-[20px] text-[#979BA5]">
+            <div class="min-w-0 text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">
               <template v-if="item.changes.length">
                 <div
                   v-for="change in item.changes"
@@ -114,9 +116,11 @@
                   {{ change.label }}
                   <template v-if="change.oldValue !== undefined">
                     {{ formatRedeployValue(change.oldValue) }}
-                    <span class="mx-[4px] text-[#C4C6CC]">→</span>
+                    <span class="mx-[4px] text-[var(--bkms-navy-5)]">→</span>
                   </template>
-                  <span class="font-medium text-[#313238]">{{ formatRedeployValue(change.newValue) }}</span>
+                  <span class="font-medium text-[var(--bkms-neutral-1)]">{{
+                    formatRedeployValue(change.newValue)
+                  }}</span>
                 </div>
               </template>
               <span v-else>

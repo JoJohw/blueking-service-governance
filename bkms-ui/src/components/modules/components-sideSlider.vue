@@ -474,7 +474,7 @@
             </template>
           </template>
           <template v-if="currentStep === 2">
-            <div class="bg-[#F1F2F6] text-[313238] font-bold text-[14px] px-[16px] py-[6px]">
+            <div class="bg-[var(--bkms-neutral-7)] text-[313238] font-bold text-[14px] px-[16px] py-[6px]">
               {{ $t('试运行结果预览') }}
             </div>
             <PatchPreviewCard

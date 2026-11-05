@@ -36,20 +36,20 @@
       />
       <Close
         v-else-if="alertTheme === 'error'"
-        fill="#EA3636"
+        fill="var(--bkms-danger-2)"
         height="16px"
         width="16px"
       />
       <Warn
         v-else
-        fill="#FF9C01"
+        fill="var(--bkms-warning-2)"
         height="16px"
         width="16px"
       />
-      <span class="text-[#4D4F56] text-[12px] font-bold ml-[8px]">{{ $t(statusText) }}</span>
+      <span class="text-[var(--bkms-neutral-2)] text-[12px] font-bold ml-[8px]">{{ $t(statusText) }}</span>
     </template>
     <template #default>
-      <div class="flex px-[24px] gap-[36px] text-[12px] text-[#4D4F56] h-[18px] leading-[18px]">
+      <div class="flex px-[24px] gap-[36px] text-[12px] text-[var(--bkms-neutral-2)] h-[18px] leading-[18px]">
         <span>{{ revisionLabel }}: {{ buildInfo.revision || '--' }}</span>
         <span>{{ $t('镜像 Tag') }}: {{ buildInfo.imageTag || '--' }}</span>
         <span>{{ $t('操作人') }}: {{ buildInfo.operator || '--' }}</span>

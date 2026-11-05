@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="bg-[#F5F7FA] px-[24px] py-[16px]">
+  <div class="bg-[var(--bkms-neutral-7)] px-[24px] py-[16px]">
     <Loading :loading="isLoading">
       <Form
         ref="formRef"
@@ -101,7 +101,7 @@
         >
           {{ $t('服务"{0}"未上线全量版本，请先将服务上线到全部实例。', [currentServiceName]) }}
           <a
-            class="text-[#3a84ff]"
+            class="text-[var(--bkms-brand-2)]"
             :href="bscpServiceReleaseUrl"
             target="_blank"
             >{{ $t('去上线') }}

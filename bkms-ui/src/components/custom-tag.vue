@@ -46,13 +46,13 @@
   }
   .danger {
     background-color: #fbe9e7;
-    color: #e02020;
-    border-color: #e02020;
+    color: var(--bkms-danger-2);
+    border-color: var(--bkms-danger-2);
   }
   .warning {
-    background-color: #fdf6e5;
-    color: #e02020;
-    border-color: #e02020;
+    background-color: var(--bkms-warning-7);
+    color: var(--bkms-danger-2);
+    border-color: var(--bkms-danger-2);
   }
   .info {
     background-color: var(--bkms-brand-6);

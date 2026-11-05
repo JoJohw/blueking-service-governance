@@ -13,7 +13,7 @@
         </i18n-t>
         <div class="flex items-center justify-between bg-[#fff] mt-[8px] h-[52px] px-[12px]">
           <code class="font-mono">
-            go build -o <span class="text-[#3A84FF]">{{ buildOutputPath }}</span>
+            go build -o <span class="text-[var(--bkms-brand-2)]">{{ buildOutputPath }}</span>
           </code>
           <Button
             text

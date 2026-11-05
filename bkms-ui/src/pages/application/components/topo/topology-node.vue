@@ -67,7 +67,7 @@
           >
             {{ data.data?.name }}
           </div>
-          <div class="text-[12px] text-[#8E9BB3] leading-[20px]">
+          <div class="text-[12px] text-[var(--bkms-navy-4)] leading-[20px]">
             {{ KIND_SHORT_MAP[data.data?.kind || ''] ?? data.data?.kind }}
           </div>
         </div>
@@ -105,14 +105,14 @@
             />
           </svg>
           <span
-            class="collapse-btn absolute top-[50%] translate-y-[-50%] select-none bg-[#F5F7FA] rounded-[50%] flex items-center justify-center w-[18px] h-[18px]"
+            class="collapse-btn absolute top-[50%] translate-y-[-50%] select-none bg-[var(--bkms-neutral-7)] rounded-[50%] flex items-center justify-center w-[18px] h-[18px]"
             :style="{ left: `calc(100% + ${EDGE_LENGTH / 2 - 9}px)` }"
             @click.stop.prevent="handleCollapse"
             @pointerdown.stop
             @pointerenter.stop
           >
             <i
-              class="text-[#ABB5CC] text-[18px] hover:text-[#3A84FF] custom-collapse"
+              class="text-[#ABB5CC] text-[18px] hover:text-[var(--bkms-brand-2)] custom-collapse"
               :class="data.data?.collapsed ? 'bkms-icon bkms-icon-plus' : 'bkms-icon bkms-icon-minus'"
             ></i>
           </span>
@@ -175,9 +175,9 @@
 
   // 状态优先级配置：[状态名, 对应样式]
   const stateOutlineMap = [
-    ['focused', '4px solid #FF9C01'],
-    ['highlighted', '4px solid #FFE8C3'],
-    ['selected', '4px solid #FF9C01'],
+    ['focused', '4px solid var(--bkms-warning-2)'],
+    ['highlighted', '4px solid var(--bkms-warning-5)'],
+    ['selected', '4px solid var(--bkms-warning-2)'],
   ] as const;
 
   const statusConfig = computed(

@@ -152,20 +152,20 @@
             <div class="h-[32px] flex items-center gap-[8px]">
               <!-- 添加行 -->
               <i
-                class="bkms-icon bkms-icon-plus-circle-shape cursor-pointer text-[#C4C6CC] hover:text-[#4D4F56]"
+                class="bkms-icon bkms-icon-plus-circle-shape cursor-pointer text-[var(--bkms-navy-5)] hover:text-[var(--bkms-neutral-2)]"
                 @click="addPort"
               ></i>
               <!-- 删除行 -->
               <template v-if="portList.length > 1">
                 <i
-                  class="bkms-icon bkms-icon-minus-circle-shape cursor-pointer text-[#C4C6CC] hover:text-[#4D4F56]"
+                  class="bkms-icon bkms-icon-minus-circle-shape cursor-pointer text-[var(--bkms-navy-5)] hover:text-[var(--bkms-neutral-2)]"
                   @click="deletePort(row)"
                 ></i>
               </template>
               <template v-else>
                 <i
                   v-bk-tooltips="$t('至少保留一个')"
-                  class="bkms-icon bkms-icon-minus-circle-shape cursor-not-allowed text-[#DCDEE5]"
+                  class="bkms-icon bkms-icon-minus-circle-shape cursor-not-allowed text-[var(--bkms-neutral-5)]"
                 ></i>
               </template>
             </div>

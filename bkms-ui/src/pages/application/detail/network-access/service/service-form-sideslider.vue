@@ -34,7 +34,7 @@
             class="mx-[12px]"
             direction="vertical"
           ></Divider>
-          <span class="text-[#979BA5] text-[14px] leading-[24px]">{{ currentService?.name }}</span>
+          <span class="text-[var(--bkms-neutral-3)] text-[14px] leading-[24px]">{{ currentService?.name }}</span>
         </template>
       </div>
     </template>

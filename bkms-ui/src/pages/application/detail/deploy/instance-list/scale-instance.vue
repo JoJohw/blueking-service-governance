@@ -148,7 +148,7 @@
                 <Radio :label="false">{{ $t('按 Requests 计算') }}</Radio>
                 <Radio :label="true">{{ $t('按 Limits 计算') }}</Radio>
               </Radio.Group>
-              <div class="text-[12px] leading-[20px] text-[#979BA5]">
+              <div class="text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">
                 {{ computeByLimitsTip }}
               </div>
             </div>
@@ -179,7 +179,7 @@
                     />
                   </Select>
                 </Form.FormItem>
-                <div class="text-align-center text-[#63656E]">=</div>
+                <div class="text-align-center text-[var(--bkms-neutral-2)]">=</div>
                 <Form.FormItem
                   class="mb-0"
                   error-display-type="tooltips"
@@ -199,23 +199,23 @@
                 <div class="ml-[12px] flex items-center gap-[8px] h-[32px]">
                   <i
                     v-if="canAddMetric"
-                    class="bkms-icon bkms-icon-plus-circle-shape cursor-pointer text-[#979BA5] hover:text-[#4D4F56]"
+                    class="bkms-icon bkms-icon-plus-circle-shape cursor-pointer text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-neutral-2)]"
                     @click="handleAddMetric"
                   ></i>
                   <i
                     v-else
                     v-bk-tooltips="$t('最多配置 2 项')"
-                    class="bkms-icon bkms-icon-plus-circle-shape cursor-not-allowed text-[#DCDEE5]"
+                    class="bkms-icon bkms-icon-plus-circle-shape cursor-not-allowed text-[var(--bkms-neutral-5)]"
                   ></i>
                   <i
                     v-if="formModel.metrics.length > 1"
-                    class="bkms-icon bkms-icon-minus-circle-shape cursor-pointer text-[#979BA5] hover:text-[#4D4F56]"
+                    class="bkms-icon bkms-icon-minus-circle-shape cursor-pointer text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-neutral-2)]"
                     @click="handleRemoveMetric(metric.id)"
                   ></i>
                   <i
                     v-else
                     v-bk-tooltips="$t('至少保留一个')"
-                    class="bkms-icon bkms-icon-minus-circle-shape cursor-not-allowed text-[#DCDEE5]"
+                    class="bkms-icon bkms-icon-minus-circle-shape cursor-not-allowed text-[var(--bkms-neutral-5)]"
                   ></i>
                 </div>
               </div>
@@ -743,11 +743,17 @@
     InfoBox({
       type: 'warning',
       title: t('无法启用自动扩缩容'),
-      content: h('div', { class: 'bg-[#F5F7FA] px-[16px] py-[12px] text-left leading-[24px] text-[#4D4F56]' }, [
-        t('当前环境对应集群未安装 General-Pod-Autoscaler 组件。请先在'),
-        h('span', { class: 'px-[4px] text-[#3A84FF]' }, t('环境管理 / 集群组件')),
-        t('页面安装组件后，再配置自动扩缩容。'),
-      ]),
+      content: h(
+        'div',
+        {
+          class: 'bg-[var(--bkms-neutral-7)] px-[16px] py-[12px] text-left leading-[24px] text-[var(--bkms-neutral-2)]',
+        },
+        [
+          t('当前环境对应集群未安装 General-Pod-Autoscaler 组件。请先在'),
+          h('span', { class: 'px-[4px] text-[var(--bkms-brand-2)]' }, t('环境管理 / 集群组件')),
+          t('页面安装组件后，再配置自动扩缩容。'),
+        ],
+      ),
       headerAlign: 'center',
       contentAlign: 'left',
       footerAlign: 'center',
@@ -773,7 +779,7 @@
     return new Promise<boolean>(resolve => {
       InfoBox({
         title: isManual ? t('确认切换为手动调节') : t('确认切换为自动调节'),
-        content: h('div', { class: 'bg-[#F5F7FA] px-[16px] py-[12px] text-left leading-[22px]' }, [
+        content: h('div', { class: 'bg-[var(--bkms-neutral-7)] px-[16px] py-[12px] text-left leading-[22px]' }, [
           h('div', { class: 'mb-[4px]' }, [isManual ? t('切换为手动调节后：') : t('切换为自动调节后：')]),
           h('ul', { class: 'list-disc pl-[18px]' }, [
             h('li', [

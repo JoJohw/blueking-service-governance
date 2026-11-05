@@ -106,7 +106,7 @@
         >
           <template #default="{ row }">
             <span
-              class="inline-flex max-w-full cursor-pointer items-center text-[#3A84FF]"
+              class="inline-flex max-w-full cursor-pointer items-center text-[var(--bkms-brand-2)]"
               @click="handleToPolarisProject(row)"
             >
               <template v-if="row?.polarisName">
@@ -815,15 +815,18 @@
 
   /** 删除分支 1 弹窗内容：提示先置空可用环境，且不展示去部署操作。 */
   function renderClearScopeInfoBoxContent(row: PolarisConfigOutputObj, scopeEnvs: DeployedEnv[]) {
-    return h('div', { class: 'text-[14px] leading-[22px] text-[#4D4F56]' }, [
-      h('div', { class: 'mb-[16px] bg-[#F5F7FA] p-[12px]' }, [
+    return h('div', { class: 'text-[14px] leading-[22px] text-[var(--bkms-neutral-2)]' }, [
+      h('div', { class: 'mb-[16px] bg-[var(--bkms-neutral-7)] p-[12px]' }, [
         h('div', { class: 'mb-[12px]' }, [
           t('北极星 {0} 已关联以下环境，需要按以下顺序完成后才能删除：', [row.polarisName || '--']),
         ]),
         h('div', { class: 'mb-[8px] flex items-center' }, [
           h(
             'span',
-            { class: 'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-[#EAEBF0]' },
+            {
+              class:
+                'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-[var(--bkms-neutral-6)]',
+            },
             '1',
           ),
           h('span', t('可用环境置空')),
@@ -831,7 +834,10 @@
         h('div', { class: 'flex items-center' }, [
           h(
             'span',
-            { class: 'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-[#EAEBF0]' },
+            {
+              class:
+                'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-[var(--bkms-neutral-6)]',
+            },
             '2',
           ),
           h('span', t('重新部署已关联的环境')),
@@ -843,7 +849,7 @@
 
   /** 删除确认说明：立即生效配置由后端同步摘除，其他配置沿用未部署场景说明。 */
   function renderDeleteInfoBoxContent(row: PolarisConfigOutputObj) {
-    const serviceName = h('div', { class: 'mb-[16px] text-[14px] text-[#313238]' }, [
+    const serviceName = h('div', { class: 'mb-[16px] text-[14px] text-[var(--bkms-neutral-1)]' }, [
       `${t('北极星服务名')}：${row.polarisName || '--'}`,
     ]);
 
@@ -853,7 +859,7 @@
 
     return h('div', [
       serviceName,
-      h('div', { class: 'bg-[#F5F7FA] px-[16px] py-[12px] text-[14px] leading-[22px]' }, [description]),
+      h('div', { class: 'bg-[var(--bkms-neutral-7)] px-[16px] py-[12px] text-[14px] leading-[22px]' }, [description]),
     ]);
   }
 
@@ -871,7 +877,7 @@
 
   /** 删除分支 2 弹窗内容：提示重新部署已关联环境后才能删除配置。 */
   function renderRedeployBlockingInfoBoxContent(row: PolarisConfigOutputObj, redeployBlockingEnvs: DeployedEnv[]) {
-    return h('div', { class: 'text-[14px] leading-[22px] text-[#4D4F56]' }, [
+    return h('div', { class: 'text-[14px] leading-[22px] text-[var(--bkms-neutral-2)]' }, [
       h('div', { class: 'mb-[24px]' }, [
         t('北极星 '),
         h('span', { class: 'font-bold' }, row.polarisName || '--'),
@@ -884,15 +890,23 @@
   /** 渲染删除弹窗中的环境列表，可按弹窗类型控制是否展示去部署入口。 */
   function renderRedeployEnvTable(envs: DeployedEnv[], options: { showDeployAction?: boolean } = {}) {
     const { showDeployAction = true } = options;
-    return h('div', { class: 'overflow-hidden rounded-[2px] border border-[#EAEBF0]' }, [
-      h('div', { class: 'flex h-[32px] items-center bg-[#EAEBF0] px-[16px] text-[14px] text-[#313238]' }, [
-        t('需要重新部署的 {0} 个环境', [envs.length]),
-      ]),
+    return h('div', { class: 'overflow-hidden rounded-[2px] border border-[var(--bkms-neutral-6)]' }, [
+      h(
+        'div',
+        {
+          class:
+            'flex h-[32px] items-center bg-[var(--bkms-neutral-6)] px-[16px] text-[14px] text-[var(--bkms-neutral-1)]',
+        },
+        [t('需要重新部署的 {0} 个环境', [envs.length])],
+      ),
       ...envs.map((env, index) =>
         h(
           'div',
           {
-            class: ['flex h-[36px] items-center px-[16px] text-[12px]', index % 2 === 1 ? 'bg-[#FAFBFD]' : 'bg-[#fff]'],
+            class: [
+              'flex h-[36px] items-center px-[16px] text-[12px]',
+              index % 2 === 1 ? 'bg-[var(--bkms-neutral-8)]' : 'bg-[#fff]',
+            ],
           },
           [
             h('span', { class: 'truncate' }, env.displayName),

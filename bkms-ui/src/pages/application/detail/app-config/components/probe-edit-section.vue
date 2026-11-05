@@ -19,13 +19,15 @@
 <template>
   <div class="probe-card border rounded-[8px] flex-1 min-w-0 overflow-hidden">
     <!-- 卡片标题行 -->
-    <div class="flex items-center justify-between h-[32px] px-[12px] bg-[#F5F7FA] border-b border-[#EAEBF0]">
+    <div
+      class="flex items-center justify-between h-[32px] px-[12px] bg-[var(--bkms-neutral-7)] border-b border-[var(--bkms-neutral-6)]"
+    >
       <div class="flex items-center gap-[6px]">
         <i
           v-if="isFieldModified"
-          class="w-[3px] h-[18px] bg-[#ff9c01] flex-shrink-0"
+          class="w-[3px] h-[18px] bg-[var(--bkms-warning-2)] flex-shrink-0"
         ></i>
-        <span class="text-[12px] font-bold text-[#4D4F56]">{{ label }}</span>
+        <span class="text-[12px] font-bold text-[var(--bkms-neutral-2)]">{{ label }}</span>
       </div>
     </div>
 
@@ -82,7 +84,7 @@
         >
           <div class="mb-[4px] text-[12px]">
             {{ $t('执行命令') }}
-            <span class="text-[#EA3636]">*</span>
+            <span class="text-[var(--bkms-danger-2)]">*</span>
           </div>
           <Radio.Group
             v-model="execMode"
@@ -249,7 +251,7 @@
         </Button>
         <Divider
           class="h-[14px] !mx-[0]"
-          color="#EAEBF0"
+          color="var(--bkms-neutral-6)"
           direction="vertical"
           type="solid"
         />
@@ -445,6 +447,6 @@
 
 <style lang="postcss" scoped>
   :deep(.bk-form-label) {
-    color: #4d4f56;
+    color: var(--bkms-neutral-2);
   }
 </style>

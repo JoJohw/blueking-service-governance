@@ -53,7 +53,7 @@
         :placeholder="$t('搜索变量名、变量值、描述')"
       >
         <template #suffix>
-          <Search class="text-[16px] text-[#979BA5] mr-[6px] mt-[2px] hover:text-[#3A84FF]" />
+          <Search class="text-[16px] text-[var(--bkms-neutral-3)] mr-[6px] mt-[2px] hover:text-[var(--bkms-brand-2)]" />
         </template>
       </Input>
 

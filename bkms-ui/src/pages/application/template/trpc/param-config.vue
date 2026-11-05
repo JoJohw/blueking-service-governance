@@ -232,7 +232,7 @@
                       :rows="4"
                       type="textarea"
                     />
-                    <span class="text-[#c4c6cc]">{{
+                    <span class="text-[var(--bkms-navy-5)]">{{
                       $t(
                         '文件会按相对路径打包到运行镜像的 /app 目录，例如 data/privatekey.pem 打包后为 /app/data/privatekey.pem。',
                       )
@@ -261,7 +261,7 @@
                       :rows="4"
                       type="textarea"
                     />
-                    <span class="text-[#c4c6cc]">{{
+                    <span class="text-[var(--bkms-navy-5)]">{{
                       $t('写入镜像的默认启动方式（ENTRYPOINT），构建时固化到镜像中。部署时可被「运行命令」覆盖')
                     }}</span>
                   </div>
@@ -282,7 +282,7 @@
               <div class="mb-[24px]">
                 <span class="inline-block mb-[2px] mt-[10px] font-bold">{{ $t('等价构建命令（示意）') }}</span>
                 <div
-                  class="equivalent-build-command bg-[#f5f7fa] p-[16px] leading-[20px] text-[#4D4F56] overflow-x-auto"
+                  class="equivalent-build-command bg-[var(--bkms-neutral-7)] p-[16px] leading-[20px] text-[var(--bkms-neutral-2)] overflow-x-auto"
                 >
                   <pre
                     v-bk-xss-html="highlightedBuildCommand"
@@ -302,7 +302,7 @@
                 v-model="formData.buildConfig.pipelineBuildConfig.pipelineID"
                 :workspace="formData.workspaceID"
               />
-              <div class="text-[12px] text-[#979ba5]">
+              <div class="text-[12px] text-[var(--bkms-neutral-3)]">
                 {{ $t('需要保证流水线会将构建的镜像推送到当前空间的镜像仓库下') }}
                 <Button
                   text
@@ -763,11 +763,11 @@
   }
 
   .equivalent-build-command :deep(.build-command-comment) {
-    color: #c4c6cc;
+    color: var(--bkms-navy-5);
   }
 
   .equivalent-build-command :deep(.build-command-option) {
-    color: #699df4;
+    color: var(--bkms-brand-3);
   }
 
   .equivalent-build-command :deep(.build-command-arg-key) {
@@ -775,6 +775,6 @@
   }
 
   .equivalent-build-command :deep(.build-command-image) {
-    color: #8648d7;
+    color: var(--bkms-purple-2);
   }
 </style>

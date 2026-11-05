@@ -25,13 +25,15 @@
     <div
       :class="[
         'topo-search__input group flex items-center h-[32px] border rounded-[2px] transition-colors',
-        isFocused ? 'border-[#3A84FF] bg-white' : 'border-[#C4C6CC] bg-white hover:border-[#979BA5]',
+        isFocused
+          ? 'border-[var(--bkms-brand-2)] bg-white'
+          : 'border-[var(--bkms-navy-5)] bg-white hover:border-[var(--bkms-neutral-3)]',
       ]"
     >
       <input
         ref="inputRef"
         v-model="inputValue"
-        class="flex-1 h-full px-[10px] text-[12px] text-[#63656E] outline-none bg-transparent placeholder-[#C4C6CC]"
+        class="flex-1 h-full px-[10px] text-[12px] text-[var(--bkms-neutral-2)] outline-none bg-transparent placeholder-[var(--bkms-navy-5)]"
         :placeholder="t('搜索资源名称')"
         @focus="handleFocus"
         @keydown.enter="handleEnter"
@@ -40,7 +42,7 @@
       <span
         v-if="inputValue"
         :class="[
-          'flex items-center justify-center w-[20px] h-[20px] cursor-pointer text-[#C4C6CC] hover:text-[#979BA5] shrink-0 transition-opacity',
+          'flex items-center justify-center w-[20px] h-[20px] cursor-pointer text-[var(--bkms-navy-5)] hover:text-[var(--bkms-neutral-3)] shrink-0 transition-opacity',
           isFocused ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
         ]"
         @click.stop="handleClear"
@@ -51,10 +53,10 @@
         <!-- 有命中结果时显示计数和翻页 -->
         <div
           v-if="inputValue && matchedNodes.length > 0"
-          class="flex items-center gap-[2px] text-[12px] text-[#979BA5] shrink-0"
+          class="flex items-center gap-[2px] text-[12px] text-[var(--bkms-neutral-3)] shrink-0"
         >
           <span
-            class="flex items-center justify-center w-[20px] h-[20px] cursor-pointer hover:text-[#3A84FF] rounded-[2px] hover:bg-[#F0F1F5]"
+            class="flex items-center justify-center w-[20px] h-[20px] cursor-pointer hover:text-[var(--bkms-brand-2)] rounded-[2px] hover:bg-[var(--bkms-neutral-6)]"
             :title="t('上一个')"
             @click.stop="navigatePrev"
           >
@@ -62,7 +64,7 @@
           </span>
           <span class="tabular-nums">{{ currentIndex + 1 }} / {{ matchedNodes.length }}</span>
           <span
-            class="flex items-center justify-center w-[20px] h-[20px] cursor-pointer hover:text-[#3A84FF] rounded-[2px] hover:bg-[#F0F1F5]"
+            class="flex items-center justify-center w-[20px] h-[20px] cursor-pointer hover:text-[var(--bkms-brand-2)] rounded-[2px] hover:bg-[var(--bkms-neutral-6)]"
             :title="t('下一个')"
             @click.stop="navigateNext"
           >
@@ -72,14 +74,14 @@
         <!-- 无结果提示 -->
         <span
           v-else-if="inputValue && matchedNodes.length === 0"
-          class="text-[12px] text-[#C4C6CC] shrink-0 pr-[4px]"
+          class="text-[12px] text-[var(--bkms-navy-5)] shrink-0 pr-[4px]"
         >
           {{ t('无结果') }}
         </span>
       </template>
       <!-- 搜索图标（始终显示，可点击触发搜索） -->
       <span
-        class="flex items-center justify-center w-[32px] h-full cursor-pointer text-[#979BA5] hover:text-[#3A84FF]"
+        class="flex items-center justify-center w-[32px] h-full cursor-pointer text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-brand-2)]"
         @click="handleSearchClick"
       >
         <i class="bkms-icon bkms-icon-sousuo text-[14px]" />
@@ -91,7 +93,7 @@
       <div
         v-show="showDropdown"
         ref="dropdownRef"
-        class="topo-search-dropdown fixed z-[9999] bg-white rounded-[4px] shadow-[0_3px_8px_0_rgba(0,0,0,0.16)] border border-[#DCDEE5] max-h-[320px] overflow-y-auto py-[4px]"
+        class="topo-search-dropdown fixed z-[9999] bg-white rounded-[4px] shadow-[0_3px_8px_0_rgba(0,0,0,0.16)] border border-[var(--bkms-neutral-5)] max-h-[320px] overflow-y-auto py-[4px]"
         :style="dropdownStyle"
       >
         <!-- 有结果 -->
@@ -100,7 +102,7 @@
             v-for="(node, index) in matchedNodes"
             :key="node.id"
             :class="[
-              'topo-search-item flex items-center gap-[8px] h-[32px] px-[12px] cursor-pointer text-[12px] text-[#63656E] hover:bg-[#F5F7FA]',
+              'topo-search-item flex items-center gap-[8px] h-[32px] px-[12px] cursor-pointer text-[12px] text-[var(--bkms-neutral-2)] hover:bg-[var(--bkms-neutral-7)]',
             ]"
             @click="handleSelect(index)"
           >
@@ -119,7 +121,7 @@
         <!-- 无结果 -->
         <div
           v-else-if="inputValue"
-          class="flex items-center justify-center gap-[8px] h-[32px] px-[12px] text-[12px] text-[#C4C6CC]"
+          class="flex items-center justify-center gap-[8px] h-[32px] px-[12px] text-[12px] text-[var(--bkms-navy-5)]"
         >
           <i class="bkms-icon bkms-icon-sousuo text-[14px]" />
           <span>{{ t('无结果') }}</span>

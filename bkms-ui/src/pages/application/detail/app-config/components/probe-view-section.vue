@@ -17,13 +17,13 @@
 -->
 
 <template>
-  <div class="probe-view-section border border-[#EAEBF0] rounded-[8px] flex-1 min-w-0 overflow-hidden">
+  <div class="probe-view-section border border-[var(--bkms-neutral-6)] rounded-[8px] flex-1 min-w-0 overflow-hidden">
     <!-- 卡片标题行 -->
-    <div class="card-header flex items-center gap-[10px] h-[32px] px-[12px] border-b border-[#EAEBF0]">
+    <div class="card-header flex items-center gap-[10px] h-[32px] px-[12px] border-b border-[var(--bkms-neutral-6)]">
       <div class="flex items-center gap-[6px]">
         <i
           v-if="modified"
-          class="w-[3px] h-[18px] bg-[#ff9c01] flex-shrink-0"
+          class="w-[3px] h-[18px] bg-[var(--bkms-warning-2)] flex-shrink-0"
         ></i>
         <span class="probe-title text-[12px] font-bold">{{ label }}</span>
       </div>
@@ -34,7 +34,7 @@
         theme="dark"
       >
         <Button
-          class="!hover:text-[#3A84FF]"
+          class="!hover:text-[var(--bkms-brand-2)]"
           disabled
           text
         >
@@ -43,7 +43,7 @@
       </Popover>
       <Button
         v-else-if="showEditIcon && !disabled"
-        class="!hover:text-[#3A84FF]"
+        class="!hover:text-[var(--bkms-brand-2)]"
         text
         @click="$emit('edit')"
       >
@@ -143,7 +143,7 @@
               <!-- 探针描述 -->
               <div
                 v-if="description"
-                class="description p-[12px] mt-[8px] bg-[#F5F7FA] text-align-left"
+                class="description p-[12px] mt-[8px] bg-[var(--bkms-neutral-7)] text-align-left"
               >
                 {{ description }}
               </div>
@@ -220,11 +220,11 @@
   }
 
   .probe-view-section {
-    --probe-title-color: #4d4f56;
-    --probe-description-color: #313238;
-    --probe-header-bg: #f5f7fa;
-    --probe-detail-label-color: #979ba5;
-    --probe-detail-value-color: #313238;
+    --probe-title-color: var(--bkms-neutral-2);
+    --probe-description-color: var(--bkms-neutral-1);
+    --probe-header-bg: var(--bkms-neutral-7);
+    --probe-detail-label-color: var(--bkms-neutral-3);
+    --probe-detail-value-color: var(--bkms-neutral-1);
   }
 
   .card-header {
@@ -245,10 +245,10 @@
   .startup-probe-deemphasized {
     opacity: 0.8;
 
-    --probe-title-color: #c4c6cc;
-    --probe-description-color: #c4c6cc;
-    --probe-header-bg: #fafbfd;
-    --probe-detail-label-color: #c4c6cc;
-    --probe-detail-value-color: #c4c6cc;
+    --probe-title-color: var(--bkms-navy-5);
+    --probe-description-color: var(--bkms-navy-5);
+    --probe-header-bg: var(--bkms-neutral-8);
+    --probe-detail-label-color: var(--bkms-navy-5);
+    --probe-detail-value-color: var(--bkms-navy-5);
   }
 </style>
