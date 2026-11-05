@@ -38,13 +38,13 @@
     >
       <div class="flex">
         <div
-          class="flex items-center justify-center w-[16px] h-[64px] bg-[#DCDEE5] border-0 cursor-pointer"
+          class="flex items-center justify-center w-[16px] h-[64px] bg-[var(--bkms-neutral-5)] border-0 cursor-pointer"
           :style="collapsed ? buttonStyle.expand : buttonStyle.collapse"
           @click="toggle"
         >
           <component
             :is="collapsed ? expandIcon : collapseIcon"
-            class="text-[16px] text-[#63656E]"
+            class="text-[16px] text-[var(--bkms-neutral-2)]"
           />
         </div>
       </div>

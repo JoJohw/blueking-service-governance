@@ -17,10 +17,10 @@
 -->
 
 <template>
-  <div class="group border rounded-[2px] text-[#4D4F56] hover:border-[#1562FC]">
+  <div class="group border rounded-[2px] text-[var(--bkms-neutral-2)] hover:border-[var(--bkms-brand-2)]">
     <div
       :class="[
-        'bg-[#FAFBFD] px-[16px] py-[8px] border-b leading-[22px] flex justify-between items-center relative',
+        'bg-[var(--bkms-neutral-8)] px-[16px] py-[8px] border-b leading-[22px] flex justify-between items-center relative',
         headerClass,
       ]"
     >
@@ -37,7 +37,7 @@
         <Button
           v-if="visibleButtonList.includes('edit')"
           v-bk-tooltips="{ content: $t('编辑') }"
-          class="hover:text-[#3a84ff]"
+          class="hover:text-[var(--bkms-brand-2)]"
           text
           @click="handleEdit"
         >
@@ -51,12 +51,17 @@
           text
           @click="handleClone"
         >
-          <i :class="['bkms-icon bkms-icon-clone', { 'text-[#979BA5] hover:text-[#3a84ff]': !disabledClone }]"></i>
+          <i
+            :class="[
+              'bkms-icon bkms-icon-clone',
+              { 'text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-brand-2)]': !disabledClone },
+            ]"
+          ></i>
         </Button>
         <Button
           v-if="visibleButtonList.includes('delete')"
           v-bk-tooltips="{ content: delDesc || $t('删除') }"
-          :class="['ml-[16px]', { 'hover:text-[#ea3636]': !disabledDelete }]"
+          :class="['ml-[16px]', { 'hover:text-[var(--bkms-danger-2)]': !disabledDelete }]"
           :disabled="disabledDelete"
           text
           @click="handleDel"

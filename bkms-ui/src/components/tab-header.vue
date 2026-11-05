@@ -22,7 +22,7 @@
       v-if="title"
       :class="tabs.length > 0 ? 'pt-[14px] pb-[10px]' : 'h-[52px] flex items-center'"
     >
-      <span class="text-[16px] font-medium text-[#313238]">{{ title }}</span>
+      <span class="text-[16px] font-medium text-[var(--bkms-neutral-1)]">{{ title }}</span>
       <slot name="title-extra"></slot>
     </div>
 

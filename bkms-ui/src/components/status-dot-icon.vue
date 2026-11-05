@@ -60,8 +60,8 @@
   });
 
   const colorMap: Record<string, { inner: string; outer: string }> = {
-    normal: { inner: '#3FC06D', outer: '#E5F6EA' },
-    abnormal: { inner: '#EA3636', outer: '#FFE6E6' },
+    normal: { inner: 'var(--bkms-success-2)', outer: 'var(--bkms-success-7)' },
+    abnormal: { inner: 'var(--bkms-danger-2)', outer: '#FFE6E6' },
   };
 
   const colors = computed(() => colorMap[props.icon]);

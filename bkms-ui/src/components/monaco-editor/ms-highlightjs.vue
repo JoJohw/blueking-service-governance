@@ -20,17 +20,22 @@
 <template>
   <div
     ref="highlightRef"
-    class="flex flex-col border-[1px] border-[#DCDEE5] w-full h-full"
+    class="flex flex-col border-[1px] border-[var(--bkms-neutral-5)] w-full h-full"
   >
     <!-- 工具栏 -->
     <FlexRow
       :class="[
-        'h-[40px] px-[16px] rounded-t-sm border-b-[1px] border-[#DCDEE5]',
-        lightTheme ? 'bg-[#F5F7FA]' : 'bg-[#2E2E2E]',
+        'h-[40px] px-[16px] rounded-t-sm border-b-[1px] border-[var(--bkms-neutral-5)]',
+        lightTheme ? 'bg-[var(--bkms-neutral-7)]' : 'bg-[#2E2E2E]',
       ]"
     >
       <template #left>
-        <span :class="['text-[14px] leading-none', lightTheme ? 'text-[#313238]' : 'text-[#C4C6CC]']">
+        <span
+          :class="[
+            'text-[14px] leading-none',
+            lightTheme ? 'text-[var(--bkms-neutral-1)]' : 'text-[var(--bkms-navy-5)]',
+          ]"
+        >
           <slot name="title">{{ title }}</slot>
         </span>
       </template>
@@ -46,7 +51,7 @@
           >
             <template #icon>
               <Copy
-                color="#979BA5"
+                color="var(--bkms-neutral-3)"
                 height="16"
                 :title="$t('复制')"
                 width="16"
@@ -88,7 +93,7 @@
   interface HighlightMark {
     /** 可选的 CSS class 名 */
     className?: string;
-    /** 标记颜色，如 '#FF9C01'（仅允许合法 CSS 颜色值） */
+    /** 标记颜色，如 'var(--bkms-warning-2)'（仅允许合法 CSS 颜色值） */
     color?: string;
     /**
      * 是否替换所有匹配项，默认 false（仅替换第一次出现）。

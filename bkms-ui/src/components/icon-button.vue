@@ -34,7 +34,7 @@
     <slot name="icon">
       <i
         :class="icon"
-        :style="{ color: props.color || '#979BA5' }"
+        :style="{ color: props.color || 'var(--bkms-neutral-3)' }"
       >
       </i>
     </slot>

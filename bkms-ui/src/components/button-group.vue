@@ -50,7 +50,7 @@
 <style lang="postcss" scoped>
   .bk-button-group {
     .is-selected {
-      background-color: #3a84ff !important;
+      background-color: var(--bkms-brand-2) !important;
       color: #ffffff !important;
     }
   }
