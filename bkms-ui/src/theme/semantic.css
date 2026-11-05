@@ -1,0 +1,95 @@
+/*
+ * BKMS 语义层：只引用 colors.css 的色阶，禁止出现色值字面量（不享受 stylelint 豁免）。
+ * 每个变量的「用在」注释与 spec 语义表同步维护。
+ */
+:root {
+  /* 文字 */
+
+  /** 标题、表头字 */
+  --bkms-text-title: var(--bkms-neutral-1);
+
+  /** 正文、表单标签 */
+  --bkms-text-body: var(--bkms-neutral-2);
+
+  /** 辅助字、图标、关闭 */
+  --bkms-text-secondary: var(--bkms-neutral-3);
+
+  /** 禁用字、占位 */
+  --bkms-text-disabled: var(--bkms-neutral-4);
+
+  /** 链接、选中字 */
+  --bkms-text-brand: var(--bkms-brand-2);
+
+  /** 主按钮字、顶栏选中字 */
+  --bkms-text-inverse: var(--bkms-neutral-10);
+
+  /* 线条 */
+
+  /** Dialog 顶线、分页顶线 */
+  --bkms-line-light: var(--bkms-neutral-6);
+
+  /** 表格行线、侧栏边线 */
+  --bkms-line-default: var(--bkms-neutral-5);
+
+  /** 输入框边、按钮边、虚线 */
+  --bkms-line-input: var(--bkms-neutral-4);
+
+  /** 输入悬停边 */
+  --bkms-line-hover: var(--bkms-neutral-3);
+
+  /** 输入激活边、主色描边 */
+  --bkms-line-active: var(--bkms-brand-2);
+
+  /** 警示边、校验 */
+  --bkms-line-danger: var(--bkms-danger-2);
+
+  /* 背景 */
+
+  /** 内容区底 */
+  --bkms-bg-page: var(--bkms-neutral-7);
+
+  /** 行悬停、菜单悬停 */
+  --bkms-bg-hover: var(--bkms-neutral-7);
+
+  /** 斑马纹、输入禁用底 */
+  --bkms-bg-subtle: var(--bkms-neutral-8);
+
+  /** 表头、Dialog 底栏 */
+  --bkms-bg-head: var(--bkms-neutral-9);
+
+  /** 标题条、筛选条 */
+  --bkms-bg-title: var(--bkms-neutral-5);
+
+  /** 主按钮禁用底 */
+  --bkms-bg-disabled: var(--bkms-neutral-5);
+
+  /** 白卡片 */
+  --bkms-bg-card: var(--bkms-neutral-10);
+
+  /** 选中底、Alert 信息底 */
+  --bkms-bg-active: var(--bkms-brand-6);
+
+  /** 选中悬停 */
+  --bkms-bg-active-hover: var(--bkms-brand-5);
+
+  /** Message 信息底 */
+  --bkms-bg-brand-soft: var(--bkms-brand-7);
+
+  /** Alert 成功底 */
+  --bkms-bg-success: var(--bkms-success-6);
+
+  /** Message 成功底 */
+  --bkms-bg-success-soft: var(--bkms-success-7);
+
+  /** Alert 警告底 */
+  --bkms-bg-warning: var(--bkms-warning-6);
+
+  /** Message 警告底 */
+  --bkms-bg-warning-soft: var(--bkms-warning-7);
+
+  /** Alert 危险底 */
+  --bkms-bg-danger: var(--bkms-danger-6);
+
+  /** Message 危险底 */
+  --bkms-bg-danger-soft: var(--bkms-danger-7);
+}

@@ -1,7 +1,7 @@
 /*
- * BKMS 主题令牌：全库唯一允许出现色值字面量的文件（stylelint color-no-hex 豁免点）。
+ * BKMS 原子层：全库唯一允许出现色值字面量的文件（stylelint color-no-hex 豁免点）。
  * 真源：bkms-color-spec.md（不进 git，真源位置见 scripts/theme-codemod/rules.md）。
- * 色阶一律挂 :root；语义层只引用色阶，不写字面量；[data-theme] 覆盖位预留。
+ * 色阶一律挂 :root；语义层（semantic.css）只引用色阶，不写字面量；[data-theme] 覆盖位预留。
  */
 :root {
   /* brand */
@@ -82,45 +82,23 @@
   --bkms-nav-indicator-2: #425BFB;
   --bkms-nav-indicator-3: #4551FB;
 
-  /* 语义层：文字 */
-  --bkms-text-title: var(--bkms-neutral-1);
-  --bkms-text-body: var(--bkms-neutral-2);
-  --bkms-text-secondary: var(--bkms-neutral-3);
-  --bkms-text-disabled: var(--bkms-neutral-4);
-  --bkms-text-brand: var(--bkms-brand-2);
-  --bkms-text-inverse: var(--bkms-neutral-10);
+  /* 阴影（写死值，随暗色主题需整体覆盖，故归原子层而非语义层） */
 
-  /* 语义层：线条 */
-  --bkms-line-light: var(--bkms-neutral-6);
-  --bkms-line-default: var(--bkms-neutral-5);
-  --bkms-line-input: var(--bkms-neutral-4);
-  --bkms-line-hover: var(--bkms-neutral-3);
-  --bkms-line-active: var(--bkms-brand-2);
-  --bkms-line-danger: var(--bkms-danger-2);
-
-  /* 语义层：背景 */
-  --bkms-bg-page: var(--bkms-neutral-7);
-  --bkms-bg-hover: var(--bkms-neutral-7);
-  --bkms-bg-subtle: var(--bkms-neutral-8);
-  --bkms-bg-head: var(--bkms-neutral-9);
-  --bkms-bg-title: var(--bkms-neutral-5);
-  --bkms-bg-disabled: var(--bkms-neutral-5);
-  --bkms-bg-card: var(--bkms-neutral-10);
-  --bkms-bg-active: var(--bkms-brand-6);
-  --bkms-bg-active-hover: var(--bkms-brand-5);
-  --bkms-bg-brand-soft: var(--bkms-brand-7);
-  --bkms-bg-success: var(--bkms-success-6);
-  --bkms-bg-success-soft: var(--bkms-success-7);
-  --bkms-bg-warning: var(--bkms-warning-6);
-  --bkms-bg-warning-soft: var(--bkms-warning-7);
-  --bkms-bg-danger: var(--bkms-danger-6);
-  --bkms-bg-danger-soft: var(--bkms-danger-7);
-
-  /* 语义层：阴影。button 用 color-mix 等价 spec 的 #3B6EF540，随主题换色 */
+  /** 白卡片 */
   --bkms-shadow-card: #1919290D;
+
+  /** 卡片悬停、筛选条 */
   --bkms-shadow-hover: #0000001A;
+
+  /** 内容头 */
   --bkms-shadow-header: #0000000A;
+
+  /** 气泡、下拉 */
   --bkms-shadow-popover: #00000029;
+
+  /** Dialog */
   --bkms-shadow-dialog: #00000033;
+
+  /** 主按钮。禁用和按钮组不加；用 color-mix 等价 spec 的 #3B6EF540，随主题换色 */
   --bkms-shadow-button: color-mix(in srgb, var(--bkms-brand-2) 25%, transparent);
 }

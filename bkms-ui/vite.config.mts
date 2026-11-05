@@ -104,7 +104,7 @@ export default ({ mode }: { mode: string }) => {
     // 环境变量前缀
     envPrefix: 'BK_',
 
-    // 编译期替换 bkui dist css 内写死 hex（docs/THEME_STEPS-v4.md Step 2）
+    // 编译期替换 bkui dist css 内写死 hex（docs/theme-style/THEME_STEPS-v4.md Step 2）
     css: {
       postcss: {
         plugins: [bkmsThemeReplace()],

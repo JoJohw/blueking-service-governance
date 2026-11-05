@@ -1,6 +1,6 @@
 /**
  * postcss 插件：对 bkui-vue/dist 下流经 Vite CSS 管线的样式做编译期 hex → var(--bkms-*) 替换。
- * 规则（docs/THEME_STEPS-v4.md Step 2）：
+ * 规则（docs/theme-style/THEME_STEPS-v4.md Step 2）：
  * - 匹配 node_modules/bkui-vue 下所有样式（dist 的 css + lib 各组件 less，含 pnpm 多版本副本）；磁盘 node_modules 不动
  * - 先小写化再匹配，仅 6 位 hex（词边界），不碰 3 位短写与 rgba()；8 位 hex 因词边界天然不命中
  * - 跳过 prop 以 -- 开头的 declaration（变量定义值归 bridge.css）

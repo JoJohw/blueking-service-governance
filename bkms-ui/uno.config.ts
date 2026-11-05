@@ -16,6 +16,10 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import {
   defineConfig,
   presetAttributify,
@@ -25,13 +29,53 @@ import {
   transformerVariantGroup,
 } from 'unocss';
 
-import { bkmsColorTokens } from './uno.bkms-theme';
+/*
+ * ## bkms 令牌注册
+ *
+ * 构建期从 `src/theme` 解析令牌，CSS 是单一真源，新增变量零注册。
+ *
+ * ### 消费方式（两种等价，编译产物相同，均不强制）
+ *
+ * | 场景 | 写法 | 示例 |
+ * | --- | --- | --- |
+ * | 模板（推荐） | 注册类 / 别名 | `class="text-bkms-brand-2 bg-card hover:bg-active-hover"` |
+ * | style 块 / inline style / 动态值 | CSS 变量 | `color: var(--bkms-text-title); background: var(--bkms-bg-card);` |
+ *
+ * ### 规则
+ *
+ * 1. 唯一强制项：不写色值字面量（stylelint `color-no-hex` + codemod 管辖）。
+ * 2. 模板内任意值 `text-[var(--bkms-neutral-2)]` 合法但不推荐：拼错变量名会静默生成死规则。
+ * 3. 半透明：纯 var() token 不支持 `/50` alpha 修饰符，用 `color-mix(in srgb, var(--bkms-brand-2) 25%, transparent)`。
+ */
+const THEME_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src/theme');
+
+// 色阶：colors.css → theme.colors.bkms，类名形如 text-bkms-brand-2 / bg-bkms-cyan-6
+function parseScaleColors() {
+  const tokens: Record<string, string> = {};
+  const SCALE_RE = /--bkms-([a-z-]+)-(\d+)\s*:/g;
+  for (const m of fs.readFileSync(path.join(THEME_DIR, 'colors.css'), 'utf8').matchAll(SCALE_RE)) {
+    const [, family, step] = m;
+    tokens[`${family}-${step}`] = `var(--bkms-${family}-${step})`;
+  }
+  return { bkms: tokens };
+}
+
+// 语义变量：semantic.css → shortcuts 别名（text-title/bg-card 等），line 是边框色需映射为 border 前缀
+function parseSemanticShortcuts() {
+  const SEMANTIC_UTILITY_PREFIX: Record<string, string> = { text: 'text', line: 'border', bg: 'bg' };
+  const SEMANTIC_RE = /--bkms-(text|line|bg)-([a-z-]+)\s*:/g;
+  const shortcuts: Array<[string, string]> = [];
+  for (const m of fs.readFileSync(path.join(THEME_DIR, 'semantic.css'), 'utf8').matchAll(SEMANTIC_RE)) {
+    const [, group, name] = m;
+    const utilityPrefix = SEMANTIC_UTILITY_PREFIX[group];
+    shortcuts.push([`${utilityPrefix}-${name}`, `${utilityPrefix}-[var(--bkms-${group}-${name})]`]);
+  }
+  return shortcuts;
+}
 
 export default defineConfig({
   theme: {
-    colors: {
-      bkms: bkmsColorTokens,
-    },
+    colors: parseScaleColors(),
   },
   shortcuts: [
     [
@@ -46,6 +90,8 @@ export default defineConfig({
     ['env-tag-test', '!border-none !bg-bkms-cyan-6 !text-bkms-cyan-2'],
     ['env-tag-staging', '!border-none !bg-bkms-warning-6 !text-bkms-warning-1'],
     ['env-tag-production', '!border-none !bg-bkms-success-6 !text-bkms-success-2'],
+    // 语义层别名由 parseSemanticShortcuts 自动生成，不加也不影响 var() 消费
+    ...parseSemanticShortcuts(),
   ],
   presets: [presetUno(), presetAttributify(), presetTypography()],
   transformers: [transformerDirectives(), transformerVariantGroup()],

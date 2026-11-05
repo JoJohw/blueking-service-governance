@@ -1,6 +1,6 @@
 # bk-patch.css 审计结论（Step 3，2026-11-03）
 
-原文件 19 条规则逐条三分类（docs/THEME_STEPS-v4.md Step 3），文件已退役删除，`main.css` 的 `@import './bk-patch.css'` 一并移除。
+原文件 19 条规则逐条三分类（docs/theme-style/THEME_STEPS-v4.md Step 3），文件已退役删除，`main.css` 的 `@import './bk-patch.css'` 一并移除。
 
 | # | 规则 | 处置 | 去向 | 依据 |
 | --- | --- | --- | --- | --- |

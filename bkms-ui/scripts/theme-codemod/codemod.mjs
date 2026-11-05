@@ -8,7 +8,7 @@
  *   node codemod.mjs scan   只扫 src/**，输出报告，不写文件
  *   node codemod.mjs apply [dir]  扫指定目录（默认 src/**）并写回替换
  *
- * 口径（docs/THEME-v4.md 第四节）：
+ * 口径（docs/theme-style/THEME-v4.md 第四节）：
  * - 先小写化再匹配；仅 6 位 hex（词边界），8 位 hex（带 alpha）整体跳过
  * - 3 位短写先展开成 6 位，仅当命中 mapping 才替换，命中 keep 或未命中一律不动
  * - rgba( 不进脚本
@@ -31,7 +31,7 @@ const HEX6 = /#([0-9a-f]{6})(?![0-9a-f])/gi;
 const HEX3 = /#([0-9a-f]{3})(?![0-9a-f])/gi;
 const HEX8 = /#([0-9a-f]{8})(?![0-9a-f])/gi;
 const EXTS = new Set(['.vue', '.css', '.ts', '.js', '.scss', '.less']);
-const TOKENS_FILE = path.join(ROOT, 'src/theme/tokens.css');
+const TOKEN_FILES = ['colors.css', 'semantic.css'].map(name => path.join(ROOT, 'src/theme', name));
 
 function applyReplacements() {
   const files = sourceFiles();
@@ -150,7 +150,7 @@ function scanSource() {
 
 function sourceFiles(target = targetArg) {
   const targetPath = path.resolve(ROOT, target);
-  return walk(targetPath).filter(file => path.resolve(file) !== TOKENS_FILE);
+  return walk(targetPath).filter(file => !TOKEN_FILES.includes(path.resolve(file)));
 }
 
 function walk(dir, files = []) {
