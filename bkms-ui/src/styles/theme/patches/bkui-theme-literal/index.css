@@ -2,6 +2,7 @@
 @import './button.css';
 @import './card.css';
 @import './checkbox.css';
+@import './collapse.css';
 @import './date-picker.css';
 @import './dialog.css';
 @import './divider.css';
@@ -17,10 +18,12 @@
 @import './radio.css';
 @import './search-select.css';
 @import './select.css';
+@import './slider.css';
 @import './steps.css';
 @import './switcher.css';
 @import './tab.css';
 @import './tag-input.css';
+@import './textarea.css';
 @import './timeline.css';
 @import './transfer.css';
 @import './upload.css';

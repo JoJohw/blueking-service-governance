@@ -1,11 +1,11 @@
 # gen-overrides 生成摘要
 
-- 生成时间：2026-11-06T08:07:03.464Z
+- 生成时间：2026-11-06T09:28:13.845Z
 - dist 数据源：style.variable.css
-- 扫描含 hex 声明：1680；归属组件：31 个；生成覆写规则：305 条 / 438 声明
-- 字面量源（dist/style.css）：348 条 / 540 声明（bkui-theme-literal/，25 个组件；未归属 341 条不计入台账）
-- 未归属规则（选择器无白名单组件前缀）：176 条
-- 未收录 hex（不在 mapping/keep/pending 任一清单）：30 种
+- 扫描含 hex 声明：1713；归属组件：36 个；生成覆写规则：331 条 / 480 声明
+- 字面量源（dist/style.css）：359 条 / 554 声明（bkui-theme-literal/，28 个组件；未归属 283 条不计入台账）
+- 未归属规则（选择器无白名单组件前缀）：129 条
+- 未收录 hex（不在 mapping/keep/pending 任一清单）：6 种
 
 ## 按组件产出
 
@@ -14,6 +14,7 @@
 | patches/bkui-theme/alert.css | Alert | 13 | 19 |
 | patches/bkui-theme/card.css | Card | 5 | 6 |
 | patches/bkui-theme/checkbox.css | Checkbox | 8 | 12 |
+| patches/bkui-theme/collapse.css | Collapse（monitor 渲染） | 7 | 8 |
 | patches/bkui-theme/date-picker.css | DatePicker | 33 | 48 |
 | patches/bkui-theme/dialog.css | Dialog | 3 | 4 |
 | patches/bkui-theme/dropdown.css | Dropdown | 5 | 7 |
@@ -26,17 +27,21 @@
 | patches/bkui-theme/navigation.css | Navigation | 9 | 13 |
 | patches/bkui-theme/pop-confirm.css | PopConfirm | 3 | 3 |
 | patches/bkui-theme/popover.css | Popover | 25 | 40 |
+| patches/bkui-theme/popper.css | Popper（Popover 浮层） | 6 | 14 |
 | patches/bkui-theme/progress.css | Progress | 2 | 2 |
 | patches/bkui-theme/radio.css | Radio | 4 | 7 |
 | patches/bkui-theme/resize-layout.css | ResizeLayout | 10 | 13 |
+| patches/bkui-theme/scroll-util.css | ScrollUtil（第三方滚动条） | 4 | 7 |
 | patches/bkui-theme/search-select.css | SearchSelect | 17 | 26 |
 | patches/bkui-theme/select.css | Select | 9 | 13 |
 | patches/bkui-theme/sideslider.css | Sideslider | 8 | 13 |
+| patches/bkui-theme/slider.css | Slider（monitor 渲染） | 6 | 8 |
 | patches/bkui-theme/steps.css | Steps | 11 | 25 |
 | patches/bkui-theme/switcher.css | Switcher | 4 | 5 |
 | patches/bkui-theme/tab.css | Tab | 13 | 17 |
 | patches/bkui-theme/tag.css | Tag | 23 | 36 |
 | patches/bkui-theme/tag-input.css | TagInput | 12 | 17 |
+| patches/bkui-theme/textarea.css | Textarea（Input textarea 形态） | 3 | 5 |
 | patches/bkui-theme/time-picker.css | TimePicker | 13 | 16 |
 | patches/bkui-theme/timeline.css | Timeline | 15 | 21 |
 | patches/bkui-theme/transfer.css | Transfer | 2 | 3 |
@@ -45,20 +50,7 @@
 
 ## 未归属规则（需人工判定收编或加入白名单/keep）
 
-- `.scroll-bar-style::-webkit-scrollbar-thumb` → #dddddd #cccccc
 - `fieldset` → #c0c0c0
-- `.bk-scroll-y::-webkit-scrollbar-thumb` → #dddddd #cccccc
-- `.bk-scroll-x::-webkit-scrollbar-thumb` → #dddddd #cccccc
-- `.bk-collapse-header` → #63656e #ffffff
-- `.bk-collapse-header .bk-collapse-title` → #313238
-- `.bk-collapse-content` → #63656e
-- `.bk-collapse-header-border .bk-collapse-item:after` → #dcdee5
-- `.bk-collapse-header-hover .bk-collapse-header:hover` → #f0f1f5
-- `.bk-collapse-card .bk-collapse-item` → #cccccc
-- `.bk-collapse-block .bk-collapse-item .bk-collapse-header` → #f0f1f5
-- `.bk-textarea` → #ffffff
-- `.bk-textarea ::-webkit-scrollbar-thumb` → #dcdee5
-- `.bk-textarea--suffix-icon:hover` → #313238
 - `.bk-rate-stars .bk-rate-star` → #c5c7d1
 - `.bk-rate-stars .bk-rate-star.bk-is-select` → #ffb848
 - `.bk-swiper-index li` → #63656e
@@ -104,12 +96,6 @@
 - `.bk-across-page-popover .dropwn-content>div:hover` → #f5f7fa
 - `.bk-notify` → #ffffff #f0f1f5 #000000
 - `.bk-notify .bk-notify-content-header` → #313238
-- `.bk-slider .bk-slider-interval` → #ffffff
-- `.bk-slider .bk-slider-interval:hover:after` → #ffffff
-- `.bk-slider-button .slider-button` → #ffffff
-- `.bk-slider-button .slider-button-disable` → #979ba5
-- `.bk-slider-button .slider-button:hover` → #3a84ff
-- `.bk-slider-button .slider-button:focus` → #3a84ff
 - `.bk-process .bk-process-toggle.active,.bk-process .bk-process-toggle:hover` → #ffffff
 - `.bk-process li` → #f0f1f5
 - `.bk-process li:before` → #ffffff
@@ -117,7 +103,6 @@
 - `.bk-process li.success` → #ffffff
 - `.bk-process li.current` → #ffffff
 - `.bk-process li.error` → #ffffff
-- `.bk-F-scroll-x` → #a0a0a0
 - `.bk-pagination` → #63656e
 - `.bk-pagination-list-pre-batch,.bk-pagination-list-next-batch,.bk-pagination-list-pre,.bk-pagination-list-next,.bk-pagination-list-item` → #63656e #ffffff
 - `.bk-pagination-list-pre-batch.is-active,.bk-pagination-list-next-batch.is-active,.bk-pagination-list-pre.is-active,.bk-pagination-list-next.is-active,.bk-pagination-list-item.is-active` → #3a84ff #e1ecff
@@ -135,29 +120,8 @@
 - `.bk-pagination-picker-list .item:hover,.bk-pagination-picker-list .item.is-actived` → #3a84ff #f4f6fa
 - `.bk-code-diff .d2h-files-diff .d2h-file-side-diff:last-child .d2h-diff-table` → #dcdee5
 - `.bk-code-diff .d2h-code-side-linenumber` → #fafbfd
-- `.bk-code-diff .hljs` → #000000 #ffffff
-- `.bk-code-diff .hljs-comment,.bk-code-diff .hljs-quote` → #880000
-- `.bk-code-diff .hljs-keyword,.bk-code-diff .hljs-name,.bk-code-diff .hljs-section,.bk-code-diff .hljs-selector-tag,.bk-code-diff .hljs-title` → #000088
-- `.bk-code-diff .hljs-template-variable,.bk-code-diff .hljs-variable` → #666600
-- `.bk-code-diff .hljs-regexp,.bk-code-diff .hljs-selector-attr,.bk-code-diff .hljs-selector-pseudo,.bk-code-diff .hljs-string` → #008800
-- `.bk-code-diff .hljs-bullet,.bk-code-diff .hljs-link,.bk-code-diff .hljs-literal,.bk-code-diff .hljs-meta,.bk-code-diff .hljs-number,.bk-code-diff .hljs-symbol` → #006666
-- `.bk-code-diff .hljs-attr,.bk-code-diff .hljs-built_in,.bk-code-diff .hljs-doctag,.bk-code-diff .hljs-params,.bk-code-diff .hljs-title,.bk-code-diff .hljs-type` → #660066
-- `.bk-code-diff .hljs-attribute,.bk-code-diff .hljs-subst` → #000000
-- `.bk-code-diff .hljs-formula` → #eeeeee
-- `.bk-code-diff .hljs-selector-class,.bk-code-diff .hljs-selector-id` → #9b703f
-- `.bk-code-diff .hljs-addition` → #e9faed
-- `.bk-code-diff .hljs-deletion` → #fbe9eb
-- `.bk-code-diff.dark,.bk-code-diff.dark .hljs` → #abb2bf #1d1d1d
 - `.bk-code-diff.dark .d2h-files-diff:last-child .d2h-diff-table` → #313238
 - `.bk-code-diff.dark .d2h-file-side-diff:nth-child(n+2) .d2h-code-wrapper` → #313238
-- `.bk-code-diff.dark .hljs-comment,.bk-code-diff.dark .hljs-quote` → #5c6370
-- `.bk-code-diff.dark .hljs-doctag,.bk-code-diff.dark .hljs-formula,.bk-code-diff.dark .hljs-keyword,.bk-code-diff.dark .hljs-params` → #c678dd
-- `.bk-code-diff.dark .hljs-deletion,.bk-code-diff.dark .hljs-name,.bk-code-diff.dark .hljs-section,.bk-code-diff.dark .hljs-selector-tag,.bk-code-diff.dark .hljs-subst` → #e06c75
-- `.bk-code-diff.dark .hljs-literal` → #56b6c2
-- `.bk-code-diff.dark .hljs-addition,.bk-code-diff.dark .hljs-attribute,.bk-code-diff.dark .hljs-meta .hljs-string,.bk-code-diff.dark .hljs-regexp,.bk-code-diff.dark .hljs-string` → #98c379
-- `.bk-code-diff.dark .hljs-attr,.bk-code-diff.dark .hljs-number,.bk-code-diff.dark .hljs-selector-attr,.bk-code-diff.dark .hljs-selector-class,.bk-code-diff.dark .hljs-selector-pseudo,.bk-code-diff.dark .hljs-template-variable,.bk-code-diff.dark .hljs-type,.bk-code-diff.dark .hljs-variable` → #d19a66
-- `.bk-code-diff.dark .hljs-bullet,.bk-code-diff.dark .hljs-link,.bk-code-diff.dark .hljs-meta,.bk-code-diff.dark .hljs-selector-id,.bk-code-diff.dark .hljs-symbol,.bk-code-diff.dark .hljs-title` → #61aeee
-- `.bk-code-diff.dark .hljs-built_in,.bk-code-diff.dark .hljs-class .hljs-title,.bk-code-diff.dark .hljs-title.class_` → #e6c07b
 - `.bk-code-diff.dark .d2h-code-linenumber,.bk-code-diff.dark .d2h-code-side-linenumber` → #8f8f89 #212121
 - `.bk-code-diff.dark .d2h-del` → #422321
 - `.bk-code-diff.dark .d2h-ins` → #212121
@@ -197,12 +161,6 @@
 - `.bk-color-picker-saturation:focus,.bk-color-picker-hue:focus,.bk-color-picker-recommend:focus` → #2d8cf0
 - `.bk-color-picker-pointer .bk-color-picker-circle` → #ffffff #000000
 - `.bk-color-picker-empty:after` → #ea3536
-- `.bk-popper` → #ffffff #333333 #dcdee5
-- `.bk-popper.light` → #63656e #ffffff #dcdee5
-- `.bk-popper.light[data-popper-placement^=top] .bk-popper-arrow:before` → #dcdee5
-- `.bk-popper.light[data-popper-placement^=right] .bk-popper-arrow:before` → #dcdee5
-- `.bk-popper.light[data-popper-placement^=left] .bk-popper-arrow:before` → #dcdee5
-- `.bk-popper.light[data-popper-placement^=bottom] .bk-popper-arrow:before` → #dcdee5
 - `.bk-image-placeholder` → #c4c6cc #f0f1f5
 - `.bk-image-viewer-wrapper` → 
 - `.bk-image-viewer-header` → #c4c6cc #000000
@@ -224,33 +182,9 @@
 
 ## 未收录 hex（需补录 mapping/pending/keep 后重跑）
 
-- #000088：`.bk-code-diff .hljs-keyword,.bk-code-diff .hljs-name,.bk-code-diff .hljs-section,.bk-code-diff .hljs-selector-tag,.bk-code-diff .hljs-title`
 - #0000ff：`.bk-color-picker-hue`
-- #006666：`.bk-code-diff .hljs-bullet,.bk-code-diff .hljs-link,.bk-code-diff .hljs-literal,.bk-code-diff .hljs-meta,.bk-code-diff .hljs-number,.bk-code-diff .hljs-symbol`
-- #008800：`.bk-code-diff .hljs-regexp,.bk-code-diff .hljs-selector-attr,.bk-code-diff .hljs-selector-pseudo,.bk-code-diff .hljs-string`
 - #00ff00：`.bk-color-picker-hue`
 - #00ffff：`.bk-color-picker-hue`
-- #1d1d1d：`.bk-code-diff.dark,.bk-code-diff.dark .hljs`
 - #1f2d3d：`.bk-swiper-nav`、`.bk-swiper-nav:hover`
-- #212121：`.bk-code-diff.dark .d2h-code-linenumber,.bk-code-diff.dark .d2h-code-side-linenumber`、`.bk-code-diff.dark .d2h-ins`
-- #292929：`.bk-code-diff.dark .d2h-code-side-emptyplaceholder,.bk-code-diff.dark .d2h-emptyplaceholder`
-- #422321：`.bk-code-diff.dark .d2h-del`
-- #56b6c2：`.bk-code-diff.dark .hljs-literal`
-- #5c6370：`.bk-code-diff.dark .hljs-comment,.bk-code-diff.dark .hljs-quote`
-- #61aeee：`.bk-code-diff.dark .hljs-bullet,.bk-code-diff.dark .hljs-link,.bk-code-diff.dark .hljs-meta,.bk-code-diff.dark .hljs-selector-id,.bk-code-diff.dark .hljs-symbol,.bk-code-diff.dark .hljs-title`
-- #660066：`.bk-code-diff .hljs-attr,.bk-code-diff .hljs-built_in,.bk-code-diff .hljs-doctag,.bk-code-diff .hljs-params,.bk-code-diff .hljs-title,.bk-code-diff .hljs-type`
-- #666600：`.bk-code-diff .hljs-template-variable,.bk-code-diff .hljs-variable`
-- #880000：`.bk-code-diff .hljs-comment,.bk-code-diff .hljs-quote`
-- #8f8f89：`.bk-code-diff.dark .d2h-code-linenumber,.bk-code-diff.dark .d2h-code-side-linenumber`
-- #98c379：`.bk-code-diff.dark .hljs-addition,.bk-code-diff.dark .hljs-attribute,.bk-code-diff.dark .hljs-meta .hljs-string,.bk-code-diff.dark .hljs-regexp,.bk-code-diff.dark .hljs-string`
-- #a0a0a0：`.bk-F-scroll-x`
-- #abb2bf：`.bk-code-diff.dark,.bk-code-diff.dark .hljs`
-- #c0c0c0：`fieldset`
-- #c678dd：`.bk-code-diff.dark .hljs-doctag,.bk-code-diff.dark .hljs-formula,.bk-code-diff.dark .hljs-keyword,.bk-code-diff.dark .hljs-params`
-- #d19a66：`.bk-code-diff.dark .hljs-attr,.bk-code-diff.dark .hljs-number,.bk-code-diff.dark .hljs-selector-attr,.bk-code-diff.dark .hljs-selector-class,.bk-code-diff.dark .hljs-selector-pseudo,.bk-code-diff.dark .hljs-template-variable,.bk-code-diff.dark .hljs-type,.bk-code-diff.dark .hljs-variable`
-- #dddddd：`.scroll-bar-style::-webkit-scrollbar-thumb`、`.bk-scroll-y::-webkit-scrollbar-thumb`、`.bk-scroll-x::-webkit-scrollbar-thumb` 等 4 处
-- #e06c75：`.bk-code-diff.dark .hljs-deletion,.bk-code-diff.dark .hljs-name,.bk-code-diff.dark .hljs-section,.bk-code-diff.dark .hljs-selector-tag,.bk-code-diff.dark .hljs-subst`
-- #e6c07b：`.bk-code-diff.dark .hljs-built_in,.bk-code-diff.dark .hljs-class .hljs-title,.bk-code-diff.dark .hljs-title.class_`
-- #eeeeee：`.bk-code-diff .hljs-formula`
 - #ff00ff：`.bk-color-picker-hue`
 - #ffff00：`.bk-color-picker-hue`

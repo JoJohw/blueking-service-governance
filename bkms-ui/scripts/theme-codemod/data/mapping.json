@@ -199,5 +199,15 @@
   "f7f7f7": "--bkms-neutral-8",
   "000000": "--bkms-neutral-1",
   "babcc0": "--bkms-navy-5",
-  "fea500": "--bkms-warning-2"
+  "fea500": "--bkms-warning-2",
+  "a0a0a0": "--bkms-navy-4",
+  "c0c0c0": "--bkms-navy-5",
+  "212121": "--bkms-navy-1",
+  "292929": "--bkms-navy-1",
+  "1d1d1d": "--bkms-neutral-1",
+  "422321": "--bkms-neutral-1",
+  "3a3c42": "--bkms-navy-2",
+  "dee0ea": "--bkms-neutral-5",
+  "8f8f89": "--bkms-navy-4",
+  "dddddd": "--bkms-neutral-5"
 }

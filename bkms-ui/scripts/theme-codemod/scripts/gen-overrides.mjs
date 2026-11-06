@@ -44,7 +44,27 @@ for (const cm of colorsText.matchAll(/(--bkms-[a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{3,
 const PENDING_KEYS = new Set(Object.keys(PENDING));
 const KEEP_KEYS = new Set(Object.keys(KEEP));
 const WHITELIST = new Set(usage.components.map(c => c.kebab));
-const COMPONENT_NAME = new Map(usage.components.map(c => [c.kebab, c.name]));
+
+/** 台账收编：真实渲染但不在 usage 白名单的类前缀。
+ * 依据：Popover 浮层基础类 .bk-popper（styles/mixins/popper.css）、Input textarea 形态（lib/input/index.js）；
+ * monitor-vue3-components 渲染 .bk-collapse/.bk-slider；@blueking/bk-user-selector 等第三方包渲染 .scroll-bar-style。
+ * prefixes 对 .bk-<prefix> 族（含 - 后代类）；rawPrefixes 对无 bk- 前缀的独立工具类。 */
+const EXTRA_OWNERS = [
+  { kebab: 'popper', name: 'Popper（Popover 浮层）', prefixes: ['popper'] },
+  { kebab: 'collapse', name: 'Collapse（monitor 渲染）', prefixes: ['collapse'] },
+  { kebab: 'slider', name: 'Slider（monitor 渲染）', prefixes: ['slider'] },
+  { kebab: 'textarea', name: 'Textarea（Input textarea 形态）', prefixes: ['textarea'] },
+  {
+    kebab: 'scroll-util',
+    name: 'ScrollUtil（第三方滚动条）',
+    prefixes: ['scroll-y', 'scroll-x', 'f-scroll-x'],
+    rawPrefixes: ['scroll-bar-style'],
+  },
+];
+const COMPONENT_NAME = new Map([
+  ...usage.components.map(c => [c.kebab, c.name]),
+  ...EXTRA_OWNERS.map(e => [e.kebab, e.name]),
+]);
 
 /** 组件 -> 类前缀别名：部分组件的 DOM 类前缀与导出名 kebab 不一致 */
 const PREFIX_ALIAS = {
@@ -97,7 +117,8 @@ function collectBlocks(text, media, out) {
   }
 }
 
-/** 规则归属：选择器中 .bk-xxx token 与白名单前缀（含别名）匹配（精确优先，其次族前缀最长者） */
+/** 规则归属：先按 .bk-xxx token 与白名单前缀匹配（精确优先，其次族前缀最长者）；
+ * 白名单未命中时再试 EXTRA_OWNERS（类 token 去 bk- 前缀后精确/族匹配，无 bk- 前缀的按 rawPrefixes 整体匹配） */
 function findOwner(selector) {
   let best = null;
   for (const m of selector.matchAll(/\.bk-([a-z0-9-]+)/g)) {
@@ -112,7 +133,20 @@ function findOwner(selector) {
       }
     }
   }
-  return best?.kebab ?? null;
+  if (best) return best.kebab;
+  for (const m of selector.matchAll(/\.([a-zA-Z0-9][a-zA-Z0-9-]+)/g)) {
+    const t = m[1].toLowerCase();
+    const core = t.startsWith('bk-') ? t.slice(3) : t;
+    for (const e of EXTRA_OWNERS) {
+      for (const p of e.prefixes) {
+        if (core === p || core.startsWith(`${p}-`)) return e.kebab;
+      }
+      for (const p of e.rawPrefixes ?? []) {
+        if (t === p) return e.kebab;
+      }
+    }
+  }
+  return null;
 }
 
 function normalizeHex(raw) {
@@ -199,10 +233,15 @@ const COLOR_PROPS = new Set([
   'column-rule',
 ]);
 
+/** 扫描豁免：随组件库产物带入的第三方编辑器/语法高亮主题色（hljs），非组件库设计色——
+ * 不归属、不进台账、不计未收录 hex（源码为 #800/#ff0 等 3 位缩写，dist 展开后才成 6 位） */
+const SKIP_SELECTOR_RE = /\bhljs\b/i;
+
 function scanDist(file, patchesMap, trackUnassigned) {
   const rawRules = [];
   collectBlocks(fs.readFileSync(path.join(DIST, file), 'utf8'), null, rawRules);
   for (const rule of rawRules) {
+    if (SKIP_SELECTOR_RE.test(rule.selector)) continue;
     const owner = findOwner(rule.selector);
     // 单趟解析保持原始声明顺序（shorthand/longhand 混排时顺序参与级联，不可重排）
     const decls = [];

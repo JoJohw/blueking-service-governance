@@ -1,0 +1,30 @@
+/* bkui Slider（monitor 渲染） 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-slider .bk-slider-interval {
+  background-color: #fff; /* 原值保留（keep：#fff） */
+}
+
+.bkms-themed .bk-slider .bk-slider-interval:hover:after {
+  background-color: #fff; /* 原值保留（keep：#fff） */
+  border: solid 1px var(--primary-color); /* 原值保留 */
+}
+
+.bkms-themed .bk-slider-button .slider-button {
+  background-color: #fff; /* 原值保留（keep：#fff） */
+  border: 2px solid var(--primary-color); /* 原值保留 */
+}
+
+.bkms-themed .bk-slider-button .slider-button-disable {
+  border: 2px solid var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-slider-button .slider-button:hover {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--bkms-brand-2) 30%, transparent); /* 原 #3a84ff4d */
+}
+
+.bkms-themed .bk-slider-button .slider-button:focus {
+  box-shadow: 0 0 10px color-mix(in srgb, var(--bkms-brand-2) 90%, transparent); /* 原 #3a84ffe6 */
+}
+
