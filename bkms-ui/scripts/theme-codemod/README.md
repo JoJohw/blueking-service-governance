@@ -30,6 +30,7 @@ theme-codemod/
 | `mapping.json` | hex → `--bkms-*` token 映射（设计已确认值，真源 = `bkms-color-spec.md`） |
 | `keep.json` | 刻意保留原色、不替换的黑名单 |
 | `pending-design.json` | 待设计确认值（当前为空；重新积累待确认色时在此登记，设计拍板后转入 mapping） |
+| `color-diff-backup.json` | 主题改造历史颜色备份：记录按实际赋值变量计算、CIEDE2000 色差不超过 6 的 hex、对应 token、色差及来源；仅用于历史追溯与审查，不作为自动替换输入。 |
 
 ## 典型工作流
 

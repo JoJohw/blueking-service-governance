@@ -65,13 +65,13 @@
           <div class="flex-1 flex justify-between">
             <div>
               V{{ previousVersion?.version }}
-              <span class="text-[#979BA5] ml-[8px]">
+              <span class="text-[var(--bkms-neutral-3)] ml-[8px]">
                 {{ previousVersion?.createdAt ? dayjs(previousVersion?.createdAt).format('YYYY-MM-DD HH:mm:ss') : '' }}
               </span>
             </div>
             <div
               v-if="diffStats.deleted"
-              class="text-[#EA3636]"
+              class="text-[var(--bkms-danger-2)]"
             >
               -{{ diffStats.deleted }}
             </div>
@@ -79,7 +79,7 @@
           <div class="flex-1 flex justify-between pl-[28px]">
             <div>
               V{{ currentVersion?.version }}
-              <span class="text-[#979BA5]">（{{ $t('当前版本') }}）</span>
+              <span class="text-[var(--bkms-neutral-3)]">（{{ $t('当前版本') }}）</span>
             </div>
             <div
               v-if="diffStats.added"

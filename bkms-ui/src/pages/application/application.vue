@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <main class="flex flex-col h-full w-full relative overflow-hidden bg-[#F5F7FA] px-[24px] py-[16px]">
+  <main class="flex flex-col h-full w-full relative overflow-hidden bg-[var(--bkms-neutral-7)] px-[24px] py-[16px]">
     <Skeleton
       :loading="isLoading"
       theme="gray"
@@ -85,7 +85,7 @@
               <Button
                 :key="`${curSortOption}-${sortOrder}`"
                 v-bk-tooltips="sortTip"
-                class="!min-w-[32px] !px-[8px] !ml-[-1px] text-[#3A84FF]"
+                class="!min-w-[32px] !px-[8px] !ml-[-1px] text-[var(--bkms-brand-2)]"
                 @click="toggleSortOrder"
               >
                 <i :class="['bkms-icon', sortOrder === 'asc' ? 'bkms-icon-shengxu' : 'bkms-icon-jiangxu']" />
@@ -242,7 +242,7 @@
                           :size="14"
                         />
                         <span>{{ item.displayName || item.name }}</span>
-                        <span class="text-[#979BA5]">
+                        <span class="text-[var(--bkms-neutral-3)]">
                           （{{ getDeployStatusInfo(row.type as AppType, item.deployStatus || '').text }}）
                         </span>
                       </div>

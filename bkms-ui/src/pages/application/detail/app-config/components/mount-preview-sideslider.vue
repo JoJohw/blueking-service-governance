@@ -60,8 +60,8 @@
         >
           <template #default="{ row }">
             <div class="leading-[18px]">
-              <span class="text-[#313238]">{{ row.name || '--' }}</span>
-              <div class="text-[#979BA5]">{{ row.mountDir || '--' }}</div>
+              <span class="text-[var(--bkms-neutral-1)]">{{ row.name || '--' }}</span>
+              <div class="text-[var(--bkms-neutral-3)]">{{ row.mountDir || '--' }}</div>
             </div>
           </template>
         </TableColumn>
@@ -80,7 +80,11 @@
           min-width="180"
         >
           <template #default="{ row }">
-            <span :class="{ 'text-[#F59500]': row.contentSource === 'overlay' || row.contentSource === 'overwrite' }">
+            <span
+              :class="{
+                'text-[var(--bkms-warning-2)]': row.contentSource === 'overlay' || row.contentSource === 'overwrite',
+              }"
+            >
               {{ getContentSourceLabel(row) }}
             </span>
           </template>
@@ -94,7 +98,7 @@
           </template>
         </TableColumn>
       </Table>
-      <div class="mt-[12px] text-[12px] text-[#979BA5]">
+      <div class="mt-[12px] text-[12px] text-[var(--bkms-neutral-3)]">
         {{ $t('共 {0} 个文件；未挂载到该环境的配置文件不会出现在容器内。', [rows.length]) }}
       </div>
     </div>

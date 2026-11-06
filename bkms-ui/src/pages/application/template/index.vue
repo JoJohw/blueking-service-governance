@@ -40,8 +40,8 @@
             'flex flex-col items-center justify-center',
             'h-[180px] w-[360px] bg-[#fff] shadow cursor-pointer',
             'rounded-sm border-[1px]',
-            activeCard?.id === item.id ? 'border-[#3A84FF]' : '',
-            item.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-[#3A84FF]',
+            activeCard?.id === item.id ? 'border-[var(--bkms-brand-2)]' : '',
+            item.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-[var(--bkms-brand-2)]',
           ]"
           @click="handleClick(item)"
         >
@@ -50,8 +50,10 @@
             :class="[item.icon, 'size-[50px] leading-[50px]', item.disabled ? 'grayscale' : '']"
             :style="{ color: item.iconColor, fontSize: item.iconFontSize }"
           ></span>
-          <span class="text-[#313238] leading-[24px] text-[16px] mt-[10px] font-bold">{{ item.title }}</span>
-          <span class="mt-[12px] text-[#4D4F56] text-[12px]">{{ item.desc }}</span>
+          <span class="text-[var(--bkms-neutral-1)] leading-[24px] text-[16px] mt-[10px] font-bold">{{
+            item.title
+          }}</span>
+          <span class="mt-[12px] text-[var(--bkms-neutral-2)] text-[12px]">{{ item.desc }}</span>
         </div>
       </div>
       <div class="mt-[32px]">
@@ -116,7 +118,7 @@
         desc: t('适用于使用 tRPC 协议的服务'),
         disabled: false,
         icon: 'bkms-icon bkms-icon-trpc',
-        iconColor: '#1B44C8',
+        iconColor: 'var(--bkms-brand-1)',
       },
       {
         id: 'createHelmTemplateApp',
@@ -135,7 +137,7 @@
         desc: t('采用 TAF 框架实现的服务端应用'),
         disabled: false,
         icon: 'bkms-icon bkms-icon-taf',
-        iconColor: '#1b44c8',
+        iconColor: 'var(--bkms-brand-1)',
         iconFontSize: '40px',
       },
       {

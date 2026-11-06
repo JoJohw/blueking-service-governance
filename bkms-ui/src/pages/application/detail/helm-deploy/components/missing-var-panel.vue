@@ -17,20 +17,22 @@
 -->
 
 <template>
-  <div class="rounded-[2px] border border-[#F9D090] bg-[#FDF4E8] px-[12px]">
+  <div class="rounded-[2px] border border-[#F9D090] bg-[var(--bkms-warning-7)] px-[12px]">
     <!-- Header -->
     <div
       class="flex cursor-pointer items-center justify-between py-[8px]"
       @click="collapsed = !collapsed"
     >
       <div class="flex items-center">
-        <i class="bkms-icon bkms-icon-triangle-warning text-[12px] text-[#F59500]" />
+        <i class="bkms-icon bkms-icon-triangle-warning text-[12px] text-[var(--bkms-warning-2)]" />
 
-        <span class="mx-[8px] text-base font-bold text-[#F59500]">
+        <span class="mx-[8px] text-base font-bold text-[var(--bkms-warning-2)]">
           {{ title }}
         </span>
 
-        <span class="rounded-[2px] bg-[#FCE5C0] px-[8px] py-[2px] text-[12px] text-[#E38B02]">
+        <span
+          class="rounded-[2px] bg-[var(--bkms-warning-5)] px-[8px] py-[2px] text-[12px] text-[var(--bkms-warning-1)]"
+        >
           <i18n-t keypath="{0} 个变量">
             <span class="pl-[2px]">{{ data.length }}</span>
           </i18n-t>
@@ -38,7 +40,7 @@
       </div>
 
       <div
-        class="flex items-center text-[#979BA5] transition-transform duration-200"
+        class="flex items-center text-[var(--bkms-neutral-3)] transition-transform duration-200"
         :class="{ 'rotate-180': !collapsed }"
       >
         <AngleDown class="text-[22px]" />
@@ -134,16 +136,16 @@
 <style scoped lang="postcss">
   /* 表格边框色 */
   :deep(.missing-var-panel__table) {
-    --vxe-ui-table-border-color: #dcdee5;
+    --vxe-ui-table-border-color: var(--bkms-neutral-5);
   }
 
   /* 表头背景色 */
   :deep(.missing-var-panel__table .vxe-header--column) {
-    background-color: #fafbfd;
+    background-color: var(--bkms-neutral-8);
   }
 
   /* 表格正文文字色 */
   :deep(.missing-var-panel__table .vxe-body--column .vxe-cell) {
-    color: #4d4f56;
+    color: var(--bkms-neutral-2);
   }
 </style>

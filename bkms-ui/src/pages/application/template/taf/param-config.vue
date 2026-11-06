@@ -136,7 +136,7 @@
                 v-model="formData.buildConfig.pipelineBuildConfig.pipelineID"
                 :workspace="formData.workspaceID"
               />
-              <div class="text-[12px] text-[#979ba5]">
+              <div class="text-[12px] text-[var(--bkms-neutral-3)]">
                 {{ $t('需要保证流水线会将构建的镜像推送到当前空间的镜像仓库下') }}
                 <Button
                   text

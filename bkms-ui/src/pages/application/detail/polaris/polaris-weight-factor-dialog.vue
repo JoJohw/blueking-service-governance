@@ -28,7 +28,7 @@
         :title="mode === 'conflict' ? $t('权重因子参数') : $t('确认修改北极星上的权重因子？')"
         :title-size="20"
       >
-        <span class="truncate text-[#979BA5]">{{ namespace }} / {{ serviceName }}</span>
+        <span class="truncate text-[var(--bkms-neutral-3)]">{{ namespace }} / {{ serviceName }}</span>
       </DividerHeader>
     </template>
 
@@ -43,7 +43,7 @@
     />
 
     <template v-if="mode === 'conflict'">
-      <div class="mb-[12px] text-[14px] text-[#313238]">{{ $t('请选择处理方式：') }}</div>
+      <div class="mb-[12px] text-[14px] text-[var(--bkms-neutral-1)]">{{ $t('请选择处理方式：') }}</div>
       <Radio.Group
         v-model="action"
         class="weight-factor-options mb-[20px] flex flex-col gap-[12px]"
@@ -52,25 +52,29 @@
           v-for="item in options"
           :key="item.value"
           class="cursor-pointer rounded-[4px] border border-solid px-[16px] py-[14px]"
-          :class="action === item.value ? 'border-[#3A84FF] bg-[#F0F5FF]' : 'border-[#DCDEE5]'"
+          :class="
+            action === item.value
+              ? 'border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-7)]'
+              : 'border-[var(--bkms-neutral-5)]'
+          "
           @click="action = item.value"
         >
           <Radio :label="item.value">
             <div class="ml-[8px] whitespace-normal">
-              <div class="text-[12px] font-bold text-[#313238]">{{ item.title }}</div>
-              <div class="mt-[8px] text-[12px] leading-[20px] text-[#63656E]">{{ item.description }}</div>
+              <div class="text-[12px] font-bold text-[var(--bkms-neutral-1)]">{{ item.title }}</div>
+              <div class="mt-[8px] text-[12px] leading-[20px] text-[var(--bkms-neutral-2)]">{{ item.description }}</div>
             </div>
           </Radio>
         </div>
       </Radio.Group>
     </template>
 
-    <div class="rounded-[2px] bg-[#F5F7FA] px-[16px] py-[12px]">
+    <div class="rounded-[2px] bg-[var(--bkms-neutral-7)] px-[16px] py-[12px]">
       <div class="flex min-w-0 items-center text-[12px] leading-[20px]">
         <span class="shrink-0">{{ $t('北极星服务名') }}：</span>
         <span class="truncate">{{ namespace }} / {{ serviceName }}</span>
         <a
-          class="ml-[4px] shrink-0 text-[#3A84FF]"
+          class="ml-[4px] shrink-0 text-[var(--bkms-brand-2)]"
           :href="serviceUrl"
           rel="noopener noreferrer"
           target="_blank"
@@ -98,7 +102,7 @@
             v-for="row in rows"
             :key="row.label"
           >
-            <td class="text-[#979BA5]">{{ row.label }}</td>
+            <td class="text-[var(--bkms-neutral-3)]">{{ row.label }}</td>
             <td
               :class="{ selected: mode === 'conflict' && action === 'keep', 'font-bold': row.remote !== row.platform }"
             >
@@ -219,35 +223,35 @@
       padding: 8px 12px;
       text-align: left;
       overflow-wrap: anywhere;
-      border-bottom: 1px solid #f0f1f5;
+      border-bottom: 1px solid var(--bkms-neutral-6);
     }
 
     th {
       font-weight: normal;
-      color: #979ba5;
-      background-color: #fafbfd;
+      color: var(--bkms-neutral-3);
+      background-color: var(--bkms-neutral-8);
     }
 
     .selected {
-      background-color: #f0f5ff;
+      background-color: var(--bkms-brand-7);
       box-shadow:
-        inset 1px 0 #3a84ff,
-        inset -1px 0 #3a84ff;
+        inset 1px 0 var(--bkms-brand-2),
+        inset -1px 0 var(--bkms-brand-2);
     }
 
     th.selected {
-      color: #3a84ff;
+      color: var(--bkms-brand-2);
       box-shadow:
-        inset 1px 0 #3a84ff,
-        inset -1px 0 #3a84ff,
-        inset 0 1px #3a84ff;
+        inset 1px 0 var(--bkms-brand-2),
+        inset -1px 0 var(--bkms-brand-2),
+        inset 0 1px var(--bkms-brand-2);
     }
 
     tr:last-child td.selected {
       box-shadow:
-        inset 1px 0 #3a84ff,
-        inset -1px 0 #3a84ff,
-        inset 0 -1px #3a84ff;
+        inset 1px 0 var(--bkms-brand-2),
+        inset -1px 0 var(--bkms-brand-2),
+        inset 0 -1px var(--bkms-brand-2);
     }
   }
 </style>

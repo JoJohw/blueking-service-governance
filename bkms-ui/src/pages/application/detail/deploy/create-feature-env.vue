@@ -42,24 +42,26 @@
     >
       <Success
         class="mb-[36px]"
-        fill="#2CAF5E"
+        fill="var(--bkms-success-2)"
         height="64px"
         width="64px"
       />
-      <span class="mb-[16px] text-[24px] leading-[32px] text-[#313238]">
+      <span class="mb-[16px] text-[24px] leading-[32px] text-[var(--bkms-neutral-1)]">
         {{ $t('环境创建成功') }}
       </span>
-      <p class="mb-[28px] max-w-[480px] text-center text-[14px] leading-[22px] text-[#4D4F56]">
+      <p class="mb-[28px] max-w-[480px] text-center text-[14px] leading-[22px] text-[var(--bkms-neutral-2)]">
         {{ $t('当前使用应用默认配置，未配置环境级变量。可直接部署，也可先调整配置。') }}
       </p>
-      <div class="mb-[28px] w-full max-w-[480px] bg-[#F5F7FA] px-[16px] py-[12px] text-left text-[14px] leading-[22px]">
+      <div
+        class="mb-[28px] w-full max-w-[480px] bg-[var(--bkms-neutral-7)] px-[16px] py-[12px] text-left text-[14px] leading-[22px]"
+      >
         <div>
-          <span class="text-[#63656E]">{{ $t('环境展示名称') }}：</span>
-          <span class="text-[#313238]">{{ createdEnv.displayName || createdEnv.name }}</span>
+          <span class="text-[var(--bkms-neutral-2)]">{{ $t('环境展示名称') }}：</span>
+          <span class="text-[var(--bkms-neutral-1)]">{{ createdEnv.displayName || createdEnv.name }}</span>
         </div>
         <div>
-          <span class="text-[#63656E]">{{ $t('命名空间') }}：</span>
-          <span class="text-[#313238]">{{ createdEnv.cluster?.namespace || createdEnv.name }}</span>
+          <span class="text-[var(--bkms-neutral-2)]">{{ $t('命名空间') }}：</span>
+          <span class="text-[var(--bkms-neutral-1)]">{{ createdEnv.cluster?.namespace || createdEnv.name }}</span>
         </div>
       </div>
       <div>
@@ -130,7 +132,7 @@
             :sync-env-store="false"
             @update:item="handleSourceEnvChange"
           />
-          <div class="mt-[8px] text-[12px] leading-[20px] text-[#979BA5]">
+          <div class="mt-[8px] text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">
             {{ $t('沿用来源环境的集群和环境分类。应用配置不会复制，新环境使用应用的默认配置。') }}
           </div>
         </Form.FormItem>

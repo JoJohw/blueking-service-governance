@@ -103,7 +103,7 @@
             :width="100"
           >
             <template #default="{ row }">
-              <span :class="row.level === 'Warning' ? 'text-[#EA3636]' : 'text-[#2DCB56]'">
+              <span :class="row.level === 'Warning' ? 'text-[var(--bkms-danger-2)]' : 'text-[var(--bkms-success-2)]'">
                 {{ row.level || '--' }}
               </span>
             </template>

@@ -27,12 +27,12 @@
           @click="toggleExpand"
         >
           <RightShape
-            class="text-[#63656E] transition-transform duration-300 origin-center"
+            class="text-[var(--bkms-neutral-2)] transition-transform duration-300 origin-center"
             :class="{ 'rotate-90': isExpanded }"
             :height="14"
             :width="14"
           />
-          <span class="text-[14px] font-bold text-[#313238] ml-[6px]">{{ service.name }}</span>
+          <span class="text-[14px] font-bold text-[var(--bkms-neutral-1)] ml-[6px]">{{ service.name }}</span>
           <!-- 是否为泳道服务 -->
           <Tag
             v-if="service.trafficLaneEnabled"
@@ -44,7 +44,7 @@
         <!-- 编辑 -->
         <EditLine
           v-bk-tooltips="$t('编辑')"
-          class="cursor-pointer text-[#979BA5] hover:text-[#3A84FF] p-[3px]"
+          class="cursor-pointer text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-brand-2)] p-[3px]"
           @click="handleEdit"
         ></EditLine>
         <!-- 删除 -->
@@ -57,14 +57,14 @@
           <template #content>
             <div class="mb-[16px] text-[12px]">
               <div>
-                {{ $t('服务名称') }}：<span class="text-[#313238]">{{ service.name }}</span>
+                {{ $t('服务名称') }}：<span class="text-[var(--bkms-neutral-1)]">{{ service.name }}</span>
               </div>
               <div>{{ $t('删除后，不可恢复，请谨慎操作！') }}</div>
             </div>
           </template>
           <Del
             v-bk-tooltips="$t('删除')"
-            class="cursor-pointer text-[#979BA5] hover:text-[#EA3636] p-[3px]"
+            class="cursor-pointer text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-danger-2)] p-[3px]"
           ></Del>
         </PopConfirm>
       </div>
@@ -78,7 +78,7 @@
       <!-- 选择器信息 -->
       <div class="mb-[24px]">
         <div class="flex items-center gap-[8px] mb-[8px]">
-          <span class="text-[12px] font-bold text-[#313238]">{{ $t('选择器') }}</span>
+          <span class="text-[12px] font-bold text-[var(--bkms-neutral-1)]">{{ $t('选择器') }}</span>
         </div>
         <ul class="flex flex-wrap items-center gap-y-[8px] gap-x-[80px] max-w-[1000px]">
           <li
@@ -92,7 +92,7 @@
               :content="`${key}：${value}`"
               type="tips"
             >
-              <span class="text-[#4D4F56]">{{ key }}：</span>{{ value }}
+              <span class="text-[var(--bkms-neutral-2)]">{{ key }}：</span>{{ value }}
             </OverflowTitle>
           </li>
         </ul>
@@ -100,7 +100,7 @@
 
       <!-- 端口配置 -->
       <div>
-        <div class="text-[12px] font-bold text-[#313238] mb-[8px]">{{ $t('端口配置') }}</div>
+        <div class="text-[12px] font-bold text-[var(--bkms-neutral-1)] mb-[8px]">{{ $t('端口配置') }}</div>
         <Table
           class="max-w-[1000px]"
           :data="service.ports"

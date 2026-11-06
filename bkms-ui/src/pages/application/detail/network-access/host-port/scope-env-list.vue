@@ -20,7 +20,7 @@
     <div
       v-for="env in scopeEnvItems"
       :key="env.name"
-      class="inline-flex items-center h-[22px] text-[12px] text-[#4D4F56]"
+      class="inline-flex items-center h-[22px] text-[12px] text-[var(--bkms-neutral-2)]"
     >
       <span class="max-w-[160px] truncate">{{ env.displayName }}</span>
       <Tag
@@ -36,7 +36,7 @@
         theme="popover-dark-translucent"
         trigger="hover"
       >
-        <span class="ml-[4px] cursor-pointer text-[#F59500]">（{{ $t('待部署生效') }}）</span>
+        <span class="ml-[4px] cursor-pointer text-[var(--bkms-warning-2)]">（{{ $t('待部署生效') }}）</span>
         <template #content>
           <div class="max-w-[520px] text-[12px] leading-[20px] text-[#fff]">
             <div class="mb-[6px]">{{ $t('您修改了以下内容，需要重新部署应用后方可生效：') }}</div>
@@ -49,7 +49,7 @@
             </div>
             <Button
               v-if="showGoDeploy"
-              class="mt-[6px] !px-0 text-[#3A84FF]"
+              class="mt-[6px] !px-0 text-[var(--bkms-brand-2)]"
               text
               theme="primary"
               @click.stop="$emit('goDeploy', env.name)"

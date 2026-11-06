@@ -18,10 +18,10 @@
 
 <template>
   <div
-    class="flex items-center border-[1px] border-[#C4C6CC] border-solid h-[32px] leading-[32px] text-[#4D4F56] bg-[#fff] min-w-[160px]"
+    class="flex items-center border-[1px] border-[var(--bkms-navy-5)] border-solid h-[32px] leading-[32px] text-[var(--bkms-neutral-2)] bg-[#fff] min-w-[160px]"
   >
     <div
-      class="text-center bg-[#FAFBFD] text-center h-full border-r-[1px] border-solid border-[#C4C6CC]"
+      class="text-center bg-[var(--bkms-neutral-8)] text-center h-full border-r-[1px] border-solid border-[var(--bkms-navy-5)]"
       :style="`min-width: ${keyWidth ? keyWidth : 0}px`"
     >
       {{ keyName }}

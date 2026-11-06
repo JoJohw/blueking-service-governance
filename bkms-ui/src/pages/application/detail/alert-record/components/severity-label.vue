@@ -23,9 +23,9 @@
   const { t } = useI18n();
 
   const SEVERITY_COLOR_MAP: Record<number, string> = {
-    1: '#E71818',
-    2: '#FF9C01',
-    3: '#3A84FF',
+    1: 'var(--bkms-danger-1)',
+    2: 'var(--bkms-warning-2)',
+    3: 'var(--bkms-brand-2)',
   };
 
   const SEVERITY_LABEL_MAP: Record<number, string> = {
@@ -34,6 +34,6 @@
     3: t('提醒'),
   };
 
-  const color = computed(() => SEVERITY_COLOR_MAP[props.severity || 0] || '#979BA5');
+  const color = computed(() => SEVERITY_COLOR_MAP[props.severity || 0] || 'var(--bkms-neutral-3)');
   const label = computed(() => SEVERITY_LABEL_MAP[props.severity || 0] || '--');
 </script>

@@ -37,7 +37,7 @@
     <!-- 空状态 -->
     <div
       v-if="!fileList?.length"
-      class="flex-1 h-full flex items-center min-w-0 bg-[#F5F7FA]"
+      class="flex-1 h-full flex items-center min-w-0 bg-[var(--bkms-neutral-7)]"
     >
       <Exception
         class="large-exception"
@@ -48,20 +48,20 @@
           <img src="/empty.svg" />
         </template>
         <template #description>
-          <div class="text-[#4D4F56] text-[14px] leading-[22px]">{{ $t('请先在左侧添加文件') }}</div>
+          <div class="text-[var(--bkms-neutral-2)] text-[14px] leading-[22px]">{{ $t('请先在左侧添加文件') }}</div>
         </template>
       </Exception>
     </div>
     <div
       v-else
-      class="flex-1 h-full pt-[12px] flex flex-col min-w-0 bg-[#F5F7FA]"
+      class="flex-1 h-full pt-[12px] flex flex-col min-w-0 bg-[var(--bkms-neutral-7)]"
     >
       <FlexRow class="mb-[8px] mx-[24px]">
         <template #left>
           <span class="font-bold text-[14px]">{{ curFileInfo?.name || '' }}</span>
           <span
             v-if="isReadonlyFile"
-            class="text-[#F59500] text-[12px]"
+            class="text-[var(--bkms-warning-2)] text-[12px]"
             >{{ $t('（来源于 BSCP 的文件仅能查看，不能编辑）') }}</span
           >
           <Tag
@@ -89,7 +89,7 @@
             />
             <Divider
               class="h-[12px]"
-              color="#C4C6CC"
+              color="var(--bkms-navy-5)"
               direction="vertical"
               type="solid"
             />
@@ -102,7 +102,7 @@
           />
           <Divider
             class="h-[12px]"
-            color="#C4C6CC"
+            color="var(--bkms-navy-5)"
             direction="vertical"
             type="solid"
           />
@@ -114,7 +114,7 @@
           />
           <Divider
             class="h-[12px]"
-            color="#C4C6CC"
+            color="var(--bkms-navy-5)"
             direction="vertical"
             type="solid"
           />
@@ -155,7 +155,7 @@
                     extCls: '!w-[400px]',
                     theme: 'light',
                   }"
-                  class="ml-[6px] text-[14px] text-[#979BA5] transform translate-y-[2px]"
+                  class="ml-[6px] text-[14px] text-[var(--bkms-neutral-3)] transform translate-y-[2px]"
                 />
               </template>
             </MsHighlightjs>
@@ -211,7 +211,7 @@
                       width="240"
                     >
                       <Tag
-                        class="!text-[#CDDFFE] !bg-[#2759AE] ml-[4px] h-[16px] text-[10px] px-[4px]"
+                        class="!text-[var(--bkms-brand-5)] !bg-[#2759AE] ml-[4px] h-[16px] text-[10px] px-[4px]"
                         theme="info"
                       >
                         {{ $t('覆盖层') }}
@@ -236,7 +236,7 @@
                       theme="light"
                     >
                       <Tag
-                        class="!text-[#FDF4E8] !bg-[#6D5B42] ml-[4px] h-[16px] text-[10px] px-[4px]"
+                        class="!text-[var(--bkms-warning-7)] !bg-[#6D5B42] ml-[4px] h-[16px] text-[10px] px-[4px]"
                         theme="warning"
                       >
                         BSCP
@@ -261,7 +261,7 @@
                     >
                       <template #icon>
                         <Upload
-                          color="#979BA5"
+                          color="var(--bkms-neutral-3)"
                           height="16"
                           width="16"
                         />

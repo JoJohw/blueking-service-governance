@@ -24,8 +24,10 @@
         :title="$t('环境配置')"
         :trigger-back="leaveEnvVarsPage"
       >
-        <span class="mx-[8px] h-[20px] w-[1px] bg-[#dcdee5]"></span>
-        <span class="text-[16px] leading-[24px] text-[#979ba5]">{{ $t('特性环境') }}：{{ envVarsPageTitle }}</span>
+        <span class="mx-[8px] h-[20px] w-[1px] bg-[var(--bkms-neutral-5)]"></span>
+        <span class="text-[16px] leading-[24px] text-[var(--bkms-neutral-3)]"
+          >{{ $t('特性环境') }}：{{ envVarsPageTitle }}</span
+        >
       </MsHeader>
       <div
         v-bkloading="{ loading: loading && !envVarsTargetRow }"
@@ -56,8 +58,10 @@
         :title="$t('特性环境')"
         :trigger-back="() => emit('back')"
       >
-        <span class="mx-[8px] h-[20px] w-[1px] bg-[#dcdee5]"></span>
-        <span class="text-[16px] leading-[24px] text-[#979ba5]">{{ $t('共 {0} 个', [list.length]) }}</span>
+        <span class="mx-[8px] h-[20px] w-[1px] bg-[var(--bkms-neutral-5)]"></span>
+        <span class="text-[16px] leading-[24px] text-[var(--bkms-neutral-3)]">{{
+          $t('共 {0} 个', [list.length])
+        }}</span>
       </MsHeader>
 
       <div class="flex-1 min-h-0 p-[24px] flex flex-col gap-[16px] overflow-hidden">
@@ -84,7 +88,9 @@
             :placeholder="$t('搜索环境展示名称')"
           >
             <template #suffix>
-              <Search class="text-[16px] text-[#979BA5] mr-[6px] mt-[2px] hover:text-[#3A84FF]" />
+              <Search
+                class="text-[16px] text-[var(--bkms-neutral-3)] mr-[6px] mt-[2px] hover:text-[var(--bkms-brand-2)]"
+              />
             </template>
           </Input>
         </div>
@@ -232,7 +238,7 @@
                       <div class="font-bold text-[14px] leading-[22px]">{{ $t('无法销毁特性环境') }}</div>
                       <div>• {{ $t('该特性环境有部署实例，请先移除部署后再销毁环境') }}</div>
                       <Button
-                        class="mt-[6px] !text-[#3A84FF]"
+                        class="mt-[6px] !text-[var(--bkms-brand-2)]"
                         :loading="preparingRemoveDeployRowID === row.id"
                         text
                         @click.stop.prevent="handleShowRemoveDeployDialog(row)"
@@ -269,17 +275,17 @@
             icon="bkms-icon-tishi"
             :width="42"
           />
-          <span class="text-[#313238] text-[20px] leading-[32px] text-center mt-[18px]">
+          <span class="text-[var(--bkms-neutral-1)] text-[20px] leading-[32px] text-center mt-[18px]">
             {{ $t('确认销毁特性环境') }} ?
           </span>
         </div>
       </template>
-      <div class="mb-[16px] px-[16px] py-[12px] bg-[#F5F6FA] rounded-[2px]">
+      <div class="mb-[16px] px-[16px] py-[12px] bg-[var(--bkms-neutral-8)] rounded-[2px]">
         {{ $t('将永久删除特性环境及其命名空间，并清理应用配置 / 北极星 / 组件中的引用。') }}
       </div>
       <i18n-t keypath="该操作不可恢复，请输入特性环境命名空间：{0} 进行确认">
         <span
-          class="font-bold text-[#EA3636] px-[3px] cursor-pointer hover:bg-[#FFEBEB]"
+          class="font-bold text-[var(--bkms-danger-2)] px-[3px] cursor-pointer hover:bg-[var(--bkms-danger-6)]"
           @click="copyText(destroyTargetRow?.name || '')"
         >
           {{ destroyTargetRow?.name || '--' }}
@@ -337,7 +343,7 @@
             icon="bkms-icon-tishi"
             :width="42"
           />
-          <span class="text-[#313238] text-[20px] leading-[32px] text-center mt-[18px]">
+          <span class="text-[var(--bkms-neutral-1)] text-[20px] leading-[32px] text-center mt-[18px]">
             {{ $t('确认移除部署') }} ?
           </span>
         </div>
@@ -346,7 +352,7 @@
         <div>
           <span>{{ $t('环境') }}：</span>
           <span class="font-bold">{{ removeDeployTargetRow?.name || '--' }}</span>
-          <Tag class="ml-[8px] text-[#3A9EAA] bg-[#E2F5F7]">
+          <Tag class="ml-[8px] text-[var(--bkms-cyan-2)] bg-[var(--bkms-cyan-6)]">
             {{ $t('特性') }}
           </Tag>
         </div>
@@ -356,7 +362,7 @@
           <span>&nbsp;{{ $t('个') }}</span>
         </div>
       </div>
-      <div class="mb-[16px] px-[16px] py-[12px] bg-[#F5F6FA] rounded-[2px] text-[14px] leading-[24px]">
+      <div class="mb-[16px] px-[16px] py-[12px] bg-[var(--bkms-neutral-8)] rounded-[2px] text-[14px] leading-[24px]">
         {{ $t('将移除当前环境下的全部运行实例，服务将不可访问。特性环境本身会保留，之后仍可再次「部署」到该环境。') }}
       </div>
       <template #footer>

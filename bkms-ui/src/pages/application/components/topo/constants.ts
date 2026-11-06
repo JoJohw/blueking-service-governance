@@ -239,21 +239,21 @@ export const STATUS_CONFIG: Record<
   },
   healthy: {
     bgColor: '#fff',
-    iconBgColor: 'linear-gradient(90deg, #5FB8AC 0%, #61C7B9 100%)',
-    color: '#61C7B9',
+    iconBgColor: 'linear-gradient(90deg, var(--bkms-cyan-2) 0%, var(--bkms-cyan-3) 100%)',
+    color: 'var(--bkms-cyan-3)',
     miniColor: '#DAF6E5',
   },
   warning: {
     bgColor: 'linear-gradient(90deg, #FFF5F5 0%, #FFFDFC 50%, #FFFFFF 100%)',
-    iconBgColor: 'linear-gradient(90deg, #F59500 0%, #F8B64F 100%)',
-    badgeIconColor: '#F59500',
+    iconBgColor: 'linear-gradient(90deg, var(--bkms-warning-2) 0%, #F8B64F 100%)',
+    badgeIconColor: 'var(--bkms-warning-2)',
     color: '#F8B64F',
     miniColor: '#FDEED8',
   },
   error: {
     bgColor: 'linear-gradient(90deg, #FFF5F5 0%, #FFFDFC 50%, #FFFFFF 100%)',
-    iconBgColor: 'linear-gradient(90deg, #FA4E41 0%, #F07474 100%)',
-    badgeIconColor: '#FA4E41',
+    iconBgColor: 'linear-gradient(90deg, var(--bkms-danger-2) 0%, #F07474 100%)',
+    badgeIconColor: 'var(--bkms-danger-2)',
     color: '#F07474',
     miniColor: '#FEDDDD',
   },
@@ -317,15 +317,7 @@ export const CUSTOM_NODE_TYPE = 'resource-node';
 
 /** 资源类别 */
 export type ResourceCategory =
-  | 'config'
-  | 'crd'
-  | 'hpa'
-  | 'network'
-  | 'rbac'
-  | 'storage'
-  | 'tkex-crd'
-  | 'unknown'
-  | 'workload';
+  'config' | 'crd' | 'hpa' | 'network' | 'rbac' | 'storage' | 'tkex-crd' | 'unknown' | 'workload';
 
 export interface ResourceCategoryMeta {
   icon: string;

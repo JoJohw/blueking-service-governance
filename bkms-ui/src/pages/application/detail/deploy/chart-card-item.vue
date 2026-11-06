@@ -21,10 +21,10 @@
     <!-- 头部 -->
     <div class="flex items-center justify-between px-[16px] py-[12px]">
       <slot name="title">
-        <span class="text-[#313238] text-[14px] font-medium leading-[22px]">{{ title }}</span>
+        <span class="text-[var(--bkms-neutral-1)] text-[14px] font-medium leading-[22px]">{{ title }}</span>
       </slot>
       <!-- <i
-        class="bkms-icon bkms-icon-filliscreen-line text-[#979BA5] text-[14px] cursor-pointer hover:text-[#3A84FF]"
+        class="bkms-icon bkms-icon-filliscreen-line text-[var(--bkms-neutral-3)] text-[14px] cursor-pointer hover:text-[var(--bkms-brand-2)]"
         @click="handleFullscreen"
       ></i> -->
     </div>
@@ -64,7 +64,7 @@
         :sort-config="sortConfig"
       >
         <template #empty>
-          <span class="text-[#979BA5] text-[12px]">{{ $t('暂无数据') }}</span>
+          <span class="text-[var(--bkms-neutral-3)] text-[12px]">{{ $t('暂无数据') }}</span>
         </template>
         <TableColumn
           field="name"
@@ -77,9 +77,11 @@
             >
               <span
                 class="legend-color-dot mr-[8px]"
-                :style="{ backgroundColor: row.show ? row.color : '#C4C6CC' }"
+                :style="{ backgroundColor: row.show ? row.color : 'var(--bkms-navy-5)' }"
               ></span>
-              <span :style="{ color: row.show ? '#63656E' : '#C4C6CC' }">{{ row.alias || row.name }}</span>
+              <span :style="{ color: row.show ? 'var(--bkms-neutral-2)' : 'var(--bkms-navy-5)' }">{{
+                row.alias || row.name
+              }}</span>
             </div>
           </template>
         </TableColumn>
@@ -115,7 +117,12 @@
   import { ExploreChart } from '@blueking/monitor-vue3-components';
   import { Table, TableColumn } from '@blueking/table';
   import * as echarts from 'echarts/core';
-  import { formatOffsetLabel, getCachedMetric, getColorByOffset, isPercentUnit } from '~/pages/application/detail/deploy/monitor-chart-bridge';
+  import {
+    formatOffsetLabel,
+    getCachedMetric,
+    getColorByOffset,
+    isPercentUnit,
+  } from '~/pages/application/detail/deploy/monitor-chart-bridge';
   import { useAppDetail } from '~/stores/app-detail';
 
   // 将所有 ExploreChart 加入同一 echarts group，实现跨图 tooltip 联动
@@ -252,7 +259,6 @@
   /** 表格 loading：接口请求期间显示加载状态 */
   const tableLoading = ref(true);
 
-
   function syncLegendRows() {
     if (!props.instances?.length) {
       legendRows.value = [];
@@ -329,8 +335,9 @@
     const rows: LegendRow[] = (chartLegend ?? []).map(item => {
       // 优先读 ExploreChart 透传的 isCompare 字段，否则回退到反查 seriesItem 的原 instance 前缀
       const seriesItem = seriesByName.get(item.name) ?? seriesByName.get(item.alias ?? '');
-      const isCompare = (item as LegendSourceItem).isCompare === true
-        || (!!seriesItem && (seriesItem.instance ?? '').startsWith('__CMP__'));
+      const isCompare =
+        (item as LegendSourceItem).isCompare === true ||
+        (!!seriesItem && (seriesItem.instance ?? '').startsWith('__CMP__'));
       const stat = seriesItem?.stat;
       const fmt = (v: number | undefined) => (v != null ? truncFixed2(v * percentScale * valueScale) + unitSuffix : '');
       return {

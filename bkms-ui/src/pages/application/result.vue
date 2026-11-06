@@ -24,12 +24,12 @@
     >
       <Success
         class="mb-[36px]"
-        fill="#2CAF5E"
+        fill="var(--bkms-success-2)"
         height="64px"
         width="64px"
       />
       <span class="text-[24px] leading-[32px] mb-[16px]">{{ $t('{name} 应用创建成功', { name: data.name }) }}</span>
-      <span class="text-[14px] text-[#4D4F56] leading-[22px] mb-[28px]">
+      <span class="text-[14px] text-[var(--bkms-neutral-2)] leading-[22px] mb-[28px]">
         <template v-if="!isHelmLikeAppType(appType)">
           {{ $t('接下来你可以直接 “查看应用” 或 继续 “创建应用”') }}
         </template>
@@ -71,12 +71,12 @@
     >
       <Close
         class="mb-[36px]"
-        fill="#EA3636"
+        fill="var(--bkms-danger-2)"
         height="64px"
         width="64px"
       />
       <span class="text-[24px] leading-[32px] mb-[16px]">{{ $t('{name} 应用创建失败', data.name) }}</span>
-      <span class="text-[14px] text-[#4D4F56] leading-[22px] mb-[28px]">{{
+      <span class="text-[14px] text-[var(--bkms-neutral-2)] leading-[22px] mb-[28px]">{{
         $t('接下来你可以根据失败的原因，重新修改配置')
       }}</span>
       <div class="mb-[24px]">

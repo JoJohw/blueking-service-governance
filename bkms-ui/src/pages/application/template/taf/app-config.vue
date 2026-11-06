@@ -122,7 +122,7 @@
               >
                 <template #title>
                   <div class="flex items-center">
-                    <span class="text-[14px] text-[#C4C6CC]">{{ formData.tafSpec.fileName }}</span>
+                    <span class="text-[14px] text-[var(--bkms-navy-5)]">{{ formData.tafSpec.fileName }}</span>
                     <Popover
                       v-model:is-show="isPopoverShow"
                       :padding="16"
@@ -133,7 +133,7 @@
                       @after-hidden="handlePopoverHidden"
                     >
                       <EditLine
-                        class="ml-[8px] text-[#979BA5] cursor-pointer hover:text-[#3A84FF]"
+                        class="ml-[8px] text-[var(--bkms-neutral-3)] cursor-pointer hover:text-[var(--bkms-brand-2)]"
                         @click="handleEdit"
                       />
                       <template #content>
@@ -184,7 +184,7 @@
       </ResizeLayout>
       <p
         v-show="isShowContentTip"
-        class="text-[#EA3636]"
+        class="text-[var(--bkms-danger-2)]"
       >
         {{ $t('必填项') }}
       </p>

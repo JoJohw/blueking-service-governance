@@ -51,7 +51,7 @@
             >
               {{ nodeData?.name }}
             </span>
-            <div class="flex items-center gap-[16px] text-[12px] text-[#8E9BB3]">
+            <div class="flex items-center gap-[16px] text-[12px] text-[var(--bkms-navy-4)]">
               <span> {{ $t('类型') }}：{{ nodeData?.kind }} </span>
               <div class="flex items-center gap-[4px]">
                 <span>{{ $t('状态') }}：</span>

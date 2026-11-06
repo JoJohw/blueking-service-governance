@@ -20,7 +20,7 @@
   <div class="h-full overflow-auto flex flex-col">
     <!-- 环境选择器 -->
     <div
-      class="bg-[#EAEBF0] shadow-[0_2px_4px_0_#0000001a] px-[12px] py-[8px] mx-[24px] mt-[20px] mb-[16px] flex items-center gap-[10px] flex-shrink-0"
+      class="bg-[var(--bkms-neutral-6)] shadow-[0_2px_4px_0_#0000001a] px-[12px] py-[8px] mx-[24px] mt-[20px] mb-[16px] flex items-center gap-[10px] flex-shrink-0"
     >
       <EnvPerspectiveSelect
         data-testid="deploy-config-env-select"
@@ -30,13 +30,13 @@
         @change="handleEnvSelectChange"
       />
       <Popover render-type="auto">
-        <i class="bkms-icon bkms-icon-circle-info text-[16px] text-[#63656e]"></i>
+        <i class="bkms-icon bkms-icon-circle-info text-[16px] text-[var(--bkms-neutral-2)]"></i>
         <template #content>
           <p>{{ $t('全局：所有环境共用，不可按环境修改。') }}</p>
           <p>{{ $t('按环境：继承默认配置，支持按环境单独覆盖。') }}</p>
           <div class="flex items-center">
             <span>{{ deployConfigTipPrefix }}</span>
-            <i class="inline-block w-[3px] h-[12px] bg-[#ff9c01] mx-[5px] flex-shrink-0"></i>
+            <i class="inline-block w-[3px] h-[12px] bg-[var(--bkms-warning-2)] mx-[5px] flex-shrink-0"></i>
             <span>{{ deployConfigTipSuffix }}</span>
           </div>
         </template>

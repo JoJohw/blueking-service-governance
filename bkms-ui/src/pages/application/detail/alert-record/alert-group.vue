@@ -63,7 +63,7 @@
         >
           <template #default="{ row }">
             <span
-              class="text-[#3a84ff] cursor-pointer"
+              class="text-[var(--bkms-brand-2)] cursor-pointer"
               @click="handleEdit(row)"
             >
               {{ row.name || '--' }}
@@ -82,8 +82,10 @@
               overflow-mode="popover"
             >
               <template #default="{ item }: { item: UserGroupUser }">
-                <span class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-[#F0F1F5] cursor-default">
-                  <i class="bkms-icon bkms-icon-usergroup text-[#979BA5] text-[14px]"></i>
+                <span
+                  class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-[var(--bkms-neutral-6)] cursor-default"
+                >
+                  <i class="bkms-icon bkms-icon-usergroup text-[var(--bkms-neutral-3)] text-[14px]"></i>
                   {{ item.display_name || item.id || '--' }}
                 </span>
               </template>

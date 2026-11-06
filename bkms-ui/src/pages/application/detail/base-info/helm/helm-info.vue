@@ -69,7 +69,7 @@
             >
               <TypeIcon :type="isAgones ? 'agones' : 'helm'">
                 <template #label>
-                  <span class="text-[#313238] leading-[20px] ml-[6px]">
+                  <span class="text-[var(--bkms-neutral-1)] leading-[20px] ml-[6px]">
                     {{ $t(isAgones ? 'Agones 应用' : 'Helm 应用') }}
                   </span>
                 </template>
@@ -126,7 +126,7 @@
                     @click="copyText(appData?.helmSpec?.helmSource?.gitRepoConfig?.repoURL || '')"
                   >
                     <Copy
-                      class="hover:text-[#3A84FF]"
+                      class="hover:text-[var(--bkms-brand-2)]"
                       :title="$t('复制')"
                     />
                   </Button>
@@ -160,7 +160,7 @@
                     @click="copyText(appData?.helmSpec?.helmSource?.helmRepoConfig?.repoURL || '')"
                   >
                     <Copy
-                      class="hover:text-[#3A84FF]"
+                      class="hover:text-[var(--bkms-brand-2)]"
                       :title="$t('复制')"
                     />
                   </Button>
@@ -206,7 +206,7 @@
                   @click="copyText(repoURL)"
                 >
                   <Copy
-                    class="hover:text-[#3A84FF]"
+                    class="hover:text-[var(--bkms-brand-2)]"
                     :title="$t('复制')"
                   />
                 </Button>
@@ -269,8 +269,8 @@
             {{ $t('删除应用') }}
           </Button>
           <div class="flex items-center gap-[4px] text-[12px]">
-            <ExclamationCircleShape class="text-[14px] text-[#F59500]" />
-            <span class="text-[#4D4F56]">
+            <ExclamationCircleShape class="text-[14px] text-[var(--bkms-warning-2)]" />
+            <span class="text-[var(--bkms-neutral-2)]">
               {{ $t('删除应用后，所有相关的配置、部署信息和操作记录将永久丢失，此操作不可恢复。') }}
             </span>
           </div>
@@ -376,6 +376,6 @@
 
 <style lang="postcss" scoped>
   .info-title :deep(.bkms-content-title) {
-    background-color: #eaebf0;
+    background-color: var(--bkms-neutral-6);
   }
 </style>

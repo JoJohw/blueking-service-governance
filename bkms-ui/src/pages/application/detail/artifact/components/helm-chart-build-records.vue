@@ -226,9 +226,9 @@
 
   type statusType = 'FAILED' | 'RUNNING' | 'SUCCED' | 'UNKNOWN';
   const statusColor: Record<statusType, string> = {
-    RUNNING: 'text-[#3d86ff]',
-    SUCCED: 'text-[#30b061]',
-    FAILED: 'text-[#ec4343]',
+    RUNNING: 'text-[var(--bkms-brand-3)]',
+    SUCCED: 'text-[var(--bkms-success-2)]',
+    FAILED: 'text-[var(--bkms-danger-2)]',
     UNKNOWN: 'text-[#ffb848]',
   };
   const failedStatus = ['failed', 'pollingBroken'];
