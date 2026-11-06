@@ -1,7 +1,7 @@
-# 主题色适配操作步骤 v4
+# 主题色适配操作步骤
 
-> 版本记录：v0 = `THEME_STEPS.md`；v1 = `THEME_STEPS-v1.md`；v2 = `THEME_STEPS-v2.md`；v3 = `THEME_STEPS-v3.md`；v4 = 本文件（2026-11-06 原地覆盖）。
-> **v4 修订点**：① Step 2 整体替换——编译期替换退役，改为 **class 覆写批**（作用域挂载 + 生成器 + 漂移自检）；② Step 7 验收口径更换。依据：`THEME-v4.md`。
+> 版本记录：v0~v4 见 git 历史（`THEME_STEPS-v1.md` ~ `THEME_STEPS-v4.md`，2026-11-06 起文件名不再带版本后缀）。本文为现行版，同步 2026-11-06 目录重排（theme → `src/styles/theme/`，patches 分 `bkui-theme/` 生成 + `bkms/` 手写）与设计确认值收编进度。
+> **关键修订**：① Step 2 整体替换——编译期替换退役，改为 **class 覆写批**（作用域挂载 + 生成器 + 漂移自检）；② Step 7 验收口径更换。依据：`THEME.md`。
 > 每步 = 操作 + 验证标准 + 回滚方式。一个 PR 对应一步或一步的一个子批。
 > **范围声明**：只覆盖「颜色映射」+ 令牌地基；运行时第二主题、其余视觉块待需求单核实后补版本。
 
@@ -9,22 +9,22 @@
 
 主特性分支只进不改；每步开子分支（Step 2 分支名 `theme/step2r-class-override`）；规约点位强制 commit；子分支验证通过后 merge 回主分支并跑 lint + 构建；push / 删分支 / 远端操作先询问。message 规范 `theme(stepN): <动作>`。
 
-## Step 0 前置准备（已执行，v4 增量）
+## Step 0 前置准备（已执行）
 
-已落地：`scripts/theme-codemod/`（`mapping.json` / `keep.json` / `pending-design.json`、`codemod.mjs`、`extract-root-vars.mjs`、reports）、`src/theme/` 骨架（colors / semantic / bridge / patches / themes / index.css）。
+已落地：`scripts/theme-codemod/`（`mapping.json` / `keep.json` / `pending-design.json`、`codemod.mjs`、`extract-root-vars.mjs`、reports）、`src/styles/theme/` 结构（tokens/colors + tokens/semantic + bridge + patches/bkui-theme + patches/bkms + themes + index.css）。
 
-**v4 增量**：
+**实施调整**：
 
 1. JS 内联开关语义微调：编译替换退役后，问题变为"**inline style 无法被 class 覆写覆盖**"——盘点组件库 JS 内联样式后，命中项只能走 `!important` 覆盖或 JS 改写，单独登记决策。
 2. `gen-overrides.mjs` / `check-overrides.mjs` 的配置（输入路径、分域规则）进 `rules.md`。
 
 **验证**：mapping/keep/pending-design 三者两两无交集；未命中清单区分"已在 pending-design"与"全新未记录"。
 
-## Step 1 基建批（已执行，v4 增量）
+## Step 1 基建批（已执行）
 
 已落地：colors / semantic / bridge / 引入位（bkui.ts 内显式相邻）、语义映射写死（`--white-color`→neutral-10、`--whitesmoke-color`→neutral-8、`--gray-color`→neutral-3、`--light-gray`→neutral-4）。
 
-**v4 增量（已落地 2026-11-06）**：`src/main.ts` 启动时 `document.body.classList.add('bkms-themed')`（运行时挂载——本项目 app.mount 在异步回调之后，时序安全；teleport 到 body 的弹层天然在作用域内）。
+**增量（已落地 2026-11-06）**：`src/main.ts` 启动时 `document.body.classList.add('bkms-themed')`（运行时挂载——本项目 app.mount 在异步回调之后，时序安全；teleport 到 body 的弹层天然在作用域内）。
 
 **验证**：body 类存在；teleport 弹层（Select 下拉）DOM 在 body 内、天然处于覆写作用域；bridge 变量解析正确（`--primary-color` = `#3B6EF5`）。
 
@@ -39,7 +39,8 @@
 - stylelint：patches 豁免形态类规则（`no-descending-specificity`/`selector-class-pattern`/`selector-pseudo-element-colon-notation`/`selector-attribute-quotes`/`order/properties-order`）；colors/bridge 既有格式违规已 `--fix` 顺手清掉。
 - `check-overrides.mjs`：270/270 有效。踩坑记录：patches 首条规则的 prelude 混有文件头注释，`startsWith('.bkms-themed')` 判定前必须先剥注释——曾导致每文件漏检 1 条（infobox/progress/switcher 三文件当时完全未被自检覆盖）。
 - 工具链入口：`npm run theme:usage` / `theme:gen` / `theme:check`。
-- **设计确认收编（2026-11-06，commit 4fac5ff）**：设计拍板 45 项全部按建议值替换 → 收编 `mapping.json`（188 项）、`pending-design.json` 清空、重跑 `theme:gen` 后 patches 内这 45 色全部换 `var(--bkms-*)`，漂移自检 270/270。覆写内新暴露 13 种清单外 hex（24 处）按原值占位并进台账"覆写内占位"组，待补设计确认。
+- **设计确认收编（2026-11-06）**：设计拍板 45 项全部按建议值替换 → 收编 `mapping.json`、`pending-design.json` 清空、重跑 `theme:gen` 后覆写内这 45 色全部换 `var(--bkms-*)`，漂移自检 270/270。覆写内新暴露 13 种清单外 hex（24 处）按原值占位并进台账"覆写内占位"组。
+- **覆写内占位清零（2026-11-06）**：13 种分三路收编——与已采纳建议值重复 5 种、ΔE≤6 / spec 原色邻近自动收录 4 种、借鉴已采纳 45 对的实证容忍度收录 3 种（ΔE 中位 8.39、30/45 对超 6 仍被采纳，证明该模式可取）。`mapping.json` 总量 199，覆写内 pending = 0。
 
 **操作**
 
@@ -48,7 +49,7 @@
    - 抽取：prop 非 `--` 开头且 value 含 6 位 hex（先小写化）的 declaration，按"选择器 + prop"聚合。
    - 过滤：仅生成 mapping 已收录**且设计已确认**的值；`pending-design.json` 内的值不生成，进"待确认清单"。
    - 输出：选择器加 `.bkms-themed ` 前缀、逐字复刻原选择器（含伪类/组合器），值写 `var(--bkms-*)`；渐变/阴影**整值重拼**；8 位 hex 用 color-mix；**原值保留为行尾注释**。
-   - 分域：按 bkui 组件前缀写入 `patches/` 对应文件（button / form / table / dialog / alert-message / pagination / …，每组件一文件，文件内分区注释），`index.css` 同步 @import。
+   - 分域：按 bkui 组件前缀写入 `patches/bkui-theme/` 对应文件（button / form / table / dialog / alert-message / pagination / …，每组件一文件，文件内分区注释），`index.css` 同步 @import（bkms 手写补丁段由生成器扫描 `patches/bkms/` 追加）。
 2. **stylelint 配置**：`patches/` 目录豁免 `no-descending-specificity`。
 3. **人工审查生成草稿**：重点核伪类复刻、组合选择器、渐变整值重拼；patches 内禁止裸 hex（原值只准在注释）。
 4. **退役编译替换**：删 `vite.config.mts` 的 postcss import 与 `css.postcss` 配置；删 `scripts/theme-codemod/postcss-theme-replace.mjs`。
@@ -67,7 +68,7 @@
 
 ## Step 3 存量 patch 审计（口径微调）
 
-19 条规则三分类：动机被 bridge 替代 → 删；布局/尺寸规则 → 迁入**全局无包裹段**（`patches/legacy.css`，无 `.bkms-themed` 前缀——作用于 body/html 自身或需全局生效）；涉色规则（1 处 rgba 气泡）→ 变量化后入全局段。结论表附 PR。**未走查完不删任何一条。**
+19 条规则三分类：动机被 bridge 替代 → 删；布局/尺寸规则 → 迁入**全局无包裹段**（`patches/bkms/` 手写文件，无 `.bkms-themed` 前缀——作用于 body/html 自身或需全局生效）；涉色规则（1 处 rgba 气泡）→ 变量化后入全局段。结论表附 PR。**未走查完不删任何一条。**（注：`patches/bkms/feedback.css` 与 `table.css` 为原手写补丁，已恢复保留。）
 
 ## Step 4 全局层替换（同前版）
 
@@ -79,7 +80,7 @@ UnoCSS 注册 `theme.colors.bkms` + env-tag-* 短写法；`main.css` 约 14 处�
 
 ## Step 6 人工批（微调）
 
-动态注入（`use-env-manager.ts` 4 处）、echarts（待拍板）、rgba 阴影对照 spec；**漏网组件统一收进 `patches/`**（注明"bridge 够不着"，不再有编译替换选项）；JS 内联命中项按 Step 0 开关结论处理。
+动态注入（`use-env-manager.ts` 4 处）、echarts（待拍板）、rgba 阴影对照 spec；**漏网组件统一收进 `patches/`**（bkui 组件进 `bkui-theme/`、业务/第三方进 `bkms/`；注明"bridge 够不着"，不再有编译替换选项）；JS 内联命中项按 Step 0 开关结论处理。
 
 ## Step 7 收尾验收（口径更换）
 
@@ -92,7 +93,7 @@ UnoCSS 注册 `theme.colors.bkms` + env-tag-* 短写法；`main.css` 约 14 处�
 4. 多主题预留自检：`--bkms-*` 色阶只在 colors.css（grep 其他文件 0 命中）。
 5. dark 主题审计备注记入需求单输入，不在本次执行。
 
-**DoD（v4 覆盖版）**：改一个 `--bkms-brand-2` 值，业务页与 bkui 组件**已确认覆盖的部分**全站联动变色；未确认项随设计确认收敛，收敛完成后达成全站联动。
+**DoD**：改一个 `--bkms-brand-2` 值，业务页与 bkui 组件**已确认覆盖的部分**全站联动变色；未确认项随设计确认收敛，收敛完成后达成全站联动。
 
 ## 依赖关系
 

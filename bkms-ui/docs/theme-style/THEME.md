@@ -1,7 +1,7 @@
-# 主题色适配指南 v4（多主题体系）
+# 主题色适配指南（多主题体系）
 
-> 版本记录：v0 = `THEME.md`（初版）；v1 = `THEME-v1.md`（修正变量体系、新增编译期替换层、范围声明）；v2 = `THEME-v2.md`（统计口径注明、未命中兜底、语义映射写死）；v3 = `THEME-v3.md`（合并多主题蓝图 + 评审三处修正）；v4 = 本文件（2026-11-06 原地覆盖）。
-> **v4 修订点（方向性变更）**：① **编译期替换层（postcss-theme-replace）退役**，组件库写死 hex 改由 **class 选择器覆写**承担；② 覆写层组织规约：按组件域分文件 + `body.bkms-themed` 统一作用域 + 全局无包裹段分离；③ specificity 策略、stylelint 豁免、漂移自检脚本明确；④ DoD 口径更换；⑤ 沿用 v4 已定内容：mapping 拆分「spec 已收录 / 待设计确认」、bridge 语义映射写死、UnoCSS 接入、多主题预留、dark 审计备注。
+> 版本记录：v0 = `THEME.md`（初版）；v1~v4 见 git 历史（`THEME-v1.md` ~ `THEME-v4.md`，2026-11-06 起文件名不再带版本后缀，历史版本只存在于 git）。本文为现行版，含 2026-11-06 目录重排：theme 移入 `src/styles/theme/`、令牌收进 `tokens/`、patches 按 `bkui-theme/`（生成）与 `bkms/`（手写）分域；设计确认值全部收编（mapping 199），覆写内 pending 清零。
+> **关键决策（方向性变更）**：① **编译期替换层（postcss-theme-replace）退役**，组件库写死 hex 改由 **class 选择器覆写**承担；② 覆写层组织规约：按组件域分文件 + `body.bkms-themed` 统一作用域 + 全局无包裹段分离；③ specificity 策略、stylelint 豁免、漂移自检脚本明确；④ DoD 口径更换；⑤ 沿用已定内容：mapping 拆分「spec 已收录 / 待设计确认」、bridge 语义映射写死、UnoCSS 接入、多主题预留、dark 审计备注。
 > 本文数字均于 2026-11-03 对 `node_modules/bkui-vue/dist/style.variable.css`（v2.0.2-beta.97，226KB）实测复核，统计口径随数字标注。
 > 原则：重分析、轻方案；色值真源 = `bkms-color-spec.md`；`--bkms-*` 色阶唯一写在 tokens。
 
@@ -40,11 +40,14 @@
 ## 三、分层模型（编译替换层移除，patches 升格）
 
 ```
-colors.css         原子色阶             --bkms-brand-2……（唯一写色值处，:root）
-semantic.css       语义层               --bkms-text-body…… 引用色阶
-bridge.css         桥接层               组件库 :root 变量重指向 --bkms-*（覆盖 822 处 var 引用点）
-patches/           class 覆写层 ★主角   组件库写死 hex 的选择器级覆盖（549 处的归属地）
-themes/            主题扩展位           [data-theme] 第二主题时启用
+tokens/
+├── colors.css         原子色阶             --bkms-brand-2……（唯一写色值处，:root；uno 注册真源）
+└── semantic.css       语义层               --bkms-text-body…… 引用色阶
+bridge.css          桥接层               组件库 :root 变量重指向 --bkms-*（覆盖 822 处 var 引用点）
+patches/
+├── bkui-theme/        class 覆写层 ★主角   组件库写死 hex 的选择器级覆盖（549 处的归属地，生成器管理）
+└── bkms/              手写业务补丁         feedback/table 等手工维护，生成器不触碰
+themes/             主题扩展位           [data-theme] 第二主题时启用
 ```
 
 职责表：
@@ -58,30 +61,30 @@ themes/            主题扩展位           [data-theme] 第二主题时启用
 ## 四、目录结构与引入顺序
 
 ```
-src/theme/
-├── colors.css          # 色阶（唯一写色值处）
-├── semantic.css        # 语义层
-├── bridge.css          # 组件库变量桥接
-├── patches/            # class 覆写，按组件域分文件
-│   ├── form.css
-│   ├── table.css
-│   ├── dialog.css
-│   ├── feedback.css
-│   └── navigation.css
+src/styles/theme/
+├── tokens/
+│   ├── colors.css      # 色阶（唯一写色值处）
+│   └── semantic.css    # 语义层
+├── bridge.css          # 组件库变量桥接（bkui.ts 紧随组件库样式加载）
+├── patches/
+│   ├── bkui-theme/     # class 覆写，按组件域分文件（生成器管理，重跑整体覆盖）
+│   │   ├── form.css
+│   │   ├── dialog.css
+│   │   └── …
+│   └── bkms/           # 手写业务补丁（feedback / table，生成器不触碰）
 ├── themes/             # 本期留空
-└── index.css           # 统一 @import
+└── index.css           # 统一 @import（生成器重写）
 ```
 
 **引入顺序**：
 
-1. `main.ts` 顶部：`import '~/theme/colors.css';` + `semantic.css` —— 最早定义 `--bkms-*`。
-2. `src/modules/bkui.ts`：`import 'bkui-vue/dist/style.variable.css';` **紧接其后** `import '~/theme/bridge.css';` —— ES module 规范保证 bridge 后于组件库样式加载。
-3. `main.css` 末尾：`@import '~/theme/index.css';` —— patches 最后加载。
-4. `src/main.ts` 启动时 `document.body.classList.add('bkms-themed')` —— 覆写作用域运行时挂载（见第五节）。
+1. `src/main.ts`：`import '~/styles/theme/index.css';`（整包：tokens + patches，放 CSS 组末尾）—— `--bkms-*` 最早有定义。
+2. `src/modules/bkui.ts`：`import 'bkui-vue/dist/style.variable.css';` **紧接其后** `import '~/styles/theme/bridge.css';` —— ES module 规范保证 bridge 后于组件库样式加载。
+3. `src/main.ts` 启动时 `document.body.classList.add('bkms-themed')` —— 覆写作用域运行时挂载（见第五节）。
 
 ## 五、覆写层组织规约
 
-**作用域类**：所有覆写选择器加 `.bkms-themed ` 前缀（`.bkms-themed .bk-input { … }`）， specificity (0,2,0) > 库内 (0,1,0)，**全程不用 !important**。挂载在 `body` 上而非 app 根：Modal/Select 下拉/Message 等 teleport 到 body 的弹层天然在作用域内，无需额外补救。挂载点定案为 `main.ts` 启动时运行时添加（本项目 app.mount 在异步回调之后，时序安全）。`body`/`html` 自身样式与历史临时修正放**全局无包裹段**（独立文件，无前缀）。
+**作用域类**：`patches/bkui-theme/` 所有覆写选择器加 `.bkms-themed ` 前缀（`.bkms-themed .bk-input { … }`）， specificity (0,2,0) > 库内 (0,1,0)，**全程不用 !important**。挂载在 `body` 上而非 app 根：Modal/Select 下拉/Message 等 teleport 到 body 的弹层天然在作用域内，无需额外补救。挂载点定案为 `main.ts` 启动时运行时添加（本项目 app.mount 在异步回调之后，时序安全）。`body`/`html` 自身样式与历史临时修正放**全局无包裹段**（`patches/bkms/` 手写文件，无前缀）。
 
 **值策略（占位制，2026-11-06 定案）**：覆写结构先行、不等设计全部拍板——设计已确认值直接写 `var(--bkms-*)`；待确认值先用组件库**原色值占位**并打 `pending` 标记（拍板后换 token 即可，结构零返工）；keep 值不生成。
 
@@ -95,21 +98,22 @@ src/theme/
 
 ## 六、质量基建
 
-- **stylelint**：`patches/` 豁免**形态类规则**（`no-descending-specificity`、`selector-class-pattern`、`selector-pseudo-element-colon-notation`、`selector-attribute-quotes`、`order/properties-order`）——patches 逐字复刻 bkui 产物形态，按本项目规约改写选择器会破坏匹配；`color-no-hex` 全局启用仍待存量清完（排最后），patches 内原值只准进注释。
-- **漂移自检（必要基建，非可选）**：`check-overrides.mjs` 校验 patches/ 每条选择器仍存在于 bkui dist css 且原 hex 仍在，失效即报警；`npm run theme:check`，库升级后必跑（当前 270/270 有效）。注意实现细节：patches 首条规则的 prelude 混有文件头注释，解析时需先剥注释再判定。
+- **stylelint**：`patches/bkui-theme/` 与 `patches/bkms/` 豁免**形态类规则**（`no-descending-specificity`、`selector-class-pattern`、`selector-pseudo-element-colon-notation`、`selector-attribute-quotes`、`order/properties-order`）——覆写逐字复刻 bkui/vxe 产物形态，按本项目规约改写选择器会破坏匹配；`color-no-hex` 全局启用仍待存量清完（排最后），覆写内原值只准进注释。
+- **漂移自检（必要基建，非可选）**：`check-overrides.mjs` 校验 `patches/bkui-theme/` 每条选择器仍存在于 bkui dist css 且原 hex 仍在，失效即报警；`npm run theme:check`，库升级后必跑（当前 270/270 有效）。注意实现细节：覆写文件首条规则的 prelude 混有文件头注释，解析时需先剥注释再判定。
 - **工具链 npm scripts**：`theme:usage`（组件使用统计）→ `theme:gen`（生成覆写）→ `theme:check`（漂移自检），数据基线为 `reports/usage.json` + `mapping/keep/pending-design.json`。
-- **生成器**：`gen-overrides.mjs` 从 bkui dist css 抽取"prop 非 `--` 开头且 value 含 6 位 hex"的 declaration，按选择器+prop 聚合，**只对设计已确认的值**生成覆写草稿（`pending-design` 内的值不生成），按组件域归档输出，人工只审不写。
+- **生成器**：`gen-overrides.mjs` 从 bkui dist css 抽取"prop 非 `--` 开头且 value 含 6 位 hex"的 declaration，按选择器+prop 聚合，**只对设计已确认的值**生成覆写草稿，按组件域写入 `patches/bkui-theme/` 输出，人工只审不写；每次重跑 `rmSync` 整个 `bkui-theme/` 重建，但**绝不触碰 `patches/bkms/`**（手写补丁目录，index.css 的 bkms 段由生成器扫描追加 import）。
 - **纪律**：进 `patches/` 前先试 bridge（变量定义值都能走 bridge）；patches 内禁止裸 hex。
 
-## 七、映射表的可执行性（沿用 v4）
+## 七、映射表的可执行性
 
 - 「不替换」清单 = `keep.json` 黑名单；hex 先小写化再匹配；3 位短写展开成 6 位后仅当命中 mapping 才处理；`rgba(` 人工处理。
 - 写死 hex 报告"去重种类（113）+ 出现处数（549）"两列都输出。
-- **spec 未收录色拆分**：spec 已收录 → `mapping.json`；未收录 → `pending-design.json`（附建议归类，标注待设计拍板），不臆断。基线已于 2026-11-06 按最新设计待确认清单同步（45 项），**设计同日全部拍板按建议值替换**——45 项已收编 `mapping.json`（总量 188）、`pending-design.json` 清空、patches 全量换 `var(--bkms-*)`；覆写内新暴露 13 种清单外 hex 继续占位（见 `reports/pending-values.md` "覆写内占位"组）。
+- **spec 未收录色拆分**：spec 已收录 → `mapping.json`；未收录 → `pending-design.json`（附建议归类，标注待设计拍板），不臆断。基线已于 2026-11-06 按最新设计待确认清单同步（45 项），**设计同日全部拍板按建议值替换**——45 项已收编 `mapping.json`、`pending-design.json` 清空、patches 全量换 `var(--bkms-*)`。
+- **覆写内占位清零（2026-11-06）**：覆写后新暴露的 13 种清单外 hex 分三路收编完毕——① 与设计已采纳建议值重复（1890ff/253047/d8d8d8/e6e9ea/f7f7f7）；② ΔE≤6 进最近规范色（000000/babcc0）与 spec 原色邻近（333333/fea500）；③ 借鉴"设计已采纳 45 对建议值"的实证容忍度（ΔE 中位 8.39、30/45 超 6 仍被采纳）收录剩余 3 个（333c48/aaaaaa/4070cb）。**当前覆写内 pending = 0**；`reports/pending-values.md` 仅剩 30 种未收录 hex（多为未使用组件 one-dark/ColorPicker 色），留待全局无包裹段处理。
 - 判定规则待补：紫青收拢 / 色差 ≤6 进最近规范色（需求单核实后落脚本）。
 - **未命中兜底**：生成器与 codemod 共用"未命中 → 补 spec → 补 mapping → 重跑"，禁止静默跳过。
 
-## 八、非颜色 token 与 UnoCSS（沿用 v4）
+## 八、非颜色 token 与 UnoCSS
 
 - **圆角**：组件库自带 `--border-radius-base: 2px`、`--input-broder-radius: 3px`，走 bridge 重声明即可，不建业务侧 token；业务侧自有圆角按"≥3 次同语义才提 token"。
 - **shadow**：6 个语义变量，`--bkms-shadow-button` 用 `color-mix(in srgb, var(--bkms-brand-2) 25%, transparent)` 实现随主题换色。
@@ -124,7 +128,7 @@ src/theme/
 
 ## 十、决策清单
 
-1. ~~编译期替换选型~~ → **已决策退役**（v4 覆盖版）。
+1. ~~编译期替换选型~~ → **已决策退役**。
 2. **JS 内联样式**：inline style 无法被 class 覆写覆盖（除非 !important 或 JS 改写），维持 Step 0 盘点开关。
 3. **需求单原文**：6 大块数值、紫青/色差规则——待提供后核实回填。
 4. **存量 `bk-patch.css` 归宿**：审计后布局/尺寸规则迁入全局无包裹段。
@@ -138,7 +142,7 @@ src/theme/
 - 映射字典与 spec 同步维护；未命中色值走统一消化流程，禁止静默跳过。
 - stylelint `color-no-hex` 全局启用替代人工 grep。
 - teleport 组件覆写天然被 `body.bkms-themed` 覆盖，patches 不依赖业务 scoped 作用域。
-- **Git 纪律**：大步骤拆子分支、点位强制 commit、验证后合入，细则见 `THEME_STEPS-v4.md`。
+- **Git 纪律**：大步骤拆子分支、点位强制 commit、验证后合入，细则见 `THEME_STEPS.md`。
 
 ## v0~v3 勘误与合并记录
 

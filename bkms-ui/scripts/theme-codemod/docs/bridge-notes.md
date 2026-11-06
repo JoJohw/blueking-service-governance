@@ -1,7 +1,7 @@
 # bridge.css 生成说明（Step 1）
 
 变量清单实抓自 `node_modules/bkui-vue/dist/style.variable.css`（v2.0.2-beta.97）`:root` 块，共 128 个
-（THEME-v4 记 129，以实抓为准），逐值清单见 `reports/root-vars.txt`。
+（THEME-v4 记 129，以实抓为准），逐值清单原存 `reports/root-vars.txt`，已删，git 历史可查。
 
 ## 语义映射口径（THEME-v4 写死）
 

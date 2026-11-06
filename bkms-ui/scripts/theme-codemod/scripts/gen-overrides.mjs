@@ -11,30 +11,31 @@
  * 未归属规则不静默丢弃，进 reports/gen-summary.md 供人工收编。
  *
  * 产出：
- *   - src/theme/patches/<kebab>.css（按组件族，每组件一文件）
+ *   - src/styles/theme/patches/bkui-theme/<kebab>.css（bkui 组件覆写，按组件族每组件一文件；手写业务补丁在 patches/bkms/，生成器不触碰）
  *   - reports/gen-summary.md（生成摘要 + 未归属规则 + 未收录 hex）
  *   - reports/pending-values.md（占位值台账，按待确认清单分组）
  *
- * 用法：node scripts/theme-codemod/gen-overrides.mjs
+ * 用法：node scripts/theme-codemod/scripts/gen-overrides.mjs
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT = path.resolve(__dirname, '../../..');
 const DIST = path.join(ROOT, 'node_modules/bkui-vue/dist');
-const PATCHES_DIR = path.join(ROOT, 'src/theme/patches');
-const REPORTS = path.join(__dirname, 'reports');
+const PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme');
+const MANUAL_PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkms');
+const REPORTS = path.join(__dirname, '../reports');
 
 const readJson = f => JSON.parse(fs.readFileSync(path.join(__dirname, f), 'utf8'));
-const usage = readJson('reports/usage.json');
-const MAPPING = readJson('mapping.json');
-const KEEP = readJson('keep.json');
-const PENDING = readJson('pending-design.json');
+const usage = readJson('../reports/usage.json');
+const MAPPING = readJson('../data/mapping.json');
+const KEEP = readJson('../data/keep.json');
+const PENDING = readJson('../data/pending-design.json');
 
 // 令牌定义值索引：8 位源 hex 若与令牌值完全一致，直接 var() 引用（令牌自带 alpha 时 color-mix 会二次衰减）
-const colorsText = fs.readFileSync(path.join(ROOT, 'src/theme/colors.css'), 'utf8');
+const colorsText = fs.readFileSync(path.join(ROOT, 'src/styles/theme/tokens/colors.css'), 'utf8');
 const TOKEN_HEX = new Map();
 for (const cm of colorsText.matchAll(/(--bkms-[a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{3,8})\b/g)) {
   TOKEN_HEX.set(cm[1], cm[2].toLowerCase());
@@ -256,15 +257,23 @@ for (const [kebab, bucket] of [...patches.entries()].sort((a, b) => a[0].localeC
   }
 }
 
-// index.css 统一入口：令牌在前、patches 按组件字母序在后（生成器接管，保证与 patches 目录一致）
+// index.css 统一入口：令牌在前、bkui-theme 覆写居中、手写业务 patches 兜底在后
+// （patches/bkms/ 为手工维护目录，生成器只读取现有 *.css 追加 import，不写入）
+const manualPatches = fs.existsSync(MANUAL_PATCHES_DIR)
+  ? fs
+      .readdirSync(MANUAL_PATCHES_DIR)
+      .filter(f => f.endsWith('.css'))
+      .sort()
+  : [];
 const indexLines = [
-  '/* 主题层统一入口 — patches 清单由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */',
-  "@import './colors.css';",
-  "@import './semantic.css';",
-  ...perComponent.map(p => `@import './patches/${p.kebab}.css';`),
+  '/* 主题层统一入口 — bkui-theme 清单由 gen-overrides.mjs 生成，重跑会整体覆盖本文件；patches/bkms 段为手工维护 */',
+  "@import './tokens/colors.css';",
+  "@import './tokens/semantic.css';",
+  ...perComponent.map(p => `@import './patches/bkui-theme/${p.kebab}.css';`),
+  ...manualPatches.map(f => `@import './patches/bkms/${f}';`),
   '',
 ];
-fs.writeFileSync(path.join(ROOT, 'src/theme/index.css'), indexLines.join('\n'));
+fs.writeFileSync(path.join(ROOT, 'src/styles/theme/index.css'), indexLines.join('\n'));
 
 // ---------- 4. 生成摘要 + 台账 ----------
 fs.mkdirSync(REPORTS, { recursive: true });
@@ -282,7 +291,7 @@ const summary = [
   '',
   '| 文件 | 组件 | 规则数 | 声明数 |',
   '| --- | --- | --- | --- |',
-  ...perComponent.map(p => `| patches/${p.kebab}.css | ${p.name} | ${p.rules} | ${p.decls} |`),
+  ...perComponent.map(p => `| patches/bkui-theme/${p.kebab}.css | ${p.name} | ${p.rules} | ${p.decls} |`),
   '',
 ];
 if (unassigned.length > 0) {

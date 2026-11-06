@@ -4,14 +4,14 @@
  *   - reports/usage-report.md  使用统计报告（人工查阅）
  *   - reports/usage.json       在用组件清单（gen-overrides.mjs 的过滤白名单）
  *
- * 用法：node scripts/theme-codemod/stats-usage.mjs
+ * 用法：node scripts/theme-codemod/scripts/stats-usage.mjs
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '../..');
+const ROOT = path.resolve(__dirname, '../../..');
 const SRC = path.join(ROOT, 'src');
 const BKUI_DIST = path.join(ROOT, 'node_modules/bkui-vue/dist');
 
@@ -116,7 +116,7 @@ const inScope = components.filter(c => c.cssFound);
 const noCss = components.filter(c => !c.cssFound);
 
 // ---------- 4. 输出 ----------
-fs.mkdirSync(path.join(__dirname, 'reports'), { recursive: true });
+fs.mkdirSync(path.join(__dirname, '../reports'), { recursive: true });
 
 const scopeJson = {
   generatedAt: new Date().toISOString(),
@@ -125,7 +125,7 @@ const scopeJson = {
   inScopeCount: inScope.length,
   components: inScope.map(c => ({ name: c.name, kebab: c.kebab, fileCount: c.fileCount })),
 };
-fs.writeFileSync(path.join(__dirname, 'reports/usage.json'), `${JSON.stringify(scopeJson, null, 2)}\n`);
+fs.writeFileSync(path.join(__dirname, '../reports/usage.json'), `${JSON.stringify(scopeJson, null, 2)}\n`);
 
 const lines = [
   '# bkui-vue 组件使用情况报告',
@@ -156,7 +156,7 @@ const lines = [
   '',
 ];
 
-fs.writeFileSync(path.join(__dirname, 'reports/usage-report.md'), lines.join('\n'));
+fs.writeFileSync(path.join(__dirname, '../reports/usage-report.md'), lines.join('\n'));
 
 console.log(`components: ${components.length}, in-scope: ${inScope.length}, no-css: ${noCss.length}`);
 console.log('report: scripts/theme-codemod/reports/usage-report.md');

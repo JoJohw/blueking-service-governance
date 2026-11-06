@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const css = fs.readFileSync(path.resolve(__dirname, '../../node_modules/bkui-vue/dist/style.variable.css'), 'utf8');
+const css = fs.readFileSync(path.resolve(__dirname, '../../../node_modules/bkui-vue/dist/style.variable.css'), 'utf8');
 
 const vars = new Map();
 const blockRe = /:root\s*\{([^}]*)\}/g;
@@ -15,6 +15,6 @@ for (const block of css.matchAll(blockRe)) {
   }
 }
 const lines = [...vars.entries()].map(([k, v]) => `${k} = ${v}`);
-const out = path.join(__dirname, 'reports/root-vars.txt');
+const out = path.join(__dirname, '../reports/root-vars.txt');
 fs.writeFileSync(out, lines.join('\n'), 'utf8');
 console.log('root vars:', vars.size, '->', out);

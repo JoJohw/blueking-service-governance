@@ -19,10 +19,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '../..');
-const MAPPING = JSON.parse(fs.readFileSync(path.join(__dirname, 'mapping.json'), 'utf8'));
-const KEEP = JSON.parse(fs.readFileSync(path.join(__dirname, 'keep.json'), 'utf8'));
-const PENDING_FILE = path.join(__dirname, 'pending-design.json');
+const ROOT = path.resolve(__dirname, '../../..');
+const MAPPING = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/mapping.json'), 'utf8'));
+const KEEP = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/keep.json'), 'utf8'));
+const PENDING_FILE = path.join(__dirname, '../data/pending-design.json');
 const PENDING = fs.existsSync(PENDING_FILE) ? JSON.parse(fs.readFileSync(PENDING_FILE, 'utf8')) : {};
 
 const mode = process.argv[2] || 'scan';
@@ -31,7 +31,7 @@ const HEX6 = /#([0-9a-f]{6})(?![0-9a-f])/gi;
 const HEX3 = /#([0-9a-f]{3})(?![0-9a-f])/gi;
 const HEX8 = /#([0-9a-f]{8})(?![0-9a-f])/gi;
 const EXTS = new Set(['.vue', '.css', '.ts', '.js', '.scss', '.less']);
-const TOKEN_FILES = ['colors.css', 'semantic.css'].map(name => path.join(ROOT, 'src/theme', name));
+const TOKEN_FILES = ['colors.css', 'semantic.css'].map(name => path.join(ROOT, 'src/styles/theme/tokens', name));
 
 function applyReplacements() {
   const files = sourceFiles();
