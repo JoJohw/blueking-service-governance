@@ -71,7 +71,11 @@
           <template #default="{ row }">
             <span
               class="rounded-[2px] px-[8px] py-[2px] text-[12px]"
-              :class="isSourceBuild(row) ? 'bg-[#E1ECFF] text-[#1768EF]' : 'bg-[#F0F1F5] text-[#4D4F56]'"
+              :class="
+                isSourceBuild(row)
+                  ? 'bg-[var(--bkms-brand-6)] text-[var(--bkms-brand-2)]'
+                  : 'bg-[var(--bkms-neutral-6)] text-[var(--bkms-neutral-2)]'
+              "
             >
               {{ isSourceBuild(row) ? $t('源码构建') : $t('已构建镜像') }}
             </span>

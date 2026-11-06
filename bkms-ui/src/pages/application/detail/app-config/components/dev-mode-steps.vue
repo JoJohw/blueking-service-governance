@@ -17,11 +17,13 @@
 -->
 
 <template>
-  <div class="rounded-[2px] bg-[#F5F7FA] p-[16px]">
+  <div class="rounded-[2px] bg-[var(--bkms-neutral-7)] p-[16px]">
     <p class="mb-[12px]">{{ $t('开启后，仍需执行以下流程，才能使用开发模式') }}：</p>
 
-    <div class="mb-[12px] flex items-center gap-x-[8px] leading-[20px] text-[#4D4F56]">
-      <div class="h-[20px] w-[20px] rounded-[50%] bg-[#EAEBF0] text-center text-[14px] leading-[20px]">1</div>
+    <div class="mb-[12px] flex items-center gap-x-[8px] leading-[20px] text-[var(--bkms-neutral-2)]">
+      <div class="h-[20px] w-[20px] rounded-[50%] bg-[var(--bkms-neutral-6)] text-center text-[14px] leading-[20px]">
+        1
+      </div>
       <span>{{ $t('执行部署') }}</span>
       <Button
         text
@@ -33,8 +35,10 @@
       </Button>
     </div>
 
-    <div class="mb-[12px] flex items-center gap-x-[8px] leading-[20px] text-[#4D4F56]">
-      <div class="h-[20px] w-[20px] rounded-[50%] bg-[#EAEBF0] text-center text-[14px] leading-[20px]">2</div>
+    <div class="mb-[12px] flex items-center gap-x-[8px] leading-[20px] text-[var(--bkms-neutral-2)]">
+      <div class="h-[20px] w-[20px] rounded-[50%] bg-[var(--bkms-neutral-6)] text-center text-[14px] leading-[20px]">
+        2
+      </div>
       <span>{{ $t('登录 bkms-cli') }}</span>
       <Button
         text
@@ -47,16 +51,18 @@
     </div>
 
     <div class="mb-[16px] ml-[28px]">
-      <div class="mb-[12px] text-[#979BA5]">
+      <div class="mb-[12px] text-[var(--bkms-neutral-3)]">
         {{ $t('请点击【查看 Token】自行获取 access_token，复制后填入下方命令') }}
       </div>
-      <div class="relative overflow-x-auto border border-[#DCDEE5] rounded-[2px] bg-[#FFF] p-[16px] pr-[72px]">
+      <div
+        class="relative overflow-x-auto border border-[var(--bkms-neutral-5)] rounded-[2px] bg-[#FFF] p-[16px] pr-[72px]"
+      >
         <pre
           v-bk-xss-html="highlightedLoginCommand"
-          class="m-0 whitespace-pre-wrap break-all bg-transparent! leading-[22px] text-[#4D4F56]"
+          class="m-0 whitespace-pre-wrap break-all bg-transparent! leading-[22px] text-[var(--bkms-neutral-2)]"
         ></pre>
         <span
-          class="absolute right-[10px] top-[10px] h-[24px] w-[24px] flex cursor-pointer items-center justify-center rounded-[2px] hover:bg-[#F0F1F5]"
+          class="absolute right-[10px] top-[10px] h-[24px] w-[24px] flex cursor-pointer items-center justify-center rounded-[2px] hover:bg-[var(--bkms-neutral-6)]"
           role="button"
           tabindex="0"
           :title="$t('复制')"
@@ -64,7 +70,7 @@
           @keydown.enter.space.prevent="copyText(LOGIN_COMMAND)"
         >
           <Copy
-            fill="#3a84ff"
+            fill="var(--bkms-brand-2)"
             height="16"
             width="16"
           />
@@ -72,19 +78,23 @@
       </div>
     </div>
 
-    <div class="mb-[12px] flex items-center gap-x-[8px] leading-[20px] text-[#4D4F56]">
-      <div class="h-[20px] w-[20px] rounded-[50%] bg-[#EAEBF0] text-center text-[14px] leading-[20px]">3</div>
+    <div class="mb-[12px] flex items-center gap-x-[8px] leading-[20px] text-[var(--bkms-neutral-2)]">
+      <div class="h-[20px] w-[20px] rounded-[50%] bg-[var(--bkms-neutral-6)] text-center text-[14px] leading-[20px]">
+        3
+      </div>
       <span>{{ $t('使用 bkms-cli 发布二进制') }}</span>
     </div>
 
     <div class="ml-[28px]">
-      <div class="relative overflow-x-auto border border-[#DCDEE5] rounded-[2px] bg-[#FFF] p-[16px] pr-[72px]">
+      <div
+        class="relative overflow-x-auto border border-[var(--bkms-neutral-5)] rounded-[2px] bg-[#FFF] p-[16px] pr-[72px]"
+      >
         <pre
           v-bk-xss-html="highlightedCommand"
-          class="m-0 whitespace-pre-wrap break-all bg-transparent! leading-[22px] text-[#4D4F56]"
+          class="m-0 whitespace-pre-wrap break-all bg-transparent! leading-[22px] text-[var(--bkms-neutral-2)]"
         ></pre>
         <span
-          class="absolute right-[10px] top-[10px] h-[24px] w-[24px] flex cursor-pointer items-center justify-center rounded-[2px] hover:bg-[#F0F1F5]"
+          class="absolute right-[10px] top-[10px] h-[24px] w-[24px] flex cursor-pointer items-center justify-center rounded-[2px] hover:bg-[var(--bkms-neutral-6)]"
           role="button"
           tabindex="0"
           :title="$t('复制')"
@@ -92,7 +102,7 @@
           @keydown.enter.space.prevent="copyText(publishCommand)"
         >
           <Copy
-            fill="#3a84ff"
+            fill="var(--bkms-brand-2)"
             height="16"
             width="16"
           />
@@ -186,8 +196,8 @@
       .split('\n')
       .map(line =>
         line.startsWith('#')
-          ? `<span class="text-[#979BA5]">${line}</span>`
-          : line.replace(/(^|\s)(--?[a-z][a-z-]*)/g, '$1<span class="text-[#3A84FF]">$2</span>'),
+          ? `<span class="text-[var(--bkms-neutral-3)]">${line}</span>`
+          : line.replace(/(^|\s)(--?[a-z][a-z-]*)/g, '$1<span class="text-[var(--bkms-brand-2)]">$2</span>'),
       )
       .join('\n');
   }

@@ -104,7 +104,7 @@
                         :field-value="isFrameworkFile ? $t('框架配置文件') : $t('文件名')"
                       >
                         <template #value>
-                          <span class="text-[12px] text-[#313238]">
+                          <span class="text-[12px] text-[var(--bkms-neutral-1)]">
                             {{ activeDisplayName || '--' }}
                           </span>
                         </template>
@@ -116,7 +116,7 @@
                       >
                         <template #value>
                           <OverflowTitle
-                            class="max-w-[300px] text-[12px] text-[#313238]"
+                            class="max-w-[300px] text-[12px] text-[var(--bkms-neutral-1)]"
                             type="tips"
                           >
                             {{ activeDisplayPath || '--' }}
@@ -131,7 +131,7 @@
                         <template #value>
                           <span
                             v-if="isFrameworkFile || activeMountScope === 'all'"
-                            class="text-[12px] text-[#313238]"
+                            class="text-[12px] text-[var(--bkms-neutral-1)]"
                           >
                             {{ $t('所有环境') }}
                           </span>
@@ -191,7 +191,7 @@
                           clearable
                           :disabled="isFileInfoSaving"
                         />
-                        <div class="mt-[4px] text-[12px] text-[#979BA5]">
+                        <div class="mt-[4px] text-[12px] text-[var(--bkms-neutral-3)]">
                           {{ $t('文件最终挂载到 {0}', [mountPathPreview]) }}
                         </div>
                       </Form.FormItem>
@@ -219,7 +219,7 @@
                             size="small"
                             theme="primary"
                           />
-                          <span class="ml-[10px] text-[12px] text-[#979BA5]">
+                          <span class="ml-[10px] text-[12px] text-[var(--bkms-neutral-3)]">
                             {{ $t('开启后，文件内容中的 {0} 会在下发前被渲染为实际值', [envVarPlaceholder]) }}
                           </span>
                         </div>
@@ -237,7 +237,7 @@
                           <RightShape
                             class="mr-[4px] transition-transform duration-200"
                             :class="showAdvancedFileSettings ? 'rotate-90' : ''"
-                            fill="#3A84FF"
+                            fill="var(--bkms-brand-2)"
                             :height="12"
                             :width="12"
                           />
@@ -245,9 +245,9 @@
                         </Button>
                         <div
                           v-show="showAdvancedFileSettings"
-                          class="mt-[8px] rounded-[2px] bg-[#F5F7FA] px-[16px] py-[12px]"
+                          class="mt-[8px] rounded-[2px] bg-[var(--bkms-neutral-7)] px-[16px] py-[12px]"
                         >
-                          <div class="mb-[10px] text-[12px] font-bold text-[#313238]">
+                          <div class="mb-[10px] text-[12px] font-bold text-[var(--bkms-neutral-1)]">
                             {{ $t('环境文件生效方式') }}
                           </div>
                           <Radio.Group
@@ -261,14 +261,14 @@
                               class="env-strategy-option !m-0 !h-auto !flex w-full items-center whitespace-normal rounded-[2px] border border-solid px-[16px] py-[8px]"
                               :class="
                                 fileInfoFormData.envContentStrategy === option.value
-                                  ? 'border-[#3A84FF] bg-[#F0F5FF]'
-                                  : 'border-[#DCDEE5] bg-white'
+                                  ? 'border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-7)]'
+                                  : 'border-[var(--bkms-neutral-5)] bg-white'
                               "
                               :label="option.value"
                             >
                               <span class="inline-flex flex-wrap items-center gap-x-[8px] leading-[20px]">
-                                <span class="shrink-0 text-[#4D4F56]">{{ $t(option.label) }}</span>
-                                <span class="text-[12px] leading-[20px] text-[#979BA5]">
+                                <span class="shrink-0 text-[var(--bkms-neutral-2)]">{{ $t(option.label) }}</span>
+                                <span class="text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">
                                   {{ $t(option.description) }}
                                 </span>
                               </span>
@@ -303,7 +303,7 @@
                   @edit="handleStartEdit"
                 >
                   <template #title>
-                    <span class="text-[#313238]">{{ $t('文件内容') }}</span>
+                    <span class="text-[var(--bkms-neutral-1)]">{{ $t('文件内容') }}</span>
                   </template>
                   <template #action>
                     <div class="flex items-center">
@@ -315,7 +315,7 @@
                       />
                       <Divider
                         class="h-[12px]"
-                        color="#C4C6CC"
+                        color="var(--bkms-navy-5)"
                         direction="vertical"
                         type="solid"
                       />
@@ -336,7 +336,7 @@
                     class="flex min-h-0 flex-1 flex-col bg-[#fff] p-[16px]"
                   >
                     <div class="mb-[12px] flex h-[32px] shrink-0 items-center">
-                      <span class="mr-[6px] text-[12px] text-[#4D4F56]">{{ $t('按环境配置') }}：</span>
+                      <span class="mr-[6px] text-[12px] text-[var(--bkms-neutral-2)]">{{ $t('按环境配置') }}：</span>
                       <Tag
                         v-if="!isEditing"
                         :theme="isIndependentConfig ? 'success' : 'default'"
@@ -410,7 +410,7 @@
                                   <div class="flex h-full min-w-0 items-center">
                                     <span class="shrink-0">{{ editorLang }}</span>
                                     <template v-if="isIndependentConfig">
-                                      <div class="mx-[12px] h-[14px] w-px shrink-0 bg-[#63656E]"></div>
+                                      <div class="mx-[12px] h-[14px] w-px shrink-0 bg-[var(--bkms-neutral-2)]"></div>
                                       <EnvPerspectiveSelect
                                         class="!h-[26px] !min-w-[240px] shrink-0"
                                         :env-list="perspectiveEnvList"
@@ -437,7 +437,7 @@
                                       class="ml-[8px] flex min-w-0 flex-1 items-center overflow-hidden"
                                     >
                                       <OverflowTitle
-                                        class="min-w-0 text-[12px] leading-[20px] text-[#979ba5]"
+                                        class="min-w-0 text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]"
                                         resizeable
                                         type="tips"
                                       >
@@ -460,18 +460,18 @@
                                   #tools
                                 >
                                   <div
-                                    class="mr-[8px] inline-flex h-[24px] items-stretch rounded-[2px] border border-[#63656e] border-solid bg-transparent"
+                                    class="mr-[8px] inline-flex h-[24px] items-stretch rounded-[2px] border border-[var(--bkms-neutral-2)] border-solid bg-transparent"
                                   >
                                     <button
                                       v-for="item in contentViewOptions"
                                       :key="item.value"
                                       :aria-pressed="contentView === item.value"
-                                      class="inline-flex h-full appearance-none items-center justify-center gap-[4px] whitespace-nowrap rounded-none border-0 border-solid bg-transparent px-[8px] text-[12px] leading-[22px] text-[#979ba5] outline-offset-[-1px] cursor-pointer focus-visible:outline focus-visible:outline-[1px] focus-visible:outline-[#3a84ff]"
+                                      class="inline-flex h-full appearance-none items-center justify-center gap-[4px] whitespace-nowrap rounded-none border-0 border-solid bg-transparent px-[8px] text-[12px] leading-[22px] text-[var(--bkms-neutral-3)] outline-offset-[-1px] cursor-pointer focus-visible:outline focus-visible:outline-[1px] focus-visible:outline-[var(--bkms-brand-2)]"
                                       :class="[
-                                        item.divider ? 'border-r border-r-[#63656e]' : '',
+                                        item.divider ? 'border-r border-r-[var(--bkms-neutral-2)]' : '',
                                         contentView === item.value
-                                          ? '!bg-[#4d4d4d] text-[#c4c6cc]'
-                                          : 'hover:bg-[#3a3a3a] hover:text-[#c4c6cc]',
+                                          ? '!bg-[#4d4d4d] text-[var(--bkms-navy-5)]'
+                                          : 'hover:bg-[#3a3a3a] hover:text-[var(--bkms-navy-5)]',
                                       ]"
                                       type="button"
                                       @click="contentView = item.value"
@@ -1532,7 +1532,7 @@
   }
 
   .env-strategy-option:not(.is-disabled):hover {
-    border-color: #3a84ff;
+    border-color: var(--bkms-brand-2);
   }
 
   .mount-env-form-item :deep(.bk-form-content) {
@@ -1566,7 +1566,7 @@
   }
 
   .info-title :deep(.bkms-content-title) {
-    background-color: #eaebf0;
+    background-color: var(--bkms-neutral-6);
   }
 
   .yaml-content {

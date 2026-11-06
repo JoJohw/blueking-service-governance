@@ -214,8 +214,8 @@
   const expandConfig = {
     showIcon: true,
     trigger: 'row',
-    iconOpen: 'bkms-icon bkms-icon-down-shape !text-[#C4C6CC] hover:!text-[#63656E] p-[2px]',
-    iconClose: 'bkms-icon bkms-icon-right-shape !text-[#C4C6CC] hover:!text-[#63656E] p-[2px]',
+    iconOpen: 'bkms-icon bkms-icon-down-shape !text-[var(--bkms-navy-5)] hover:!text-[var(--bkms-neutral-2)] p-[2px]',
+    iconClose: 'bkms-icon bkms-icon-right-shape !text-[var(--bkms-navy-5)] hover:!text-[var(--bkms-neutral-2)] p-[2px]',
   };
 
   /** 服务端排序：remote 模式下点击表头仅触发 @sort-change，排序交给后端 ordering 处理 */
@@ -485,6 +485,6 @@
 <style lang="postcss" scoped>
   /* 展开行的数据行背景色 */
   :deep(.vxe-body--row.alert-expanded-row) {
-    background-color: #f5f7fa;
+    background-color: var(--bkms-neutral-7);
   }
 </style>

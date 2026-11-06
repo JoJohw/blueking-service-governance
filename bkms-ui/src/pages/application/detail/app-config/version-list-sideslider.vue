@@ -33,11 +33,11 @@
         >
           <Divider
             class="h-[16px] mx-[0] text-[12px]"
-            color="#DCDEE5"
+            color="var(--bkms-neutral-5)"
             direction="vertical"
             type="solid"
           />
-          <span class="text-[14px] ml-[16px] text-[#979BA5]">{{ activeFileName }}</span>
+          <span class="text-[14px] ml-[16px] text-[var(--bkms-neutral-3)]">{{ activeFileName }}</span>
         </div>
       </div>
     </template>
@@ -107,25 +107,27 @@
                 theme="dark"
               >
                 <div class="flex items-center cursor-pointer">
-                  <i class="bkms-icon bkms-icon-warning-circle text-[16px] text-[#979BA5]"></i>
+                  <i class="bkms-icon bkms-icon-warning-circle text-[16px] text-[var(--bkms-neutral-3)]"></i>
                 </div>
                 <template #content>
                   <div class="max-w-[238px] text-[#fff]">
-                    <div class="leading-[20px] text-[#979BA5]">
+                    <div class="leading-[20px] text-[var(--bkms-neutral-3)]">
                       {{ $t('版本号自动生成规则') }}
                     </div>
                     <div class="text-[12px] leading-[20px]">
                       {{ $t('每次保存或回滚将自动递增生成新版本号，格式为') }}
                       <span
-                        class="inline-block h-[16px] leading-[16px] bg-[#4D4F56] text-[#AD7A6B] text-[10px] px-[4px] rounded-[2px]"
+                        class="inline-block h-[16px] leading-[16px] bg-[var(--bkms-neutral-2)] text-[#AD7A6B] text-[10px] px-[4px] rounded-[2px]"
                         >VN
                       </span>
                       {{ $t('。') }}
                     </div>
-                    <div class="text-[12px] leading-[20px] mb-[8px] text-[#979BA5]">
+                    <div class="text-[12px] leading-[20px] mb-[8px] text-[var(--bkms-neutral-3)]">
                       {{ $t('示例：（ V1:V2:V3... ）') }}
                     </div>
-                    <div class="border-t border-[#4D4F56] pt-[8px] text-[12px] leading-[20px] text-[#979BA5]">
+                    <div
+                      class="border-t border-[var(--bkms-neutral-2)] pt-[8px] text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]"
+                    >
                       {{ $t('回滚操作也会生成新版本号，原历史记录始终保留，不会被覆盖。') }}
                     </div>
                   </div>

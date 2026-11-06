@@ -19,7 +19,7 @@
 <template>
   <div class="h-full py-[12px] px-[16px] flex flex-col bg-[#fff]">
     <div class="leading-[40px] flex items-center justify-between px-[10px]">
-      <span class="text-[#313238] font-bold">{{ $t('状态') }}</span>
+      <span class="text-[var(--bkms-neutral-1)] font-bold">{{ $t('状态') }}</span>
       <Button
         text
         theme="primary"
@@ -37,8 +37,10 @@
       <template #trigger>
         <div
           :class="[
-            'px-[12px] flex items-center justify-between group text-[#4D4F56] border-[1px] h-full text-[14px] cursor-pointer rounded-[2px]',
-            isStatusPopoverShow ? 'bg-[#fff] border-[#3A84FF]' : 'bg-[#F0F1F5] border-[transparent] hover:bg-[#EAEBF0]',
+            'px-[12px] flex items-center justify-between group text-[var(--bkms-neutral-2)] border-[1px] h-full text-[14px] cursor-pointer rounded-[2px]',
+            isStatusPopoverShow
+              ? 'bg-[#fff] border-[var(--bkms-brand-2)]'
+              : 'bg-[var(--bkms-neutral-6)] border-[transparent] hover:bg-[var(--bkms-neutral-6)]',
           ]"
         >
           <div class="flex items-center gap-[8px]">
@@ -46,12 +48,15 @@
               :size="12"
               :type="status"
             />
-            <span class="whitespace-nowrap text-[#4D4F56] text-[12px]">
+            <span class="whitespace-nowrap text-[var(--bkms-neutral-2)] text-[12px]">
               {{ statusLabel[status] }} ( {{ statusCounts[status] }} )
             </span>
           </div>
           <AngleDownFill
-            :class="['text-[#C4C6CC] group-hover:text-[#979BA5]', isStatusPopoverShow ? '' : 'rotate-180']"
+            :class="[
+              'text-[var(--bkms-navy-5)] group-hover:text-[var(--bkms-neutral-3)]',
+              isStatusPopoverShow ? '' : 'rotate-180',
+            ]"
           />
         </div>
       </template>
@@ -77,14 +82,16 @@
         :key="item.id"
         class="mt-[4px]"
       >
-        <div class="flex items-center h-[40px] px-[10px] text-[#313238] font-bold">{{ $t(item.label) }}</div>
+        <div class="flex items-center h-[40px] px-[10px] text-[var(--bkms-neutral-1)] font-bold">
+          {{ $t(item.label) }}
+        </div>
 
         <FlexRow
           v-for="resource in item.kinds"
           :key="resource.kind"
-          class="h-[32px] px-[10px] text-[#979BA5] hover:bg-[#F5F7FA] cursor-pointer"
+          class="h-[32px] px-[10px] text-[var(--bkms-neutral-3)] hover:bg-[var(--bkms-neutral-7)] cursor-pointer"
           :class="{
-            '!bg-[#F0F5FF] !text-[#3A84FF]': visibleResourceKinds.includes(resource.kind),
+            '!bg-[var(--bkms-brand-7)] !text-[var(--bkms-brand-2)]': visibleResourceKinds.includes(resource.kind),
           }"
           lclass="flex items-center gap-[8px]"
           @click="toggleResourceNodes(resource)"
@@ -93,7 +100,10 @@
             <template v-if="KIND_ICON_ASIDE_MAP[resource.kind]">
               <component
                 :is="KIND_ICON_ASIDE_MAP[resource.kind]"
-                :class="['w-[16px] h-[16px]', visibleResourceKinds.includes(resource.kind) ? '' : 'text-[#979BA5]']"
+                :class="[
+                  'w-[16px] h-[16px]',
+                  visibleResourceKinds.includes(resource.kind) ? '' : 'text-[var(--bkms-neutral-3)]',
+                ]"
               />
               <span
                 class="max-w-[150px] ellipsis"
@@ -105,7 +115,7 @@
               <span
                 :class="[
                   'bkms-icon bkms-icon-space-basic text-[16px]',
-                  visibleResourceKinds.includes(resource.kind) ? '' : 'text-[#979BA5]',
+                  visibleResourceKinds.includes(resource.kind) ? '' : 'text-[var(--bkms-neutral-3)]',
                 ]"
               ></span>
               <span
@@ -117,9 +127,9 @@
           </template>
           <template #right>
             <span
-              class="bg-[#F0F1F5] px-[8px] py-[2px] rounded-[2px]"
+              class="bg-[var(--bkms-neutral-6)] px-[8px] py-[2px] rounded-[2px]"
               :class="{
-                '!bg-[#E1ECFF] !text-[#3A84FF]': visibleResourceKinds.includes(resource.kind),
+                '!bg-[var(--bkms-brand-6)] !text-[var(--bkms-brand-2)]': visibleResourceKinds.includes(resource.kind),
               }"
               >{{ resource.nodes.length }}</span
             >

@@ -35,9 +35,9 @@
         'flex items-center min-w-[280px] h-[32px] rounded-[2px] cursor-pointer overflow-hidden transition-all duration-200',
         isDarkTheme
           ? 'h-full bg-[#4A4A4A] hover:bg-[#545454]'
-          : 'border border-[#c4c6cc] bg-[#FFF] transition-border-color hover:border-[#979BA5]',
+          : 'border border-[var(--bkms-navy-5)] bg-[#FFF] transition-border-color hover:border-[var(--bkms-neutral-3)]',
         {
-          'border-[#3a84ff] shadow-[0_0_3px_0_#a3c5fd]': isPopoverVisible && !isDarkTheme,
+          'border-[var(--bkms-brand-2)] shadow-[0_0_3px_0_var(--bkms-brand-4)]': isPopoverVisible && !isDarkTheme,
         },
       ]"
       :data-selected-env="modelValue"
@@ -46,7 +46,7 @@
       <div
         :class="[
           'flex items-center h-full px-[10px] border-r-[1px] text-[12px]',
-          isDarkTheme ? 'text-[#979BA5] border-[#63656E]' : 'border-[#c4c6cc]',
+          isDarkTheme ? 'text-[var(--bkms-neutral-3)] border-[var(--bkms-neutral-2)]' : 'border-[var(--bkms-navy-5)]',
         ]"
       >
         {{ displayLabel }}
@@ -56,7 +56,7 @@
           v-if="selectedEnvItem"
           :class="[
             'inline-flex items-center gap-[4px] min-w-0 text-[12px] leading-[22px]',
-            isDarkTheme ? 'text-[#DCDEE5]' : 'text-[#4D4F56]',
+            isDarkTheme ? 'text-[var(--bkms-neutral-5)]' : 'text-[var(--bkms-neutral-2)]',
           ]"
         >
           <span class="truncate">{{ selectedEnvItem.displayName }}</span>
@@ -69,7 +69,7 @@
           </Tag>
           <Tag
             v-if="isFeatureEnv(selectedEnvItem)"
-            class="bg-[#E2F5F7] text-[#3A9EAA] shrink-0"
+            class="bg-[var(--bkms-cyan-6)] text-[var(--bkms-cyan-2)] shrink-0"
             size="small"
           >
             {{ $t('特性') }}
@@ -77,13 +77,16 @@
         </span>
         <span
           v-else-if="isDefaultSelected"
-          :class="['text-[12px] leading-[22px]', isDarkTheme ? 'text-[#DCDEE5]' : 'text-[#4D4F56]']"
+          :class="[
+            'text-[12px] leading-[22px]',
+            isDarkTheme ? 'text-[var(--bkms-neutral-5)]' : 'text-[var(--bkms-neutral-2)]',
+          ]"
         >
           {{ $t('默认配置') }}
         </span>
         <span
           v-else
-          :class="['text-[14px] leading-[22px]', isDarkTheme ? 'text-[#74767E]' : 'text-[#C4C6CC]']"
+          :class="['text-[14px] leading-[22px]', isDarkTheme ? 'text-[#74767E]' : 'text-[var(--bkms-navy-5)]']"
         >
           {{ $t('请选择') }}
         </span>
@@ -91,7 +94,7 @@
       <AngleDownLine
         :class="[
           'text-[10px] mr-[10px] transition-transform duration-200',
-          isDarkTheme ? 'text-[#C4C6CC]' : 'text-[#979BA5]',
+          isDarkTheme ? 'text-[var(--bkms-navy-5)]' : 'text-[var(--bkms-neutral-3)]',
           { 'rotate-180': isPopoverVisible },
         ]"
       />
@@ -112,19 +115,19 @@
             :placeholder="$t('请输入关键词')"
           >
             <template #prefix>
-              <div class="flex items-center justify-center text-[#979BA5]">
+              <div class="flex items-center justify-center text-[var(--bkms-neutral-3)]">
                 <Search class="ml-[2px] text-[16px]" />
               </div>
             </template>
           </Input>
           <div
-            class="h-[40px] flex items-center border-l-[1px] border-b-[1px] border-[#DCDEE5] ml-[-1px] pl-[8px] pb-[2px]"
+            class="h-[40px] flex items-center border-l-[1px] border-b-[1px] border-[var(--bkms-neutral-5)] ml-[-1px] pl-[8px] pb-[2px]"
           >
             <Checkbox
               v-model="onlyModified"
               class="shrink-0"
             >
-              <span class="text-[12px] text-[#63656E]">{{ displayFilterLabel }}</span>
+              <span class="text-[12px] text-[var(--bkms-neutral-2)]">{{ displayFilterLabel }}</span>
             </Checkbox>
           </div>
         </div>
@@ -141,7 +144,7 @@
           >
             <!-- 分组标题 -->
             <div
-              class="h-[32px] flex items-center px-[8px] bg-[#f5f7fa] text-[12px] font-bold text-[#63656E]"
+              class="h-[32px] flex items-center px-[8px] bg-[var(--bkms-neutral-7)] text-[12px] font-bold text-[var(--bkms-neutral-2)]"
               :class="envTypeTagClassMap[group.type] || ''"
             >
               {{ group.label }}
@@ -152,10 +155,10 @@
                 v-for="env in group.envs"
                 :key="env.name"
                 :class="[
-                  'flex flex-col justify-center h-[42px] px-[8px] cursor-pointer text-[12px] text-[#4D4F56] transition-bg-color duration-150',
+                  'flex flex-col justify-center h-[42px] px-[8px] cursor-pointer text-[12px] text-[var(--bkms-neutral-2)] transition-bg-color duration-150',
                   { 'feature-env-child': env.isFeatureChild },
-                  { '!bg-[#E1ECFF] !text-[#3a84ff]': isSelected(env) },
-                  { 'hover:bg-[#F5F7FA]': !isSelected(env) },
+                  { '!bg-[var(--bkms-brand-6)] !text-[var(--bkms-brand-2)]': isSelected(env) },
+                  { 'hover:bg-[var(--bkms-neutral-7)]': !isSelected(env) },
                 ]"
                 :data-env-name="env.name"
                 :data-env-type="env.type"
@@ -175,7 +178,7 @@
                   </OverflowTitle>
                   <Tag
                     v-if="isFeatureEnv(env)"
-                    class="bg-[#E2F5F7] text-[#3A9EAA] ml-[4px] shrink-0"
+                    class="bg-[var(--bkms-cyan-6)] text-[var(--bkms-cyan-2)] ml-[4px] shrink-0"
                     size="small"
                   >
                     {{ $t('特性') }}
@@ -184,7 +187,10 @@
                 <!-- 环境状态（默认配置不显示） -->
                 <span
                   v-if="env.type !== 'default'"
-                  :class="['text-[10px] shrink-0', isModified(env.name) ? 'text-[#F8B64F]' : 'text-[#C4C6CC]']"
+                  :class="[
+                    'text-[10px] shrink-0',
+                    isModified(env.name) ? 'text-[#F8B64F]' : 'text-[var(--bkms-navy-5)]',
+                  ]"
                 >
                   {{ isModified(env.name) ? displayStatusLabels.active : displayStatusLabels.inactive }}
                 </span>
@@ -195,7 +201,7 @@
         <!-- 全局空状态：筛选后无匹配数据 -->
         <div
           v-else
-          class="py-[16px] px-[12px] text-[12px] text-[#c4c6cc] text-center"
+          class="py-[16px] px-[12px] text-[12px] text-[var(--bkms-navy-5)] text-center"
         >
           {{ $t('无匹配数据') }}
         </div>
@@ -421,7 +427,7 @@
 
 <style lang="postcss" scoped>
   :deep(.bk-input.is-simplicity) {
-    border-bottom-color: #dcdee5 !important;
+    border-bottom-color: var(--bkms-neutral-5) !important;
     border-radius: 0 !important;
 
     &:hover {
@@ -458,8 +464,8 @@
       width: 16px;
       height: 16px;
       content: '';
-      border-bottom: 1px solid #dcdee5;
-      border-left: 1px solid #dcdee5;
+      border-bottom: 1px solid var(--bkms-neutral-5);
+      border-left: 1px solid var(--bkms-neutral-5);
       border-bottom-left-radius: 8px;
     }
   }
@@ -478,11 +484,11 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #dcdee5;
+        background: var(--bkms-neutral-5);
         box-shadow: inset 0 0 6px #cccccc4d;
 
         &:hover {
-          background: #dcdee5;
+          background: var(--bkms-neutral-5);
         }
       }
     }

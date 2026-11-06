@@ -28,7 +28,7 @@
 
 .resize-line {
   width: 8px;
-  border-left: 1px solid #DCDEE5;
+  border-left: 1px solid var(--bkms-neutral-5);
   height: 100%;
   cursor: col-resize;
   position: absolute;
@@ -40,9 +40,9 @@
   position: absolute;
   width: 2px;
   height: 2px;
-  color: #63656E;
-  background: #63656E;
-  box-shadow: 0 4px 0 0 #63656E,0 8px 0 0 #63656E,0 -4px 0 0 #63656E,0 -8px 0 0 #63656E;
+  color: var(--bkms-neutral-2);
+  background: var(--bkms-neutral-2);
+  box-shadow: 0 4px 0 0 var(--bkms-neutral-2),0 8px 0 0 var(--bkms-neutral-2),0 -4px 0 0 var(--bkms-neutral-2),0 -8px 0 0 var(--bkms-neutral-2);
   left: 4px;
   top: 50%;
   transform: translate3d(0, -50%, 0);
@@ -55,7 +55,7 @@
   display: flex;
   align-items: center;
   z-index: 3;
-  color: #979BA5;
+  color: var(--bkms-neutral-3);
 }
 
 .fold-left {
@@ -64,8 +64,8 @@
   justify-content: center;
   width: 16px;
   height: 32px;
-  background: #FAFBFD;
-  border: 1px solid #DCDEE5;
+  background: var(--bkms-neutral-8);
+  border: 1px solid var(--bkms-neutral-5);
   border-radius: 4px 0 0 4px;
   cursor: pointer;
   position: relative;
@@ -78,14 +78,14 @@
   justify-content: center;
   width: 16px;
   height: 32px;
-  background: #FAFBFD;
-  border: 1px solid #DCDEE5;
+  background: var(--bkms-neutral-8);
+  border: 1px solid var(--bkms-neutral-5);
   border-radius: 0 4px 4px 0;
   cursor: pointer;
 }
 
 .active {
-  background-color: #699DF4;
-  border-color: #699DF4;
+  background-color: var(--bkms-brand-3);
+  border-color: var(--bkms-brand-3);
   color: #fff;
 }

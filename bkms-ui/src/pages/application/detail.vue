@@ -47,7 +47,7 @@
       >
         <template #trigger>
           <div
-            class="flex items-center justify-between bg-[#F0F1F5] overflow-hidden group text-[#4D4F56] h-full text-[14px] cursor-pointer rounded-[2px] hover:bg-[#EAEBF0]"
+            class="flex items-center justify-between bg-[var(--bkms-neutral-6)] overflow-hidden group text-[var(--bkms-neutral-2)] h-full text-[14px] cursor-pointer rounded-[2px] hover:bg-[var(--bkms-neutral-6)]"
           >
             <div class="flex items-center min-w-[43px] overflow-hidden">
               <TypeIcon
@@ -58,7 +58,10 @@
               <span class="whitespace-nowrap">{{ currentApplicationName }}</span>
             </div>
             <AngleDownFill
-              :class="['mr-[5px] text-[#C4C6CC] group-hover:text-[#979BA5]', isSpacePopoverShow ? '' : 'rotate-180']"
+              :class="[
+                'mr-[5px] text-[var(--bkms-navy-5)] group-hover:text-[var(--bkms-neutral-3)]',
+                isSpacePopoverShow ? '' : 'rotate-180',
+              ]"
             />
           </div>
         </template>

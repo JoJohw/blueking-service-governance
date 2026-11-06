@@ -57,7 +57,7 @@
         >
           <template #default="{ row }">
             <span
-              class="text-[#3a84ff] cursor-pointer"
+              class="text-[var(--bkms-brand-2)] cursor-pointer"
               @click="handleEdit(row)"
               >{{ row.displayName || '--' }}</span
             >
@@ -75,7 +75,7 @@
           <template #default="{ row }">
             <span class="flex flex-col">
               <span>{{ monitorMetricNameMap.get(row.monitorMetric || '') || row.monitorMetric || '--' }}</span>
-              <span class="text-[#979BA5] text-[12px] font-mono">{{ row.monitorMetric }}</span>
+              <span class="text-[var(--bkms-neutral-3)] text-[12px] font-mono">{{ row.monitorMetric }}</span>
             </span>
           </template>
         </TableColumn>
@@ -139,9 +139,9 @@
                     delay: 300,
                     disabled: !getUserGroupUsers(item).length,
                   }"
-                  class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-[#F0F1F5] cursor-default"
+                  class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-[var(--bkms-neutral-6)] cursor-default"
                 >
-                  <i class="bkms-icon bkms-icon-usergroup text-[#979BA5] text-[14px]"></i>
+                  <i class="bkms-icon bkms-icon-usergroup text-[var(--bkms-neutral-3)] text-[14px]"></i>
                   {{ userGroupMap.get(String(item))?.name || item }}
                 </span>
               </template>
@@ -517,7 +517,9 @@
       footerAlign: 'center',
       content: h('div', { class: 'text-left' }, [
         h('div', [t('策略名称: {name}', { name: row.displayName || row.id })]),
-        h('div', { class: 'mt-[14px] bg-[#F5F7FA] py-[12px] px-[16px]' }, [t('删除后，将不可恢复，请谨慎操作！')]),
+        h('div', { class: 'mt-[14px] bg-[var(--bkms-neutral-7)] py-[12px] px-[16px]' }, [
+          t('删除后，将不可恢复，请谨慎操作！'),
+        ]),
       ]),
       confirmButtonTheme: 'danger',
       confirmText: t('删除'),

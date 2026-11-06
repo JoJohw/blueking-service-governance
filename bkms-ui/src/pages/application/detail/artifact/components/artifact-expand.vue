@@ -25,7 +25,7 @@
         :field-value="t('镜像仓库')"
         :field-width="100"
         :value="row.repository"
-        value-color="#313238"
+        value-color="var(--bkms-neutral-1)"
         value-max-width="100%"
       />
       <FieldItem
@@ -33,7 +33,7 @@
         field-value="tag"
         :field-width="100"
         :value="row.tag"
-        value-color="#313238"
+        value-color="var(--bkms-neutral-1)"
       />
       <FieldItem
         :container-height="32"
@@ -43,7 +43,7 @@
         <template #value>
           <div
             v-if="row.sourceMaterial"
-            class="flex min-w-0 max-w-full items-center text-[#313238]"
+            class="flex min-w-0 max-w-full items-center text-[var(--bkms-neutral-1)]"
           >
             <!-- 与蓝盾一致：分支 / Tag / CommitID 都用分支图标标修订，短哈希另用 commit 图标 -->
             <span class="bkms-icon bkms-icon-branchs mr-[5px] shrink-0"></span>
@@ -63,7 +63,7 @@
           </div>
           <span
             v-else
-            class="text-[#313238]"
+            class="text-[var(--bkms-neutral-1)]"
             >--</span
           >
         </template>
@@ -73,14 +73,14 @@
         :field-value="t('大小')"
         :field-width="100"
         :value="formatSize(Number(row?.size))"
-        value-color="#313238"
+        value-color="var(--bkms-neutral-1)"
       />
       <FieldItem
         :container-height="32"
         :field-value="t('构建时间')"
         :field-width="100"
         :value="row.builtAt ? formatDateString(row.builtAt) : '--'"
-        value-color="#313238"
+        value-color="var(--bkms-neutral-1)"
       />
       <FieldItem
         :container-height="32"
@@ -93,10 +93,12 @@
       </FieldItem>
       <FieldItem
         class="!min-h-[32px] !h-auto !items-start"
-        value-color="#313238"
+        value-color="var(--bkms-neutral-1)"
       >
         <template #field>
-          <div class="w-[100px] min-h-[32px] leading-[32px] text-align-end text-[#979BA5]">{{ t('已部署环境') }}：</div>
+          <div class="w-[100px] min-h-[32px] leading-[32px] text-align-end text-[var(--bkms-neutral-3)]">
+            {{ t('已部署环境') }}：
+          </div>
         </template>
         <template #value>
           <div
@@ -132,13 +134,13 @@
     </div>
 
     <!-- 右侧：部署记录时间线 -->
-    <div class="w-[400px] min-h-[180px] flex-shrink-0 px-[16px] pt-[8px] bg-[#FAFBFD]">
+    <div class="w-[400px] min-h-[180px] flex-shrink-0 px-[16px] pt-[8px] bg-[var(--bkms-neutral-8)]">
       <div class="flex items-center h-[32px] leading-[32px]">
-        <span class="text-[12px] text-[#313238]">{{ t('部署记录') }}</span>
-        <span class="text-[12px] text-[#979BA5] ml-[4px]"> ({{ $t('仅展示前 5 条') }}) </span>
+        <span class="text-[12px] text-[var(--bkms-neutral-1)]">{{ t('部署记录') }}</span>
+        <span class="text-[12px] text-[var(--bkms-neutral-3)] ml-[4px]"> ({{ $t('仅展示前 5 条') }}) </span>
       </div>
       <div
-        v-bkloading="{ loading: isDeployRecordLoading, color: '#F5F7FA]' }"
+        v-bkloading="{ loading: isDeployRecordLoading, color: 'var(--bkms-neutral-7)]' }"
         class="flex-1 h-full"
       >
         <Timeline
@@ -146,7 +148,7 @@
           :list="timelineList"
         >
           <template #content="{ content }">
-            <div class="text-[12px] text-[#979BA5]">{{ content }}</div>
+            <div class="text-[12px] text-[var(--bkms-neutral-3)]">{{ content }}</div>
           </template>
         </Timeline>
         <Exception
@@ -228,13 +230,13 @@
   }
 
   const DEPLOY_STATUS_MAP: Record<string, DeployStatusConfig> = {
-    [APP_DEPLOY_STATUS.DEPLOYED]: { color: '#2DCB56', label: '成功', timelineColor: 'green' },
-    [HELM_DEPLOY_STATUS.PENDING_INSTALL]: { color: '#3A84FF', label: '部署中' },
-    [HELM_DEPLOY_STATUS.PENDING_UPGRADE]: { color: '#3A84FF', label: '部署中' },
-    [APP_DEPLOY_STATUS.DEPLOYING]: { color: '#3A84FF', label: '部署中' },
-    [APP_DEPLOY_STATUS.FAILED]: { color: '#EA3636', label: '失败', timelineColor: 'red' },
-    [APP_DEPLOY_STATUS.POLLING_TIMEOUT]: { color: '#EA3636', label: '失败', timelineColor: 'red' },
-    [APP_DEPLOY_STATUS.POLLING_BROKEN]: { color: '#EA3636', label: '失败', timelineColor: 'red' },
+    [APP_DEPLOY_STATUS.DEPLOYED]: { color: 'var(--bkms-success-2)', label: '成功', timelineColor: 'green' },
+    [HELM_DEPLOY_STATUS.PENDING_INSTALL]: { color: 'var(--bkms-brand-2)', label: '部署中' },
+    [HELM_DEPLOY_STATUS.PENDING_UPGRADE]: { color: 'var(--bkms-brand-2)', label: '部署中' },
+    [APP_DEPLOY_STATUS.DEPLOYING]: { color: 'var(--bkms-brand-2)', label: '部署中' },
+    [APP_DEPLOY_STATUS.FAILED]: { color: 'var(--bkms-danger-2)', label: '失败', timelineColor: 'red' },
+    [APP_DEPLOY_STATUS.POLLING_TIMEOUT]: { color: 'var(--bkms-danger-2)', label: '失败', timelineColor: 'red' },
+    [APP_DEPLOY_STATUS.POLLING_BROKEN]: { color: 'var(--bkms-danger-2)', label: '失败', timelineColor: 'red' },
   };
 
   function getDeployStatusConfig(status: string): DeployStatusConfig {
@@ -256,7 +258,11 @@
   function buildTimelineTag(record: ImageTagDeployRecordOutputObj) {
     const tagText = t('{0} 部署 {1}', [record.operator, getEnvDisplayName(record?.envName ?? '')]);
     const { color, label } = getDeployStatusConfig(record?.status ?? '');
-    const tagTextVNode = h(OverflowTitle, { type: 'tips', style: { color: '#4D4F56', minWidth: 0 } }, () => tagText);
+    const tagTextVNode = h(
+      OverflowTitle,
+      { type: 'tips', style: { color: 'var(--bkms-neutral-2)', minWidth: 0 } },
+      () => tagText,
+    );
     const statusVNode = h('span', { style: { color, flexShrink: '0', fontSize: '12px' } }, `（${t(label)}）`);
 
     return h(
@@ -278,7 +284,7 @@
   const timelineList = computed(() =>
     deployRecords.value.map(record => {
       const config = getDeployStatusConfig(record?.status ?? '');
-      const isLoading = config.color === '#3A84FF';
+      const isLoading = config.color === 'var(--bkms-brand-2)';
       return {
         tag: buildTimelineTag(record),
         nodeType: 'vnode',

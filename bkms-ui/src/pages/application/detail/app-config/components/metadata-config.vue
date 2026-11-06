@@ -42,12 +42,14 @@
         <div
           v-for="section in sectionItems"
           :key="section.key"
-          class="metadata-card border border-[#EAEBF0] rounded-[8px] min-w-0 overflow-hidden"
+          class="metadata-card border border-[var(--bkms-neutral-6)] rounded-[8px] min-w-0 overflow-hidden"
         >
-          <div class="flex items-center gap-[10px] h-[32px] px-[12px] bg-[#F5F7FA] border-b border-[#EAEBF0]">
+          <div
+            class="flex items-center gap-[10px] h-[32px] px-[12px] bg-[var(--bkms-neutral-7)] border-b border-[var(--bkms-neutral-6)]"
+          >
             <span
               :class="[
-                'text-[12px] font-bold text-[#4D4F56]',
+                'text-[12px] font-bold text-[var(--bkms-neutral-2)]',
                 { 'section-modified-label': controllers[section.key].hasOverride.value },
               ]"
             >
@@ -55,7 +57,7 @@
             </span>
             <Button
               v-if="!editingSection"
-              class="!hover:text-[#3A84FF]"
+              class="!hover:text-[var(--bkms-brand-2)]"
               text
               @click="handleEdit(section.key)"
             >
@@ -81,7 +83,7 @@
 
                 <Copy
                   v-if="inputModes[section.key] === 'text'"
-                  class="text-[#979BA5] text-[16px] hover:text-[#3A84FF] cursor-pointer"
+                  class="text-[var(--bkms-neutral-3)] text-[16px] hover:text-[var(--bkms-brand-2)] cursor-pointer"
                   :title="$t('复制')"
                   @click="handleCopy"
                 />
@@ -834,19 +836,19 @@
 
 <style lang="postcss" scoped>
   :deep(.bkms-content-title) {
-    background-color: #eaebf0;
+    background-color: var(--bkms-neutral-6);
   }
 
   :deep(.bk-form-label) {
-    color: #4d4f56;
+    color: var(--bkms-neutral-2);
   }
 
   :deep(.metadata-card .bk-radio-group) {
-    background-color: #eaebf0;
+    background-color: var(--bkms-neutral-6);
   }
 
   .section-modified-label {
-    border-left: 3px solid #ff9c01;
+    border-left: 3px solid var(--bkms-warning-2);
     padding-left: 6px;
   }
 

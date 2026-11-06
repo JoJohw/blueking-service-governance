@@ -173,7 +173,7 @@
           <!-- 实例数（副本数） -->
           <Form.FormItem
             :class="[
-              '!text-[#4D4F56] !w-[400px] relative',
+              '!text-[var(--bkms-neutral-2)] !w-[400px] relative',
               { 'field-diff-highlight': shouldShowResetIcon('replicas') },
             ]"
             :label="$t('实例数')"
@@ -338,8 +338,8 @@
   import type { ExtendedEnv } from './types';
 
   // 查看态字段值样式常量
-  const FIELD_VALUE_BASE_CLASS = 'text-[12px] text-[#313238]';
-  const FIELD_VALUE_MODIFIED_CLASS = 'border-b border-dashed border-b-[#313238]';
+  const FIELD_VALUE_BASE_CLASS = 'text-[12px] text-[var(--bkms-neutral-1)]';
+  const FIELD_VALUE_MODIFIED_CLASS = 'border-b border-dashed border-b-[var(--bkms-neutral-1)]';
 
   type FieldKey = 'cpuLimits' | 'cpuRequests' | 'memoryLimits' | 'memoryRequests' | 'replicas';
 
@@ -598,16 +598,16 @@
 
 <style lang="postcss" scoped>
   :deep(.bkms-content-title) {
-    background-color: #eaebf0;
+    background-color: var(--bkms-neutral-6);
   }
 
   :deep(.bk-form-label) {
-    color: #4d4f56;
+    color: var(--bkms-neutral-2);
   }
 
   :deep(.field-diff-highlight) {
     .bk-form-label {
-      border-left: 3px solid #ff9c01 !important;
+      border-left: 3px solid var(--bkms-warning-2) !important;
       padding-left: 6px !important;
     }
   }

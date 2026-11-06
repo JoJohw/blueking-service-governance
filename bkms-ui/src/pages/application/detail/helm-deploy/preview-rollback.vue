@@ -33,10 +33,10 @@
           direction="vertical"
         />
         <div class="flex items-center gap-[24px]">
-          <div class="text-[14px] text-[#979ba5]">{{ appName }}</div>
+          <div class="text-[14px] text-[var(--bkms-neutral-3)]">{{ appName }}</div>
           <div class="flex items-center">
-            <div class="text-[14px] text-[#979ba5]">{{ $t('环境') }}：</div>
-            <div class="text-[14px] text-[#979ba5]">{{ envName }}</div>
+            <div class="text-[14px] text-[var(--bkms-neutral-3)]">{{ $t('环境') }}：</div>
+            <div class="text-[14px] text-[var(--bkms-neutral-3)]">{{ envName }}</div>
           </div>
         </div>
       </div>

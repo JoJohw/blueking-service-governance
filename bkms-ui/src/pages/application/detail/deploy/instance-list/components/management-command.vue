@@ -144,8 +144,8 @@
                 @click="handleFormat(editor)"
               >
                 <template #icon>
-                  <span class="bkms-icon bkms-icon-angle-left text-[12px] text-[#979BA5]"></span>
-                  <span class="bkms-icon bkms-icon-angle-right text-[12px] text-[#979BA5]"></span>
+                  <span class="bkms-icon bkms-icon-angle-left text-[12px] text-[var(--bkms-neutral-3)]"></span>
+                  <span class="bkms-icon bkms-icon-angle-right text-[12px] text-[var(--bkms-neutral-3)]"></span>
                 </template>
               </IconButton>
             </template>
@@ -198,7 +198,7 @@
                 <span v-if="row.key">{{ row.key }}</span>
                 <span
                   v-else
-                  class="text-[#C4C6CC]"
+                  class="text-[var(--bkms-navy-5)]"
                   >{{ $t('请输入') }}</span
                 >
               </template>
@@ -218,7 +218,7 @@
                 <span v-if="row.value">{{ row.value }}</span>
                 <span
                   v-else
-                  class="text-[#C4C6CC]"
+                  class="text-[var(--bkms-navy-5)]"
                   >{{ $t('请输入') }}</span
                 >
               </template>
@@ -233,7 +233,9 @@
                   text
                   @click="handleAdd()"
                 >
-                  <i class="bkms-icon bkms-icon-plus-circle-shape text-[#979BA5] text-[14px] mr-[10px]"></i>
+                  <i
+                    class="bkms-icon bkms-icon-plus-circle-shape text-[var(--bkms-neutral-3)] text-[14px] mr-[10px]"
+                  ></i>
                 </Button>
                 <Button
                   :disabled="tableData.length === 1"
@@ -244,7 +246,7 @@
                   <i
                     :class="[
                       'bkms-icon bkms-icon-minus-circle-shape text-[14px]',
-                      { 'text-[#979BA5]': tableData.length !== 1 },
+                      { 'text-[var(--bkms-neutral-3)]': tableData.length !== 1 },
                     ]"
                   >
                   </i>
@@ -315,7 +317,7 @@
           @collapse-change="handleCollapse"
         >
           <template #aside>
-            <div class="h-full bg-[#F5F7FA] py-[8px] flex flex-col w-[160px]">
+            <div class="h-full bg-[var(--bkms-neutral-7)] py-[8px] flex flex-col w-[160px]">
               <div class="font-bold h-[32px] leading-[32px] shrink-0 px-[12px]">
                 {{ `${$t('实例列表')}( ${executeResult.length} )` }}
               </div>
@@ -325,8 +327,8 @@
                   :key="`${index}-${item.instanceID}`"
                   :class="[
                     'h-[32px] leading-[32px] px-[12px]',
-                    'hover:bg-[#f0f1f5] cursor-pointer',
-                    { '!bg-[#d1e8ff] text-[#3a84ff]': curInstance?.instanceID === item.instanceID },
+                    'hover:bg-[var(--bkms-neutral-6)] cursor-pointer',
+                    { '!bg-[#d1e8ff] text-[var(--bkms-brand-2)]': curInstance?.instanceID === item.instanceID },
                   ]"
                   @click="handleClickInstance(item)"
                 >
@@ -349,8 +351,8 @@
                   @click="handleFormat(editor)"
                 >
                   <template #icon>
-                    <span class="bkms-icon bkms-icon-angle-left text-[12px] text-[#979BA5]"></span>
-                    <span class="bkms-icon bkms-icon-angle-right text-[12px] text-[#979BA5]"></span>
+                    <span class="bkms-icon bkms-icon-angle-left text-[12px] text-[var(--bkms-neutral-3)]"></span>
+                    <span class="bkms-icon bkms-icon-angle-right text-[12px] text-[var(--bkms-neutral-3)]"></span>
                   </template>
                 </IconButton>
               </template>
@@ -358,13 +360,13 @@
                 <div class="flex items-center">
                   <Success
                     v-if="responseType === 'success'"
-                    fill="#2CAF5E"
+                    fill="var(--bkms-success-2)"
                     height="16"
                     width="16"
                   />
                   <Close
                     v-else
-                    fill="#EA3636"
+                    fill="var(--bkms-danger-2)"
                     height="16"
                     width="16"
                   />
@@ -382,12 +384,12 @@
           <template #title>
             <span
               v-if="responseType === 'success'"
-              class="text-[#4D4F56] text-[14px]"
+              class="text-[var(--bkms-neutral-2)] text-[14px]"
               >{{ $t('无执行成功的结果') }}</span
             >
             <span
               v-else
-              class="text-[#4D4F56] text-[14px]"
+              class="text-[var(--bkms-neutral-2)] text-[14px]"
               >{{ $t('无执行失败的结果') }}</span
             >
           </template>
@@ -399,10 +401,10 @@
         type="empty"
       >
         <template #title>
-          <span class="text-[#4D4F56] text-[14px]">{{ $t('执行结果为空') }}</span>
+          <span class="text-[var(--bkms-neutral-2)] text-[14px]">{{ $t('执行结果为空') }}</span>
         </template>
         <template #description>
-          <span class="text-[#979BA5] text-[12px]">{{
+          <span class="text-[var(--bkms-neutral-3)] text-[12px]">{{
             $t('请先选择命令，填写相应的参数，然后点击执行按钮发送请求')
           }}</span>
         </template>
@@ -414,8 +416,8 @@
       theme="danger"
     >
       <template #title>
-        <p class="font-bold text-[#4D4F56] mb-[4px]">{{ $t('API 请求失败') }}:</p>
-        <p class="text-[#4D4F56]">{{ `${$t('状态')}: ${requestFailed.status}` }}</p>
+        <p class="font-bold text-[var(--bkms-neutral-2)] mb-[4px]">{{ $t('API 请求失败') }}:</p>
+        <p class="text-[var(--bkms-neutral-2)]">{{ `${$t('状态')}: ${requestFailed.status}` }}</p>
         <p>{{ `${JSON.stringify(requestFailed?.error || {}, null, 2)}` }}</p>
       </template>
     </Alert>
@@ -442,8 +444,7 @@
   import { DeployableAppType, useDeployAPIs } from '../../use-deploy';
 
   type InstanceExecuteAdminCmdResult =
-    | InstanceExecuteTafAdminCmdResultOutputObj
-    | InstanceExecuteTrpcAdminCmdResultOutputObj;
+    InstanceExecuteTafAdminCmdResultOutputObj | InstanceExecuteTrpcAdminCmdResultOutputObj;
 
   interface IProps {
     data: string[];
