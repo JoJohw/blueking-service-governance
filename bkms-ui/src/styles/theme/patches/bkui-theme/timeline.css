@@ -7,6 +7,7 @@
 }
 
 .bkms-themed .bk-timeline .bk-timeline-dot:before {
+  background: #fff; /* 原值保留（keep：#fff） */
   border: 2px solid var(--bkms-success-5); /* 原 #d8d8d8 */
 }
 

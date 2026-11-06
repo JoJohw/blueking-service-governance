@@ -1,0 +1,90 @@
+/* bkui Tab 字面量覆写 — 压制 lib/*.less 的字面量旧色（选择器逐字复刻 dist/style.css），由 gen-overrides.mjs 生成 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记 */
+
+.bkms-themed .bk-tab-header {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-tab--left .bk-tab-header {
+  border-right: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--right .bk-tab-header {
+  border-left: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--card-tab .bk-tab-header .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-square {
+  background-color: #fff; /* 原值保留（keep：#fff） */
+}
+
+.bkms-themed .bk-tab--card-tab .bk-tab-header .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
+  background-color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-tab--card .bk-tab-header,.bk-tab--vertical-card .bk-tab-header {
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--border-card .bk-tab-header {
+  border: solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--unborder-card .bk-tab-header {
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--card .bk-tab-header-nav,.bk-tab--border-card .bk-tab-header-nav,.bk-tab--vertical-card .bk-tab-header-nav {
+  border-left: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--card .bk-tab-header-item,.bk-tab--vertical-card .bk-tab-header-item {
+  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--card .bk-tab-header-item,.bk-tab--border-card .bk-tab-header-item,.bk-tab--vertical-card .bk-tab-header-item {
+  border-right: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab-header-item .bk-tab-header--has-num-right {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-default,.bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-bracket {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-tab-header-item:hover {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-tab-header-item:hover .bk-tab-header--close {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-tab-header--active {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-tab--card .bk-tab-header--active,.bk-tab--border-card .bk-tab-header--active,.bk-tab--vertical-card .bk-tab-header--active {
+  background: #fff; /* 原值保留（keep：#fff） */
+  border-bottom-color: #fff; /* 原值保留（keep：#fff） */
+}
+
+.bkms-themed .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-bracket,.bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,.bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-tab-header--close {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tab-header-active-bar {
+  background: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-tab--border-card .bk-tab-content,.bk-tab--vertical-card .bk-tab-content {
+  border: solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+

@@ -3,6 +3,7 @@
 /* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
 
 .bkms-themed .bk-transfer .source-list .content li.custom-item:hover:not(.is-disabled),.bk-transfer .target-list .content li.custom-item:hover:not(.is-disabled),.bk-transfer .source-list .content li .item-content:hover:not(.is-disabled),.bk-transfer .target-list .content li .item-content:hover:not(.is-disabled),.bk-transfer .source-list .content .checkbox-item:hover:not(.is-disabled),.bk-transfer .target-list .content .checkbox-item:hover:not(.is-disabled) {
+  color: var(--primary-color); /* 原值保留 */
   background-color: var(--bkms-brand-6); /* 原 #e1ecff */
 }
 

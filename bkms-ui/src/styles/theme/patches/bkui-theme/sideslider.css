@@ -16,7 +16,13 @@
 }
 
 .bkms-themed .bk-sideslider-header {
+  background: #fff; /* 原值保留（keep：#fff） */
   border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-sideslider-close {
+  color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--primary-color); /* 原值保留 */
 }
 
 .bkms-themed .bk-sideslider-title {
@@ -25,6 +31,8 @@
 
 .bkms-themed .bk-sideslider-resize-trigger:after {
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  background: currentcolor; /* 原值保留 */
+  box-shadow: 0 4px 0 0 currentcolor,0 8px 0 0 currentcolor,0 -4px 0 0 currentcolor,0 -8px 0 0 currentcolor; /* 原值保留 */
 }
 
 .bkms-themed .bk-sideslider-resize-trigger:hover:after {

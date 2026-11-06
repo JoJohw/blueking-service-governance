@@ -3,6 +3,7 @@
 /* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
 
 .bkms-themed .bk-select.is-focus:not(.is-disabled).normal .bk-select-trigger .bk-select-tag {
+  border-color: var(--primary-color); /* 原值保留 */
   box-shadow: 0 0 3px var(--bkms-brand-4); /* 原 #a3c5fd */
 }
 
@@ -37,6 +38,7 @@
 
 .bkms-themed .bk-select--prefix-area {
   color: var(--bkms-neutral-2); /* 原 #63656e */
+  background-color: var(--select-hover-color); /* 原值保留 */
   border-right: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 

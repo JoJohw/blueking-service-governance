@@ -25,7 +25,11 @@ import stylelintConfig from '@blueking/bkui-lint/stylelint.mjs';
 const patchesOverride = {
   overrides: [
     {
-      files: ['src/styles/theme/patches/bkui-theme/**/*.css', 'src/styles/theme/patches/bkms/**/*.css'],
+      files: [
+        'src/styles/theme/patches/bkui-theme/**/*.css',
+        'src/styles/theme/patches/bkui-theme-literal/**/*.css',
+        'src/styles/theme/patches/bkms/**/*.css',
+      ],
       rules: {
         'no-descending-specificity': null,
         'selector-class-pattern': null,

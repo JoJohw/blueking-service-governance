@@ -1,0 +1,96 @@
+/* bkui SearchSelect 字面量覆写 — 压制 lib/*.less 的字面量旧色（选择器逐字复刻 dist/style.css），由 gen-overrides.mjs 生成 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记 */
+
+.bkms-themed .bk-search-select-container {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-search-select-container .search-container-selected:hover .selected-clear {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-search-select-container .search-container-input {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-search-select-container .search-container-input .input-before:after {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-container .search-container-input .input-after:after {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-container .search-container .selected-input {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-search-select-container .search-nextfix {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-container .search-nextfix .search-clear {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-tips {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-search-select-menu {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-search-select-menu .menu-disabled-mixin {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-menu .menu-header {
+  border-bottom: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-menu .menu-header-item.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item .is-keyword {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item.is-hover .menu-name {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item.is-disabled .menu-name {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item .menu-name {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-search-select-menu .menu-footer {
+  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-search-select-menu .menu-footer-btn:first-child {
+  border-right: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-search-select-menu .menu-footer-btn:hover {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-search-select-menu .menu-footer-btn.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+

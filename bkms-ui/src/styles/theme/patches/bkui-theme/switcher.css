@@ -2,7 +2,20 @@
 
 /* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
 
+.bkms-themed .bk-switcher:after {
+  background: var(--switch-default-color); /* 原值保留 */
+  background-color: #fff; /* 原值保留（keep：#fff） */
+}
+
+.bkms-themed .bk-switcher .switcher-text {
+  color: #fff; /* 原值保留（keep：#fff） */
+}
+
 .bkms-themed .bk-switcher .animating-node {
   box-shadow: 0 0 var(--bkms-brand-2); /* 原 #1890ff */
+}
+
+.bkms-themed .bk-switcher.bk-switcher-outline .bk-switcher-loading svg {
+  color: #fff; /* 原值保留（keep：#fff） */
 }
 

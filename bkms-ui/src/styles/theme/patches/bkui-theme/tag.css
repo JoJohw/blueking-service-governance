@@ -3,6 +3,7 @@
 /* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
 
 .bkms-themed .bk-tag {
+  color: var(--default-color); /* 原值保留 */
   background-color: var(--bkms-neutral-6); /* 原 #f0f1f5 */
   border-color: color-mix(in srgb, var(--bkms-neutral-3) 30%, transparent); /* 原 #979ba54d */
 }
@@ -26,6 +27,7 @@
 }
 
 .bkms-themed .bk-tag.bk-tag-info {
+  color: var(--primary-color); /* 原值保留 */
   border-color: color-mix(in srgb, var(--bkms-brand-2) 30%, transparent); /* 原 #3a84ff4d */
   background-color: var(--bkms-brand-7); /* 原 #edf4ff */
 }
@@ -61,6 +63,7 @@
 }
 
 .bkms-themed .bk-tag.bk-tag-danger {
+  color: var(--danger-color); /* 原值保留 */
   border-color: color-mix(in srgb, var(--bkms-danger-2) 30%, transparent); /* 原 #ea35364d */
   background-color: var(--bkms-danger-6); /* 原 #feebea */
 }
@@ -82,6 +85,7 @@
 }
 
 .bkms-themed .bk-tag.bk-tag-filled {
+  color: #fff; /* 原值保留（keep：#fff） */
   background-color: var(--bkms-neutral-3); /* 原 #979ba5 */
 }
 
@@ -91,5 +95,15 @@
 
 .bkms-themed .bk-tag.bk-tag-checkable:hover {
   background: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+}
+
+.bkms-themed .bk-tag.bk-tag-check {
+  color: #fff; /* 原值保留（keep：#fff） */
+  background: var(--primary-color); /* 原值保留 */
+}
+
+.bkms-themed .bk-tag.bk-tag-check:hover {
+  color: #fff; /* 原值保留（keep：#fff） */
+  background: var(--primary-color); /* 原值保留 */
 }
 

@@ -17,8 +17,8 @@ theme-codemod/
 
 | 脚本 | npm | 作用 |
 | --- | --- | --- |
-| `scripts/gen-overrides.mjs` | `theme:gen` | 从 bkui dist css 抽取写死 hex 的声明，按"选择器+prop"生成 `src/styles/theme/patches/bkui-theme/` 覆写 + `index.css` + 摘要/占位台账 |
-| `scripts/check-overrides.mjs` | `theme:check` | 漂移自检：校验每条覆写的选择器仍在 bkui dist 且原 hex 仍在，失效即 exit 1。**库升级后必跑** |
+| `scripts/gen-overrides.mjs` | `theme:gen` | 双源扫描 bkui dist（style.variable.css 变量版 + style.css 字面量版），生成 `patches/bkui-theme/`（变量版覆写）与 `patches/bkui-theme-literal/`（压制 lib/*.less 字面量旧色）+ `index.css` + 摘要/占位台账 |
+| `scripts/check-overrides.mjs` | `theme:check` | 漂移自检：变量版对 style.variable.css、字面量版对 style.css，校验选择器与原 hex 仍在，失效即 exit 1。**库升级后必跑** |
 | `scripts/stats-usage.mjs` | `theme:usage` | 组件使用统计 → `reports/usage.json`（生成器白名单基线）+ `reports/usage-report.md` |
 | `scripts/codemod.mjs` | — | 业务侧 hex → `var(--bkms-*)`（Step 5 用：`scan` 只报告 / `apply [dir]` 写回） |
 | `scripts/extract-root-vars.mjs` | — | 一次性：提取 bkui `:root` 变量清单（Step 0 盘点用，已完成使命） |
@@ -41,7 +41,8 @@ theme:usage（组件白名单基线） → theme:gen（生成覆写） → 人�
 
 ## 纪律
 
-- `patches/bkui-theme/` 由生成器管理，**重跑整体覆盖**；`patches/bkms/` 为手写业务补丁，生成器只读取并追加进 `index.css` import 清单，**绝不写入**。
+- `patches/bkui-theme/`（变量版）与 `patches/bkui-theme-literal/`（字面量版）由生成器管理，**重跑整体覆盖**；`patches/bkms/` 为手写业务补丁，生成器只读取并追加进 `index.css` import 清单，**绝不写入**。
+- 字面量版存在的原因：dev 下 bkui 组件入口（`lib/<comp>/index.js`）按需加载 `.less`（字面量色），部分选择器比变量版更具体（如 `.bk-button.bk-button-primary`），同 specificity 下后加载的 less 会赢——字面量覆写复刻 less 的选择器并加 `.bkms-themed` 前缀（+1 specificity）压制。
 - 覆写文件内禁止裸 hex，原值只准进行尾注释（供 review 与漂移自检比对）。
 - 设计拍板流程：确认值写入 `data/mapping.json` → `theme:gen` → `theme:check`，占位自动换成 token。
 - `--bkms-*` 色阶只在 `tokens/colors.css` 定义，业务代码禁止新写 hex（stylelint `color-no-hex` 落地后自动管控）。

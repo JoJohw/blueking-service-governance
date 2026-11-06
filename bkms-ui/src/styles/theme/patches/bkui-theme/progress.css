@@ -6,3 +6,7 @@
   background: var(--bkms-neutral-6); /* 原 #f0f1f5 */
 }
 
+.bkms-themed .bk-progress .inner-text {
+  color: #fff; /* 原值保留（keep：#fff） */
+}
+

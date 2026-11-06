@@ -2,6 +2,13 @@
 
 /* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
 
+.bkms-themed .bk-steps .icon-circle-4-1 {
+  border: 2px solid #fff; /* 原值保留（keep：#fff） */
+  border-right: 0; /* 原值保留 */
+  border-bottom: 0; /* 原值保留 */
+  border-left: 0; /* 原值保留 */
+}
+
 .bkms-themed .bk-steps .bk-step.is-disabled .bk-step-indicator {
   color: var(--bkms-neutral-5); /* 原 #dcdee5 */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
@@ -13,6 +20,7 @@
 
 .bkms-themed .bk-steps .bk-step .bk-step-indicator {
   color: var(--bkms-neutral-3); /* 原 #979ba5 */
+  background-color: #fff; /* 原值保留（keep：#fff） */
   border: 1px solid var(--bkms-neutral-3); /* 原 #979ba5 */
 }
 
@@ -26,5 +34,29 @@
 
 .bkms-themed .bk-steps .bk-step.done .bk-step-description {
   color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-steps-primary .bk-step.current .bk-step-number,.bk-steps-primary .bk-step.current .bk-step-icon,.bk-steps-primary .bk-step.current .bk-step-text {
+  color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--primary-color); /* 原值保留 */
+  border-color: var(--primary-color); /* 原值保留 */
+}
+
+.bkms-themed .bk-steps-warning .bk-step.current .bk-step-number,.bk-steps-warning .bk-step.current .bk-step-icon,.bk-steps-warning .bk-step.current .bk-step-text {
+  color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--warning-color); /* 原值保留 */
+  border-color: var(--warning-color); /* 原值保留 */
+}
+
+.bkms-themed .bk-steps-success .bk-step.current .bk-step-number,.bk-steps-success .bk-step.current .bk-step-icon,.bk-steps-success .bk-step.current .bk-step-text {
+  color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--success-color); /* 原值保留 */
+  border-color: var(--success-color); /* 原值保留 */
+}
+
+.bkms-themed .bk-steps-danger .bk-step.current .bk-step-number,.bk-steps-danger .bk-step.current .bk-step-icon,.bk-steps-danger .bk-step.current .bk-step-text {
+  color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--danger-color); /* 原值保留 */
+  border-color: var(--danger-color); /* 原值保留 */
 }
 

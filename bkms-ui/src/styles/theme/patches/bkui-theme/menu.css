@@ -15,6 +15,7 @@
 }
 
 .bkms-themed .bk-menu-item:hover {
+  color: var(--menu-active-color); /* 原值保留 */
   background-color: var(--bkms-navy-2); /* 原 #31394f */
 }
 

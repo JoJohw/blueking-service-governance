@@ -1,4 +1,4 @@
-/* 主题层统一入口 — bkui-theme 清单由 gen-overrides.mjs 生成，重跑会整体覆盖本文件；patches/bkms 段为手工维护 */
+/* 主题层统一入口 — bkui-theme/bkui-theme-literal 清单由 gen-overrides.mjs 生成，重跑会整体覆盖本文件；patches/bkms 段为手工维护 */
 @import './tokens/colors.css';
 @import './tokens/semantic.css';
 @import './patches/bkui-theme/alert.css';
@@ -32,5 +32,32 @@
 @import './patches/bkui-theme/transfer.css';
 @import './patches/bkui-theme/tree.css';
 @import './patches/bkui-theme/upload.css';
+@import './patches/bkui-theme-literal/button.css';
+@import './patches/bkui-theme-literal/card.css';
+@import './patches/bkui-theme-literal/checkbox.css';
+@import './patches/bkui-theme-literal/date-picker.css';
+@import './patches/bkui-theme-literal/dialog.css';
+@import './patches/bkui-theme-literal/divider.css';
+@import './patches/bkui-theme-literal/infobox.css';
+@import './patches/bkui-theme-literal/input.css';
+@import './patches/bkui-theme-literal/link.css';
+@import './patches/bkui-theme-literal/loading.css';
+@import './patches/bkui-theme-literal/menu.css';
+@import './patches/bkui-theme-literal/message.css';
+@import './patches/bkui-theme-literal/navigation.css';
+@import './patches/bkui-theme-literal/popover.css';
+@import './patches/bkui-theme-literal/progress.css';
+@import './patches/bkui-theme-literal/radio.css';
+@import './patches/bkui-theme-literal/search-select.css';
+@import './patches/bkui-theme-literal/select.css';
+@import './patches/bkui-theme-literal/steps.css';
+@import './patches/bkui-theme-literal/switcher.css';
+@import './patches/bkui-theme-literal/tab.css';
+@import './patches/bkui-theme-literal/tag-input.css';
+@import './patches/bkui-theme-literal/timeline.css';
+@import './patches/bkui-theme-literal/transfer.css';
+@import './patches/bkui-theme-literal/upload.css';
 @import './patches/bkms/feedback.css';
+@import './patches/bkms/form.css';
+@import './patches/bkms/navigation.css';
 @import './patches/bkms/table.css';

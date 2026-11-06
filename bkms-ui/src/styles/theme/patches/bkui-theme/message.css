@@ -26,6 +26,10 @@
   color: var(--bkms-neutral-3); /* 原 #979ba5 */
 }
 
+.bkms-themed .bk-message-content.multi .message-detail .message-tree {
+  background: #fff; /* 原值保留（keep：#fff） */
+}
+
 .bkms-themed .bk-message-content.multi .message-detail .message-tree .message-row {
   color: var(--bkms-neutral-1); /* 原 #313238 */
 }
@@ -53,11 +57,13 @@
 
 .bkms-themed .bk-message-content.multi .message-detail .copy-status .inner {
   color: var(--bkms-neutral-2); /* 原 #63656e */
+  background: #fff; /* 原值保留（keep：#fff） */
   border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
   box-shadow: 0 2px 6px color-mix(in srgb, var(--bkms-neutral-1) 10%, transparent); /* 原 #0000001a */
 }
 
 .bkms-themed .bk-message-content.multi .message-detail .copy-status .inner:after {
+  background: #fff; /* 原值保留（keep：#fff） */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
   box-shadow: 5px 3px 6px color-mix(in srgb, var(--bkms-neutral-1) 10%, transparent); /* 原 #0000001a */
 }

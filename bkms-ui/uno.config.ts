@@ -47,17 +47,33 @@ import {
  * 2. 模板内任意值 `text-[var(--bkms-neutral-2)]` 合法但不推荐：拼错变量名会静默生成死规则。
  * 3. 半透明：纯 var() token 不支持 `/50` alpha 修饰符，用 `color-mix(in srgb, var(--bkms-brand-2) 25%, transparent)`。
  */
-const THEME_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src/styles/theme/tokens');
+/**
+ * 解析令牌目录。不能用 import.meta.url 单独定位：uno 的配置加载器（unconfig）会把本文件
+ * 打包到临时目录再执行，此时 import.meta.url 指向临时位置，相对路径会解析失败导致整个
+ * 令牌注册静默丢失（dev 下 uno 回退默认配置）。因此 cwd 优先、import.meta.url 兜底，
+ * 以 colors.css 实际存在为准。
+ */
+function resolveThemeDir() {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const candidates = [path.resolve(process.cwd(), 'src/styles/theme/tokens'), path.resolve(here, 'src/styles/theme/tokens')];
+  for (const dir of candidates) {
+    if (fs.existsSync(path.join(dir, 'colors.css'))) return dir;
+  }
+  throw new Error(`[uno] 令牌目录未找到，已尝试：${candidates.join(' , ')}`);
+}
+const THEME_DIR = resolveThemeDir();
 
-// 色阶：colors.css → theme.colors.bkms，类名形如 text-bkms-brand-2 / bg-bkms-cyan-6
+// 色阶：colors.css → theme.colors，类名形如 text-bkms-brand-2 / bg-bkms-cyan-6
+// 注意必须扁平注册（key = 'bkms-brand-6' 整体）：unocss 按 '-' 切段逐层查 theme，
+// 嵌套结构 { bkms: { 'brand-6' } } 会把 bkms-brand-6 拆成 bkms/brand/6 三段而查不到（实测验证）
 function parseScaleColors() {
   const tokens: Record<string, string> = {};
   const SCALE_RE = /--bkms-([a-z-]+)-(\d+)\s*:/g;
   for (const m of fs.readFileSync(path.join(THEME_DIR, 'colors.css'), 'utf8').matchAll(SCALE_RE)) {
     const [, family, step] = m;
-    tokens[`${family}-${step}`] = `var(--bkms-${family}-${step})`;
+    tokens[`bkms-${family}-${step}`] = `var(--bkms-${family}-${step})`;
   }
-  return { bkms: tokens };
+  return tokens;
 }
 
 // 语义变量：semantic.css → shortcuts 别名（text-title/bg-card 等），line 是边框色需映射为 border 前缀

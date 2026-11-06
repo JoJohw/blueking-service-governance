@@ -3,6 +3,7 @@
 /* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
 
 .bkms-themed .bk-modal-body {
+  background: #fff; /* 原值保留（keep：#fff） */
   box-shadow: 0 4px 12px color-mix(in srgb, var(--bkms-neutral-1) 15%, transparent); /* 原 #00000026 */
 }
 

@@ -6,12 +6,28 @@
   color: var(--bkms-neutral-2); /* 原 #63656e */
 }
 
+.bkms-themed .bk-checkbox.is-checked.is-outline .bk-checkbox-input {
+  background: #fff; /* 原值保留（keep：#fff） */
+}
+
+.bkms-themed .bk-checkbox.is-checked .bk-checkbox-input:after {
+  border: 2px solid #fff; /* 原值保留（keep：#fff） */
+  border-top: 0; /* 原值保留 */
+  border-left: 0; /* 原值保留 */
+}
+
+.bkms-themed .bk-checkbox.is-indeterminated .bk-checkbox-input:after {
+  background: #fff; /* 原值保留（keep：#fff） */
+  border: none; /* 原值保留 */
+}
+
 .bkms-themed .bk-checkbox.is-disabled {
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-checkbox.is-disabled .bk-checkbox-input {
   background: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-color: var(--disable-color); /* 原值保留 */
 }
 
 .bkms-themed .bk-checkbox-input {

@@ -26,3 +26,7 @@
   border-color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
+.bkms-themed .bk-pagination-limit-select .bk-input.is-focused .bk-input--text {
+  background-color: #fff; /* 原值保留（keep：#fff） */
+}
+

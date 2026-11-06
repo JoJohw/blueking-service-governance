@@ -29,6 +29,7 @@
 }
 
 .bkms-themed .bk-navigation-wrapper .navigation-container .container-header {
+  background: #fff; /* 原值保留（keep：#fff） */
   border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
   box-shadow: 0 3px 4px color-mix(in srgb, var(--bkms-brand-3) 6%, transparent); /* 原 #4070cb0f */
 }

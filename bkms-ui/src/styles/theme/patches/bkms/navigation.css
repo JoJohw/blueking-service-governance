@@ -1,0 +1,4 @@
+/* bkui 补丁 - navigation 域：仅布局/尺寸修正；颜色归 tokens/bridge/编译替换，不在此出现 */
+.bk-navigation-wrapper .navigation-container .container-content {
+  padding: 0 !important;
+}

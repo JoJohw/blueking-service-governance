@@ -4,6 +4,7 @@
 
 .bkms-themed .bk-alert {
   color: var(--bkms-neutral-2); /* 原 #63656e */
+  border: var(--border-width-base) var(--border-style-base); /* 原值保留 */
 }
 
 .bkms-themed .bk-alert-info {

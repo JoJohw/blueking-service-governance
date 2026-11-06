@@ -1,0 +1,18 @@
+/* bkui 补丁 - form 域：表单及通用控件（tab/button/textarea/search-select）的尺寸修正；
+ * 颜色归 tokens/bridge/编译替换，不在此出现。 */
+.bk-tab-content {
+  padding: 18px 24px !important;
+}
+
+.bk-button:not(.is-text, .bk-button-small) {
+  min-width: 88px;
+}
+
+.bk-textarea {
+  min-height: 50px;
+}
+
+/* SearchSelect 选中项过多时容器空间不足不换行 */
+.bk-search-select-container .search-container-input {
+  min-width: fit-content;
+}

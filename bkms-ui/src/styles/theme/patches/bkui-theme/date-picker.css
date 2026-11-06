@@ -3,6 +3,8 @@
 /* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
 
 .bkms-themed .bk-date-picker-dropdown {
+  background-color: var(--date-picker-dropdown-bg); /* 原值保留 */
+  border: 1px solid var(--disable-color); /* 原值保留 */
   box-shadow: 0 3px 10px color-mix(in srgb, var(--bkms-neutral-1) 10%, transparent); /* 原 #0000001a */
 }
 
@@ -113,9 +115,11 @@
 
 .bkms-themed .bk-date-picker-cells-cell-range:before {
   background: var(--bkms-brand-6); /* 原 #e1ecff */
+  border: 0; /* 原值保留 */
 }
 
 .bkms-themed .bk-date-picker-cells-cell-selected em,.bk-date-picker-cells-cell-selected:hover em {
+  color: #fff; /* 原值保留（keep：#fff） */
   background-color: var(--bkms-brand-2); /* 原 #3a84ff */
   box-shadow: 0 0 0 1px var(--bkms-brand-2) inset; /* 原 #3a84ff */
 }
@@ -123,6 +127,10 @@
 .bkms-themed span.bk-date-picker-cells-cell-disabled.bk-date-picker-cells-cell-selected em {
   color: var(--bkms-neutral-8); /* 原 #f7f7f7 */
   background: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em:after {
+  background: #fff; /* 原值保留（keep：#fff） */
 }
 
 .bkms-themed .bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em,.bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em:hover {

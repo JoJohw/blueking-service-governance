@@ -19,3 +19,7 @@
   border-bottom: 1px solid var(--bkms-neutral-7); /* 原 #f0f2f5 */
 }
 
+.bkms-themed .bk-card-border-none {
+  border: none; /* 原值保留 */
+}
+

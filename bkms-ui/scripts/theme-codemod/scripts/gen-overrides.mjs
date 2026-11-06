@@ -25,6 +25,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../../..');
 const DIST = path.join(ROOT, 'node_modules/bkui-vue/dist');
 const PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme');
+const LITERAL_PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme-literal');
 const MANUAL_PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkms');
 const REPORTS = path.join(__dirname, '../reports');
 
@@ -52,8 +53,11 @@ const PREFIX_ALIAS = {
   'date-picker': ['date-picker', 'picker-panel', 'picker-confirm'], // 面板类 .bk-picker-panel-*
 };
 
-/** 只解析实际被加载的产物（style.css 为非变量版，项目未引用） */
+/** 两个产物源：变量版 = 项目引入的 style.variable.css；字面量版 = dist/style.css（lib/*.less 的编译合体，
+ * dev 下组件入口 lib/<comp>/index.js 按需加载 .less，选择器与变量版不完全一致（如 .bk-button.bk-button-primary），
+ * 同 specificity 下后加载的字面量版会赢——必须单独生成覆写压制（patches/bkui-theme-literal/） */
 const DIST_FILES = ['style.variable.css'];
+const LITERAL_DIST_FILE = 'style.css';
 
 const HEX_TOKEN_RE = /#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b/g;
 
@@ -128,7 +132,12 @@ function rewriteValue(rawValue) {
   if (tokens.length === 0) return null;
   const kinds = tokens.map(classifyHex);
   const pendingHexes = kinds.filter(k => k.kind === 'pending').map(k => k.base6);
-  if (kinds.every(k => k.kind === 'keep')) return null;
+  if (kinds.every(k => k.kind === 'keep')) {
+    // keep 声明也原值生成：值不变，但抬升 specificity 保护级联层级
+    // （否则基类覆写 color:var(--bkms-*) 会以同级/更高优先级压过变体规则的白字，如 bk-button-primary）
+    const rawHexes = [...rawValue.matchAll(HEX_TOKEN_RE)].map(x => x[0]).join(' ');
+    return { value: rawValue.trim(), comment: `原值保留（keep：${rawHexes}）`, pendingHexes: [] };
+  }
   if (pendingHexes.length > 0) {
     return { value: rawValue.trim(), comment: `pending: 待设计确认（原值）`, pendingHexes };
   }
@@ -154,63 +163,104 @@ function rewriteValue(rawValue) {
   return { value: out.trim(), comment, pendingHexes: [] };
 }
 
-// ---------- 1. 扫描 dist ----------
-const rawRules = [];
-for (const f of DIST_FILES) {
-  collectBlocks(fs.readFileSync(path.join(DIST, f), 'utf8'), null, rawRules);
-}
-
-// ---------- 2. 归属 + 声明重写 ----------
+// ---------- 1+2. 扫描 dist（双源）+ 归属 + 声明重写 ----------
 // patches[kebab] = Map(key => { selector, media, decls: Map(prop -> {value, comment}) })
-const patches = new Map();
+const patches = new Map(); // 变量版源
+const literalPatches = new Map(); // 字面量版源
 const unassigned = [];
 const unknownHexes = new Map(); // 未归属规则中的 hex -> selectors
 const rulePending = new Map(); // 覆写规则内按原值占位的 hex -> selectors（不在任何清单）
 let scannedDecls = 0;
+let literalUnassigned = 0;
 
-for (const rule of rawRules) {
-  const owner = findOwner(rule.selector);
-  const decls = [];
-  for (const piece of rule.body.split(';')) {
-    const idx = piece.indexOf(':');
-    if (idx === -1) continue;
-    const prop = piece.slice(0, idx).trim();
-    const value = piece.slice(idx + 1).trim();
-    if (!prop || prop.startsWith('--')) continue; // 变量定义归 bridge
-    if (!/#?[0-9a-fA-F]{3,8}\b/.test(value) || !value.includes('#')) continue;
-    scannedDecls++;
-    decls.push({ prop, value });
-  }
-  if (decls.length === 0) continue;
-  if (!owner) {
-    unassigned.push(rule);
-    for (const d of decls) {
-      for (const m of d.value.matchAll(HEX_TOKEN_RE)) {
-        const h = normalizeHex(m[0]);
-        const base = h.slice(0, 6);
-        if (!KEEP_KEYS.has(base) && !MAPPING[base] && !PENDING_KEYS.has(base)) {
-          if (!unknownHexes.has(base)) unknownHexes.set(base, new Set());
-          unknownHexes.get(base).add(rule.selector);
+/** 色彩类属性：规则被覆写时，同规则内的这些声明需一并原值生成（含 transparent/var 等），保住原级联层级 */
+const COLOR_PROPS = new Set([
+  'color',
+  'background',
+  'background-color',
+  'background-image',
+  'border',
+  'border-color',
+  'border-top',
+  'border-right',
+  'border-bottom',
+  'border-left',
+  'border-top-color',
+  'border-right-color',
+  'border-bottom-color',
+  'border-left-color',
+  'outline',
+  'outline-color',
+  'box-shadow',
+  'text-decoration',
+  'text-decoration-color',
+  'fill',
+  'stroke',
+  'caret-color',
+  'column-rule',
+]);
+
+function scanDist(file, patchesMap, trackUnassigned) {
+  const rawRules = [];
+  collectBlocks(fs.readFileSync(path.join(DIST, file), 'utf8'), null, rawRules);
+  for (const rule of rawRules) {
+    const owner = findOwner(rule.selector);
+    // 单趟解析保持原始声明顺序（shorthand/longhand 混排时顺序参与级联，不可重排）
+    const decls = [];
+    let hasHexDecl = false;
+    for (const piece of rule.body.split(';')) {
+      const idx = piece.indexOf(':');
+      if (idx === -1) continue;
+      const prop = piece.slice(0, idx).trim();
+      const value = piece.slice(idx + 1).trim();
+      if (!prop || prop.startsWith('--')) continue; // 变量定义归 bridge
+      const hasHex = value.includes('#') && /#[0-9a-fA-F]{3,8}\b/.test(value);
+      if (hasHex) hasHexDecl = true;
+      // 无 hex 的色彩类声明：原值生成（transparent/var/keep 等），
+      // 否则基类覆写（+1 specificity）会压过库内变体规则的原级联（如 primary.is-text 的 transparent 库）
+      decls.push({ prop, value, hasHex, raw: !hasHex && COLOR_PROPS.has(prop) });
+    }
+    if (!hasHexDecl) continue;
+    const effective = decls.filter(d => d.hasHex || d.raw);
+    if (!owner) {
+      if (!trackUnassigned) {
+        literalUnassigned++;
+        continue;
+      }
+      scannedDecls += effective.length;
+      unassigned.push(rule);
+      for (const d of effective) {
+        for (const m of d.value.matchAll(HEX_TOKEN_RE)) {
+          const h = normalizeHex(m[0]);
+          const base = h.slice(0, 6);
+          if (!KEEP_KEYS.has(base) && !MAPPING[base] && !PENDING_KEYS.has(base)) {
+            if (!unknownHexes.has(base)) unknownHexes.set(base, new Set());
+            unknownHexes.get(base).add(rule.selector);
+          }
         }
       }
+      continue;
     }
-    continue;
-  }
-  if (!patches.has(owner)) patches.set(owner, new Map());
-  const bucket = patches.get(owner);
-  const key = `${rule.media ?? ''}::${rule.selector}`;
-  if (!bucket.has(key)) bucket.set(key, { selector: rule.selector, media: rule.media, decls: new Map() });
-  const entry = bucket.get(key);
-  for (const d of decls) {
-    const r = rewriteValue(d.value);
-    if (!r) continue;
-    entry.decls.set(d.prop, r); // 后出现的同名 prop 覆盖（与级联一致）
-    for (const h of r.pendingHexes) {
-      if (!rulePending.has(h)) rulePending.set(h, new Set());
-      rulePending.get(h).add(rule.selector);
+    if (!patchesMap.has(owner)) patchesMap.set(owner, new Map());
+    const bucket = patchesMap.get(owner);
+    const key = `${rule.media ?? ''}::${rule.selector}`;
+    if (!bucket.has(key)) bucket.set(key, { selector: rule.selector, media: rule.media, decls: new Map() });
+    const entry = bucket.get(key);
+    for (const d of effective) {
+      scannedDecls++;
+      const r = d.raw ? { value: d.value, comment: '原值保留', pendingHexes: [] } : rewriteValue(d.value);
+      if (!r) continue;
+      entry.decls.set(d.prop, r); // 后出现的同名 prop 覆盖（与级联一致）
+      for (const h of r.pendingHexes) {
+        if (!rulePending.has(h)) rulePending.set(h, new Set());
+        rulePending.get(h).add(rule.selector);
+      }
     }
   }
 }
+
+for (const f of DIST_FILES) scanDist(f, patches, true);
+scanDist(LITERAL_DIST_FILE, literalPatches, false);
 
 // ---------- 3. 输出 patches + index.css ----------
 fs.rmSync(PATCHES_DIR, { recursive: true, force: true });
@@ -257,7 +307,50 @@ for (const [kebab, bucket] of [...patches.entries()].sort((a, b) => a[0].localeC
   }
 }
 
-// index.css 统一入口：令牌在前、bkui-theme 覆写居中、手写业务 patches 兜底在后
+// 字面量版输出：剔除变量版已覆盖的（media::selector::prop 同键取一，两源同规则无需重复覆写）
+fs.rmSync(LITERAL_PATCHES_DIR, { recursive: true, force: true });
+fs.mkdirSync(LITERAL_PATCHES_DIR, { recursive: true });
+
+let literalRules = 0;
+let literalDecls = 0;
+const literalPerComponent = [];
+
+for (const [kebab, bucket] of [...literalPatches.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+  const name = COMPONENT_NAME.get(kebab) ?? kebab;
+  const varBucket = patches.get(kebab);
+  const lines = [
+    `/* bkui ${name} 字面量覆写 — 压制 lib/*.less 的字面量旧色（选择器逐字复刻 dist/style.css），由 gen-overrides.mjs 生成 */`,
+    '',
+    `/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记 */`,
+    '',
+  ];
+  let ruleCount = 0;
+  for (const { selector, media, decls } of bucket.values()) {
+    const varEntry = varBucket?.get(`${media ?? ''}::${selector}`);
+    const fresh = [...decls].filter(([prop]) => !varEntry?.decls.has(prop));
+    if (fresh.length === 0) continue;
+    const pad = media ? '  ' : '';
+    if (media) lines.push(`${media} {`);
+    lines.push(`${pad}.bkms-themed ${selector} {`);
+    for (const [prop, r] of fresh) {
+      lines.push(`${pad}  ${prop}: ${r.value}; /* ${r.comment} */`);
+      literalDecls++;
+    }
+    lines.push(`${pad}}`);
+    if (media) lines.push(`}`);
+    lines.push('');
+    ruleCount++;
+  }
+  if (ruleCount > 0) {
+    fs.writeFileSync(path.join(LITERAL_PATCHES_DIR, `${kebab}.css`), `${lines.join('\n')}\n`);
+    literalRules += ruleCount;
+    literalPerComponent.push({ kebab, name, rules: ruleCount });
+  } else {
+    fs.rmSync(path.join(LITERAL_PATCHES_DIR, `${kebab}.css`), { force: true });
+  }
+}
+
+// index.css 统一入口：令牌在前、变量版覆写 → 字面量版覆写 → 手写业务 patches 兜底在后
 // （patches/bkms/ 为手工维护目录，生成器只读取现有 *.css 追加 import，不写入）
 const manualPatches = fs.existsSync(MANUAL_PATCHES_DIR)
   ? fs
@@ -266,10 +359,11 @@ const manualPatches = fs.existsSync(MANUAL_PATCHES_DIR)
       .sort()
   : [];
 const indexLines = [
-  '/* 主题层统一入口 — bkui-theme 清单由 gen-overrides.mjs 生成，重跑会整体覆盖本文件；patches/bkms 段为手工维护 */',
+  '/* 主题层统一入口 — bkui-theme/bkui-theme-literal 清单由 gen-overrides.mjs 生成，重跑会整体覆盖本文件；patches/bkms 段为手工维护 */',
   "@import './tokens/colors.css';",
   "@import './tokens/semantic.css';",
   ...perComponent.map(p => `@import './patches/bkui-theme/${p.kebab}.css';`),
+  ...literalPerComponent.map(p => `@import './patches/bkui-theme-literal/${p.kebab}.css';`),
   ...manualPatches.map(f => `@import './patches/bkms/${f}';`),
   '',
 ];
@@ -284,6 +378,7 @@ const summary = [
   `- 生成时间：${new Date().toISOString()}`,
   `- dist 数据源：${DIST_FILES.join(', ')}`,
   `- 扫描含 hex 声明：${scannedDecls}；归属组件：${perComponent.length} 个；生成覆写规则：${emittedRules} 条 / ${emittedDecls} 声明`,
+  `- 字面量源（dist/style.css）：${literalRules} 条 / ${literalDecls} 声明（bkui-theme-literal/，${literalPerComponent.length} 个组件；未归属 ${literalUnassigned} 条不计入台账）`,
   `- 未归属规则（选择器无白名单组件前缀）：${unassigned.length} 条`,
   `- 未收录 hex（不在 mapping/keep/pending 任一清单）：${unknownHexes.size} 种`,
   '',

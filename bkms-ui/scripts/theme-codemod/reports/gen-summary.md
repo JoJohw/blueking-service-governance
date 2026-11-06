@@ -1,8 +1,9 @@
 # gen-overrides 生成摘要
 
-- 生成时间：2026-11-06T04:39:47.757Z
+- 生成时间：2026-11-06T06:36:12.925Z
 - dist 数据源：style.variable.css
-- 扫描含 hex 声明：613；归属组件：31 个；生成覆写规则：270 条 / 325 声明
+- 扫描含 hex 声明：1680；归属组件：31 个；生成覆写规则：305 条 / 438 声明
+- 字面量源（dist/style.css）：348 条 / 540 声明（bkui-theme-literal/，25 个组件；未归属 341 条不计入台账）
 - 未归属规则（选择器无白名单组件前缀）：176 条
 - 未收录 hex（不在 mapping/keep/pending 任一清单）：30 种
 
@@ -10,37 +11,37 @@
 
 | 文件 | 组件 | 规则数 | 声明数 |
 | --- | --- | --- | --- |
-| patches/bkui-theme/alert.css | Alert | 13 | 18 |
-| patches/bkui-theme/card.css | Card | 4 | 5 |
-| patches/bkui-theme/checkbox.css | Checkbox | 5 | 5 |
-| patches/bkui-theme/date-picker.css | DatePicker | 32 | 43 |
-| patches/bkui-theme/dialog.css | Dialog | 3 | 3 |
-| patches/bkui-theme/dropdown.css | Dropdown | 5 | 5 |
+| patches/bkui-theme/alert.css | Alert | 13 | 19 |
+| patches/bkui-theme/card.css | Card | 5 | 6 |
+| patches/bkui-theme/checkbox.css | Checkbox | 8 | 12 |
+| patches/bkui-theme/date-picker.css | DatePicker | 33 | 48 |
+| patches/bkui-theme/dialog.css | Dialog | 3 | 4 |
+| patches/bkui-theme/dropdown.css | Dropdown | 5 | 7 |
 | patches/bkui-theme/exception.css | Exception | 2 | 2 |
 | patches/bkui-theme/form.css | Form | 5 | 5 |
 | patches/bkui-theme/infobox.css | InfoBox | 1 | 1 |
-| patches/bkui-theme/input.css | Input | 6 | 6 |
-| patches/bkui-theme/menu.css | Menu | 4 | 4 |
-| patches/bkui-theme/message.css | Message | 16 | 20 |
-| patches/bkui-theme/navigation.css | Navigation | 9 | 12 |
+| patches/bkui-theme/input.css | Input | 7 | 7 |
+| patches/bkui-theme/menu.css | Menu | 4 | 5 |
+| patches/bkui-theme/message.css | Message | 17 | 23 |
+| patches/bkui-theme/navigation.css | Navigation | 9 | 13 |
 | patches/bkui-theme/pop-confirm.css | PopConfirm | 3 | 3 |
-| patches/bkui-theme/popover.css | Popover | 23 | 31 |
-| patches/bkui-theme/progress.css | Progress | 1 | 1 |
-| patches/bkui-theme/radio.css | Radio | 2 | 2 |
-| patches/bkui-theme/resize-layout.css | ResizeLayout | 10 | 10 |
-| patches/bkui-theme/search-select.css | SearchSelect | 10 | 10 |
-| patches/bkui-theme/select.css | Select | 9 | 11 |
-| patches/bkui-theme/sideslider.css | Sideslider | 7 | 8 |
-| patches/bkui-theme/steps.css | Steps | 6 | 8 |
-| patches/bkui-theme/switcher.css | Switcher | 1 | 1 |
-| patches/bkui-theme/tab.css | Tab | 10 | 10 |
-| patches/bkui-theme/tag.css | Tag | 21 | 28 |
-| patches/bkui-theme/tag-input.css | TagInput | 12 | 13 |
-| patches/bkui-theme/time-picker.css | TimePicker | 13 | 15 |
-| patches/bkui-theme/timeline.css | Timeline | 15 | 20 |
-| patches/bkui-theme/transfer.css | Transfer | 2 | 2 |
+| patches/bkui-theme/popover.css | Popover | 25 | 40 |
+| patches/bkui-theme/progress.css | Progress | 2 | 2 |
+| patches/bkui-theme/radio.css | Radio | 4 | 7 |
+| patches/bkui-theme/resize-layout.css | ResizeLayout | 10 | 13 |
+| patches/bkui-theme/search-select.css | SearchSelect | 17 | 26 |
+| patches/bkui-theme/select.css | Select | 9 | 13 |
+| patches/bkui-theme/sideslider.css | Sideslider | 8 | 13 |
+| patches/bkui-theme/steps.css | Steps | 11 | 25 |
+| patches/bkui-theme/switcher.css | Switcher | 4 | 5 |
+| patches/bkui-theme/tab.css | Tab | 13 | 17 |
+| patches/bkui-theme/tag.css | Tag | 23 | 36 |
+| patches/bkui-theme/tag-input.css | TagInput | 12 | 17 |
+| patches/bkui-theme/time-picker.css | TimePicker | 13 | 16 |
+| patches/bkui-theme/timeline.css | Timeline | 15 | 21 |
+| patches/bkui-theme/transfer.css | Transfer | 2 | 3 |
 | patches/bkui-theme/tree.css | Tree | 11 | 12 |
-| patches/bkui-theme/upload.css | Upload | 9 | 11 |
+| patches/bkui-theme/upload.css | Upload | 11 | 17 |
 
 ## 未归属规则（需人工判定收编或加入白名单/keep）
 

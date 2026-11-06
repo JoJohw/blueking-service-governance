@@ -45,6 +45,7 @@
 
 .bkms-themed .bk-time-picker-cells-list .bk-time-picker-cells-ul .bk-time-picker-cells-cell-disabled:hover {
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  background-color: #fff; /* 原值保留（keep：#fff） */
 }
 
 .bkms-themed .bk-time-picker-cells-list .bk-time-picker-cells-ul .bk-time-picker-cells-cell-selected,.bk-time-picker-cells-list .bk-time-picker-cells-ul .bk-time-picker-cells-cell-selected:hover {

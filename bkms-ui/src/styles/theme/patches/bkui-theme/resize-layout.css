@@ -24,6 +24,8 @@
 
 .bkms-themed .bk-resize-layout>.bk-resize-layout-aside:after {
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  background: currentcolor; /* 原值保留 */
+  box-shadow: 0 4px 0 0 currentcolor,0 8px 0 0 currentcolor,0 -4px 0 0 currentcolor,0 -8px 0 0 currentcolor; /* 原值保留 */
 }
 
 .bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-proxy.left,.bk-resize-layout>.bk-resize-layout-aside .bk-resize-proxy.right {
@@ -35,6 +37,7 @@
 }
 
 .bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-collapse {
+  color: #fff; /* 原值保留（keep：#fff） */
   background: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
