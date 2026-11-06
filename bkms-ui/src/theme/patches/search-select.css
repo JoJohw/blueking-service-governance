@@ -1,0 +1,44 @@
+/* bkui SearchSelect 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-search-select-container .search-container-selected {
+  background: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+}
+
+.bkms-themed .bk-search-select-container .search-container-selected:hover {
+  background: var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-search-select-container .search-container-selected .selected-clear {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-search-select-container .search-nextfix .search-clear:hover {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-search-select-container::-webkit-scrollbar-thumb {
+  background: var(--bkms-neutral-5); /* 原 #e6e9ea */
+}
+
+.bkms-themed .bk-search-select-menu .menu-item-mixin:hover {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+
+.bkms-themed .bk-search-select-menu .menu-header-item:hover {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content-wrapper .menu-condition {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item:hover {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item.is-hover {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+

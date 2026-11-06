@@ -29,8 +29,6 @@ import VueDevTools from 'vite-plugin-vue-devtools';
 import Layouts from 'vite-plugin-vue-layouts';
 import SvgLoader from 'vite-svg-loader';
 
-import bkmsThemeReplace from './scripts/theme-codemod/postcss-theme-replace.mjs';
-
 export default ({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd(), 'BK_');
   const isDev = mode === 'development';
@@ -103,13 +101,6 @@ export default ({ mode }: { mode: string }) => {
 
     // 环境变量前缀
     envPrefix: 'BK_',
-
-    // 编译期替换 bkui dist css 内写死 hex（docs/theme-style/THEME_STEPS-v4.md Step 2）
-    css: {
-      postcss: {
-        plugins: [bkmsThemeReplace()],
-      },
-    },
 
     // 生产镜像不产出 .map，降低源码泄露风险（Nginx 侧仍会拒绝 .map 访问）
     build: {

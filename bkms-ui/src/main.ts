@@ -50,6 +50,10 @@ import '@blueking/monitor-vue3-components/index.css';
 const w = window as unknown as Record<string, string>;
 if (!w.timezone) w.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+// 主题覆写作用域：src/theme/patches 的选择器统一以 body.bkms-themed 为前缀；
+// 挂 body 而非 app 根，teleport 到 body 的弹层（Modal/下拉/Message）天然在作用域内
+document.body.classList.add('bkms-themed');
+
 import type { UserModule } from './types.ts';
 
 import './styles/main.css';

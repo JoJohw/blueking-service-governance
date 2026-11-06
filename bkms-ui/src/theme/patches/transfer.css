@@ -1,0 +1,12 @@
+/* bkui Transfer 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-transfer .source-list .content li.custom-item:hover:not(.is-disabled),.bk-transfer .target-list .content li.custom-item:hover:not(.is-disabled),.bk-transfer .source-list .content li .item-content:hover:not(.is-disabled),.bk-transfer .target-list .content li .item-content:hover:not(.is-disabled),.bk-transfer .source-list .content .checkbox-item:hover:not(.is-disabled),.bk-transfer .target-list .content .checkbox-item:hover:not(.is-disabled) {
+  background-color: var(--bkms-brand-6); /* 原 #e1ecff */
+}
+
+.bkms-themed .bk-transfer .source-list .content::-webkit-scrollbar-thumb,.bk-transfer .target-list .content::-webkit-scrollbar-thumb {
+  background-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+

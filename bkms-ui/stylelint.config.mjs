@@ -5,7 +5,7 @@
  * Licensed under the MIT License (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
  *
- *  http://opensource.org/licenses/MIT
+ * http://opensource.org/licenses/MIT
  *
  * Unless required by applicable law or agreed to in writing, software distributed under
  * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -18,4 +18,24 @@
 
 import stylelintConfig from '@blueking/bkui-lint/stylelint.mjs';
 
-export default stylelintConfig;
+// 主题覆写层：patches 由生成器产出，选择器/属性形态逐字复刻 bkui 产物
+// （bkui 自身不符合本项目规约：BEM -- 修饰类名、单冒号伪元素、属性顺序等），
+// 这些"形态类"规则在复刻件上不适用——选择器一旦按本项目规约改写就不再匹配产物，破坏覆写
+const patchesOverride = {
+  overrides: [
+    {
+      files: ['src/theme/patches/**/*.css'],
+      rules: {
+        'no-descending-specificity': null,
+        'selector-class-pattern': null,
+        'selector-pseudo-element-colon-notation': null,
+        'selector-attribute-quotes': null,
+        'order/properties-order': null,
+      },
+    },
+  ],
+};
+
+export default Array.isArray(stylelintConfig)
+  ? [...stylelintConfig, patchesOverride]
+  : { ...stylelintConfig, overrides: [...(stylelintConfig.overrides ?? []), patchesOverride.overrides[0]] };

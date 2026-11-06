@@ -1,0 +1,24 @@
+/* bkui Checkbox 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-checkbox {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-checkbox.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-checkbox.is-disabled .bk-checkbox-input {
+  background: var(--bkms-neutral-8); /* 原 #fafbfd */
+}
+
+.bkms-themed .bk-checkbox-input {
+  border: 1px solid var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-checkbox-checking {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+

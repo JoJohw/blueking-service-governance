@@ -14,7 +14,7 @@
   --bkms-brand-1: #274ECF;
 
   /* neutral */
-  --bkms-neutral-10: #FFFFFF;
+  --bkms-neutral-10: #FFF;
   --bkms-neutral-9: #FBFCFE;
   --bkms-neutral-8: #F7F9FD;
   --bkms-neutral-7: #F0F4FA;
@@ -46,7 +46,7 @@
   /* danger */
   --bkms-danger-7: #FFF0F0;
   --bkms-danger-6: #FFEBEB;
-  --bkms-danger-5: #FFDDDD;
+  --bkms-danger-5: #FDD;
   --bkms-danger-4: #F8B4B4;
   --bkms-danger-3: #FF5656;
   --bkms-danger-2: #EA3636;
@@ -97,7 +97,7 @@
   --bkms-shadow-popover: #00000029;
 
   /** Dialog */
-  --bkms-shadow-dialog: #00000033;
+  --bkms-shadow-dialog: #0003;
 
   /** 主按钮。禁用和按钮组不加；用 color-mix 等价 spec 的 #3B6EF540，随主题换色 */
   --bkms-shadow-button: color-mix(in srgb, var(--bkms-brand-2) 25%, transparent);

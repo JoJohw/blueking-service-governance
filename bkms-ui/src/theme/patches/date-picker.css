@@ -1,0 +1,143 @@
+/* bkui DatePicker 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-date-picker-dropdown {
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--bkms-neutral-1) 10%, transparent); /* 原 #0000001a */
+}
+
+.bkms-themed .bk-date-picker-footer-wrapper {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-date-picker-top-wrapper {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-picker-panel-sidebar {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-left: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-picker-panel-sidebar .bk-picker-panel-shortcut:hover {
+  background-color: var(--bkms-brand-6); /* 原 #e1ecff */
+}
+
+.bkms-themed .bk-picker-panel-sidebar .bk-picker-panel-shortcuts>div {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-picker-panel-sidebar .bk-picker-panel-shortcuts>div:hover {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+
+.bkms-themed .bk-picker-panel-sidebar .bk-picker-panel-shortcuts .shortcuts-item-active {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+  background-color: var(--bkms-brand-6); /* 原 #e1ecff */
+}
+
+.bkms-themed .bk-picker-confirm {
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-picker-confirm a {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-picker-confirm a.confirm {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-picker-confirm a[disabled] {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-picker-confirm .bk-picker-confirm-time {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-picker-confirm .bk-picker-confirm-time.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-date-picker-header {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-date-picker-header .bk-date-picker-header-label:hover {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-date-picker-header .up-to-now.disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-date-picker-cells {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-date-picker-cells .bk-date-picker-cells-header span {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-date-picker-cells-cell:hover em {
+  background-color: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+}
+
+.bkms-themed .bk-date-picker-cells-focused em {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+  box-shadow: 0 0 0 1px var(--bkms-brand-4) inset; /* 原 #a3c5fd */
+}
+
+.bkms-themed .bk-date-picker-cells-cell-prev-month em,.bk-date-picker-cells-cell-next-month em {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed span.bk-date-picker-cells-cell-week-label,span.bk-date-picker-cells-cell-week-label:hover,span.bk-date-picker-cells-cell-disabled,span.bk-date-picker-cells-cell-disabled:hover {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed span.bk-date-picker-cells-cell-disabled,span.bk-date-picker-cells-cell-disabled:hover {
+  background-color: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+}
+
+.bkms-themed .bk-date-picker-cells-cell-today em {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+  box-shadow: 0 0 0 1px var(--bkms-brand-4) inset; /* 原 #a3c5fd */
+}
+
+.bkms-themed .bk-date-picker-cells-cell-range:before {
+  background: var(--bkms-brand-6); /* 原 #e1ecff */
+}
+
+.bkms-themed .bk-date-picker-cells-cell-selected em,.bk-date-picker-cells-cell-selected:hover em {
+  background-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  box-shadow: 0 0 0 1px var(--bkms-brand-2) inset; /* 原 #3a84ff */
+}
+
+.bkms-themed span.bk-date-picker-cells-cell-disabled.bk-date-picker-cells-cell-selected em {
+  color: var(--bkms-neutral-8); /* 原 #f7f7f7 */
+  background: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em,.bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em:hover {
+  box-shadow: 0 0 0 1px var(--bkms-brand-2) inset; /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-picker-panel-icon-btn {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-picker-panel-icon-btn:hover {
+  color: var(--bkms-brand-2); /* 原 #2d8cf0 */
+}
+
+.bkms-themed .bk-time-picker-with-range .bk-picker-panel-content:after {
+  background: var(--bkms-neutral-5); /* 原 #e8eaec */
+}
+

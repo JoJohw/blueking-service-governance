@@ -1,0 +1,104 @@
+/* bkui Popover 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover {
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--bkms-neutral-1) 10%, transparent); /* 原 #0000001a */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-empty {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-empty .spinner {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-dropdown::-webkit-scrollbar-thumb {
+  background: var(--bkms-neutral-5); /* 原 #dde4eb */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-extension {
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-option {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-option:hover {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-option.is-selected:not(.is-checkbox) {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+  background-color: var(--bkms-brand-6); /* 原 #e1ecff */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-option.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-option-group-label {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-option-group.disabled .default-group-label {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content {
+  background: var(--bkms-navy-2); /* 原 #26323d */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content .bk-pop2-arrow {
+  background: var(--bkms-neutral-1); /* 原 #333 */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content[data-theme^=light] {
+  color: var(--bkms-navy-2); /* 原 #26323d */
+  box-shadow: 0 0 6px var(--bkms-neutral-5); /* 原 #dcdee5 */
+  border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content[data-theme^=light] .bk-pop2-arrow[data-arrow=top] {
+  border-right: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content[data-theme^=light] .bk-pop2-arrow[data-arrow=right] {
+  border-left: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content[data-theme^=light] .bk-pop2-arrow[data-arrow=left] {
+  border-right: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content[data-theme^=light] .bk-pop2-arrow[data-arrow=bottom] {
+  border-left: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-table-head-filter {
+  box-shadow: 0 3px 6px color-mix(in srgb, var(--bkms-neutral-1) 10%, transparent); /* 原 #0000001a */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-table-head-filter .content-list .content-items .list-item {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-table-head-filter .content-list .content-items .list-item:hover {
+  background: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-table-head-filter .content-list .content-items .list-item label:hover {
+  background: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+}
+
+.bkms-themed .bk-popover.bk-pop2-content.bk-table-head-filter .content-footer {
+  border-top: solid 1px var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+

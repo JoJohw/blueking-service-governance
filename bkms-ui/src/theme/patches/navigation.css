@@ -1,4 +1,43 @@
-/* bkui 补丁 - navigation 域：仅布局/尺寸修正；颜色归 tokens/bridge/编译替换，不在此出现 */
-.bk-navigation-wrapper .navigation-container .container-content {
-  padding: 0 !important;
+/* bkui Navigation 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-navigation-title .title-icon {
+  color: var(--bkms-neutral-3); /* 原 #768197 */
 }
+
+.bkms-themed .bk-navigation-title .title-desc {
+  color: var(--bkms-navy-4); /* 原 #96a2b9 */
+}
+
+.bkms-themed .bk-navigation-wrapper .navigation-nav .nav-slider-footer .footer-icon {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-navigation-wrapper .navigation-nav .nav-slider-footer .footer-icon.is-left {
+  color: var(--bkms-navy-4); /* 原 #96a2b9 */
+}
+
+.bkms-themed .bk-navigation-wrapper .navigation-nav .nav-slider-footer .footer-icon.is-left:hover {
+  color: var(--bkms-neutral-4); /* 原 #d3d9e4 */
+  background: linear-gradient(270deg,var(--bkms-navy-2),var(--bkms-navy-2)); /* 原 #253047 #263247 */
+}
+
+.bkms-themed .bk-navigation-wrapper .navigation-nav .nav-slider-footer .footer-icon:hover {
+  color: var(--bkms-navy-5); /* 原 #b0bdd5 */
+  background: var(--bkms-navy-3); /* 原 #424a5f */
+}
+
+.bkms-themed .bk-navigation-wrapper .navigation-container .container-header {
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  box-shadow: 0 3px 4px color-mix(in srgb, var(--bkms-brand-3) 6%, transparent); /* 原 #4070cb0f */
+}
+
+.bkms-themed .bk-navigation-wrapper .navigation-container .container-header-title {
+  color: var(--bkms-neutral-1); /* 原 #313238 */
+}
+
+.bkms-themed .bk-navigation-wrapper .navigation-container .container-content {
+  background: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+

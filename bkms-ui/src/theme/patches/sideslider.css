@@ -1,0 +1,33 @@
+/* bkui Sideslider 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-sideslider.is-position-right.bk-sideslider-resizable .bk-sideslider-resize-proxy.right {
+  border-left: 2px solid var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-sideslider.is-position-left.bk-sideslider-resizable .bk-sideslider-resize-proxy.left {
+  border-left: 2px solid var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-sideslider .bk-modal-footer.is-fixed .bk-sideslider-footer {
+  background: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-sideslider-header {
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-sideslider-title {
+  color: var(--bkms-neutral-1); /* 原 #313238 */
+}
+
+.bkms-themed .bk-sideslider-resize-trigger:after {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-sideslider-resize-trigger:hover:after {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
