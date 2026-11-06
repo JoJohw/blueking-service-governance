@@ -50,7 +50,7 @@ import '@blueking/monitor-vue3-components/index.css';
 const w = window as unknown as Record<string, string>;
 if (!w.timezone) w.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-// 主题覆写作用域：src/theme/patches 的选择器统一以 body.bkms-themed 为前缀；
+// 主题覆写作用域：src/styles/theme/patches 的选择器统一以 body.bkms-themed 为前缀；
 // 挂 body 而非 app 根，teleport 到 body 的弹层（Modal/下拉/Message）天然在作用域内
 document.body.classList.add('bkms-themed');
 
@@ -61,7 +61,7 @@ import '@blueking/table/vue3/vue3.css';
 import '@unocss/reset/tailwind.css';
 import 'uno.css';
 // theme/index.css 整包（令牌 + patches）只定义 --bkms-* 与选择器级兜底、无级联冲突，放 CSS 组末尾以满足 import 排序
-import '~/theme/index.css';
+import '~/styles/theme/index.css';
 
 getUser({}, { needRes: true }).then(res => {
   const app = createApp(App);

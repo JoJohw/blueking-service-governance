@@ -32,7 +32,7 @@ import {
 /*
  * ## bkms 令牌注册
  *
- * 构建期从 `src/theme` 解析令牌，CSS 是单一真源，新增变量零注册。
+ * 构建期从 `src/styles/theme/tokens` 解析令牌，CSS 是单一真源，新增变量零注册。
  *
  * ### 消费方式（两种等价，编译产物相同，均不强制）
  *
@@ -47,7 +47,7 @@ import {
  * 2. 模板内任意值 `text-[var(--bkms-neutral-2)]` 合法但不推荐：拼错变量名会静默生成死规则。
  * 3. 半透明：纯 var() token 不支持 `/50` alpha 修饰符，用 `color-mix(in srgb, var(--bkms-brand-2) 25%, transparent)`。
  */
-const THEME_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src/theme');
+const THEME_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src/styles/theme/tokens');
 
 // 色阶：colors.css → theme.colors.bkms，类名形如 text-bkms-brand-2 / bg-bkms-cyan-6
 function parseScaleColors() {
