@@ -1,0 +1,21 @@
+/* bkui Menu 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-menu-submenu .submenu-header-icon .menu-icon {
+  color: var(--bkms-navy-5); /* 原 #b0bdd5 */
+}
+
+.bkms-themed .bk-menu-submenu .submenu-header-content {
+  color: var(--bkms-navy-5); /* 原 #acb9d1 */
+}
+
+.bkms-themed .bk-menu-submenu .submenu-header-collapse {
+  color: var(--bkms-navy-5); /* 原 #acb9d1 */
+}
+
+.bkms-themed .bk-menu-item:hover {
+  color: var(--menu-active-color); /* 原值保留 */
+  background-color: var(--bkms-navy-2); /* 原 #31394f */
+}
+

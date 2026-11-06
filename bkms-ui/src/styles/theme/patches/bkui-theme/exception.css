@@ -1,0 +1,12 @@
+/* bkui Exception 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-exception-title {
+  color: var(--bkms-neutral-1); /* 原 #313238 */
+}
+
+.bkms-themed .bk-exception-description {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+

@@ -1,8 +1,0 @@
-/* 主题层统一入口：令牌（colors → semantic）在前，patches 选择器级兜底在后，整包最后于 main.css 末尾引入 */
-@import './colors.css';
-@import './semantic.css';
-@import './patches/form.css';
-@import './patches/table.css';
-@import './patches/dialog.css';
-@import './patches/feedback.css';
-@import './patches/navigation.css';

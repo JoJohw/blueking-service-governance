@@ -1,0 +1,59 @@
+/* bkui TimePicker 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-time-picker-cells:after {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+  background-color: color-mix(in srgb, var(--bkms-brand-2) 16%, transparent); /* 原 #3a84ff29 */
+}
+
+.bkms-themed .bk-time-picker-cells-with-seconds .bk-time-picker-cells-title-wrapper .bk-time-picker-cells-title:nth-of-type(1):before,.bk-time-picker-cells-with-seconds .bk-time-picker-cells-title-wrapper .bk-time-picker-cells-title:nth-of-type(2):before {
+  background-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-time-picker-cells-with-seconds .bk-time-picker-cells-title-wrapper .bk-time-picker-cells-title:nth-of-type(1):after,.bk-time-picker-cells-with-seconds .bk-time-picker-cells-title-wrapper .bk-time-picker-cells-title:nth-of-type(2):after {
+  background-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-time-picker-cells-title-wrapper .bk-time-picker-cells-title {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-time-picker-cells-title-wrapper .bk-time-picker-cells-title.active {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-time-picker-cells-title-wrapper .bk-time-picker-cells-title:nth-of-type(1):before {
+  background-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-time-picker-cells-title-wrapper .bk-time-picker-cells-title:nth-of-type(1):after {
+  background-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-time-picker-cells-list .bk-time-picker-cells-ul .bk-time-picker-cells-cell {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-time-picker-cells-list .bk-time-picker-cells-ul .bk-time-picker-cells-cell:hover {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-time-picker-cells-list .bk-time-picker-cells-ul .bk-time-picker-cells-cell-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-time-picker-cells-list .bk-time-picker-cells-ul .bk-time-picker-cells-cell-disabled:hover {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  background-color: #fff; /* 原值保留（keep：#fff） */
+}
+
+.bkms-themed .bk-time-picker-cells-list .bk-time-picker-cells-ul .bk-time-picker-cells-cell-selected,.bk-time-picker-cells-list .bk-time-picker-cells-ul .bk-time-picker-cells-cell-selected:hover {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-time-picker-header {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+

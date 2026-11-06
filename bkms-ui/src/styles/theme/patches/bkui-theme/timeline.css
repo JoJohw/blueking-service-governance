@@ -1,0 +1,70 @@
+/* bkui Timeline 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-timeline .bk-timeline-dot {
+  border-left: 1px solid var(--bkms-success-5); /* 原 #d8d8d8 */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-dot:before {
+  background: #fff; /* 原值保留（keep：#fff） */
+  border: 2px solid var(--bkms-success-5); /* 原 #d8d8d8 */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-dot .bk-timeline-title {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-dot .bk-timeline-content {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-dot .bk-timeline-icon {
+  border: 2px solid var(--bkms-success-5); /* 原 #d8d8d8 */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-blue:before,.bk-timeline .bk-timeline-blue .bk-timeline-icon {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+  border: 2px solid var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-blue.bk-timeline-filled:before,.bk-timeline .bk-timeline-blue.bk-timeline-filled .bk-timeline-icon {
+  background: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-red:before,.bk-timeline .bk-timeline-red .bk-timeline-icon {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+  border: 2px solid var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-red.bk-timeline-filled:before,.bk-timeline .bk-timeline-red.bk-timeline-filled .bk-timeline-icon {
+  background: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-green:before,.bk-timeline .bk-timeline-green .bk-timeline-icon {
+  color: var(--bkms-success-2); /* 原 #2dcb56 */
+  border: 2px solid var(--bkms-success-2); /* 原 #2dcb56 */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-green.bk-timeline-filled:before,.bk-timeline .bk-timeline-green.bk-timeline-filled .bk-timeline-icon {
+  background: var(--bkms-success-2); /* 原 #2dcb56 */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-yellow:before,.bk-timeline .bk-timeline-yellow .bk-timeline-icon {
+  color: var(--bkms-warning-2); /* 原 #ff9c01 */
+  border: 2px solid var(--bkms-warning-2); /* 原 #ff9c01 */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-yellow.bk-timeline-filled:before,.bk-timeline .bk-timeline-yellow.bk-timeline-filled .bk-timeline-icon {
+  background: var(--bkms-warning-2); /* 原 #ff9c01 */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-gray:before,.bk-timeline .bk-timeline-gray .bk-timeline-icon {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border: 2px solid var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-timeline .bk-timeline-gray.bk-timeline-filled:before,.bk-timeline .bk-timeline-gray.bk-timeline-filled .bk-timeline-icon {
+  background: var(--bkms-neutral-2); /* 原 #63656e */
+}
+

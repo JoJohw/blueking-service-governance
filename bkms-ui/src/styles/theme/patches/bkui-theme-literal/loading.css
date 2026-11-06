@@ -1,0 +1,52 @@
+/* bkui Loading 字面量覆写 — 压制 lib/*.less 的字面量旧色（选择器逐字复刻 dist/style.css），由 gen-overrides.mjs 生成 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记 */
+
+.bkms-themed .bk-loading-wrapper .oval {
+  background-color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator.bk-loading-success .oval,.bk-loading-wrapper .bk-loading-indicator.bk-loading-success .dot,.bk-loading-wrapper .bk-loading-indicator.bk-loading-success .dot-1,.bk-loading-wrapper .bk-loading-indicator.bk-loading-success .dot-2,.bk-loading-wrapper .bk-loading-indicator.bk-loading-success .dot-3,.bk-loading-wrapper .bk-loading-indicator.bk-loading-success .dot-4 {
+  background-color: var(--bkms-success-2); /* 原 #2dcb56 */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator.bk-loading-danger .oval,.bk-loading-wrapper .bk-loading-indicator.bk-loading-danger .dot,.bk-loading-wrapper .bk-loading-indicator.bk-loading-danger .dot-1,.bk-loading-wrapper .bk-loading-indicator.bk-loading-danger .dot-2,.bk-loading-wrapper .bk-loading-indicator.bk-loading-danger .dot-3,.bk-loading-wrapper .bk-loading-indicator.bk-loading-danger .dot-4 {
+  background-color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator.bk-loading-warning .oval,.bk-loading-wrapper .bk-loading-indicator.bk-loading-warning .dot,.bk-loading-wrapper .bk-loading-indicator.bk-loading-warning .dot-1,.bk-loading-wrapper .bk-loading-indicator.bk-loading-warning .dot-2,.bk-loading-wrapper .bk-loading-indicator.bk-loading-warning .dot-3,.bk-loading-wrapper .bk-loading-indicator.bk-loading-warning .dot-4 {
+  background-color: var(--bkms-warning-2); /* 原 #ff9c01 */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator.bk-loading-primary .oval,.bk-loading-wrapper .bk-loading-indicator.bk-loading-primary .dot,.bk-loading-wrapper .bk-loading-indicator.bk-loading-primary .dot-1,.bk-loading-wrapper .bk-loading-indicator.bk-loading-primary .dot-2,.bk-loading-wrapper .bk-loading-indicator.bk-loading-primary .dot-3,.bk-loading-wrapper .bk-loading-indicator.bk-loading-primary .dot-4 {
+  background-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator.bk-loading-white .oval,.bk-loading-wrapper .bk-loading-indicator.bk-loading-white .dot,.bk-loading-wrapper .bk-loading-indicator.bk-loading-white .dot-1,.bk-loading-wrapper .bk-loading-indicator.bk-loading-white .dot-2,.bk-loading-wrapper .bk-loading-indicator.bk-loading-white .dot-3,.bk-loading-wrapper .bk-loading-indicator.bk-loading-white .dot-4 {
+  background-color: #fff; /* 原值保留（keep：#fff） */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator.bk-loading-default .oval,.bk-loading-wrapper .bk-loading-indicator.bk-loading-default .dot,.bk-loading-wrapper .bk-loading-indicator.bk-loading-default .dot-1,.bk-loading-wrapper .bk-loading-indicator.bk-loading-default .dot-2,.bk-loading-wrapper .bk-loading-indicator.bk-loading-default .dot-3,.bk-loading-wrapper .bk-loading-indicator.bk-loading-default .dot-4 {
+  background-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator .dot-1 {
+  background-color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator .dot-2 {
+  background-color: var(--bkms-warning-2); /* 原 #ff9c01 */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator .dot-3 {
+  background-color: var(--bkms-success-2); /* 原 #2dcb56 */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator .dot-4 {
+  background-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-loading-wrapper .bk-loading-indicator .bk-loading-title {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+

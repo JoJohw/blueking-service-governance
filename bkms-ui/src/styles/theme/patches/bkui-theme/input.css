@@ -1,0 +1,32 @@
+/* bkui Input 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-input--suffix-icon:hover {
+  color: var(--bkms-neutral-1); /* 原 #313238 */
+}
+
+.bkms-themed .bk-pagination-limit-select .bk-input {
+  border-color: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+}
+
+.bkms-themed .bk-pagination-limit-select .bk-input--text {
+  background-color: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+}
+
+.bkms-themed .bk-pagination-limit-select:hover .bk-input {
+  border-color: var(--bkms-neutral-6); /* 原 #eaebf0 */
+}
+
+.bkms-themed .bk-pagination-limit-select:hover .bk-input--text {
+  background-color: var(--bkms-neutral-6); /* 原 #eaebf0 */
+}
+
+.bkms-themed .bk-pagination-limit-select .bk-input.is-focused {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-pagination-limit-select .bk-input.is-focused .bk-input--text {
+  background-color: #fff; /* 原值保留（keep：#fff） */
+}
+

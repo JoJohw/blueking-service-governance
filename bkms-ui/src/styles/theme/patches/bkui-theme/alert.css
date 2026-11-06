@@ -1,0 +1,62 @@
+/* bkui Alert 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-alert {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border: var(--border-width-base) var(--border-style-base); /* 原值保留 */
+}
+
+.bkms-themed .bk-alert-info {
+  background-color: var(--bkms-brand-7); /* 原 #f0f8ff */
+  border-color: var(--bkms-brand-5); /* 原 #c5daff */
+}
+
+.bkms-themed .bk-alert-info .bk-alert-icon-info {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-alert-success {
+  background-color: var(--bkms-success-7); /* 原 #f2fff4 */
+  border-color: var(--bkms-success-4); /* 原 #94f5a4 */
+}
+
+.bkms-themed .bk-alert-success .bk-alert-icon-info {
+  color: var(--bkms-success-2); /* 原 #2dcb56 */
+}
+
+.bkms-themed .bk-alert-warning {
+  background-color: var(--bkms-warning-7); /* 原 #fff4e2 */
+  border-color: var(--bkms-warning-5); /* 原 #ffdfac */
+}
+
+.bkms-themed .bk-alert-warning .bk-alert-icon-info {
+  color: var(--bkms-warning-2); /* 原 #ff9c01 */
+}
+
+.bkms-themed .bk-alert-danger {
+  background-color: var(--bkms-danger-6); /* 原 #ffeded */
+  border-color: var(--bkms-danger-5); /* 原 #ffd2d2 */
+}
+
+.bkms-themed .bk-alert-danger .bk-alert-icon-info {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-alert-error {
+  background-color: var(--bkms-danger-6); /* 原 #ffeded */
+  border-color: var(--bkms-danger-5); /* 原 #ffd2d2 */
+}
+
+.bkms-themed .bk-alert-error .bk-alert-icon-info {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-alert-close {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-alert-close:hover {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+

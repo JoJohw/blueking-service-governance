@@ -1,0 +1,78 @@
+/* bkui Message 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-message-content.multi .overview .tools .tool:not(.fix) span {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-message-content.multi .overview .tools .tool.fix.fixed span {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-message-content.multi .overview .tools .tool.fix span {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-message-content.multi .overview .tools .tool.fix:hover span {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-message-content.multi .overview .tools .tool.close span {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-message-content.multi .overview .tools .tool.close span:hover {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .message-tree {
+  background: #fff; /* 原值保留（keep：#fff） */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .message-tree .message-row {
+  color: var(--bkms-neutral-1); /* 原 #313238 */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .message-tree .message-row label {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .message-tree .message-row .copy-value:hover {
+  background: color-mix(in srgb, var(--bkms-navy-5) 20%, transparent); /* 原 #babcc033 */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .message-copy {
+  background: var(--bkms-neutral-7); /* 原 #f5f7fa */
+  color: var(--bkms-navy-4); /* 原 #9fa3ae */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .message-copy:hover {
+  background: var(--bkms-brand-7); /* 原 #f0f5ff */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .message-copy:hover span {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .copy-status .inner {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  background: #fff; /* 原值保留（keep：#fff） */
+  border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--bkms-neutral-1) 10%, transparent); /* 原 #0000001a */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .copy-status .inner:after {
+  background: #fff; /* 原值保留（keep：#fff） */
+  border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+  box-shadow: 5px 3px 6px color-mix(in srgb, var(--bkms-neutral-1) 10%, transparent); /* 原 #0000001a */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .copy-status.success .inner span {
+  color: var(--bkms-cyan-3); /* 原 #2dcb9d */
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .copy-status.error .inner span {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+

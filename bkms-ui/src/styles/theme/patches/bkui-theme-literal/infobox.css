@@ -1,0 +1,28 @@
+/* bkui InfoBox 字面量覆写 — 压制 lib/*.less 的字面量旧色（选择器逐字复刻 dist/style.css），由 gen-overrides.mjs 生成 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记 */
+
+.bkms-themed .bk-infobox .bk-modal-wrapper .bk-modal-body .bk-modal-content {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-infobox-icon.success {
+  color: var(--bkms-success-2); /* 原 #2dcb56 */
+}
+
+.bkms-themed .bk-infobox-icon.warning {
+  color: var(--bkms-warning-2); /* 原 #ff9c01 */
+}
+
+.bkms-themed .bk-infobox-icon.danger {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-infobox-icon.loading {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-infobox-content.set-bg-color {
+  background-color: var(--bkms-neutral-8); /* 原 #f5f6fa */
+}
+

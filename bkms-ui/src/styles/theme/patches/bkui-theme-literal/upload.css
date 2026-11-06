@@ -1,0 +1,90 @@
+/* bkui Upload 字面量覆写 — 压制 lib/*.less 的字面量旧色（选择器逐字复刻 dist/style.css），由 gen-overrides.mjs 生成 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记 */
+
+.bkms-themed .bk-upload__tip {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-upload--disabled .bk-upload__tip {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-trigger {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-upload-trigger__picture-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-trigger--draggable {
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border: 1px dashed var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-trigger--dragover {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-upload-trigger__draggable-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-trigger__draggable-upload-link {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-upload-trigger--picture {
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border: 1px dashed var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-trigger--disabled.bk-upload-trigger {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__draggable-inner,.bk-upload-trigger--disabled .bk-upload-trigger__draggable-icon,.bk-upload-trigger--disabled .bk-upload-trigger__draggable-upload-link,.bk-upload-trigger--disabled .bk-upload-trigger__picture-inner,.bk-upload-trigger--disabled .bk-upload-trigger__picture-icon,.bk-upload-trigger--disabled .bk-upload-trigger__picture-upload-link {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-trigger:not(.bk-upload-trigger--disabled):hover {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-upload-trigger:not(.bk-upload-trigger--disabled):hover .bk-upload-trigger__picture-icon,.bk-upload-trigger:not(.bk-upload-trigger--disabled):hover .bk-upload-trigger__draggable-icon {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-upload-trigger--single-picture.bk-upload-trigger--has-file:hover {
+  border-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-list__item:hover {
+  border-color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-list__item-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-list__item-name {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-upload-list__item-speed {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-upload-list__item-del-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-list__item-retry-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-list__item--success .bk-upload-list__item-message {
+  color: var(--bkms-success-2); /* 原 #2dcb56 */
+}
+

@@ -1,0 +1,75 @@
+/* bkui Select 字面量覆写 — 压制 lib/*.less 的字面量旧色（选择器逐字复刻 dist/style.css），由 gen-overrides.mjs 生成 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记 */
+
+.bkms-themed .bk-select.is-focus:not(.is-disabled).simplicity .bk-select-trigger .bk-select-tag {
+  border-bottom-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-select.is-focus .bk-input {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  outline: 0; /* 原值保留 */
+  box-shadow: 0 0 3px var(--bkms-brand-4); /* 原 #a3c5fd */
+}
+
+.bkms-themed .bk-select.is-focus .bk-input.is-simplicity {
+  border-color: transparent; /* 原值保留 */
+  border-bottom-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  box-shadow: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-select.is-focus .bk-input.is-simplicity .bk-input--text {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+
+.bkms-themed .bk-select .bk-input.is-focused {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  outline: 0; /* 原值保留 */
+  box-shadow: 0 0 3px var(--bkms-brand-4); /* 原 #a3c5fd */
+}
+
+.bkms-themed .bk-select .bk-input.is-focused.is-simplicity {
+  border-color: transparent; /* 原值保留 */
+  border-bottom-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  box-shadow: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-select .bk-input--text {
+  background-color: #fff; /* 原值保留（keep：#fff） */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  background-color: #fff; /* 原值保留（keep：#fff） */
+  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag::placeholder {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-simplicity {
+  background-color: transparent; /* 原值保留 */
+  border-color: transparent; /* 原值保留 */
+  border-bottom-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-simplicity:hover {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+  border-color: transparent; /* 原值保留 */
+  border-bottom-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  box-shadow: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag-input {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  background-color: transparent; /* 原值保留 */
+  border: none; /* 原值保留 */
+  outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag-input::placeholder {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+

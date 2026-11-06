@@ -1,0 +1,54 @@
+/* bkui Upload 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-upload-trigger__picture-actions {
+  color: #fff; /* 原值保留（keep：#fff） */
+  background: color-mix(in srgb, var(--bkms-neutral-1) 45%, transparent); /* 原 #00000073 */
+}
+
+.bkms-themed .bk-upload-trigger--single-picture.bk-upload-trigger--uploading {
+  background: color-mix(in srgb, var(--bkms-neutral-1) 65%, transparent); /* 原 #000000a6 */
+}
+
+.bkms-themed .bk-upload-trigger--fail {
+  background: color-mix(in srgb, var(--bkms-danger-5) 40%, transparent); /* 原 #fedddc66 */
+  border-color: var(--bkms-danger-3); /* 原 #ff5656 */
+}
+
+.bkms-themed .bk-upload-trigger--disabled.bk-upload-trigger--draggable,.bk-upload-trigger--disabled.bk-upload-trigger--picture {
+  background-color: #fff; /* 原值保留（keep：#fff） */
+  border-color: var(--disable-color); /* 原值保留 */
+}
+
+.bkms-themed .bk-upload-trigger--single-picture.bk-upload-trigger--fail.bk-upload-trigger--has-file:hover {
+  border-color: var(--bkms-danger-3); /* 原 #ff5656 */
+}
+
+.bkms-themed .bk-upload-list__item {
+  background: #fff; /* 原值保留（keep：#fff） */
+  border: 1px solid var(--light-gray); /* 原值保留 */
+}
+
+.bkms-themed .bk-upload-list__item--fail {
+  background: color-mix(in srgb, var(--bkms-danger-5) 40%, transparent); /* 原 #fedddc66 */
+  border-color: var(--bkms-danger-3); /* 原 #ff5656 */
+}
+
+.bkms-themed .bk-upload-list__item--fail .bk-upload-list__item-message {
+  color: var(--bkms-danger-3); /* 原 #ff5656 */
+}
+
+.bkms-themed .bk-upload-list__item--fail:hover {
+  border-color: var(--bkms-danger-3); /* 原 #ff5656 */
+}
+
+.bkms-themed .bk-upload-list__item-picture.bk-upload-list__item--uploading {
+  background: color-mix(in srgb, var(--bkms-neutral-1) 65%, transparent); /* 原 #000000a6 */
+}
+
+.bkms-themed .bk-upload-list__picture-item-actions {
+  color: #fff; /* 原值保留（keep：#fff） */
+  background: color-mix(in srgb, var(--bkms-neutral-1) 45%, transparent); /* 原 #00000073 */
+}
+

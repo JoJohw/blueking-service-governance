@@ -1,0 +1,57 @@
+/* bkui TagInput 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+
+.bkms-themed .bk-form-item.is-error .bk-input,.bk-form-item.is-error .bk-textarea,.bk-form-item.is-error .bk-cascader,.bk-form-item.is-error .bk-date-picker-editor,.bk-form-item.is-error .bk-select-tag,.bk-form-item.is-error .bk-tag-input {
+  border-color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger.disabled {
+  background: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-color: var(--disable-color); /* 原值保留 */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger .tag-list>li.tag-item {
+  background: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+  border-color: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger .tag-list .tag .dblclick-edit-input {
+  background-color: var(--bkms-brand-6); /* 原 #e1ecff */
+  border: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger .tag-list .text {
+  color: var(--default-color); /* 原值保留 */
+  background-color: var(--bkms-neutral-6); /* 原 #f0f1f5 */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger .tag-list .text:hover {
+  background-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .outside-ul {
+  background-color: var(--white-color); /* 原值保留 */
+  border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .outside-ul::-webkit-scrollbar-thumb {
+  background-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-group-item .group-name {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item.bk-selector-selected {
+  background-color: var(--bkms-neutral-7); /* 原 #f4f6fa */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item.bk-selector-actived {
+  background-color: var(--bkms-neutral-7); /* 原 #f4f6fa */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item:hover {
+  background-color: var(--bkms-brand-7); /* 原 #eaf3ff */
+}
+
