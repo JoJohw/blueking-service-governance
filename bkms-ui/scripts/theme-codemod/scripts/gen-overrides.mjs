@@ -26,7 +26,6 @@ const ROOT = path.resolve(__dirname, '../../..');
 const DIST = path.join(ROOT, 'node_modules/bkui-vue/dist');
 const PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme');
 const LITERAL_PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme-literal');
-const MANUAL_PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkms');
 const REPORTS = path.join(__dirname, '../reports');
 
 const readJson = f => JSON.parse(fs.readFileSync(path.join(__dirname, f), 'utf8'));
@@ -213,7 +212,7 @@ function scanDist(file, patchesMap, trackUnassigned) {
       if (idx === -1) continue;
       const prop = piece.slice(0, idx).trim();
       const value = piece.slice(idx + 1).trim();
-      if (!prop || prop.startsWith('--')) continue; // 变量定义归 bridge
+      if (!prop || prop.startsWith('--')) continue; // 变量定义归各域 variables.css
       const hasHex = value.includes('#') && /#[0-9a-fA-F]{3,8}\b/.test(value);
       if (hasHex) hasHexDecl = true;
       // 无 hex 的色彩类声明：原值生成（transparent/var/keep 等），
@@ -248,7 +247,9 @@ function scanDist(file, patchesMap, trackUnassigned) {
     const entry = bucket.get(key);
     for (const d of effective) {
       scannedDecls++;
-      const r = d.raw ? { value: d.value, comment: '原值保留', pendingHexes: [] } : rewriteValue(d.value);
+      const r = d.raw
+        ? { value: d.value.replace(/currentColor/g, 'currentcolor'), comment: '原值保留', pendingHexes: [] }
+        : rewriteValue(d.value);
       if (!r) continue;
       entry.decls.set(d.prop, r); // 后出现的同名 prop 覆盖（与级联一致）
       for (const h of r.pendingHexes) {
@@ -263,8 +264,15 @@ for (const f of DIST_FILES) scanDist(f, patches, true);
 scanDist(LITERAL_DIST_FILE, literalPatches, false);
 
 // ---------- 3. 输出 patches + index.css ----------
-fs.rmSync(PATCHES_DIR, { recursive: true, force: true });
-fs.mkdirSync(PATCHES_DIR, { recursive: true });
+// 生成目录清理：只删生成器自有的 <kebab>.css，保留手工 variables.css（桥接文件，由 bkui.ts 加载）
+const GENERATED_BUILTINS = new Set(['variables.css']);
+function cleanGeneratedDir(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+  for (const f of fs.readdirSync(dir)) {
+    if (!GENERATED_BUILTINS.has(f)) fs.rmSync(path.join(dir, f), { force: true });
+  }
+}
+cleanGeneratedDir(PATCHES_DIR);
 
 let emittedRules = 0;
 let emittedDecls = 0;
@@ -308,8 +316,7 @@ for (const [kebab, bucket] of [...patches.entries()].sort((a, b) => a[0].localeC
 }
 
 // 字面量版输出：剔除变量版已覆盖的（media::selector::prop 同键取一，两源同规则无需重复覆写）
-fs.rmSync(LITERAL_PATCHES_DIR, { recursive: true, force: true });
-fs.mkdirSync(LITERAL_PATCHES_DIR, { recursive: true });
+cleanGeneratedDir(LITERAL_PATCHES_DIR);
 
 let literalRules = 0;
 let literalDecls = 0;
@@ -350,24 +357,22 @@ for (const [kebab, bucket] of [...literalPatches.entries()].sort((a, b) => a[0].
   }
 }
 
-// index.css 统一入口：令牌在前、变量版覆写 → 字面量版覆写 → 手写业务 patches 兜底在后
-// （patches/bkms/ 为手工维护目录，生成器只读取现有 *.css 追加 import，不写入）
-const manualPatches = fs.existsSync(MANUAL_PATCHES_DIR)
-  ? fs
-      .readdirSync(MANUAL_PATCHES_DIR)
-      .filter(f => f.endsWith('.css'))
-      .sort()
-  : [];
-const indexLines = [
-  '/* 主题层统一入口 — bkui-theme/bkui-theme-literal 清单由 gen-overrides.mjs 生成，重跑会整体覆盖本文件；patches/bkms 段为手工维护 */',
-  "@import './tokens/colors.css';",
-  "@import './tokens/semantic.css';",
-  ...perComponent.map(p => `@import './patches/bkui-theme/${p.kebab}.css';`),
-  ...literalPerComponent.map(p => `@import './patches/bkui-theme-literal/${p.kebab}.css';`),
-  ...manualPatches.map(f => `@import './patches/bkms/${f}';`),
-  '',
-];
-fs.writeFileSync(path.join(ROOT, 'src/styles/theme/index.css'), indexLines.join('\n'));
+// 域内聚合入口：每个 patches 子目录一个 index.css，theme/index.css 只引各域这一个文件
+// （variables.css 不进域内清单——它由 bkui.ts 紧随产物加载，见 src/styles/theme/variables.css）
+function writeDomainIndex(dir, files, header) {
+  fs.writeFileSync(path.join(dir, 'index.css'), [...header, ...files.map(f => `@import './${f}';`), ''].join('\n'));
+}
+writeDomainIndex(
+  PATCHES_DIR,
+  perComponent.map(p => `${p.kebab}.css`),
+  ['/* bkui 变量版覆写清单 — 由 gen-overrides.mjs 生成，重跑整体覆盖；variables.css 为手工桥接，不在此列 */'],
+);
+writeDomainIndex(
+  LITERAL_PATCHES_DIR,
+  literalPerComponent.map(p => `${p.kebab}.css`),
+  ['/* bkui 字面量覆写清单（压制 lib/*.less 旧色）— 由 gen-overrides.mjs 生成，重跑整体覆盖 */'],
+);
+// patches/bkms/index.css 为手工维护（feedback/table 清单），生成器不触碰
 
 // ---------- 4. 生成摘要 + 台账 ----------
 fs.mkdirSync(REPORTS, { recursive: true });

@@ -43,7 +43,7 @@
 tokens/
 ├── colors.css         原子色阶             --bkms-brand-2……（唯一写色值处，:root；uno 注册真源）
 └── semantic.css       语义层               --bkms-text-body…… 引用色阶
-bridge.css          桥接层               组件库 :root 变量重指向 --bkms-*（覆盖 822 处 var 引用点）
+patches/*/variables.css   桥接层               组件库 :root 变量重指向 --bkms-*（按域拆分：bkui-theme/ + bkms/，bkui.ts 加载）
 patches/
 ├── bkui-theme/        class 覆写层 ★主角   组件库写死 hex 的选择器级覆盖（549 处的归属地，生成器管理）
 └── bkms/              手写业务补丁         feedback/table 等手工维护，生成器不触碰
@@ -65,13 +65,13 @@ src/styles/theme/
 ├── tokens/
 │   ├── colors.css      # 色阶（唯一写色值处）
 │   └── semantic.css    # 语义层
-├── bridge.css          # 组件库变量桥接（bkui.ts 紧随组件库样式加载）
 ├── patches/
-│   ├── bkui-theme/     # class 覆写，按组件域分文件（生成器管理，重跑整体覆盖）
+│   ├── bkui-theme/     # class 覆写，按组件域分文件（生成器管理，重跑整体覆盖；variables.css 为手工桥接，生成器保留）
+│   │   ├── variables.css
 │   │   ├── form.css
 │   │   ├── dialog.css
 │   │   └── …
-│   └── bkms/           # 手写业务补丁（feedback / table，生成器不触碰）
+│   └── bkms/           # 手写业务补丁（feedback / table / variables，生成器不触碰）
 ├── themes/             # 本期留空
 └── index.css           # 统一 @import（生成器重写）
 ```
@@ -79,7 +79,7 @@ src/styles/theme/
 **引入顺序**：
 
 1. `src/main.ts`：`import '~/styles/theme/index.css';`（整包：tokens + patches，放 CSS 组末尾）—— `--bkms-*` 最早有定义。
-2. `src/modules/bkui.ts`：`import 'bkui-vue/dist/style.variable.css';` **紧接其后** `import '~/styles/theme/bridge.css';` —— ES module 规范保证 bridge 后于组件库样式加载。
+2. `src/modules/bkui.ts`：`import 'bkui-vue/dist/style.variable.css';` **紧接其后** `import patches/bkui-theme/variables.css + patches/bkms/variables.css;` —— ES module 规范保证变量桥接后于组件库样式加载。
 3. `src/main.ts` 启动时 `document.body.classList.add('bkms-themed')` —— 覆写作用域运行时挂载（见第五节）。
 
 ## 五、覆写层组织规约

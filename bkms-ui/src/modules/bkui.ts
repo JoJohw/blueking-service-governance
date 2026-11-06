@@ -21,8 +21,7 @@ import bkui from 'bkui-vue';
 import type { UserModule } from '~/types';
 
 import 'bkui-vue/dist/style.variable.css';
-// 紧跟 style.variable.css：同一模块内 import 顺序由 ES module 规范保证，覆盖组件库 :root 变量
-import '~/styles/theme/bridge.css';
+import '~/styles/theme/variables.css';
 
 // Setup BKUI
 export const install: UserModule = ({ app }) => {
