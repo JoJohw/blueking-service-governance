@@ -32,7 +32,7 @@
       <div
         v-for="(item, index) in items"
         :key="item.id"
-        class="bg-[#F0F1F5] p-[16px]"
+        class="bg-bkms-neutral-6 p-[16px]"
       >
         <!-- 顶部行：slot header-left + 删除按钮 -->
         <div class="flex items-center mb-[12px]">
@@ -48,7 +48,7 @@
               content: t('组件输出至少要包含一个资源'),
               disabled: !disableRemove,
             }"
-            class="px-[8px] h-[32px] text-[#4D4F56] hover:text-[#3A84FF] shrink-0 ml-[14px]"
+            class="px-[8px] h-[32px] bkms-text-body hover:bkms-text-brand shrink-0 ml-[14px]"
             :disabled="disableRemove"
             text
             @click="handleRemove(index)"

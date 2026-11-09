@@ -17,12 +17,12 @@
 -->
 
 <template>
-  <div class="px-[32px] py-[12px] min-w-[520px] h-[252px] bg-[#fff] flex justify-between">
+  <div class="px-[32px] py-[12px] min-w-[520px] h-[252px] bkms-bg-card flex justify-between">
     <div class="py-[12px]">
-      <span class="text-[#313238] text-[14px] font-bold">
+      <span class="bkms-text-title text-[14px] font-bold">
         {{ $t('集群健康分数') }}
       </span>
-      <div class="text-[#979BA5] text-[12px] mt-[4px]">
+      <div class="bkms-text-secondary text-[12px] mt-[4px]">
         {{ $t('基于 {0} 个未恢复问题的综合评估', [unRecoveredCount]) }}
       </div>
       <ClusterHealthScore
@@ -38,38 +38,50 @@
     <div>
       <ul class="grid gap-y-[12px]">
         <li
-          class="min-w-[186px] h-[68px] bg-[#F5F7FA] rounded-[2px] cursor-pointer flex flex-col items-center p-[12px] hover:bg-[#F0F5FF]"
-          :class="activeCard === LEVEL_VALUE.RISK ? 'outline outline-[1px] outline-[#3A84FF] !bg-[#E1ECFF]' : ''"
+          class="min-w-[186px] h-[68px] bkms-bg-page rounded-[2px] cursor-pointer flex flex-col items-center p-[12px] hover:bkms-bg-brand-soft"
+          :class="
+            activeCard === LEVEL_VALUE.RISK
+              ? 'outline outline-[1px] outline-bkms-brand-2 !bkms-bg-active'
+              : ''
+          "
           @click="handleActiveChange(LEVEL_VALUE.RISK)"
         >
-          <span class="text-[24px] leading-[24px] text-[#EA3636] font-bold">
+          <span class="text-[24px] leading-[24px] text-bkms-danger-2 font-bold">
             {{ count.RISK }}
           </span>
-          <span class="text-[#4D4F56]">
+          <span class="bkms-text-body">
             {{ `${$t('致命问题')}(${$t('未恢复')})` }}
           </span>
         </li>
         <li
-          class="min-w-[186px] h-[68px] bg-[#F5F7FA] rounded-[2px] cursor-pointer flex flex-col items-center p-[12px] hover:bg-[#F0F5FF]"
-          :class="activeCard === LEVEL_VALUE.WARN ? 'outline outline-[1px] outline-[#3A84FF] !bg-[#E1ECFF]' : ''"
+          class="min-w-[186px] h-[68px] bkms-bg-page rounded-[2px] cursor-pointer flex flex-col items-center p-[12px] hover:bkms-bg-brand-soft"
+          :class="
+            activeCard === LEVEL_VALUE.WARN
+              ? 'outline outline-[1px] outline-bkms-brand-2 !bkms-bg-active'
+              : ''
+          "
           @click="handleActiveChange(LEVEL_VALUE.WARN)"
         >
-          <span class="text-[24px] leading-[24px] text-[#F59500] font-bold">
+          <span class="text-[24px] leading-[24px] text-bkms-warning-2 font-bold">
             {{ count.WARN }}
           </span>
-          <span class="text-[#4D4F56]">
+          <span class="bkms-text-body">
             {{ `${$t('预警问题')}(${$t('未恢复')})` }}
           </span>
         </li>
         <li
-          class="min-w-[186px] h-[68px] bg-[#F5F7FA] rounded-[2px] cursor-pointer flex flex-col items-center p-[12px] hover:bg-[#F0F5FF]"
-          :class="activeCard === LEVEL_VALUE.RECOVERED ? 'outline outline-[1px] outline-[#3A84FF] !bg-[#E1ECFF]' : ''"
+          class="min-w-[186px] h-[68px] bkms-bg-page rounded-[2px] cursor-pointer flex flex-col items-center p-[12px] hover:bkms-bg-brand-soft"
+          :class="
+            activeCard === LEVEL_VALUE.RECOVERED
+              ? 'outline outline-[1px] outline-bkms-brand-2 !bkms-bg-active'
+              : ''
+          "
           @click="handleActiveChange(LEVEL_VALUE.RECOVERED)"
         >
-          <span class="text-[24px] leading-[24px] text-[#2CAF5E] font-bold">
+          <span class="text-[24px] leading-[24px] text-bkms-success-2 font-bold">
             {{ count.RECOVERED }}
           </span>
-          <span class="text-[#4D4F56]">
+          <span class="bkms-text-body">
             {{ $t('已恢复问题') }}
           </span>
         </li>

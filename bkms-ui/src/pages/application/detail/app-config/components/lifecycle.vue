@@ -29,7 +29,7 @@
         <EnvScopeTag :current-env="currentEnv" />
       </div>
     </template>
-    <div class="bg-[#FFF] p-[16px]">
+    <div class="bkms-bg-card p-[16px]">
       <!-- 查看态 -->
       <template v-if="!isEditing">
         <div class="grid grid-cols-2 gap-[12px] gap-y-2">
@@ -75,7 +75,7 @@
                     </div>
                     <span
                       v-if="!formModel.preStopCommand?.length"
-                      class="text-[12px] text-[var(--bkms-neutral-1)]"
+                      class="text-[12px] bkms-text-title"
                       >--</span
                     >
                   </div>
@@ -118,11 +118,11 @@
       <!-- 编辑态 -->
       <div v-else>
         <div class="mb-[16px]">
-          <div class="flex flex-col mb-[24px] text-[12px] text-[var(--bkms-neutral-2)]">
+          <div class="flex flex-col mb-[24px] text-[12px] bkms-text-body">
             <div class="flex items-center gap-[4px]">
               <p :class="['text-[14px]', { 'field-diff-highlight': isFieldModified('preStop') }]">
                 {{ $t('退出前命令 (preStop)') }}
-                <span class="relative top-[2px] text-[var(--bkms-danger-2)] ml-[4px]">*</span>
+                <span class="relative top-[2px] text-bkms-danger-2 ml-[4px]">*</span>
               </p>
             </div>
             <div class="flex items-center mt-[8px]">
@@ -216,7 +216,7 @@
               <div class="flex items-center gap-[4px]">
                 <div
                   :class="[
-                    'text-[14px] text-[var(--bkms-neutral-2)]',
+                    'text-[14px] bkms-text-body',
                     { 'field-diff-highlight': isFieldModified('terminationGracePeriodSeconds') },
                   ]"
                 >
@@ -231,7 +231,7 @@
                 suffix="秒"
                 type="number"
               />
-              <p class="mt-[4px] text-[12px] text-[var(--bkms-neutral-3)]">
+              <p class="mt-[4px] text-[12px] bkms-text-secondary">
                 {{ $t('等待 preStop 执行的最大时间，时间超过而 preStop 未执行完时，将强制杀死容器') }}
               </p>
             </div>
@@ -292,8 +292,8 @@
   import type { ExtendedEnv } from './types';
 
   // 查看态值样式常量
-  const VIEW_VALUE_CLASS = 'text-[12px] text-[var(--bkms-neutral-1)]';
-  const VIEW_VALUE_MODIFIED_CLASS = 'border-b border-dashed border-b-[var(--bkms-neutral-1)]';
+  const VIEW_VALUE_CLASS = 'text-[12px] bkms-text-title';
+  const VIEW_VALUE_MODIFIED_CLASS = 'border-b border-dashed border-b-bkms-neutral-1';
 
   type FieldKey = 'preStop' | 'terminationGracePeriodSeconds';
   type PreStopExecMode = 'exec' | 'shell';
@@ -783,7 +783,7 @@
 
   :deep(.pre-stop-exec-mode.bk-radio-capsule .bk-radio-button.is-checked) {
     .bk-radio-button-label {
-      background: #fff !important;
+      background: var(--bkms-bg-card) !important;
     }
   }
 

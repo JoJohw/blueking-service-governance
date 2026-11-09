@@ -76,10 +76,10 @@
       </template>
       <div class="flex flex-col gap-[16px]">
         <BkmsContent
-          class="info-title shadow-[0_2px_4px_0_#1919290d]"
+          class="info-title shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           :title="$t('基础信息')"
         >
-          <div class="grid grid-cols-2 gap-[12px] gap-y-2 p-[16px] pl-[60px] bg-[#fff]">
+          <div class="grid grid-cols-2 gap-[12px] gap-y-2 p-[16px] pl-[60px] bkms-bg-card">
             <FieldItem
               :container-height="20"
               :field-value="$t('类型')"
@@ -92,7 +92,7 @@
                     :type="appType"
                   >
                     <template #label>
-                      <span class="text-[#313238] leading-[20px] text-[14px] font-bold ml-[6px]">
+                      <span class="bkms-text-title leading-[20px] text-[14px] font-bold ml-[6px]">
                         {{ $t(getAppDisplayLabel(getAppDisplayKind(appData || { type: appType }))) }}
                       </span>
                     </template>
@@ -121,12 +121,12 @@
           </div>
         </BkmsContent>
         <BkmsContent
-          class="info-title shadow-[0_2px_4px_0_#1919290d]"
+          class="info-title shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           show-edit-icon
           :title="$t('构建配置')"
           @edit="handleBeforeEditBuilder"
         >
-          <div class="grid grid-cols-2 gap-[12px] gap-y-2 p-[16px] pl-[60px] bg-[#fff]">
+          <div class="grid grid-cols-2 gap-[12px] gap-y-2 p-[16px] pl-[60px] bkms-bg-card">
             <FieldItem
               :class="builderType === 'pipeline' ? 'col-span-2' : ''"
               :container-height="20"
@@ -216,7 +216,7 @@
                         v-if="platformCommandsPreBuild"
                         class="rounded-[2px] overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
-                        header-class="!hover:bg-[var(--bkms-neutral-6)]"
+                        header-class="!hover:bg-bkms-neutral-6"
                         normal-bg-color="var(--bkms-neutral-7)"
                         type="normal"
                       >
@@ -230,7 +230,7 @@
                           </div>
                         </template>
                         <pre
-                          class="m-0 text-[12px] font-mono leading-[22px] text-[var(--bkms-neutral-2)] whitespace-pre-wrap"
+                          class="m-0 text-[12px] font-mono leading-[22px] bkms-text-body whitespace-pre-wrap"
                           v-text="platformCommandsPreBuild"
                         ></pre>
                       </ToggleCard>
@@ -238,7 +238,7 @@
                         v-if="platformCommandsBuild"
                         class="rounded-[2px] overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
-                        header-class="!hover:bg-[var(--bkms-neutral-6)]"
+                        header-class="!hover:bg-bkms-neutral-6"
                         normal-bg-color="var(--bkms-neutral-7)"
                         type="normal"
                       >
@@ -252,7 +252,7 @@
                           </div>
                         </template>
                         <pre
-                          class="m-0 text-[12px] font-mono leading-[22px] text-[var(--bkms-neutral-2)] whitespace-pre-wrap"
+                          class="m-0 text-[12px] font-mono leading-[22px] bkms-text-body whitespace-pre-wrap"
                           v-text="platformCommandsBuild"
                         ></pre>
                       </ToggleCard>
@@ -260,7 +260,7 @@
                         v-if="platformExtraFiles"
                         class="rounded-[2px] overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
-                        header-class="!hover:bg-[var(--bkms-neutral-6)]"
+                        header-class="!hover:bg-bkms-neutral-6"
                         normal-bg-color="var(--bkms-neutral-7)"
                         type="normal"
                       >
@@ -274,7 +274,7 @@
                           </div>
                         </template>
                         <pre
-                          class="m-0 text-[12px] font-mono leading-[22px] text-[var(--bkms-neutral-2)] whitespace-pre-wrap"
+                          class="m-0 text-[12px] font-mono leading-[22px] bkms-text-body whitespace-pre-wrap"
                           v-text="platformExtraFiles"
                         ></pre>
                       </ToggleCard>
@@ -282,7 +282,7 @@
                         v-if="platformCommandsRuntimeEnv"
                         class="rounded-[2px] overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
-                        header-class="!hover:bg-[var(--bkms-neutral-6)]"
+                        header-class="!hover:bg-bkms-neutral-6"
                         normal-bg-color="var(--bkms-neutral-7)"
                         type="normal"
                       >
@@ -296,7 +296,7 @@
                           </div>
                         </template>
                         <pre
-                          class="m-0 text-[12px] font-mono leading-[22px] text-[var(--bkms-neutral-2)] whitespace-pre-wrap"
+                          class="m-0 text-[12px] font-mono leading-[22px] bkms-text-body whitespace-pre-wrap"
                           v-text="platformCommandsRuntimeEnv"
                         ></pre>
                       </ToggleCard>
@@ -304,7 +304,7 @@
                         v-if="platformCommandsStart"
                         class="rounded-[2px] overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
-                        header-class="!hover:bg-[var(--bkms-neutral-6)]"
+                        header-class="!hover:bg-bkms-neutral-6"
                         normal-bg-color="var(--bkms-neutral-7)"
                         type="normal"
                       >
@@ -318,7 +318,7 @@
                           </div>
                         </template>
                         <pre
-                          class="m-0 text-[12px] font-mono leading-[22px] text-[var(--bkms-neutral-2)] whitespace-pre-wrap"
+                          class="m-0 text-[12px] font-mono leading-[22px] bkms-text-body whitespace-pre-wrap"
                           v-text="platformCommandsStart"
                         ></pre>
                       </ToggleCard>
@@ -382,8 +382,8 @@
             {{ $t('删除应用') }}
           </Button>
           <div class="flex items-center gap-[4px] text-[12px]">
-            <ExclamationCircleShape class="text-[14px] text-[var(--bkms-warning-2)]" />
-            <span class="text-[var(--bkms-neutral-2)]">
+            <ExclamationCircleShape class="text-[14px] text-bkms-warning-2" />
+            <span class="bkms-text-body">
               {{ $t('删除应用后，所有相关的配置、部署信息和操作记录将永久丢失，此操作不可恢复。') }}
             </span>
           </div>

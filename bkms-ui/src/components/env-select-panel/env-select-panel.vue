@@ -32,8 +32,8 @@
     <div
       v-bind="$attrs"
       :class="[
-        'flex items-center min-w-[280px] max-w-[626px] border border-[var(--bkms-neutral-4)] rounded-[2px] bg-[#FFF] cursor-pointer overflow-hidden transition-border-color duration-200 hover:border-[var(--bkms-neutral-3)]',
-        { '!border-[var(--bkms-brand-2)] shadow-[0_0_3px_0_var(--bkms-brand-4)]': isPopoverVisible },
+        'flex items-center min-w-[280px] max-w-[626px] border bkms-line-input rounded-[2px] bkms-bg-card cursor-pointer overflow-hidden transition-border-color duration-200 hover:bkms-line-hover',
+        { '!bkms-line-active shadow-[0_0_3px_0_var(--bkms-brand-4)]': isPopoverVisible },
         mode === 'multi' ? 'h-auto min-h-[32px] !w-[626px]' : 'h-[32px]',
         { '!max-w-none': !showEnvPrefix },
       ]"
@@ -59,7 +59,7 @@
       </Select>
       <div
         v-else-if="showEnvPrefix"
-        class="flex items-center h-[32px] px-[10px] border-r-[1px] border-[var(--bkms-neutral-4)] shrink-0"
+        class="flex items-center h-[32px] px-[10px] border-r-[1px] border-r-bkms-neutral-4 shrink-0"
       >
         {{ $t('环境') }}
       </div>
@@ -94,7 +94,7 @@
                   </Tag>
                   <Tag
                     v-if="isFeatureEnv(selectedMultiEnvItems[index])"
-                    class="bg-[var(--bkms-cyan-6)] text-[var(--bkms-cyan-2)]"
+                    class="bg-bkms-cyan-6 text-bkms-cyan-2"
                     size="small"
                   >
                     {{ $t('特性') }}
@@ -105,7 +105,7 @@
           </OverflowTags>
           <span
             v-else
-            class="text-[12px] leading-[22px] text-[var(--bkms-navy-5)]"
+            class="text-[12px] leading-[22px] text-bkms-navy-5"
           >
             {{ $t('请选择') }}
           </span>
@@ -114,7 +114,7 @@
         <template v-else>
           <span
             v-if="selectedEnvItem"
-            class="inline-flex items-center gap-[4px] min-w-0 text-[12px] leading-[22px] text-[var(--bkms-neutral-2)]"
+            class="inline-flex items-center gap-[4px] min-w-0 text-[12px] leading-[22px] bkms-text-body"
           >
             <span class="truncate">{{ selectedEnvItem.displayName }}</span>
             <Tag
@@ -126,7 +126,7 @@
             </Tag>
             <Tag
               v-if="isFeatureEnv(selectedEnvItem)"
-              class="bg-[var(--bkms-cyan-6)] text-[var(--bkms-cyan-2)] shrink-0"
+              class="bg-bkms-cyan-6 text-bkms-cyan-2 shrink-0"
               size="small"
             >
               {{ $t('特性') }}
@@ -134,7 +134,7 @@
           </span>
           <span
             v-else
-            class="text-[12px] leading-[22px] text-[var(--bkms-navy-5)]"
+            class="text-[12px] leading-[22px] text-bkms-navy-5"
           >
             {{ $t('请选择') }}
           </span>
@@ -142,7 +142,7 @@
       </div>
       <AngleDownLine
         :class="[
-          'text-[var(--bkms-neutral-3)] mr-[10px] shrink-0 self-start mt-[10px] transition-transform duration-200',
+          'bkms-text-secondary mr-[10px] shrink-0 self-start mt-[10px] transition-transform duration-200',
           { 'rotate-180': isPopoverVisible },
         ]"
       />
@@ -154,8 +154,8 @@
         v-if="enableVisibleEnvSettings && isEditingVisibleEnvs"
         class="px-[8px] pt-[8px]"
       >
-        <div class="text-[14px] leading-[22px] font-medium text-[var(--bkms-neutral-1)]">{{ $t('设置可见环境') }}</div>
-        <p class="mt-[4px] mb-[8px] text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">
+        <div class="text-[14px] leading-[22px] font-medium bkms-text-title">{{ $t('设置可见环境') }}</div>
+        <p class="mt-[4px] mb-[8px] text-[12px] leading-[20px] bkms-text-secondary">
           {{
             $t(
               '特性环境始终可见，无需设置。可仅勾选需要在「部署管理」页面环境下拉列表中显示的环境；其他页面不受此设置影响，仍会显示全部环境。',
@@ -187,27 +187,27 @@
             :placeholder="$t('请输入关键词')"
           >
             <template #prefix>
-              <div class="flex items-center justify-center text-[var(--bkms-neutral-3)]">
+              <div class="flex items-center justify-center bkms-text-secondary">
                 <Search class="ml-[2px] text-[16px]" />
               </div>
             </template>
           </Input>
           <div
             v-if="showOnlyDeployedFilter"
-            class="h-[40px] flex items-center border-l-[1px] border-b-[1px] border-[var(--bkms-neutral-5)] ml-[-1px] pl-[8px] pb-[2px]"
+            class="h-[40px] flex items-center border-l-[1px] border-b-[1px] bkms-line-default ml-[-1px] pl-[8px] pb-[2px]"
           >
             <Checkbox
               v-model="onlyDeployed"
               class="shrink-0"
             >
-              <span class="text-[12px] text-[var(--bkms-neutral-2)]">{{ $t('仅显示已部署环境') }}</span>
+              <span class="text-[12px] bkms-text-body">{{ $t('仅显示已部署环境') }}</span>
             </Checkbox>
           </div>
         </div>
         <!-- 无已部署环境 -->
         <div
           v-if="onlyDeployed && filteredGroups.length === 0"
-          class="py-[16px] px-[12px] text-[12px] text-[var(--bkms-neutral-4)] text-center"
+          class="py-[16px] px-[12px] text-[12px] bkms-text-disabled text-center"
         >
           {{ $t('无匹配数据') }}
         </div>
@@ -223,7 +223,7 @@
             class="flex-1 min-w-0"
           >
             <!-- 分组标题 -->
-            <div class="h-[32px] flex items-center justify-between px-[8px] bg-[var(--bkms-neutral-7)]">
+            <div class="h-[32px] flex items-center justify-between px-[8px] bkms-bg-page">
               <Tag :class="envTypeTagClassMap[group.type]">
                 {{ group.label }}
               </Tag>
@@ -248,11 +248,11 @@
                   placement: 'bottom',
                 }"
                 :class="[
-                  'flex items-center h-[32px] px-[8px] cursor-pointer text-[12px] text-[var(--bkms-neutral-2)] transition-bg-color duration-150',
+                  'flex items-center h-[32px] px-[8px] cursor-pointer text-[12px] bkms-text-body transition-bg-color duration-150',
                   { 'feature-env-child': env.isFeatureChild },
-                  { '!bg-[var(--bkms-brand-6)] !text-[var(--bkms-brand-2)]': isSelected(env) },
+                  { '!bkms-bg-active !bkms-text-brand': isSelected(env) },
                   { 'cursor-not-allowed opacity-60': isEnvDisabled(env) },
-                  { 'hover:bg-[var(--bkms-neutral-7)]': !isSelected(env) && !isEnvDisabled(env) },
+                  { 'hover:bkms-bg-page': !isSelected(env) && !isEnvDisabled(env) },
                 ]"
                 @click="handleSelectEnv(env)"
               >
@@ -270,7 +270,7 @@
                   <span class="truncate">{{ env.displayName }}</span>
                   <Tag
                     v-if="isFeatureEnv(env)"
-                    class="bg-[var(--bkms-cyan-6)] text-[var(--bkms-cyan-2)] ml-[4px] shrink-0"
+                    class="bg-bkms-cyan-6 text-bkms-cyan-2 ml-[4px] shrink-0"
                     size="small"
                   >
                     {{ $t('特性') }}
@@ -284,7 +284,7 @@
               </div>
               <div
                 v-if="group.envs.length === 0"
-                class="py-[16px] px-[12px] text-[12px] text-[var(--bkms-neutral-4)] text-center"
+                class="py-[16px] px-[12px] text-[12px] bkms-text-disabled text-center"
               >
                 {{ searchKeyword.trim() ? $t('无匹配数据') : $t('暂无数据') }}
               </div>
@@ -295,7 +295,7 @@
       <!-- 编辑态会替换操作按钮，避免同一次点击被误判为弹层外部点击。 -->
       <div
         v-if="enableVisibleEnvSettings"
-        class="flex items-center justify-between border-t border-[var(--bkms-neutral-5)] mt-[8px] px-[8px] pt-[8px]"
+        class="flex items-center justify-between border-t border-t-bkms-neutral-5 mt-[8px] px-[8px] pt-[8px]"
         @click.stop
       >
         <template v-if="isEditingVisibleEnvs">
@@ -324,7 +324,7 @@
           </div>
         </template>
         <template v-else>
-          <span class="text-[12px] text-[var(--bkms-neutral-3)]">{{
+          <span class="text-[12px] bkms-text-secondary">{{
             isRestricted && filterVisibleEnvs
               ? $t('已按可见环境筛选，共 {0} 个', [selectableEnvList.length])
               : $t('显示全部环境')
@@ -1147,7 +1147,7 @@
     padding: 0 8px 8px 8px !important;
     border-radius: 2px !important;
     border: none;
-    box-shadow: 0 2px 4px 0 #1919290d !important;
+    box-shadow: 0 2px 4px 0 var(--bkms-shadow-card) !important;
 
     .env-list-scroll {
       &::-webkit-scrollbar {

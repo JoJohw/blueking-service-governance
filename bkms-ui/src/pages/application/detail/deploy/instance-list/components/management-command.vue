@@ -144,8 +144,8 @@
                 @click="handleFormat(editor)"
               >
                 <template #icon>
-                  <span class="bkms-icon bkms-icon-angle-left text-[12px] text-[var(--bkms-neutral-3)]"></span>
-                  <span class="bkms-icon bkms-icon-angle-right text-[12px] text-[var(--bkms-neutral-3)]"></span>
+                  <span class="bkms-icon bkms-icon-angle-left text-[12px] bkms-text-secondary"></span>
+                  <span class="bkms-icon bkms-icon-angle-right text-[12px] bkms-text-secondary"></span>
                 </template>
               </IconButton>
             </template>
@@ -198,7 +198,7 @@
                 <span v-if="row.key">{{ row.key }}</span>
                 <span
                   v-else
-                  class="text-[var(--bkms-navy-5)]"
+                  class="text-bkms-navy-5"
                   >{{ $t('请输入') }}</span
                 >
               </template>
@@ -218,7 +218,7 @@
                 <span v-if="row.value">{{ row.value }}</span>
                 <span
                   v-else
-                  class="text-[var(--bkms-navy-5)]"
+                  class="text-bkms-navy-5"
                   >{{ $t('请输入') }}</span
                 >
               </template>
@@ -234,7 +234,7 @@
                   @click="handleAdd()"
                 >
                   <i
-                    class="bkms-icon bkms-icon-plus-circle-shape text-[var(--bkms-neutral-3)] text-[14px] mr-[10px]"
+                    class="bkms-icon bkms-icon-plus-circle-shape bkms-text-secondary text-[14px] mr-[10px]"
                   ></i>
                 </Button>
                 <Button
@@ -246,7 +246,7 @@
                   <i
                     :class="[
                       'bkms-icon bkms-icon-minus-circle-shape text-[14px]',
-                      { 'text-[var(--bkms-neutral-3)]': tableData.length !== 1 },
+                      { 'bkms-text-secondary': tableData.length !== 1 },
                     ]"
                   >
                   </i>
@@ -317,7 +317,7 @@
           @collapse-change="handleCollapse"
         >
           <template #aside>
-            <div class="h-full bg-[var(--bkms-neutral-7)] py-[8px] flex flex-col w-[160px]">
+            <div class="h-full bkms-bg-page py-[8px] flex flex-col w-[160px]">
               <div class="font-bold h-[32px] leading-[32px] shrink-0 px-[12px]">
                 {{ `${$t('实例列表')}( ${executeResult.length} )` }}
               </div>
@@ -327,8 +327,8 @@
                   :key="`${index}-${item.instanceID}`"
                   :class="[
                     'h-[32px] leading-[32px] px-[12px]',
-                    'hover:bg-[var(--bkms-neutral-6)] cursor-pointer',
-                    { '!bg-[#d1e8ff] text-[var(--bkms-brand-2)]': curInstance?.instanceID === item.instanceID },
+                    'hover:bg-bkms-neutral-6 cursor-pointer',
+                    { '!bg-[#d1e8ff] bkms-text-brand': curInstance?.instanceID === item.instanceID },
                   ]"
                   @click="handleClickInstance(item)"
                 >
@@ -351,8 +351,8 @@
                   @click="handleFormat(editor)"
                 >
                   <template #icon>
-                    <span class="bkms-icon bkms-icon-angle-left text-[12px] text-[var(--bkms-neutral-3)]"></span>
-                    <span class="bkms-icon bkms-icon-angle-right text-[12px] text-[var(--bkms-neutral-3)]"></span>
+                    <span class="bkms-icon bkms-icon-angle-left text-[12px] bkms-text-secondary"></span>
+                    <span class="bkms-icon bkms-icon-angle-right text-[12px] bkms-text-secondary"></span>
                   </template>
                 </IconButton>
               </template>
@@ -384,12 +384,12 @@
           <template #title>
             <span
               v-if="responseType === 'success'"
-              class="text-[var(--bkms-neutral-2)] text-[14px]"
+              class="bkms-text-body text-[14px]"
               >{{ $t('无执行成功的结果') }}</span
             >
             <span
               v-else
-              class="text-[var(--bkms-neutral-2)] text-[14px]"
+              class="bkms-text-body text-[14px]"
               >{{ $t('无执行失败的结果') }}</span
             >
           </template>
@@ -401,10 +401,10 @@
         type="empty"
       >
         <template #title>
-          <span class="text-[var(--bkms-neutral-2)] text-[14px]">{{ $t('执行结果为空') }}</span>
+          <span class="bkms-text-body text-[14px]">{{ $t('执行结果为空') }}</span>
         </template>
         <template #description>
-          <span class="text-[var(--bkms-neutral-3)] text-[12px]">{{
+          <span class="bkms-text-secondary text-[12px]">{{
             $t('请先选择命令，填写相应的参数，然后点击执行按钮发送请求')
           }}</span>
         </template>
@@ -416,8 +416,8 @@
       theme="danger"
     >
       <template #title>
-        <p class="font-bold text-[var(--bkms-neutral-2)] mb-[4px]">{{ $t('API 请求失败') }}:</p>
-        <p class="text-[var(--bkms-neutral-2)]">{{ `${$t('状态')}: ${requestFailed.status}` }}</p>
+        <p class="font-bold bkms-text-body mb-[4px]">{{ $t('API 请求失败') }}:</p>
+        <p class="bkms-text-body">{{ `${$t('状态')}: ${requestFailed.status}` }}</p>
         <p>{{ `${JSON.stringify(requestFailed?.error || {}, null, 2)}` }}</p>
       </template>
     </Alert>

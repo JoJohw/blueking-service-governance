@@ -19,7 +19,7 @@
 <template>
   <div class="flex flex-col p-[20px] max-w-[1400px] min-w-0 w-full">
     <ToggleCard
-      class="bg-[#fff] rounded-[2px] shadow-[0_2px_4px_0_#1919290d]"
+      class="bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
       :name="$t('启动配置')"
       type="normal"
     >
@@ -52,7 +52,7 @@
     </ToggleCard>
     <ToggleCard
       :class="[
-        'bg-[#fff] rounded-[2px] overflow-hidden shadow-[0_2px_4px_0_#1919290d] mt-[16px]',
+        'bkms-bg-card rounded-[2px] overflow-hidden shadow-[0_2px_4px_0_var(--bkms-shadow-card)] mt-[16px]',
         { 'h-full': isYamlCardExpanded },
       ]"
       content-class="!mt-0 h-full p-[24px]"

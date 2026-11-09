@@ -66,8 +66,8 @@
           />
         </Form.FormItem>
         <div class="absolute top-0 left-[60px] flex items-center">
-          <i class="bkms-icon bkms-icon-warning-circle text-[14px] text-[var(--bkms-neutral-3)]"></i>
-          <span class="text-[var(--bkms-neutral-3)] text-[12px] ml-[4px]">
+          <i class="bkms-icon bkms-icon-warning-circle text-[14px] bkms-text-secondary"></i>
+          <span class="bkms-text-secondary text-[12px] ml-[4px]">
             {{ $t('根据选择的版本类型自动生成') }}
           </span>
         </div>

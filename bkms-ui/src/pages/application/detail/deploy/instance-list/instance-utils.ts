@@ -68,23 +68,23 @@ export function renderDeleteInfoBoxContent(selectedInstances: AppInstanceOutputO
   if (selectedInstances.length === 1) {
     return h('div', [
       h('div', { class: 'py-[12px]' }, [t('实例: {0}', [`${selectedInstances[0]?.id} (${selectedInstances[0]?.ip})`])]),
-      h('div', { class: 'bg-[var(--bkms-neutral-7)] py-[12px] px-[16px]' }, [t('此操作将删除该实例，并调整实例数')]),
+      h('div', { class: 'bkms-bg-page py-[12px] px-[16px]' }, [t('此操作将删除该实例，并调整实例数')]),
     ]);
   }
 
   const instances = selectedInstances.map((item, i) =>
-    h('div', { class: ['px-[16px] leading-[32px]', { 'bg-[var(--bkms-neutral-8)]': i % 2 > 0 }] }, [
+    h('div', { class: ['px-[16px] leading-[32px]', { 'bkms-bg-subtle': i % 2 > 0 }] }, [
       `${item.id} (${item.ip})`,
     ]),
   );
 
   return h('div', [
-    h('div', { class: 'bg-[var(--bkms-neutral-7)] py-[12px] px-[16px]' }, [t('此操作将删除以下实例，并调整实例数')]),
+    h('div', { class: 'bkms-bg-page py-[12px] px-[16px]' }, [t('此操作将删除以下实例，并调整实例数')]),
     h(
       'div',
       {
         class:
-          'bg-[var(--bkms-neutral-7)] leading-[32px] px-[16px] mt-[16px] border-1 border-[var(--bkms-neutral-6)] rounded-[2px] border-b-transparent',
+          'bkms-bg-page leading-[32px] px-[16px] mt-[16px] border-1 bkms-line-light rounded-[2px] border-b-transparent',
       },
       [h('span', [t('已选择以下 {0} 个实例', [selectedInstances.length])])],
     ),
@@ -92,7 +92,7 @@ export function renderDeleteInfoBoxContent(selectedInstances: AppInstanceOutputO
       'div',
       {
         class:
-          'max-h-[200px] overflow-auto border-1 border-t-transparent border-[var(--bkms-neutral-6)] rounded-[2px] p-[12px]',
+          'max-h-[200px] overflow-auto border-1 border-t-transparent bkms-line-light rounded-[2px] p-[12px]',
       },
       [...instances],
     ),

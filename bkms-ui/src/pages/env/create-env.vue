@@ -80,7 +80,7 @@
             </Select.Option>
           </Select>
         </Form.FormItem>
-        <div class="mb-[16px] font-700 text-[14px] text-[#313238]">
+        <div class="mb-[16px] font-700 text-[14px] bkms-text-title">
           {{ `APM ${$t('配置')}` }}
         </div>
         <Radio.Group
@@ -90,21 +90,21 @@
           <div
             v-for="item in apmModeOptions"
             :key="item.value"
-            class="apm-radio-card cursor-pointer rounded-[2px] border border-solid border-[#dcdee5] px-[16px] py-[12px] transition-all duration-300"
+            class="apm-radio-card cursor-pointer rounded-[2px] border border-solid bkms-line-default px-[16px] py-[12px] transition-all duration-300"
             :class="{ 'is-active': apmMode === item.value }"
             @click="apmMode = item.value"
           >
             <Radio :label="item.value">
               <div class="ml-[8px]">
-                <div class="font-700 text-[14px] text-[#4D4F56]">{{ item.title }}</div>
-                <div class="mt-[4px] text-[12px] text-[#979BA5]">{{ item.desc }}</div>
+                <div class="font-700 text-[14px] bkms-text-body">{{ item.title }}</div>
+                <div class="mt-[4px] text-[12px] bkms-text-secondary">{{ item.desc }}</div>
               </div>
             </Radio>
           </div>
         </Radio.Group>
         <div
           v-if="apmMode === 'bindExist'"
-          class="bg-[#F5F7FA] px-[16px] py-[12px] mt-[24px]"
+          class="bkms-bg-page px-[16px] py-[12px] mt-[24px]"
         >
           <Form.FormItem
             class="mb-[0]"
@@ -480,12 +480,12 @@
 
   .apm-radio-card {
     &:hover {
-      border-color: #3a84ff;
+      border-color: var(--bkms-line-active);
     }
 
     &.is-active {
-      border-color: #3a84ff;
-      background: #e1ecff;
+      border-color: var(--bkms-line-active);
+      background: var(--bkms-bg-active);
     }
 
     :deep(.bk-radio) {

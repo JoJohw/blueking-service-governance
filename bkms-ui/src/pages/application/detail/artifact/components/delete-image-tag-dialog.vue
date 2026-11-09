@@ -29,7 +29,7 @@
           icon="bkms-icon-tishi"
           :width="42"
         />
-        <span class="text-[var(--bkms-neutral-1)] text-[20px] leading-[32px] text-center mt-[18px]">
+        <span class="bkms-text-title text-[20px] leading-[32px] text-center mt-[18px]">
           {{ t('确定删除镜像 Tag ?') }}
         </span>
       </div>
@@ -37,20 +37,20 @@
     <div v-bkloading="{ loading: isLoadingUsages }">
       <div
         v-if="!hasUsages"
-        class="bg-[var(--bkms-neutral-7)] mb-[16px] py-[12px] px-[16px] text-[14px] text-[var(--bkms-neutral-2)]"
+        class="bkms-bg-page mb-[16px] py-[12px] px-[16px] text-[14px] bkms-text-body"
       >
         {{ t('应用最近的部署记录中未检测到该镜像 Tag 的使用，但是镜像 Tag 一旦删除后无法找回') }}
       </div>
       <div
         v-else
-        class="bg-[var(--bkms-neutral-7)] mb-[16px] py-[12px] px-[16px] text-[14px] text-[var(--bkms-neutral-2)] font-medium"
+        class="bkms-bg-page mb-[16px] py-[12px] px-[16px] text-[14px] bkms-text-body font-medium"
       >
         <i18n-t
           keypath="该镜像 Tag ({0}) 目前正被以下环境使用，{1}，请谨慎确认是否删除"
           tag="p"
         >
           <span>{{ row?.tag }}</span>
-          <span class="text-[var(--bkms-danger-2)]">{{
+          <span class="text-bkms-danger-2">{{
             $t('删除后可能会影响已部署的环境（如扩缩容、重启、回滚将无法拉取该镜像）')
           }}</span>
         </i18n-t>
@@ -86,12 +86,12 @@
       </Table>
       <!-- 确认输入 -->
       <i18n-t
-        class="text-[12px] text-[var(--bkms-neutral-2)]"
+        class="text-[12px] bkms-text-body"
         keypath="该操作不可恢复，请输入镜像 Tag：{0} 进行确认"
       >
         <span
           v-bk-tooltips="$t('点击复制')"
-          class="font-bold text-[var(--bkms-danger-2)] cursor-pointer rounded-[2px] px-[4px] hover:bg-[var(--bkms-danger-6)]"
+          class="font-bold text-bkms-danger-2 cursor-pointer rounded-[2px] px-[4px] hover:bkms-bg-danger"
           @click="copyText(row?.tag ?? '')"
         >
           {{ row?.tag }}

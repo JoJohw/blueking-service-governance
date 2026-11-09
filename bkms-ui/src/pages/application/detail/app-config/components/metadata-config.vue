@@ -37,19 +37,19 @@
         <EnvScopeTag :current-env="currentEnv" />
       </div>
     </template>
-    <div class="bg-[#fff] p-[16px]">
+    <div class="bkms-bg-card p-[16px]">
       <div class="grid grid-cols-3 gap-[16px]">
         <div
           v-for="section in sectionItems"
           :key="section.key"
-          class="metadata-card border border-[var(--bkms-neutral-6)] rounded-[8px] min-w-0 overflow-hidden"
+          class="metadata-card border bkms-line-light rounded-[8px] min-w-0 overflow-hidden"
         >
           <div
-            class="flex items-center gap-[10px] h-[32px] px-[12px] bg-[var(--bkms-neutral-7)] border-b border-[var(--bkms-neutral-6)]"
+            class="flex items-center gap-[10px] h-[32px] px-[12px] bkms-bg-page border-b border-b-bkms-neutral-6"
           >
             <span
               :class="[
-                'text-[12px] font-bold text-[var(--bkms-neutral-2)]',
+                'text-[12px] font-bold bkms-text-body',
                 { 'section-modified-label': controllers[section.key].hasOverride.value },
               ]"
             >
@@ -57,7 +57,7 @@
             </span>
             <Button
               v-if="!editingSection"
-              class="!hover:text-[var(--bkms-brand-2)]"
+              class="!hover:bkms-text-brand"
               text
               @click="handleEdit(section.key)"
             >
@@ -83,7 +83,7 @@
 
                 <Copy
                   v-if="inputModes[section.key] === 'text'"
-                  class="text-[var(--bkms-neutral-3)] text-[16px] hover:text-[var(--bkms-brand-2)] cursor-pointer"
+                  class="bkms-text-secondary text-[16px] hover:bkms-text-brand cursor-pointer"
                   :title="$t('复制')"
                   @click="handleCopy"
                 />

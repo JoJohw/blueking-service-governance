@@ -28,7 +28,7 @@
         :title="mode === 'conflict' ? $t('权重因子参数') : $t('确认修改北极星上的权重因子？')"
         :title-size="20"
       >
-        <span class="truncate text-[var(--bkms-neutral-3)]">{{ namespace }} / {{ serviceName }}</span>
+        <span class="truncate bkms-text-secondary">{{ namespace }} / {{ serviceName }}</span>
       </DividerHeader>
     </template>
 
@@ -43,7 +43,7 @@
     />
 
     <template v-if="mode === 'conflict'">
-      <div class="mb-[12px] text-[14px] text-[var(--bkms-neutral-1)]">{{ $t('请选择处理方式：') }}</div>
+      <div class="mb-[12px] text-[14px] bkms-text-title">{{ $t('请选择处理方式：') }}</div>
       <Radio.Group
         v-model="action"
         class="weight-factor-options mb-[20px] flex flex-col gap-[12px]"
@@ -54,27 +54,27 @@
           class="cursor-pointer rounded-[4px] border border-solid px-[16px] py-[14px]"
           :class="
             action === item.value
-              ? 'border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-7)]'
-              : 'border-[var(--bkms-neutral-5)]'
+              ? 'bkms-line-active bkms-bg-brand-soft'
+              : 'bkms-line-default'
           "
           @click="action = item.value"
         >
           <Radio :label="item.value">
             <div class="ml-[8px] whitespace-normal">
-              <div class="text-[12px] font-bold text-[var(--bkms-neutral-1)]">{{ item.title }}</div>
-              <div class="mt-[8px] text-[12px] leading-[20px] text-[var(--bkms-neutral-2)]">{{ item.description }}</div>
+              <div class="text-[12px] font-bold bkms-text-title">{{ item.title }}</div>
+              <div class="mt-[8px] text-[12px] leading-[20px] bkms-text-body">{{ item.description }}</div>
             </div>
           </Radio>
         </div>
       </Radio.Group>
     </template>
 
-    <div class="rounded-[2px] bg-[var(--bkms-neutral-7)] px-[16px] py-[12px]">
+    <div class="rounded-[2px] bkms-bg-page px-[16px] py-[12px]">
       <div class="flex min-w-0 items-center text-[12px] leading-[20px]">
         <span class="shrink-0">{{ $t('北极星服务名') }}：</span>
         <span class="truncate">{{ namespace }} / {{ serviceName }}</span>
         <a
-          class="ml-[4px] shrink-0 text-[var(--bkms-brand-2)]"
+          class="ml-[4px] shrink-0 bkms-text-brand"
           :href="serviceUrl"
           rel="noopener noreferrer"
           target="_blank"
@@ -82,7 +82,7 @@
           <Share :title="$t('前往北极星')" />
         </a>
       </div>
-      <table class="weight-factor-table mt-[12px] w-full table-fixed bg-white text-[12px] leading-[20px]">
+      <table class="weight-factor-table mt-[12px] w-full table-fixed bkms-bg-card text-[12px] leading-[20px]">
         <colgroup>
           <col class="w-[28%]" />
           <col class="w-[36%]" />
@@ -102,7 +102,7 @@
             v-for="row in rows"
             :key="row.label"
           >
-            <td class="text-[var(--bkms-neutral-3)]">{{ row.label }}</td>
+            <td class="bkms-text-secondary">{{ row.label }}</td>
             <td
               :class="{ selected: mode === 'conflict' && action === 'keep', 'font-bold': row.remote !== row.platform }"
             >

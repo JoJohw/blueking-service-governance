@@ -33,7 +33,7 @@
       </FlexRow>
       <Layout.table />
     </template>
-    <div class="bg-[#fff]">
+    <div class="bkms-bg-card">
       <!-- 泳道配置 -->
       <template v-if="laneConfigTableData.length || searchVal !== undefined">
         <Alert
@@ -164,18 +164,18 @@
               >
                 <template #content>
                   <div class="mb-[4px]">
-                    <span class="text-[#4D4F56]">{{ t('泳道名称') }}：</span>
-                    <span class="text-[#313238]">{{ row.laneName }}</span>
+                    <span class="bkms-text-body">{{ t('泳道名称') }}：</span>
+                    <span class="bkms-text-title">{{ row.laneName }}</span>
                   </div>
                   <div
                     v-if="row.isOpen"
-                    class="mb-[20px] text-[#4D4F56]"
+                    class="mb-[20px] bkms-text-body"
                   >
                     {{ t('停用后该泳道的流量规则将不生效') }}
                   </div>
                   <div
                     v-else
-                    class="mb-[20px] text-[#4D4F56]"
+                    class="mb-[20px] bkms-text-body"
                   >
                     {{ t('启用后该泳道将开始生效') }}
                   </div>
@@ -219,10 +219,10 @@
                 >
                   <template #content>
                     <div class="mb-[4px]">
-                      <span class="text-[#4D4F56]">{{ t('泳道名称') }}：</span>
-                      <span class="text-[#313238]">{{ row.laneName }}</span>
+                      <span class="bkms-text-body">{{ t('泳道名称') }}：</span>
+                      <span class="bkms-text-title">{{ row.laneName }}</span>
                     </div>
-                    <div class="mb-[20px] text-[#4D4F56]">{{ t('删除后该泳道将不可恢复') }}</div>
+                    <div class="mb-[20px] bkms-text-body">{{ t('删除后该泳道将不可恢复') }}</div>
                   </template>
                   <Button
                     v-bk-tooltips="{
@@ -254,8 +254,8 @@
             <img src="/empty.svg" />
           </template>
           <template #description>
-            <div class="text-[20px] text-[#313238] mb-[16px]">{{ $t('暂无泳道') }}</div>
-            <div class="text-[14px] text-[#4D4F56] mb-[16px]">{{ $t('泳道未启用，无数据') }}</div>
+            <div class="text-[20px] bkms-text-title mb-[16px]">{{ $t('暂无泳道') }}</div>
+            <div class="text-[14px] bkms-text-body mb-[16px]">{{ $t('泳道未启用，无数据') }}</div>
             <Button
               theme="primary"
               @click="handleOpen"
@@ -316,7 +316,7 @@
                   >
                   </Input>
                   <template #content>
-                    <ul class="text-[#4D4F56] leading-[22px]">
+                    <ul class="bkms-text-body leading-[22px]">
                       <li>{{ `${$t('正则')}：^[a-zA-Z0-9]([-_.a-zA-Z0-9]{0,61}[a-zA-Z0-9])?$` }}</li>
                       <li>{{ `${$t('长度限制')}：${$t('最多 {0} 个字符', [63])}` }}</li>
                       <li>{{ `${$t('首尾字符')}：${$t('必须以字母或数字（[a-zA-Z0-9]）开头和结尾')}` }}</li>
@@ -330,7 +330,7 @@
               <div class="relative">
                 <span
                   v-if="sidesliderData.type === 'open'"
-                  class="absolute top-0 left-[62px] text-[#979BA5] text-[12px]"
+                  class="absolute top-0 left-[62px] bkms-text-secondary text-[12px]"
                 >
                   {{ $t('（建议基线泳道应当包含全部应用，后续特性泳道将基于该范围创建）') }}
                 </span>
@@ -369,12 +369,12 @@
                     @update:target-list="handleTargetListChange"
                   >
                     <template #left-header>
-                      <span class="text-[#4D4F56] text-[12px] leading-[40px] font-bold">{{
+                      <span class="bkms-text-body text-[12px] leading-[40px] font-bold">{{
                         `${t('可选应用')}（${sourceList.length}）`
                       }}</span>
                     </template>
                     <template #right-header>
-                      <span class="text-[#4D4F56] text-[12px] leading-[40px] font-bold">{{
+                      <span class="bkms-text-body text-[12px] leading-[40px] font-bold">{{
                         `${t('已选应用')}（${targetValue.length}）`
                       }}</span>
                     </template>
@@ -413,7 +413,7 @@
                               @click="handleToNetWork(sourceData.appName)"
                             >
                               {{ $t('去添加') }}
-                              <Share class="text-[#3A84FF] ml-[5px] cursor-pointer" />
+                              <Share class="bkms-text-brand ml-[5px] cursor-pointer" />
                             </Button>
                           </template>
                         </Popover>
@@ -428,7 +428,7 @@
                             delay: 300,
                           }"
                         >
-                          <span class="text-[#4D4F56] text-[12px]">{{
+                          <span class="bkms-text-body text-[12px]">{{
                             `${targetData.appName}（Service: ${targetData.services?.[0]?.name}）`
                           }}</span>
                         </overflow-title>
@@ -944,7 +944,7 @@
 </script>
 <style lang="postcss" scoped>
   .custom-shadow {
-    box-shadow: 0 -1px 0 0 #dcdee5;
+    box-shadow: 0 -1px 0 0 var(--bkms-neutral-5);
   }
   :deep(.bk-sideslider-footer) {
     margin-top: 0;

@@ -234,31 +234,31 @@ export const STATUS_CONFIG: Record<
   }
 > = {
   all: {
-    bgColor: '#fff',
+    bgColor: 'var(--bkms-bg-card)',
     iconBgColor: 'linear-gradient(90deg, #748EC1 0%, #99B1E0 100%)',
   },
   healthy: {
-    bgColor: '#fff',
+    bgColor: 'var(--bkms-bg-card)',
     iconBgColor: 'linear-gradient(90deg, var(--bkms-cyan-2) 0%, var(--bkms-cyan-3) 100%)',
     color: 'var(--bkms-cyan-3)',
-    miniColor: '#DAF6E5',
+    miniColor: 'var(--bkms-success-6)',
   },
   warning: {
-    bgColor: 'linear-gradient(90deg, #FFF5F5 0%, #FFFDFC 50%, #FFFFFF 100%)',
+    bgColor: 'linear-gradient(90deg, #FFF5F5 0%, var(--bkms-neutral-10) 50%, var(--bkms-bg-card) 100%)',
     iconBgColor: 'linear-gradient(90deg, var(--bkms-warning-2) 0%, #F8B64F 100%)',
     badgeIconColor: 'var(--bkms-warning-2)',
     color: '#F8B64F',
-    miniColor: '#FDEED8',
+    miniColor: 'var(--bkms-warning-6)',
   },
   error: {
-    bgColor: 'linear-gradient(90deg, #FFF5F5 0%, #FFFDFC 50%, #FFFFFF 100%)',
+    bgColor: 'linear-gradient(90deg, #FFF5F5 0%, var(--bkms-neutral-10) 50%, var(--bkms-bg-card) 100%)',
     iconBgColor: 'linear-gradient(90deg, var(--bkms-danger-2) 0%, #F07474 100%)',
     badgeIconColor: 'var(--bkms-danger-2)',
     color: '#F07474',
-    miniColor: '#FEDDDD',
+    miniColor: 'var(--bkms-danger-5)',
   },
   unknown: {
-    bgColor: '#fff',
+    bgColor: 'var(--bkms-bg-card)',
     iconBgColor: 'linear-gradient(90deg, #748EC1 0%, #99B1E0 100%)',
     badgeIconColor: '#748EC1',
     color: '#99B1E0',

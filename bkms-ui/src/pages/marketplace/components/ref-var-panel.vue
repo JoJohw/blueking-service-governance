@@ -20,11 +20,11 @@
   <div class="flex flex-col h-full min-w-0 w-full">
     <!-- 头部 -->
     <div
-      class="flex-shrink-0 h-[40px] pl-[16px] pr-[8px] rounded-t-sm border-b-[1px] border-[#DCDEE5] bg-[#F5F7FA] flex items-center justify-between"
+      class="flex-shrink-0 h-[40px] pl-[16px] pr-[8px] rounded-t-sm border-b-[1px] border-b-bkms-neutral-5 bkms-bg-page flex items-center justify-between"
     >
-      <span class="text-[12px] text-[#313238]">
+      <span class="text-[12px] bkms-text-title">
         {{ $t('可引用变量') }}
-        <span class="text-[#979BA5]">({{ variableList.length }})</span>
+        <span class="bkms-text-secondary">({{ variableList.length }})</span>
       </span>
       <Button
         class="p-[4px]"
@@ -54,7 +54,7 @@
           <span
             :class="[
               'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-[8px]',
-              activeTab === tab.value ? 'bg-[#E1ECFF] text-[#3A84FF]' : 'bg-[#fff]',
+              activeTab === tab.value ? 'bkms-bg-active bkms-text-brand' : 'bkms-bg-card',
             ]"
           >
             {{ tab.count }}

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="max-w-[620px] text-[12px] leading-[20px] text-[#fff]">
+  <div class="max-w-[620px] text-[12px] leading-[20px] bkms-text-inverse">
     <div
       v-for="env in displayEnvs"
       :key="env.name"
@@ -27,13 +27,13 @@
         <span class="font-bold">•&nbsp;{{ env.displayName }}</span>
         <span
           v-if="env.changes.length"
-          class="font-bold text-[var(--bkms-warning-2)]"
+          class="font-bold text-bkms-warning-2"
         >
           ({{ $t('待部署生效') }})
         </span>
         <Button
           v-if="env.changes.length"
-          class="!px-0 text-[var(--bkms-brand-2)] ml-[8px] !text-[12px]"
+          class="!px-0 bkms-text-brand ml-[8px] !text-[12px]"
           text
           theme="primary"
           @click.stop="emit('go-deploy', env.name)"

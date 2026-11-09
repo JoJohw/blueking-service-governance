@@ -18,12 +18,12 @@
 
 <template>
   <div
-    class="flex items-center justify-end gap-[6px] text-[var(--bkms-neutral-3)]"
+    class="flex items-center justify-end gap-[6px] bkms-text-secondary"
     :style="{ width: `${labelWidth}px`, lineHeight: `${lineHeight}px` }"
   >
     <i
       v-if="modified"
-      class="w-[3px] h-[18px] bg-[var(--bkms-warning-2)]"
+      class="w-[3px] h-[18px] bg-bkms-warning-2"
     ></i>
     {{ label }}：
   </div>

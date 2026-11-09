@@ -18,11 +18,11 @@
 
 <template>
   <!-- APM 实例信息 -->
-  <div class="p-[16px] bg-[#fff]">
+  <div class="p-[16px] bkms-bg-card">
     <div class="flex items-center justify-between mb-[8px]">
-      <span class="text-[14px] text-[#979ba5]">{{ $t('APM 实例') }}</span>
+      <span class="text-[14px] bkms-text-secondary">{{ $t('APM 实例') }}</span>
       <Button
-        class="bg-[#fff]"
+        class="bkms-bg-card"
         outline
         @click="handleOpenSwitchApm"
       >
@@ -30,7 +30,7 @@
       </Button>
     </div>
     <div class="flex items-center gap-[8px]">
-      <span class="text-[14px] font-700 text-[#313238]">{{ currentApm?.name || '--' }}</span>
+      <span class="text-[14px] font-700 bkms-text-title">{{ currentApm?.name || '--' }}</span>
       <Tag
         v-if="currentApm && apmTagText"
         :theme="apmTagTheme"
@@ -68,9 +68,9 @@
         </ul>
       </template>
     </Alert>
-    <div class="flex p-[16px] bg-[#F5F7FA] text-[12px]">
+    <div class="flex p-[16px] bkms-bg-page text-[12px]">
       <div class="flex flex-col gap-[6px] flex-1">
-        <div class="text-[12px] text-[#979ba5]">{{ $t('当前环境') }}</div>
+        <div class="text-[12px] bkms-text-secondary">{{ $t('当前环境') }}</div>
         <div class="flex items-center gap-[8px]">
           <span class="font-bold">{{ data.name }}</span>
           <Tag
@@ -81,7 +81,7 @@
         </div>
       </div>
       <div class="flex flex-col gap-[6px] flex-1">
-        <div class="text-[12px] text-[#979ba5]">{{ $t('当前 APM 实例') }}</div>
+        <div class="text-[12px] bkms-text-secondary">{{ $t('当前 APM 实例') }}</div>
         <div class="flex items-center gap-[8px]">
           <span class="font-bold">{{ currentApm?.name || '--' }}</span>
           <Tag
@@ -141,7 +141,7 @@
           {{ $t('切换不可撤销，请输入当前环境名称') }}
           <strong
             v-bk-tooltips="$t('复制')"
-            class="px-[4px] cursor-pointer text-[#ea3636] hover:bg-[#FFEBEB]"
+            class="px-[4px] cursor-pointer text-bkms-danger-2 hover:bkms-bg-danger"
             @click="handleCopyEnvName"
           >
             {{ data.name }}

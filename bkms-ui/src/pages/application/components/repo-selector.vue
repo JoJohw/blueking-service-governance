@@ -24,7 +24,7 @@
     @change="handleProjectChange"
   >
     <template #prefix>
-      <span class="px-[10px] text-[var(--bkms-neutral-2)] border-r-[var(--bkms-navy-5)] border-r leading-[30px]">
+      <span class="px-[10px] bkms-text-body border-r-bkms-navy-5 border-r leading-[30px]">
         {{ $t('工蜂') }}
       </span>
     </template>

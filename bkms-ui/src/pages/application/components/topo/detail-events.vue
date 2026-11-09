@@ -42,7 +42,7 @@
         />
         <SearchSelect
           v-model="searchValue"
-          class="min-w-[360px] bg-[#fff] relative z-[100]"
+          class="min-w-[360px] bkms-bg-card relative z-[100]"
           :data="searchData"
           :placeholder="
             createPlaceholder({
@@ -103,7 +103,7 @@
             :width="100"
           >
             <template #default="{ row }">
-              <span :class="row.level === 'Warning' ? 'text-[var(--bkms-danger-2)]' : 'text-[var(--bkms-success-2)]'">
+              <span :class="row.level === 'Warning' ? 'text-bkms-danger-2' : 'text-bkms-success-2'">
                 {{ row.level || '--' }}
               </span>
             </template>

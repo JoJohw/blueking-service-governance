@@ -17,21 +17,21 @@
 -->
 
 <template>
-  <div class="rounded-[2px] border border-[#F9D090] bg-[var(--bkms-warning-7)] px-[12px]">
+  <div class="rounded-[2px] border border-[#F9D090] bkms-bg-warning-soft px-[12px]">
     <!-- Header -->
     <div
       class="flex cursor-pointer items-center justify-between py-[8px]"
       @click="collapsed = !collapsed"
     >
       <div class="flex items-center">
-        <i class="bkms-icon bkms-icon-triangle-warning text-[12px] text-[var(--bkms-warning-2)]" />
+        <i class="bkms-icon bkms-icon-triangle-warning text-[12px] text-bkms-warning-2" />
 
-        <span class="mx-[8px] text-base font-bold text-[var(--bkms-warning-2)]">
+        <span class="mx-[8px] text-base font-bold text-bkms-warning-2">
           {{ title }}
         </span>
 
         <span
-          class="rounded-[2px] bg-[var(--bkms-warning-5)] px-[8px] py-[2px] text-[12px] text-[var(--bkms-warning-1)]"
+          class="rounded-[2px] bg-bkms-warning-5 px-[8px] py-[2px] text-[12px] text-bkms-warning-1"
         >
           <i18n-t keypath="{0} 个变量">
             <span class="pl-[2px]">{{ data.length }}</span>
@@ -40,7 +40,7 @@
       </div>
 
       <div
-        class="flex items-center text-[var(--bkms-neutral-3)] transition-transform duration-200"
+        class="flex items-center bkms-text-secondary transition-transform duration-200"
         :class="{ 'rotate-180': !collapsed }"
       >
         <AngleDown class="text-[22px]" />

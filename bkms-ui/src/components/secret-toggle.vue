@@ -21,15 +21,15 @@
     <template v-if="!isShow">
       <div class="flex-1 font-mono tracking-wider">{{ placeholder }}</div>
       <Eye
-        class="ml-[4px] cursor-pointer hover:text-[var(--bkms-brand-2)]"
+        class="ml-[4px] cursor-pointer hover:bkms-text-brand"
         :fill="iconFill"
         @click="handleToggle"
       />
     </template>
     <template v-else>
-      <span class="text-[var(--bkms-neutral-1)]">{{ value || emptyValuePlaceholder }}</span>
+      <span class="bkms-text-title">{{ value || emptyValuePlaceholder }}</span>
       <Unvisible
-        class="ml-[4px] cursor-pointer hover:text-[var(--bkms-brand-2)]"
+        class="ml-[4px] cursor-pointer hover:bkms-text-brand"
         :fill="iconFill"
         @click="handleToggle"
       />

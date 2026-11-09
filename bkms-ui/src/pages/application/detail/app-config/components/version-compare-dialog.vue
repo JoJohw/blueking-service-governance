@@ -79,11 +79,11 @@
         @diff-stats="handleDiffStats"
       >
         <template #title>
-          <div class="flex items-center text-[#fff]">
+          <div class="flex items-center bkms-text-inverse">
             <div class="flex-1 flex justify-between">
               <div>
                 V{{ previousVersionData?.version }}
-                <span class="text-[var(--bkms-neutral-3)] ml-[8px]">
+                <span class="bkms-text-secondary ml-[8px]">
                   {{
                     previousVersionData?.createdAt
                       ? dayjs(previousVersionData.createdAt).format('YYYY-MM-DD HH:mm:ss')
@@ -93,7 +93,7 @@
               </div>
               <div
                 v-if="diffStats.deleted"
-                class="text-[var(--bkms-danger-2)]"
+                class="text-bkms-danger-2"
               >
                 -{{ diffStats.deleted }}
               </div>
@@ -101,7 +101,7 @@
             <div class="flex-1 flex justify-between pl-[28px]">
               <div>
                 V{{ currentVersion?.version }}
-                <span class="text-[var(--bkms-neutral-3)]">（{{ $t('当前版本') }}）</span>
+                <span class="bkms-text-secondary">（{{ $t('当前版本') }}）</span>
               </div>
               <div
                 v-if="diffStats.added"

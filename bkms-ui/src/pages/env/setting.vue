@@ -58,18 +58,18 @@
             {{ $t('自定义变量') }}
           </Button>
           <Button
-            class="bg-[#fff]"
+            class="bkms-bg-card"
             @click="showImportSlider = true"
           >
-            <i class="bkms-icon bkms-icon-daoru mr-[6px] text-[#979BA5]"></i>
+            <i class="bkms-icon bkms-icon-daoru mr-[6px] bkms-text-secondary"></i>
             {{ $t('导入') }}
           </Button>
           <Button
-            class="bg-[#fff]"
+            class="bkms-bg-card"
             :loading="isExporting"
             @click="handleExport"
           >
-            <i class="bkms-icon bkms-icon-daochu mr-[6px] text-[#979BA5]"></i>
+            <i class="bkms-icon bkms-icon-daochu mr-[6px] bkms-text-secondary"></i>
             {{ $t('导出') }}
           </Button>
           <Button
@@ -84,12 +84,14 @@
         </div>
         <Input
           v-model.trim="searchKeyword"
-          class="w-[430px] max-w-full bg-white"
+          class="w-[430px] max-w-full bkms-bg-card"
           clearable
           :placeholder="$t('搜索变量名、变量值、描述')"
         >
           <template #suffix>
-            <Search class="text-[16px] text-[#979BA5] mr-[6px] mt-[2px] hover:text-[#3A84FF]" />
+            <Search
+              class="text-[16px] bkms-text-secondary mr-[6px] mt-[2px] hover:bkms-text-brand"
+            />
           </template>
         </Input>
       </div>

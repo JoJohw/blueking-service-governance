@@ -26,7 +26,7 @@
       :rules="rules"
     >
       <ToggleCard
-        class="bg-[#fff] rounded-[2px] shadow-[0_2px_4px_0_#1919290d]"
+        class="bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
         :name="$t('基础信息')"
         type="normal"
       >
@@ -57,7 +57,7 @@
       </ToggleCard>
       <!-- 构建配置 -->
       <ToggleCard
-        class="mt-[16px] bg-[#fff] rounded-[2px] shadow-[0_2px_4px_0_#1919290d]"
+        class="mt-[16px] bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
         :name="$t('构建配置')"
         type="normal"
       >
@@ -170,7 +170,7 @@
                 :label="$t('高级命令')"
               >
                 <ToggleCard
-                  class="bg-[#fff] rounded-[2px] border-[1px] border-[#e5e5e5]"
+                  class="bkms-bg-card rounded-[2px] border-[1px] border-[#e5e5e5]"
                   content-class="p-[16px]"
                   :model-value="false"
                   type="normal"
@@ -218,7 +218,7 @@
                       :rows="4"
                       type="textarea"
                     />
-                    <span class="text-[var(--bkms-navy-5)]">{{
+                    <span class="text-bkms-navy-5">{{
                       $t(
                         '文件会按相对路径打包到运行镜像的 /app 目录，例如 data/privatekey.pem 打包后为 /app/data/privatekey.pem。',
                       )
@@ -247,7 +247,7 @@
                       :rows="4"
                       type="textarea"
                     />
-                    <span class="text-[var(--bkms-navy-5)]">{{
+                    <span class="text-bkms-navy-5">{{
                       $t('写入镜像的默认启动方式（ENTRYPOINT），构建时固化到镜像中。部署时可被「运行命令」覆盖')
                     }}</span>
                   </div>
@@ -268,7 +268,7 @@
               <div class="mb-[24px]">
                 <span class="inline-block mb-[2px] mt-[10px] font-bold">{{ $t('等价构建命令（示意）') }}</span>
                 <div
-                  class="equivalent-build-command bg-[var(--bkms-neutral-7)] p-[16px] leading-[20px] text-[var(--bkms-neutral-2)] overflow-x-auto"
+                  class="equivalent-build-command bkms-bg-page p-[16px] leading-[20px] bkms-text-body overflow-x-auto"
                 >
                   <pre
                     v-bk-xss-html="highlightedBuildCommand"
@@ -288,7 +288,7 @@
                 v-model="formData.buildConfig.pipelineBuildConfig.pipelineID"
                 :workspace="formData.workspaceID"
               />
-              <div class="text-[12px] text-[var(--bkms-neutral-3)]">
+              <div class="text-[12px] bkms-text-secondary">
                 {{ $t('需要保证流水线会将构建的镜像推送到当前空间的镜像仓库下') }}
                 <Button
                   text
@@ -312,7 +312,7 @@
       </ToggleCard>
       <ToggleCard
         v-if="formData.framework === 'blank'"
-        class="mt-[16px] bg-[#fff] rounded-[2px] shadow-[0_2px_4px_0_#1919290d]"
+        class="mt-[16px] bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
         :name="$t('启动配置')"
         type="normal"
       >

@@ -227,7 +227,7 @@ export function useDeployOverview(envList: Ref<EnvOutput[]>) {
         desc: '',
         color: failedCount > 0 ? 'var(--bkms-danger-2)' : 'var(--bkms-neutral-1)',
         iconColor: 'var(--bkms-danger-2)',
-        iconBg: '#FFEEEE',
+        iconBg: 'var(--bkms-danger-7)',
       },
       {
         key: 'abnormalInstance',

@@ -44,7 +44,7 @@
         <div class="relative h-full">
           <EditorStatus :message="editorErr" />
           <Error
-            class="absolute top-[8px] right-[8px] cursor-pointer text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-navy-5)]"
+            class="absolute top-[8px] right-[8px] cursor-pointer bkms-text-secondary hover:text-bkms-navy-5"
             :height="18"
             :width="18"
             @click="isCollapsed = true"

@@ -25,10 +25,10 @@
   >
     <Tag class="mr-[4px] cursor-pointer">
       {{ displayName }}
-      <span class="text-[var(--bkms-warning-2)]">（{{ $t('待部署生效') }}）</span>
+      <span class="text-bkms-warning-2">（{{ $t('待部署生效') }}）</span>
     </Tag>
     <template #content>
-      <div class="max-w-[520px] text-[12px] leading-[20px] text-[#fff]">
+      <div class="max-w-[520px] text-[12px] leading-[20px] bkms-text-inverse">
         <div class="mb-[6px]">
           {{ $t('您修改了以下内容，需要重新部署应用后方可生效：') }}
         </div>
@@ -48,7 +48,7 @@
           </template>
         </div>
         <Button
-          class="mt-[6px] !px-0 text-[var(--bkms-brand-2)]"
+          class="mt-[6px] !px-0 bkms-text-brand"
           text
           theme="primary"
           @click.stop="emit('go-deploy', envName)"

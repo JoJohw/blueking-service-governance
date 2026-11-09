@@ -62,7 +62,7 @@
           <div class="flex">
             <SearchSelect
               v-model="searchValue"
-              class="w-[400px] bg-[#fff] relative z-[100]"
+              class="w-[400px] bkms-bg-card relative z-[100]"
               :data="artifactSearchData"
               :placeholder="
                 createPlaceholder({
@@ -288,7 +288,7 @@
       >
         {{ t('该镜像尚未部署到任何测试环境，请确认是否仍要晋级') }}
       </Alert>
-      <div class="rounded bg-[var(--bkms-neutral-7)] px-[16px] py-[12px]">
+      <div class="rounded bkms-bg-page px-[16px] py-[12px]">
         <FieldItem
           :container-height="32"
           :field-value="t('镜像 Tag')"
@@ -317,7 +317,7 @@
           </template>
         </FieldItem>
       </div>
-      <div class="mt-[12px] text-[12px] text-[var(--bkms-neutral-3)]">
+      <div class="mt-[12px] text-[12px] bkms-text-secondary">
         {{ t('制品仅在手动晋级后，才允许被部署到生产类型环境中：') }}
       </div>
       <div class="mt-[8px] flex flex-wrap gap-[4px]">
@@ -330,7 +330,7 @@
         </Tag>
         <span
           v-if="!productionEnvNames.length"
-          class="text-[12px] text-[var(--bkms-neutral-3)]"
+          class="text-[12px] bkms-text-secondary"
           >--</span
         >
       </div>
@@ -469,8 +469,8 @@
   const expandConfig = {
     showIcon: true,
     trigger: 'row',
-    iconOpen: 'bkms-icon bkms-icon-down-shape !text-[var(--bkms-navy-5)] hover:!text-[var(--bkms-neutral-2)] p-[2px]',
-    iconClose: 'bkms-icon bkms-icon-right-shape !text-[var(--bkms-navy-5)] hover:!text-[var(--bkms-neutral-2)] p-[2px]',
+    iconOpen: 'bkms-icon bkms-icon-down-shape !text-bkms-navy-5 hover:!bkms-text-body p-[2px]',
+    iconClose: 'bkms-icon bkms-icon-right-shape !text-bkms-navy-5 hover:!bkms-text-body p-[2px]',
   };
 
   const artifactSearchData = shallowRef([
@@ -767,7 +767,7 @@
   :deep(.bk-dialog-footer) {
     padding-top: 0;
     padding-bottom: 16px;
-    background-color: #fff;
+    background-color: var(--bkms-bg-card);
     border: none;
   }
   :deep(.promoted-tag-tooltip .tippy-content) {

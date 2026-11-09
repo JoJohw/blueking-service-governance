@@ -36,7 +36,7 @@
 </script>
 <template>
   <div v-if="loading">
-    <div class="grid w-full bg-[#ffffff]">
+    <div class="grid w-full bkms-bg-card">
       <div class="grid grid-cols-1 gap-[26px]">
         <Layout.shape
           v-for="(_, index) in rows"

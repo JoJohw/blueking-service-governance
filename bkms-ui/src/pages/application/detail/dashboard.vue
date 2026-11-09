@@ -19,9 +19,9 @@
 <template>
   <div class="flex h-full min-h-0 flex-col">
     <div
-      class="flex h-[52px] flex-shrink-0 items-center justify-between bg-white px-[24px] shadow-[0_3px_4px_0_#0000000a]"
+      class="flex h-[52px] flex-shrink-0 items-center justify-between bkms-bg-card px-[24px] shadow-[0_3px_4px_0_var(--bkms-shadow-header)]"
     >
-      <div class="text-[16px] text-[var(--bkms-neutral-1)]">{{ $t('仪表盘') }}</div>
+      <div class="text-[16px] bkms-text-title">{{ $t('仪表盘') }}</div>
       <Button
         text
         theme="primary"
@@ -47,7 +47,7 @@
           <img src="/empty.svg" />
         </template>
         <template #description>
-          <div class="text-[24px] text-[var(--bkms-neutral-1)]">{{ $t('暂未配置仪表盘') }}</div>
+          <div class="text-[24px] bkms-text-title">{{ $t('暂未配置仪表盘') }}</div>
           <DashboardSetupGuide class="mt-[16px] inline-block text-left" />
         </template>
         <Button
@@ -64,13 +64,13 @@
         class="flex min-h-0 flex-1 flex-col px-[24px] py-[20px]"
       >
         <FlexRow
-          class="mb-[16px] flex-shrink-0 bg-[var(--bkms-neutral-6)] px-[12px] py-[8px] shadow-[0_2px_4px_0_#0000001a]"
+          class="mb-[16px] flex-shrink-0 bg-bkms-neutral-6 px-[12px] py-[8px] shadow-[0_2px_4px_0_var(--bkms-shadow-hover)]"
         >
           <template #left>
             <Select
               ref="dashboardSelectRef"
               v-model="selectedDashboardUid"
-              class="w-[280px] bg-white"
+              class="w-[280px] bkms-bg-card"
               :clearable="false"
               filterable
               :placeholder="$t('请选择仪表盘')"
@@ -100,14 +100,14 @@
           </template>
           <template #right>
             <i
-              class="bkms-icon bkms-icon-full-screen cursor-pointer rounded-[4px] bg-[var(--bkms-neutral-8)] p-[4px] text-[16px] hover:text-[var(--bkms-brand-2)]"
+              class="bkms-icon bkms-icon-full-screen cursor-pointer rounded-[4px] bkms-bg-subtle p-[4px] text-[16px] hover:bkms-text-brand"
               @click="handleFullScreen"
             ></i>
           </template>
         </FlexRow>
         <div
           ref="iframeContainerRef"
-          class="min-h-0 flex-1 bg-white"
+          class="min-h-0 flex-1 bkms-bg-card"
         >
           <GrafanaDashboardIframe
             v-if="selectedDashboard?.url"

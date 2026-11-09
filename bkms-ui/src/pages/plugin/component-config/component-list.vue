@@ -58,7 +58,7 @@
       >
         <template #aside>
           <!-- 左侧树形菜单 -->
-          <div class="flex-1 bg-[#F5F7FA] flex flex-col">
+          <div class="flex-1 bkms-bg-page flex flex-col">
             <div class="px-[16px] py-[12px]">
               <Radio.Group
                 v-model="viewMode"
@@ -97,10 +97,10 @@
             <div
               v-show="filteredTreeData.length !== 0"
               :class="[
-                'border-b-[1px] border-b-[#EAEBF0]',
+                'border-b-[1px] border-b-bkms-neutral-6',
                 'flex items-center justify-between px-[16px] h-[36px] cursor-pointer',
-                selectedTreeNode === 'all' ? 'bg-[#E1ECFF] text-[#3A84FF]' : 'text-[#4D4F56]',
-                { 'hover:bg-[#f0f1f5]': selectedTreeNode !== 'all' },
+                selectedTreeNode === 'all' ? 'bkms-bg-active bkms-text-brand' : 'bkms-text-body',
+                { 'hover:bg-bkms-neutral-6': selectedTreeNode !== 'all' },
               ]"
               @click="handleTreeNodeClick('all')"
             >
@@ -110,8 +110,8 @@
               </div>
               <span
                 :class="[
-                  'text-[12px] text-[#979BA5] px-[8px] rounded-[2px]',
-                  selectedTreeNode === 'all' ? 'bg-[#3A84FF] text-[#fff]' : 'text-[#4D4F56] bg-[#F0F1F5]',
+                  'text-[12px] bkms-text-secondary px-[8px] rounded-[2px]',
+                  selectedTreeNode === 'all' ? 'bg-bkms-brand-2 bkms-text-inverse' : 'bkms-text-body bg-bkms-neutral-6',
                 ]"
                 >{{ componentList.length }}</span
               >
@@ -122,8 +122,8 @@
                 :key="item.id"
                 :class="[
                   'flex items-center justify-between min-h-[36px] px-[16px] py-[4px] cursor-pointer',
-                  selectedTreeNode === item.id ? 'bg-[#E1ECFF] text-[#3A84FF]' : 'text-[#4D4F56]',
-                  { 'hover:bg-[#f0f1f5]': selectedTreeNode !== item.id },
+                  selectedTreeNode === item.id ? 'bkms-bg-active bkms-text-brand' : 'bkms-text-body',
+                  { 'hover:bg-bkms-neutral-6': selectedTreeNode !== item.id },
                 ]"
                 @click="handleTreeNodeClick(item.id)"
               >
@@ -140,15 +140,15 @@
                   </div>
                   <span
                     v-if="item.type && viewMode === 'environment'"
-                    class="block text-[#979BA5]"
+                    class="block bkms-text-secondary"
                   >
                     {{ item.name }}
                   </span>
                 </div>
                 <span
                   :class="[
-                    'text-[12px] text-[#979BA5] px-[8px] rounded-[2px] shrink-0',
-                    selectedTreeNode === item.id ? 'bg-[#3A84FF] text-[#fff]' : 'text-[#4D4F56] bg-[#F0F1F5]',
+                    'text-[12px] bkms-text-secondary px-[8px] rounded-[2px] shrink-0',
+                    selectedTreeNode === item.id ? 'bg-bkms-brand-2 bkms-text-inverse' : 'bkms-text-body bg-bkms-neutral-6',
                   ]"
                   >{{ item.count }}</span
                 >
@@ -158,14 +158,14 @@
         </template>
         <template #main>
           <!-- 右侧内容区 -->
-          <div class="flex-1 flex flex-col overflow-hidden px-[24px] py-[14px] bg-[#fff]">
+          <div class="flex-1 flex flex-col overflow-hidden px-[24px] py-[14px] bkms-bg-card">
             <!-- 标题和提示 -->
             <div class="flex items-center mb-[12px]">
               <h3 class="text-[16px] font-bold">
                 {{ currentTreeNode?.displayName || currentTreeNode?.name || $t('全部') }} ( {{ count }} )
               </h3>
               <template v-if="currentTreeNode?.type">
-                <span class="mx-[8px] text-[#979BA5]">( {{ currentTreeNode.name }} )</span>
+                <span class="mx-[8px] bkms-text-secondary">( {{ currentTreeNode.name }} )</span>
                 <Tag
                   :class="envTypeTagClassMap[currentTreeNode.type]"
                   size="small"
@@ -205,7 +205,7 @@
               <template #right>
                 <SearchSelect
                   v-model="searchValue"
-                  class="w-[520px] bg-[#fff] relative z-[100]"
+                  class="w-[520px] bkms-bg-card relative z-[100]"
                   :data="searchSelectData"
                   :placeholder="
                     createPlaceholder({
@@ -312,13 +312,13 @@
                       <span
                         v-for="key in Object.keys(row.properties || {}).slice(0, 3)"
                         :key="key"
-                        class="text-[12px] text-[#4D4F56] truncate"
+                        class="text-[12px] bkms-text-body truncate"
                       >
                         {{ `${key}: ${formatPropertyValue(row.properties[key])}` }}
                       </span>
                       <span
                         v-if="Object.keys(row.properties || {}).length > 3"
-                        class="text-[12px] text-[#979BA5]"
+                        class="text-[12px] bkms-text-secondary"
                       >
                         ...
                       </span>

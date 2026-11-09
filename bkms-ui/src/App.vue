@@ -37,7 +37,7 @@
           @click="handleGotoHome"
         />
         <span
-          class="text-[16px] text-[#eaebf0] font-bold cursor-pointer"
+          class="text-[16px] text-bkms-neutral-6 font-bold cursor-pointer"
           @click="handleGotoHome"
           >{{ t('蓝鲸服务治理') }}</span
         >
@@ -52,7 +52,7 @@
         </template>
       </template>
       <template #header>
-        <FlexRow class="w-full text-[#96A2B9] text-[14px]">
+        <FlexRow class="w-full text-bkms-navy-4 text-[14px]">
           <template #left>
             <span
               v-if="!isGlobalRoute"
@@ -62,7 +62,7 @@
                 v-for="item in navList"
                 :key="item.name"
                 :class="[
-                  'px-[16px] text-[#96A2B9]',
+                  'px-[16px] text-bkms-navy-4',
                   {
                     'bkms-active-nav': item.id === route.meta.menuId,
                     'hover:text-[#C2CEE5]': item.id !== route.meta.menuId,
@@ -273,6 +273,6 @@
     flex: 0 0 360px;
   }
   .bkms-active-nav {
-    color: #fff;
+    color: var(--bkms-text-inverse);
   }
 </style>

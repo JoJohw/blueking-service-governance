@@ -19,7 +19,7 @@
 <template>
   <div
     v-bkloading="{ isLoading }"
-    class="flex h-full min-h-[480px] w-full items-center justify-center bg-white"
+    class="flex h-full min-h-[480px] w-full items-center justify-center bkms-bg-card"
   >
     <div
       v-if="isForbidden"
@@ -30,7 +30,7 @@
         class="h-[152px] w-[308px]"
         src="@/assets/permissions.png"
       />
-      <h2 class="mb-[24px] mt-[24px] text-[20px] font-normal leading-[28px] text-[#979ba5]">
+      <h2 class="mb-[24px] mt-[24px] text-[20px] font-normal leading-[28px] bkms-text-secondary">
         {{ t('您没有访问当前空间的权限') }}
       </h2>
       <div class="flex justify-center gap-[12px]">

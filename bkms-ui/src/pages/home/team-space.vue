@@ -27,7 +27,7 @@
   >
     <div class="px-[24px] py-[18px]">
       <!-- 基础信息 -->
-      <h3 class="mb-[16px] font-bold text-[#313238] text-[14px]">{{ $t('基础信息') }}</h3>
+      <h3 class="mb-[16px] font-bold bkms-text-title text-[14px]">{{ $t('基础信息') }}</h3>
       <Form
         ref="formRef"
         form-type="vertical"
@@ -158,7 +158,7 @@
           <template #current>
             <div
               v-if="repositoryType !== 'system'"
-              class="bg-[#F5F7FA] w-full p-[12px] py-[24px] text-[12px] my-[8px]"
+              class="bkms-bg-page w-full p-[12px] py-[24px] text-[12px] my-[8px]"
             >
               <div class="flex items-center whitespace-nowrap mb-[24px] custom-form-item form-item-has-tips">
                 <Form.FormItem
@@ -175,7 +175,7 @@
                     v-model.trim="formData.imageRegistry!.registry"
                     :placeholder="$t('请输入镜像命名空间，如：mirrors.tencent.com/bksaas/')"
                   />
-                  <div class="text-[#979BA5] mt-[4px]">
+                  <div class="bkms-text-secondary mt-[4px]">
                     {{ $t('仅填写命名空间即可，创建应用的时候再填写具体的仓库名称') }}
                     <Popover trigger="click">
                       <Button
@@ -190,7 +190,7 @@
                           <li
                             v-for="item in imageGitDisplayInputTips"
                             :key="item.name"
-                            class="text-[#fff] flex items-center w-full"
+                            class="bkms-text-inverse flex items-center w-full"
                           >
                             <div class="text-right shrink-0 min-w-[100px]">{{ item.name }}：</div>
                             <div class="text-wrap break-all">{{ item.value }}</div>

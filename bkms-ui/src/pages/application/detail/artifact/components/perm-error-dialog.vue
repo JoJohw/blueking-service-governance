@@ -28,13 +28,13 @@
           icon="bkms-icon-cuo"
           :width="42"
         />
-        <span class="text-[var(--bkms-neutral-1)] text-[20px] leading-[32px] text-center mt-[18px]">
+        <span class="bkms-text-title text-[20px] leading-[32px] text-center mt-[18px]">
           {{ t('镜像 Tag 删除失败') }}
         </span>
       </div>
     </template>
     <div
-      class="bg-[var(--bkms-neutral-7)] mb-[10px] py-[12px] px-[14px] text-[14px] leading-[22px] text-[var(--bkms-neutral-2)]"
+      class="bkms-bg-page mb-[10px] py-[12px] px-[14px] text-[14px] leading-[22px] bkms-text-body"
     >
       <i18n-t keypath="删除需要具备写权限的凭证。跳转到：{0} 配置凭证后重试。">
         <Button

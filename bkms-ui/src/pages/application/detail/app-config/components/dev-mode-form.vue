@@ -21,12 +21,12 @@
     :collapsible="true"
     :title="$t('开发模式')"
   >
-    <div class="bg-[#FFF] p-[16px] !text-[12px]">
+    <div class="bkms-bg-card p-[16px] !text-[12px]">
       <div class="flex items-center">
-        <span class="text-[var(--bkms-neutral-2)] mr-[16px]">
+        <span class="bkms-text-body mr-[16px]">
           {{ isProductionEnv ? $t('开发模式（生产环境不支持）') : $t('开发模式') }}
         </span>
-        <div class="flex items-center text-[var(--bkms-neutral-2)]">
+        <div class="flex items-center bkms-text-body">
           <Switcher
             class="mr-[6px]"
             :disabled="isProductionEnv"

@@ -203,7 +203,7 @@
 <style lang="postcss" scoped>
   .light :deep(.bk-navigation-wrapper .navigation-nav .nav-slider),
   .light :deep(.bk-menu) {
-    background-color: #fff;
+    background-color: var(--bkms-bg-card);
   }
 
   .light :deep(.bk-navigation-wrapper .navigation-nav .nav-slider) {
@@ -217,7 +217,7 @@
   :deep(.bk-navigation-wrapper .navigation-container .container-header) {
     justify-content: start;
     color: var(--bkms-neutral-1);
-    box-shadow: 0 3px 4px 0 #0000000a;
+    box-shadow: 0 3px 4px 0 var(--bkms-shadow-header);
     border-bottom: none;
     z-index: 1;
   }

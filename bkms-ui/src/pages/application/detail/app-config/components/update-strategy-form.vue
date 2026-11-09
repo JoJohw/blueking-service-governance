@@ -29,7 +29,7 @@
         <EnvScopeTag :current-env="currentEnv" />
       </div>
     </template>
-    <div class="bg-[#FFF] p-[16px]">
+    <div class="bkms-bg-card p-[16px]">
       <Form
         :ref="appSpecSection.formRef"
         form-type="vertical"
@@ -172,8 +172,8 @@
   import type { ExtendedEnv } from './types';
 
   // 查看态字段值样式常量
-  const FIELD_VALUE_BASE_CLASS = 'text-[12px] text-[var(--bkms-neutral-1)]';
-  const FIELD_VALUE_MODIFIED_CLASS = 'border-b border-dashed border-b-[var(--bkms-neutral-1)]';
+  const FIELD_VALUE_BASE_CLASS = 'text-[12px] bkms-text-title';
+  const FIELD_VALUE_MODIFIED_CLASS = 'border-b border-dashed border-b-bkms-neutral-1';
 
   type FieldKey = 'maxSurge' | 'maxUnavailable';
 

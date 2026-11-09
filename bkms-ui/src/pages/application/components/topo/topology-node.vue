@@ -33,7 +33,7 @@
     <template v-if="isIntersecting">
       <div
         :class="[
-          'relative flex items-center px-[8px] py-[4px] rounded-[10px] border border-[#fff] shadow-[0_4px_8px_0_rgba(41,45,51,0.08)]',
+          'relative flex items-center px-[8px] py-[4px] rounded-[10px] border border-bkms-neutral-10 shadow-[0_4px_8px_0_rgba(41,45,51,0.08)]',
           data.data?.kind !== 'App' ? 'topo-node cursor-pointer' : '',
         ]"
         :style="nodeStyle"
@@ -48,11 +48,11 @@
           <component
             :is="KIND_ICON_MAP[data.data?.kind || '']"
             v-if="KIND_ICON_MAP[data.data?.kind || '']"
-            :class="['size-[24px] svg-icon', data.data?.kind === 'PolarisConfig' ? 'text-[#fff]' : '']"
+            :class="['size-[24px] svg-icon', data.data?.kind === 'PolarisConfig' ? 'bkms-text-inverse' : '']"
           />
           <span
             v-else
-            class="text-[16px] font-600 text-[#fff]"
+            class="text-[16px] font-600 bkms-text-inverse"
           >
             {{ data.data?.kind?.charAt(0) || '?' }}
           </span>
@@ -60,14 +60,14 @@
         <div class="flex-1 min-w-0 leading-none">
           <div
             :class="[
-              'text-[12px] font-500 text-[#000000] truncate leading-[20px]',
+              'text-[12px] font-500 bkms-text-title truncate leading-[20px]',
               statusConfig.badgeIconColor ? 'mr-[20px]' : '',
             ]"
             :title="data.data?.name"
           >
             {{ data.data?.name }}
           </div>
-          <div class="text-[12px] text-[var(--bkms-navy-4)] leading-[20px]">
+          <div class="text-[12px] text-bkms-navy-4 leading-[20px]">
             {{ KIND_SHORT_MAP[data.data?.kind || ''] ?? data.data?.kind }}
           </div>
         </div>
@@ -105,14 +105,14 @@
             />
           </svg>
           <span
-            class="collapse-btn absolute top-[50%] translate-y-[-50%] select-none bg-[var(--bkms-neutral-7)] rounded-[50%] flex items-center justify-center w-[18px] h-[18px]"
+            class="collapse-btn absolute top-[50%] translate-y-[-50%] select-none bkms-bg-page rounded-[50%] flex items-center justify-center w-[18px] h-[18px]"
             :style="{ left: `calc(100% + ${EDGE_LENGTH / 2 - 9}px)` }"
             @click.stop.prevent="handleCollapse"
             @pointerdown.stop
             @pointerenter.stop
           >
             <i
-              class="text-[#ABB5CC] text-[18px] hover:text-[var(--bkms-brand-2)] custom-collapse"
+              class="text-[#ABB5CC] text-[18px] hover:bkms-text-brand custom-collapse"
               :class="data.data?.collapsed ? 'bkms-icon bkms-icon-plus' : 'bkms-icon bkms-icon-minus'"
             ></i>
           </span>
@@ -121,7 +121,7 @@
     </template>
     <div
       v-else
-      class="bg-[#fff] rounded-[10px] shadow-[0_4px_8px_0_rgba(41,45,51,0.08)]"
+      class="bkms-bg-card rounded-[10px] shadow-[0_4px_8px_0_rgba(41,45,51,0.08)]"
       :style="{
         width: `${NODE_WIDTH}px`,
         height: `${NODE_HEIGHT}px`,
@@ -226,6 +226,6 @@
 
   /* hover 时改变背景，但排除折叠按钮 hover 的情况 */
   .topo-node:hover:not(:has(.collapse-btn:hover)) {
-    background: linear-gradient(90deg, #f5f8ff 0%, #fcfdff 100%) !important;
+    background: linear-gradient(90deg, var(--bkms-neutral-8) 0%, var(--bkms-neutral-9) 100%) !important;
   }
 </style>

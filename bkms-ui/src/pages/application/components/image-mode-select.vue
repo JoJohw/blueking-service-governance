@@ -34,7 +34,7 @@
     </Button.ButtonGroup>
     <!-- 平台推荐镜像 -->
     <template v-if="imageMode === 'platform'">
-      <div class="bg-[var(--bkms-neutral-7)] mt-[16px] p-[16px]">
+      <div class="bkms-bg-page mt-[16px] p-[16px]">
         <div class="flex gap-[6px] items-start">
           <Form.FormItem
             class="flex-grow-2 !mb-0"
@@ -78,17 +78,17 @@
         </div>
         <div
           v-if="staleWarning"
-          class="text-[12px] text-[var(--bkms-warning-2)] mt-[8px]"
+          class="text-[12px] text-bkms-warning-2 mt-[8px]"
         >
           {{ $t('该镜像已不在当前平台镜像列表中，请重新选择') }}
         </div>
         <div
           v-if="staleTagWarning"
-          class="text-[12px] text-[var(--bkms-warning-2)] mt-[8px]"
+          class="text-[12px] text-bkms-warning-2 mt-[8px]"
         >
           {{ $t('所选镜像 Tag 已不在当前镜像的 Tag 列表中，请重新选择') }}
         </div>
-        <div class="text-[12px] text-[var(--bkms-neutral-3)] mt-[4px] leading-[20px]">
+        <div class="text-[12px] bkms-text-secondary mt-[4px] leading-[20px]">
           {{ descText }}
         </div>
       </div>

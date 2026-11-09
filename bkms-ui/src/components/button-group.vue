@@ -51,7 +51,7 @@
   .bk-button-group {
     .is-selected {
       background-color: var(--bkms-brand-2) !important;
-      color: #ffffff !important;
+      color: var(--bkms-text-inverse) !important;
     }
   }
 </style>

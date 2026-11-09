@@ -75,7 +75,7 @@
             >
               <!-- 实例名称 -->
               <Form.FormItem
-                class="!text-[var(--bkms-neutral-2)]"
+                class="!bkms-text-body"
                 :label="$t('实例名称')"
                 property="instanceKey"
                 required
@@ -98,7 +98,7 @@
                   :precision="0"
                   type="number"
                 />
-                <div class="mt-[4px] text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">
+                <div class="mt-[4px] text-[12px] leading-[20px] bkms-text-secondary">
                   {{ servicePortHint }}
                 </div>
                 <Alert
@@ -159,7 +159,7 @@
               <!-- 连接信息与连通测试 -->
               <div
                 ref="connectionBlockRef"
-                class="mb-[24px] rounded-[2px] bg-[var(--bkms-neutral-7)] p-[16px]"
+                class="mb-[24px] rounded-[2px] bkms-bg-page p-[16px]"
               >
                 <Form.FormItem
                   v-test="'polaris-config-namespace-options'"
@@ -226,7 +226,7 @@
                   </Button>
                   <p
                     v-if="connectionRequired && !connected"
-                    class="mt-[4px] text-[12px] text-[var(--bkms-danger-2)]"
+                    class="mt-[4px] text-[12px] text-bkms-danger-2"
                   >
                     {{ $t('请先完成连通测试并通过后再提交') }}
                   </p>
@@ -265,7 +265,7 @@
                   multiple
                 />
                 <template v-if="!isEditMode">
-                  <span class="text-[var(--bkms-neutral-3)]">{{ $t('可快捷填入') }}: </span>
+                  <span class="bkms-text-secondary">{{ $t('可快捷填入') }}: </span>
                   <Button
                     text
                     theme="primary"
@@ -314,9 +314,9 @@
                     class="w-full border border-solid rounded-[2px] px-[16px] py-[8px] transition-colors duration-200"
                     :class="[
                       formModel.registerMode === 'immediate'
-                        ? 'border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-7)]'
-                        : 'border-[var(--bkms-neutral-5)] bg-white',
-                      isEditMode ? 'cursor-not-allowed' : 'cursor-pointer hover:border-[var(--bkms-brand-2)]',
+                        ? 'bkms-line-active bkms-bg-brand-soft'
+                        : 'bkms-line-default bkms-bg-card',
+                      isEditMode ? 'cursor-not-allowed' : 'cursor-pointer hover:bkms-line-active',
                     ]"
                     @click="handleSelectRegisterMode('immediate')"
                   >
@@ -332,9 +332,9 @@
                     class="w-full border border-solid rounded-[2px] px-[16px] py-[8px] transition-colors duration-200"
                     :class="[
                       formModel.registerMode === 'on_deploy'
-                        ? 'border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-7)]'
-                        : 'border-[var(--bkms-neutral-5)] bg-white',
-                      isEditMode ? 'cursor-not-allowed' : 'cursor-pointer hover:border-[var(--bkms-brand-2)]',
+                        ? 'bkms-line-active bkms-bg-brand-soft'
+                        : 'bkms-line-default bkms-bg-card',
+                      isEditMode ? 'cursor-not-allowed' : 'cursor-pointer hover:bkms-line-active',
                     ]"
                     @click="handleSelectRegisterMode('on_deploy')"
                   >
@@ -344,18 +344,18 @@
                       label="on_deploy"
                     >
                       <span class="inline-flex flex-wrap items-center gap-x-[8px] leading-[20px]">
-                        <span class="shrink-0 text-[var(--bkms-neutral-2)]">{{ $t('下次部署生效') }}</span>
-                        <span class="text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">
+                        <span class="shrink-0 bkms-text-body">{{ $t('下次部署生效') }}</span>
+                        <span class="text-[12px] leading-[20px] bkms-text-secondary">
                           {{ $t('部署后才将实例注册到北极星，同时注入北极星 Token、服务端口等内容到应用环境变量中') }}
                         </span>
                       </span>
                     </Radio>
                   </div>
                 </Radio.Group>
-                <div class="mt-[4px] text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">
+                <div class="mt-[4px] text-[12px] leading-[20px] bkms-text-secondary">
                   <span>{{ $t('实例何时注册、摘除北极星，还受生命周期和健康探针影响') }}</span>
                   <a
-                    class="ml-[8px] text-[var(--bkms-brand-2)]"
+                    class="ml-[8px] bkms-text-brand"
                     :href="instanceLifecycleDocUrl"
                     rel="noopener noreferrer"
                     target="_blank"
@@ -379,7 +379,7 @@
                   />
                   <div
                     v-if="showHealthCheckTip"
-                    class="text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]"
+                    class="text-[12px] leading-[20px] bkms-text-secondary"
                   >
                     <i18n-t
                       v-if="isImmediateRegister(formModel)"
@@ -387,7 +387,7 @@
                       tag="span"
                     >
                       <a
-                        class="text-[var(--bkms-brand-2)]"
+                        class="bkms-text-brand"
                         :href="heartbeatDocUrl"
                         rel="noopener noreferrer"
                         target="_blank"
@@ -425,10 +425,10 @@
                       theme="primary"
                     />
                   </span>
-                  <div class="text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">
+                  <div class="text-[12px] leading-[20px] bkms-text-secondary">
                     <span>{{ $t('按实例机型动态分配流量。开启后，可在关联环境中打开「动态权重」') }}</span>
                     <a
-                      class="ml-[8px] text-[var(--bkms-brand-2)]"
+                      class="ml-[8px] bkms-text-brand"
                       :href="weightFactorDocUrl"
                       rel="noopener noreferrer"
                       target="_blank"
@@ -477,7 +477,7 @@
                   </Alert>
                   <p
                     v-if="resolutionRequired && weightFactorRequiresResolution"
-                    class="mt-[4px] text-[12px] text-[var(--bkms-danger-2)]"
+                    class="mt-[4px] text-[12px] text-bkms-danger-2"
                   >
                     {{ $t('请先处理权重因子与北极星线上配置的不一致') }}
                   </p>
@@ -491,8 +491,8 @@
               >
                 <template #label>
                   <span>{{ $t('服务标签') }}</span>
-                  <i class="bkms-icon bkms-icon-warning-circle text-[14px] text-[var(--bkms-neutral-3)] ml-[4px]"></i>
-                  <span class="text-[var(--bkms-neutral-3)] text-[12px] ml-[4px]">
+                  <i class="bkms-icon bkms-icon-warning-circle text-[14px] bkms-text-secondary ml-[4px]"></i>
+                  <span class="bkms-text-secondary text-[12px] ml-[4px]">
                     {{ $t('服务标签支持通过表达式 {0} 引用环境变量', [expressTemplate]) }}
                   </span>
                 </template>
@@ -522,7 +522,7 @@
                   <template #right>
                     <Copy
                       v-show="inputMode === 'text'"
-                      class="cursor-pointer !hover:text-[var(--bkms-brand-2)]"
+                      class="cursor-pointer !hover:bkms-text-brand"
                       height="16"
                       :title="$t('复制')"
                       width="16"

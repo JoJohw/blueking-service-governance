@@ -25,7 +25,7 @@
     <Loading :loading="buttonLoading">
       <div
         v-if="!params?.length"
-        class="bg-[var(--bkms-neutral-7)] h-[32px] flex items-center justify-center"
+        class="bkms-bg-page h-[32px] flex items-center justify-center"
       >
         <InfoLine
           class="mr-[10px]"
@@ -36,7 +36,7 @@
       </div>
       <div
         v-else
-        class="bg-[var(--bkms-neutral-7)]"
+        class="bkms-bg-page"
       >
         <PipelineParamsForm
           ref="pipelineParamsRef"

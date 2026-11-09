@@ -24,22 +24,22 @@
   >
     <template #header>
       <div class="flex flex-col items-center">
-        <span class="text-[var(--bkms-neutral-1)] text-[20px] leading-[32px] text-center mt-[18px]">
+        <span class="bkms-text-title text-[20px] leading-[32px] text-center mt-[18px]">
           {{ $t('保存并创建新版本') }}
         </span>
       </div>
     </template>
 
-    <div class="text-[14px] text-[var(--bkms-neutral-1)] mb-[16px] mt-[36px]">
+    <div class="text-[14px] bkms-text-title mb-[16px] mt-[36px]">
       {{ $t('保存将生成新的版本号，并记录到版本历史中，可用于后续对比和回滚。') }}
     </div>
 
     <!-- 版本信息 -->
-    <div class="bg-[var(--bkms-neutral-7)] mb-[16px] py-[12px] px-[16px] text-[12px]">
+    <div class="bkms-bg-page mb-[16px] py-[12px] px-[16px] text-[12px]">
       <ul class="leading-[20px]">
         <li>
-          <span class="text-[var(--bkms-neutral-2)]">{{ $t('版本号') }}：</span>
-          <span class="text-[var(--bkms-neutral-1)]">V{{ nextVersion }}</span>
+          <span class="bkms-text-body">{{ $t('版本号') }}：</span>
+          <span class="bkms-text-title">V{{ nextVersion }}</span>
         </li>
       </ul>
     </div>

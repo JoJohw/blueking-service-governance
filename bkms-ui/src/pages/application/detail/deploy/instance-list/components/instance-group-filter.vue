@@ -29,13 +29,13 @@
     <span class="cursor-pointer">
       <span
         v-bk-tooltips="{ content: tooltip, disabled: !tooltip }"
-        :class="{ 'border-b border-dashed border-[var(--bkms-neutral-3)]': tooltip }"
+        :class="{ 'border-b border-dashed border-b-bkms-neutral-3': tooltip }"
       >
         {{ label }}
       </span>
       <i
-        class="hover:text-[#606266] relative text-[var(--bkms-navy-5)] top-[1px] left-[4px] vxe-filter--btn vxe-table-icon-funnel"
-        :class="hasApplied ? '!text-[var(--bkms-brand-2)]' : ''"
+        class="hover:text-[#606266] relative text-bkms-navy-5 top-[1px] left-[4px] vxe-filter--btn vxe-table-icon-funnel"
+        :class="hasApplied ? '!bkms-text-brand' : ''"
       ></i>
     </span>
     <template #content>
@@ -49,7 +49,7 @@
             :key="group.field"
             class="group-section w-[160px]"
           >
-            <div class="px-[12px] h-[28px] leading-[28px] text-[12px] text-[var(--bkms-neutral-3)]">
+            <div class="px-[12px] h-[28px] leading-[28px] text-[12px] bkms-text-secondary">
               {{ group.label }}
             </div>
             <Checkbox.Group
@@ -59,7 +59,7 @@
               <Checkbox
                 v-for="option in group.options"
                 :key="option.value"
-                class="!ml-0 w-full text-[12px] text-[var(--bkms-neutral-2)]"
+                class="!ml-0 w-full text-[12px] bkms-text-body"
                 :label="option.value"
               >
                 {{ option.label }}
@@ -67,7 +67,7 @@
             </Checkbox.Group>
           </div>
         </div>
-        <div class="flex items-center justify-end h-[42px] border-t px-[8px] border-[var(--bkms-neutral-5)]">
+        <div class="flex items-center justify-end h-[42px] border-t px-[8px] border-t-bkms-neutral-5">
           <Button
             class="mr-[8px]"
             size="small"

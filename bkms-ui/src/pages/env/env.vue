@@ -63,7 +63,7 @@
           <div class="flex items-center justify-end">
             <SearchSelect
               v-model="searchValue"
-              class="w-[520px] bg-[#fff] relative z-[10]"
+              class="w-[520px] bkms-bg-card relative z-[10]"
               :data="envSearchData"
               :placeholder="
                 createPlaceholder({
@@ -148,7 +148,7 @@
                 @click.stop="handleShowEnvDetail(row)"
                 >{{ row.displayName }}</Button
               >
-              <div class="text-[#979BA5]">{{ row.name }}</div>
+              <div class="bkms-text-secondary">{{ row.name }}</div>
             </div>
           </template>
         </TableColumn>
@@ -185,10 +185,10 @@
               v-if="row?.status === 'Ready'"
               class="flex items-center gap-[8px]"
             >
-              <div class="bg-[#CBF0DA] rounded-[50%] flex items-center justify-center w-[14px] h-[14px]">
+              <div class="bg-bkms-success-5 rounded-[50%] flex items-center justify-center w-[14px] h-[14px]">
                 <Done
                   :height="12"
-                  text="#2CAF5E"
+                  text="var(--bkms-success-2)"
                   :width="12"
                 />
               </div>
@@ -198,7 +198,7 @@
               v-else
               class="flex items-center gap-[8px]"
             >
-              <i class="bkms-icon bkms-icon-time-circle-fill text-[#C4C6CC] text-[14px]"></i>
+              <i class="bkms-icon bkms-icon-time-circle-fill text-bkms-navy-5 text-[14px]"></i>
               {{ $t('未配置') }}
             </div>
           </template>
@@ -576,11 +576,11 @@
     }
 
     .row--current .env-normal.env-tag-development {
-      background-color: #cddffe !important;
+      background-color: var(--bkms-bg-active-hover) !important;
     }
   }
   .env-normal {
-    color: #63656e;
-    background-color: #f0f1f5;
+    color: var(--bkms-text-body);
+    background-color: var(--bkms-neutral-6);
   }
 </style>

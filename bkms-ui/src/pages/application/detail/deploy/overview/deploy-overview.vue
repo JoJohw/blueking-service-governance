@@ -37,7 +37,7 @@
             width="100%"
           />
         </div>
-        <div class="rounded-[2px] bg-white p-[16px]">
+        <div class="rounded-[2px] bkms-bg-card p-[16px]">
           <div class="mb-[16px] flex justify-end"><Layout.shape :width="560" /></div>
           <Layout.table />
         </div>
@@ -45,7 +45,7 @@
 
       <!-- 顶部操作栏：环境类型是总览表格的一级筛选，部署按钮复用部署管理现有侧栏。 -->
       <div
-        class="mb-[16px] flex shrink-0 items-center justify-between gap-[16px] bg-[var(--bkms-neutral-6)] px-[12px] py-[8px] shadow-[0_2px_4px_0_#0000001a]"
+        class="mb-[16px] flex shrink-0 items-center justify-between gap-[16px] bg-bkms-neutral-6 px-[12px] py-[8px] shadow-[0_2px_4px_0_var(--bkms-shadow-hover)]"
       >
         <Radio.Group
           v-model="globalTypeFilter"
@@ -63,8 +63,8 @@
                 :class="[
                   'ml-[4px] h-[16px] rounded-[8px] px-[6px] leading-[16px]',
                   option.value === globalTypeFilter
-                    ? 'bg-[var(--bkms-brand-6)] text-[var(--bkms-brand-2)]'
-                    : 'bg-white',
+                    ? 'bkms-bg-active bkms-text-brand'
+                    : 'bkms-bg-card',
                 ]"
               >
                 {{ option.count }}
@@ -75,7 +75,7 @@
         <div class="flex items-center gap-[8px]">
           <Button
             v-bk-tooltips="$t('刷新')"
-            class="!min-w-[32px] !px-0 bg-[#fff]"
+            class="!min-w-[32px] !px-0 bkms-bg-card"
             @click="handleRefresh"
           >
             <i
@@ -87,7 +87,7 @@
           </Button>
           <Button
             v-if="canAddDeploy"
-            class="bg-[#fff]"
+            class="bkms-bg-card"
             @click="emit('create-feature-env')"
           >
             <Plus class="text-[18px]" />
@@ -109,16 +109,16 @@
           v-for="stat in stats"
           :key="stat.key"
           :class="[
-            'flex min-w-0 cursor-pointer items-center justify-between gap-[12px] rounded-[2px] bg-white px-[16px] py-[12px] text-left shadow-[0_2px_4px_0_#1919290d] hover:shadow-[0_2px_8px_0_#1919291f]',
+            'flex min-w-0 cursor-pointer items-center justify-between gap-[12px] rounded-[2px] bkms-bg-card px-[16px] py-[12px] text-left shadow-[0_2px_4px_0_var(--bkms-shadow-card)] hover:shadow-[0_2px_8px_0_#1919291f]',
             activeStat === stat.key
-              ? '!bg-[var(--bkms-brand-6)] outline outline-[1px] outline-[var(--bkms-brand-2)]'
+              ? '!bkms-bg-active outline outline-[1px] outline-bkms-brand-2'
               : '',
           ]"
           type="button"
           @click="handleStatClick(stat.key)"
         >
           <div class="flex min-w-0 flex-col gap-[4px]">
-            <span class="text-[12px] text-[var(--bkms-neutral-3)]">{{ stat.label }}</span>
+            <span class="text-[12px] bkms-text-secondary">{{ stat.label }}</span>
             <div class="flex items-baseline gap-[8px]">
               <span
                 class="text-[24px] font-bold leading-[28px]"
@@ -128,7 +128,7 @@
               </span>
               <span
                 v-if="stat.desc"
-                class="truncate text-[12px] text-[var(--bkms-neutral-3)]"
+                class="truncate text-[12px] bkms-text-secondary"
               >
                 {{ stat.desc }}
               </span>
@@ -144,11 +144,11 @@
       </div>
 
       <!-- 表格容器占满剩余高度，仅表格内容滚动，顶部筛选与分页保持可见。 -->
-      <div class="flex min-h-0 flex-1 flex-col rounded-[2px] bg-white p-[16px] shadow-[0_2px_4px_0_#1919290d]">
+      <div class="flex min-h-0 flex-1 flex-col rounded-[2px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
         <div class="mb-[16px] flex shrink-0 justify-end">
           <SearchSelect
             v-model="searchValue"
-            class="relative z-[100] w-[560px] shrink-0 bg-white"
+            class="relative z-[100] w-[560px] shrink-0 bkms-bg-card"
             :data="searchData"
             :placeholder="createPlaceholder({ type: 'searchSelect', labels: ['环境名称', '部署状态', '资源规格'] })"
             unique-select
@@ -194,18 +194,18 @@
             >
               <template #default="{ row }: { row: DeployOverviewRow }">
                 <div class="flex items-center gap-[4px]">
-                  <span class="truncate text-[var(--bkms-brand-2)] hover:text-[var(--bkms-brand-3)]">
+                  <span class="truncate bkms-text-brand hover:text-bkms-brand-3">
                     {{ row.displayName }}
                   </span>
                   <Tag
                     v-if="row.isFeature"
-                    class="shrink-0 bg-[var(--bkms-cyan-6)] text-[var(--bkms-cyan-2)]"
+                    class="shrink-0 bg-bkms-cyan-6 text-bkms-cyan-2"
                     size="small"
                   >
                     {{ $t('特性') }}
                   </Tag>
                 </div>
-                <div class="text-[var(--bkms-neutral-3)]">{{ row.name }}</div>
+                <div class="bkms-text-secondary">{{ row.name }}</div>
               </template>
             </TableColumn>
             <TableColumn
@@ -238,7 +238,7 @@
                     :icon="getStatusInfo(row.deployStatus).icon"
                     :size="12"
                   />
-                  <span class="text-[var(--bkms-neutral-2)]">{{ getStatusInfo(row.deployStatus).text || '--' }}</span>
+                  <span class="bkms-text-body">{{ getStatusInfo(row.deployStatus).text || '--' }}</span>
                 </div>
               </template>
             </TableColumn>
@@ -249,11 +249,11 @@
             >
               <template #default="{ row }: { row: DeployOverviewRow }">
                 <div class="flex items-center">
-                  <span class="text-[var(--bkms-neutral-1)]">{{ row.runningCount ?? '--' }}</span>
-                  <span class="mx-[4px] text-[var(--bkms-neutral-5)]">/</span>
-                  <span class="text-[var(--bkms-neutral-1)]">{{ row.desiredCount ?? '--' }}</span>
-                  <span class="mx-[4px] text-[var(--bkms-neutral-5)]">/</span>
-                  <span :class="row.abnormalCount ? 'text-[var(--bkms-danger-2)]' : 'text-[var(--bkms-neutral-3)]'">
+                  <span class="bkms-text-title">{{ row.runningCount ?? '--' }}</span>
+                  <span class="mx-[4px] text-bkms-neutral-5">/</span>
+                  <span class="bkms-text-title">{{ row.desiredCount ?? '--' }}</span>
+                  <span class="mx-[4px] text-bkms-neutral-5">/</span>
+                  <span :class="row.abnormalCount ? 'text-bkms-danger-2' : 'bkms-text-secondary'">
                     {{ row.abnormalCount ?? '--' }}
                   </span>
                   <!-- 未配置不显示；已关闭显示中性标签；已启用复用 GPA 状态标签。 -->
@@ -300,7 +300,7 @@
                   v-if="getResourceText(row)"
                   placement="top"
                 >
-                  <span class="cursor-default border-b border-dashed border-[var(--bkms-neutral-3)]">{{
+                  <span class="cursor-default border-b border-dashed border-b-bkms-neutral-3">{{
                     getResourceText(row)
                   }}</span>
                   <template #content>
@@ -333,10 +333,10 @@
             >
               <template #default="{ row }: { row: DeployOverviewRow }">
                 <div v-if="row.clusterName || row.clusterID">
-                  <div class="truncate text-[var(--bkms-neutral-1)]">{{ row.clusterName || row.clusterID }}</div>
+                  <div class="truncate bkms-text-title">{{ row.clusterName || row.clusterID }}</div>
                   <div
                     v-if="row.clusterName && row.clusterID"
-                    class="truncate text-[var(--bkms-neutral-3)]"
+                    class="truncate bkms-text-secondary"
                   >
                     {{ row.clusterID }}
                   </div>

@@ -18,7 +18,7 @@
 
 <template>
   <BkmsContent
-    class="shadow-[0_2px_4px_0_#1919290d]"
+    class="shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
     :collapsible="true"
     :editing="isEditing"
     :show-edit-icon="!isEditing"
@@ -35,7 +35,7 @@
       </UnderLineTips>
       <EnvScopeTag :current-env="currentEnv" />
     </template>
-    <div class="bg-[#FFF] p-[16px]">
+    <div class="bkms-bg-card p-[16px]">
       <Form
         :ref="appSpecSection.formRef"
         form-type="vertical"
@@ -173,7 +173,7 @@
           <!-- 实例数（副本数） -->
           <Form.FormItem
             :class="[
-              '!text-[var(--bkms-neutral-2)] !w-[400px] relative',
+              '!bkms-text-body !w-[400px] relative',
               { 'field-diff-highlight': shouldShowResetIcon('replicas') },
             ]"
             :label="$t('实例数')"
@@ -338,8 +338,8 @@
   import type { ExtendedEnv } from './types';
 
   // 查看态字段值样式常量
-  const FIELD_VALUE_BASE_CLASS = 'text-[12px] text-[var(--bkms-neutral-1)]';
-  const FIELD_VALUE_MODIFIED_CLASS = 'border-b border-dashed border-b-[var(--bkms-neutral-1)]';
+  const FIELD_VALUE_BASE_CLASS = 'text-[12px] bkms-text-title';
+  const FIELD_VALUE_MODIFIED_CLASS = 'border-b border-dashed border-b-bkms-neutral-1';
 
   type FieldKey = 'cpuLimits' | 'cpuRequests' | 'memoryLimits' | 'memoryRequests' | 'replicas';
 

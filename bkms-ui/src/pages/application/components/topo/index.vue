@@ -27,7 +27,7 @@
     <div class="flex flex-col h-full custom-resource-topology">
       <FlexRow
         v-if="nodes.length > 0"
-        class="h-[48px] py-[8px] px-[16px] shrink-0 bg-[#fff] shadow-[0_2px_4px_0_#0000001a]"
+        class="h-[48px] py-[8px] px-[16px] shrink-0 bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-hover)]"
       >
         <template #left>
           <!-- <Tab
@@ -60,8 +60,8 @@
           <img src="/empty.svg" />
         </template>
         <template #description>
-          <div class="text-[20px] text-[var(--bkms-neutral-1)] mb-[16px]">{{ $t('暂无资源') }}</div>
-          <div class="text-[14px] text-[var(--bkms-neutral-2)]">{{ $t('该环境下无任何资源') }}</div>
+          <div class="text-[20px] bkms-text-title mb-[16px]">{{ $t('暂无资源') }}</div>
+          <div class="text-[14px] bkms-text-body">{{ $t('该环境下无任何资源') }}</div>
           <slot name="empty-deploy"></slot>
         </template>
       </Exception>

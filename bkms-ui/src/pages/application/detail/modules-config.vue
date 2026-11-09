@@ -58,7 +58,7 @@
         <template #right>
           <SearchSelect
             v-model="searchValue"
-            class="w-[520px] bg-[#fff] relative z-[100]"
+            class="w-[520px] bkms-bg-card relative z-[100]"
             :data="searchSelectData"
             :placeholder="
               createPlaceholder({
@@ -157,13 +157,13 @@
                 <span
                   v-for="key in Object.keys(row.properties || {}).slice(0, 3)"
                   :key="key"
-                  class="text-[12px] text-[var(--bkms-neutral-2)] truncate"
+                  class="text-[12px] bkms-text-body truncate"
                 >
                   {{ `${key}: ${formatPropertyValue(row.properties[key])}` }}
                 </span>
                 <span
                   v-if="Object.keys(row.properties || {})?.length > 3"
-                  class="text-[12px] text-[var(--bkms-neutral-3)]"
+                  class="text-[12px] bkms-text-secondary"
                 >
                   ...
                 </span>
@@ -594,12 +594,12 @@
     }
     const instances = selections.value.map(item => h('div', { class: ['px-[16px] leading-[32px]'] }, [`${item.name}`]));
     return h('div', [
-      h('div', { class: 'bg-[var(--bkms-neutral-7)] py-[12px] px-[16px]' }, [t('删除后，将不可恢复，请谨慎操作！')]),
+      h('div', { class: 'bkms-bg-page py-[12px] px-[16px]' }, [t('删除后，将不可恢复，请谨慎操作！')]),
       h(
         'div',
         {
           class:
-            'bg-[var(--bkms-neutral-7)] leading-[32px] px-[16px] mt-[16px] border-1 border-[var(--bkms-neutral-6)] rounded-[2px] border-b-transparent',
+            'bkms-bg-page leading-[32px] px-[16px] mt-[16px] border-1 bkms-line-light rounded-[2px] border-b-transparent',
         },
         [h('span', [t('已选择以下 {0} 个实例', [selections.value.length])])],
       ),
@@ -607,7 +607,7 @@
         'div',
         {
           class:
-            'max-h-[160px] overflow-auto border-1 border-t-transparent border-[var(--bkms-neutral-6)] rounded-[2px]',
+            'max-h-[160px] overflow-auto border-1 border-t-transparent bkms-line-light rounded-[2px]',
         },
         [...instances],
       ),

@@ -21,8 +21,8 @@
     class="text-[12px] flex items-center"
     :style="{ lineHeight: resolvedLineHeight }"
   >
-    <span class="text-[var(--bkms-neutral-3)]">{{ label }}：</span>
-    <span class="text-[var(--bkms-neutral-1)]">
+    <span class="bkms-text-secondary">{{ label }}：</span>
+    <span class="bkms-text-title">
       <slot>{{ value ?? '--' }}</slot>
     </span>
   </div>

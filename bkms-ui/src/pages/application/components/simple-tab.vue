@@ -17,14 +17,14 @@
 -->
 
 <template>
-  <div class="flex items-center h-[42px] border-b-[1px] border-[var(--bkms-neutral-5)]">
+  <div class="flex items-center h-[42px] border-b-[1px] border-b-bkms-neutral-5">
     <slot name="tab-prefix"></slot>
     <div
       v-for="item in tabItems"
       :key="item.id"
       :class="[
-        'flex items-center justify-center px-[20px] h-full cursor-pointer text-[14px] text-[var(--bkms-neutral-2)]',
-        activeID === item.id ? 'border-b-[1px] border-[var(--bkms-brand-2)] !text-[var(--bkms-brand-2)]' : '',
+        'flex items-center justify-center px-[20px] h-full cursor-pointer text-[14px] bkms-text-body',
+        activeID === item.id ? 'border-b-[1px] border-b-bkms-brand-2 !bkms-text-brand' : '',
       ]"
       @click="handleChangeActive(item.id)"
     >

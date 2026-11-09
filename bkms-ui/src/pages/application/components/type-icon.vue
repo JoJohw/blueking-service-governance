@@ -42,7 +42,7 @@
       <ColorIcon
         v-else
         class="shrink-0"
-        :fill="displayKind === 'bkmsApp' ? '#3A84FF' : undefined"
+        :fill="displayKind === 'bkmsApp' ? 'var(--bkms-brand-2)' : undefined"
         :icon="curTypeIconData.icon"
         :size="size"
       />

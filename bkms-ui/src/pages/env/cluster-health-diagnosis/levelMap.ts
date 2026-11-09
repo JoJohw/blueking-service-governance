@@ -41,12 +41,12 @@ export const LEVEL_FOR_UI: Record<
   }
 > = {
   RISK: {
-    resourceKeyColumnBg: '#EA3636',
+    resourceKeyColumnBg: 'var(--bkms-danger-2)',
     isRecovered: false,
     tagTheme: TagThemeEnum.DANGER,
   },
   WARN: {
-    resourceKeyColumnBg: '#F59500',
+    resourceKeyColumnBg: 'var(--bkms-warning-2)',
     isRecovered: false,
     tagTheme: TagThemeEnum.DANGER,
   },

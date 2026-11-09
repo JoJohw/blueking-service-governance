@@ -30,12 +30,12 @@
     <!-- 版本规则 -->
     <div
       v-if="enabled"
-      class="mt-[8px] p-[16px] bg-[var(--bkms-neutral-7)] rounded-[2px]"
+      class="mt-[8px] p-[16px] bkms-bg-page rounded-[2px]"
     >
       <div class="flex">
-        <div class="w-[90px] text-align-right pr-[22px] text-[14px] text-[var(--bkms-neutral-2)]">
+        <div class="w-[90px] text-align-right pr-[22px] text-[14px] bkms-text-body">
           {{ $t('版本规则') }}
-          <span class="text-[var(--bkms-danger-2)]">*</span>
+          <span class="text-bkms-danger-2">*</span>
         </div>
         <Radio.Group
           v-model="configData.type"
@@ -78,7 +78,7 @@
         >
           {{ $t('构建时间') }}
         </Checkbox>
-        <span class="text-[14px] text-[var(--bkms-neutral-2)]">{{ $t('(示例：{0})', [example]) }}</span>
+        <span class="text-[14px] bkms-text-body">{{ $t('(示例：{0})', [example]) }}</span>
       </div>
     </div>
   </Form.FormItem>

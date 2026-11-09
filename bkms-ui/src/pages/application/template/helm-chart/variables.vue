@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="flex flex-col border-[1px] border-[var(--bkms-neutral-5)] w-full h-full bg-[#fff]">
+  <div class="flex flex-col border-[1px] bkms-line-default w-full h-full bkms-bg-card">
     <Tab
       v-model:active="activeTab"
       class="helm-variable-tabs flex flex-col flex-1 min-h-0"
@@ -71,7 +71,7 @@
                     @click="copyText(`\${{ bkms.${row.key} }}`)"
                   >
                     <Copy
-                      class="group-hover:opacity-100 opacity-0 transition text-[var(--bkms-brand-2)]"
+                      class="group-hover:opacity-100 opacity-0 transition bkms-text-brand"
                       :title="$t('复制')"
                     />
                   </Button>
@@ -94,9 +94,9 @@
                 {{ $t('部署时自动将镜像凭证写入 Secret，需在 values 中引用方可拉取镜像') }}
               </span>
             </template>
-            <div class="mt-[10px] w-full overflow-hidden bg-[#fff] border border-[var(--bkms-neutral-5)] rounded-[2px]">
+            <div class="mt-[10px] w-full overflow-hidden bkms-bg-card border bkms-line-default rounded-[2px]">
               <div
-                class="h-[28px] px-[12px] text-[12px] flex items-center justify-between bg-[var(--bkms-neutral-7)] border-b border-[var(--bkms-neutral-5)]"
+                class="h-[28px] px-[12px] text-[12px] flex items-center justify-between bkms-bg-page border-b border-b-bkms-neutral-5"
               >
                 <span>{{ $t('使用示例') }}</span>
                 <Button
@@ -105,7 +105,7 @@
                   @click="copyText('imagePullSecret:\n  - name:  ${{ bkms.APP_IMAGE_PULL_SECRET }}')"
                 >
                   <Copy
-                    class="text-[var(--bkms-brand-2)]"
+                    class="bkms-text-brand"
                     :title="$t('复制')"
                   />
                 </Button>

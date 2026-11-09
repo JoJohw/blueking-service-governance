@@ -74,7 +74,7 @@
         >
           {{ count?.RISK ?? '--' }}
         </div>
-        <div class="text-[10px] text-[var(--bkms-neutral-3)] mt-[4px]">
+        <div class="text-[10px] bkms-text-secondary mt-[4px]">
           {{ $t('致命问题') }}
         </div>
       </div>
@@ -86,12 +86,12 @@
       class="flex flex-col gap-[12px]"
     >
       <div class="flex items-center gap-[8px]">
-        <span class="inline-block w-[8px] h-[8px] rounded-full bg-[var(--bkms-danger-2)]"></span>
-        <span class="text-[12px] text-[var(--bkms-neutral-2)]">{{ $t('致命问题') }}：{{ count?.RISK ?? '--' }}</span>
+        <span class="inline-block w-[8px] h-[8px] rounded-full bg-bkms-danger-2"></span>
+        <span class="text-[12px] bkms-text-body">{{ $t('致命问题') }}：{{ count?.RISK ?? '--' }}</span>
       </div>
       <div class="flex items-center gap-[8px]">
-        <span class="inline-block w-[8px] h-[8px] rounded-full bg-[var(--bkms-warning-2)]"></span>
-        <span class="text-[12px] text-[var(--bkms-neutral-2)]">{{ $t('预警问题') }}：{{ count?.WARN ?? '--' }}</span>
+        <span class="inline-block w-[8px] h-[8px] rounded-full bg-bkms-warning-2"></span>
+        <span class="text-[12px] bkms-text-body">{{ $t('预警问题') }}：{{ count?.WARN ?? '--' }}</span>
       </div>
     </div>
   </div>

@@ -80,20 +80,20 @@
 
             <!-- 顶部问候栏 -->
             <div
-              class="flex items-center justify-between p-[16px] mb-[24px] rounded-[8px] bg-[#FFF] shadow-[0_2px_4px_0_#1919290d]"
+              class="flex items-center justify-between p-[16px] mb-[24px] rounded-[8px] bkms-bg-card shadow-[0_2px_4px_0_#1919290d]"
             >
               <div class="flex items-center">
-                <div class="w-[60px] h-[60px] rounded-[12px] bg-[#F0F5FF] flex items-center justify-center mr-[16px]">
+                <div class="w-[60px] h-[60px] rounded-[12px] bkms-bg-brand-soft flex items-center justify-center mr-[16px]">
                   <Coffee class="w-[28px] h-[28px] animate-bounce-coffee" />
                 </div>
                 <div>
-                  <div class="text-[20px] font-bold text-[#313238]">
+                  <div class="text-[20px] font-bold bkms-text-title">
                     {{ greetingText }}，
-                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-[#614BFA] to-[#3A84FF]"
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-bkms-purple-2 to-bkms-brand-2"
                       >{{ userStore.userInfo.user_id || '--' }} ~
                     </span>
                   </div>
-                  <div class="text-[14px] text-[#979BA5] mt-[4px]">{{ $t('欢迎回到蓝鲸服务治理平台') }} ~</div>
+                  <div class="text-[14px] bkms-text-secondary mt-[4px]">{{ $t('欢迎回到蓝鲸服务治理平台') }} ~</div>
                 </div>
               </div>
               <Button
@@ -110,14 +110,14 @@
 
             <!-- 最近操作区域 -->
             <div class="flex items-center justify-between mb-[16px]">
-              <span class="text-[16px] font-bold text-[#313238]">{{ $t('最近操作') }}</span>
+              <span class="text-[16px] font-bold bkms-text-title">{{ $t('最近操作') }}</span>
               <Button
                 text
                 theme="primary"
                 @click="handleGoAllSpaces"
               >
                 {{ $t('启用空间') }}（{{ enableSpaceCount }}）
-                <i class="bkms-icon bkms-icon-expand-small rotate-270 text-[16px] text-[#3a84ff]"></i>
+                <i class="bkms-icon bkms-icon-expand-small rotate-270 text-[16px] bkms-text-brand"></i>
               </Button>
             </div>
 
@@ -126,7 +126,7 @@
               <div
                 v-for="(space, spaceIndex) in overviewList"
                 :key="space.id"
-                class="bg-[#fff] rounded-[8px] shadow-[0_2px_4px_0_#1919290d] overflow-hidden"
+                class="bkms-bg-card rounded-[8px] shadow-[0_2px_4px_0_#1919290d] overflow-hidden"
               >
                 <!-- 卡片头部 -->
                 <div class="flex items-center justify-between p-[16px]">
@@ -135,14 +135,14 @@
                     @click="handleChangeSpace(space)"
                   >
                     <div
-                      class="w-[40px] h-[40px] rounded-[8px] flex items-center justify-center text-[#fff] text-[18px] font-bold mr-[12px] shrink-0"
+                      class="w-[40px] h-[40px] rounded-[8px] flex items-center justify-center bkms-text-inverse text-[18px] font-bold mr-[12px] shrink-0"
                       :style="{ backgroundColor: getSpaceColor(spaceIndex) }"
                     >
                       {{ getFirstChar(space?.displayName ?? '') }}
                     </div>
                     <div class="flex flex-col">
-                      <span class="text-[14px] font-bold text-[#313238]">{{ space.displayName }}</span>
-                      <span class="text-[12px] text-[#979BA5]">
+                      <span class="text-[14px] font-bold bkms-text-title">{{ space.displayName }}</span>
+                      <span class="text-[12px] bkms-text-secondary">
                         {{ $t('共 {0} 个应用', [space.apps?.length ?? 0]) }}
                       </span>
                     </div>
@@ -153,7 +153,7 @@
                     @click="handleChangeSpace(space)"
                   >
                     {{ $t('进入空间') }}
-                    <i class="bkms-icon bkms-icon-expand-small rotate-270 text-[16px] text-[#3a84ff]"></i>
+                    <i class="bkms-icon bkms-icon-expand-small rotate-270 text-[16px] bkms-text-brand"></i>
                   </Button>
                 </div>
 
@@ -229,7 +229,7 @@
                                         :size="12"
                                       />
                                       <span>{{ item.displayName }}</span>
-                                      <span class="text-[#979BA5]">
+                                      <span class="bkms-text-secondary">
                                         （{{
                                           row.type && item?.deployStatus
                                             ? getDeployStatusInfo(row.type as AppType, item.deployStatus)?.text
@@ -244,7 +244,7 @@
                           </MoreTag>
                           <span
                             v-else
-                            class="text-[#979BA5]"
+                            class="bkms-text-secondary"
                             >--</span
                           >
                         </div>
@@ -261,7 +261,7 @@
                             content: formatRelativeTimeWithTooltip(row.lastOperatedAt).tooltip,
                             disabled: !formatRelativeTimeWithTooltip(row.lastOperatedAt).tooltip,
                           }"
-                          class="text-[#979BA5]"
+                          class="bkms-text-secondary"
                           >{{ formatRelativeTimeWithTooltip(row.lastOperatedAt).text }}</span
                         >
                       </template>

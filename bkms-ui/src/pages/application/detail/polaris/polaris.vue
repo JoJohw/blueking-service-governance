@@ -59,7 +59,7 @@
         <template #right>
           <SearchSelect
             v-model="searchValue"
-            class="w-[520px] bg-[#fff] relative z-[100]"
+            class="w-[520px] bkms-bg-card relative z-[100]"
             :data="searchSelectData"
             :placeholder="
               createPlaceholder({
@@ -76,7 +76,7 @@
       <Table
         ref="tableRef"
         v-bkloading="{ loading: filterLoading || loading, zIndex: 8 }"
-        class="bg-[#fff] mt-[16px]"
+        class="bkms-bg-card mt-[16px]"
         :data="list"
         :filter-config="{ remote: true }"
         :max-height="maxHeight"
@@ -106,7 +106,7 @@
         >
           <template #default="{ row }">
             <span
-              class="inline-flex max-w-full cursor-pointer items-center text-[var(--bkms-brand-2)]"
+              class="inline-flex max-w-full cursor-pointer items-center bkms-text-brand"
               @click="handleToPolarisProject(row)"
             >
               <template v-if="row?.polarisName">
@@ -815,8 +815,8 @@
 
   /** 删除分支 1 弹窗内容：提示先置空可用环境，且不展示去部署操作。 */
   function renderClearScopeInfoBoxContent(row: PolarisConfigOutputObj, scopeEnvs: DeployedEnv[]) {
-    return h('div', { class: 'text-[14px] leading-[22px] text-[var(--bkms-neutral-2)]' }, [
-      h('div', { class: 'mb-[16px] bg-[var(--bkms-neutral-7)] p-[12px]' }, [
+    return h('div', { class: 'text-[14px] leading-[22px] bkms-text-body' }, [
+      h('div', { class: 'mb-[16px] bkms-bg-page p-[12px]' }, [
         h('div', { class: 'mb-[12px]' }, [
           t('北极星 {0} 已关联以下环境，需要按以下顺序完成后才能删除：', [row.polarisName || '--']),
         ]),
@@ -825,7 +825,7 @@
             'span',
             {
               class:
-                'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-[var(--bkms-neutral-6)]',
+                'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-bkms-neutral-6',
             },
             '1',
           ),
@@ -836,7 +836,7 @@
             'span',
             {
               class:
-                'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-[var(--bkms-neutral-6)]',
+                'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-bkms-neutral-6',
             },
             '2',
           ),
@@ -849,7 +849,7 @@
 
   /** 删除确认说明：立即生效配置由后端同步摘除，其他配置沿用未部署场景说明。 */
   function renderDeleteInfoBoxContent(row: PolarisConfigOutputObj) {
-    const serviceName = h('div', { class: 'mb-[16px] text-[14px] text-[var(--bkms-neutral-1)]' }, [
+    const serviceName = h('div', { class: 'mb-[16px] text-[14px] bkms-text-title' }, [
       `${t('北极星服务名')}：${row.polarisName || '--'}`,
     ]);
 
@@ -859,7 +859,7 @@
 
     return h('div', [
       serviceName,
-      h('div', { class: 'bg-[var(--bkms-neutral-7)] px-[16px] py-[12px] text-[14px] leading-[22px]' }, [description]),
+      h('div', { class: 'bkms-bg-page px-[16px] py-[12px] text-[14px] leading-[22px]' }, [description]),
     ]);
   }
 
@@ -877,7 +877,7 @@
 
   /** 删除分支 2 弹窗内容：提示重新部署已关联环境后才能删除配置。 */
   function renderRedeployBlockingInfoBoxContent(row: PolarisConfigOutputObj, redeployBlockingEnvs: DeployedEnv[]) {
-    return h('div', { class: 'text-[14px] leading-[22px] text-[var(--bkms-neutral-2)]' }, [
+    return h('div', { class: 'text-[14px] leading-[22px] bkms-text-body' }, [
       h('div', { class: 'mb-[24px]' }, [
         t('北极星 '),
         h('span', { class: 'font-bold' }, row.polarisName || '--'),
@@ -890,12 +890,12 @@
   /** 渲染删除弹窗中的环境列表，可按弹窗类型控制是否展示去部署入口。 */
   function renderRedeployEnvTable(envs: DeployedEnv[], options: { showDeployAction?: boolean } = {}) {
     const { showDeployAction = true } = options;
-    return h('div', { class: 'overflow-hidden rounded-[2px] border border-[var(--bkms-neutral-6)]' }, [
+    return h('div', { class: 'overflow-hidden rounded-[2px] border bkms-line-light' }, [
       h(
         'div',
         {
           class:
-            'flex h-[32px] items-center bg-[var(--bkms-neutral-6)] px-[16px] text-[14px] text-[var(--bkms-neutral-1)]',
+            'flex h-[32px] items-center bg-bkms-neutral-6 px-[16px] text-[14px] bkms-text-title',
         },
         [t('需要重新部署的 {0} 个环境', [envs.length])],
       ),
@@ -905,7 +905,7 @@
           {
             class: [
               'flex h-[36px] items-center px-[16px] text-[12px]',
-              index % 2 === 1 ? 'bg-[var(--bkms-neutral-8)]' : 'bg-[#fff]',
+              index % 2 === 1 ? 'bkms-bg-subtle' : 'bkms-bg-card',
             ],
           },
           [

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <main class="flex flex-col w-full relative h-full bg-[#fff]">
+  <main class="flex flex-col w-full relative h-full bkms-bg-card">
     <span class="text-[16px] py-[14px] ml-[24px]">{{ $t('组件配置') }}</span>
     <Tab
       v-model:active="activeTab"

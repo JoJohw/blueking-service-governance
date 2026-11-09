@@ -25,92 +25,92 @@
       >
         {{ levelMap[data.level].label }}
       </Tag>
-      <span class="text-[#313238] text-[14px] font-bold ml-[16px] mr-[12px]">
+      <span class="bkms-text-title text-[14px] font-bold ml-[16px] mr-[12px]">
         {{ data.description }}
       </span>
     </div>
     <FieldItem
       v-if="data.level !== 'INFO'"
       container-height="auto"
-      field-color="#4D4F56"
+      field-color="var(--bkms-text-body)"
       :field-value="$t('告警资源')"
       :field-width="70"
       :value="data.resourceKey"
-      value-color="#313238"
+      value-color="var(--bkms-text-title)"
       value-max-width="85%"
     >
     </FieldItem>
     <FieldItem
       v-else
       container-height="auto"
-      field-color="#4D4F56"
+      field-color="var(--bkms-text-body)"
       :field-value="$t('节点')"
       :field-width="70"
       :value="data.resourceKey"
-      value-color="#313238"
+      value-color="var(--bkms-text-title)"
       value-max-width="85%"
     >
     </FieldItem>
     <FieldItem
       class="col-span-2"
       container-height="auto"
-      field-color="#4D4F56"
+      field-color="var(--bkms-text-body)"
       :field-value="$t('类型')"
       :field-width="70"
       :value="data.resourceType"
-      value-color="#313238"
+      value-color="var(--bkms-text-title)"
     >
     </FieldItem>
     <FieldItem
       container-height="auto"
-      field-color="#4D4F56"
+      field-color="var(--bkms-text-body)"
       :field-value="$t('开始时间')"
       :field-width="70"
       :value="formatTimeByTimezone(data.timestamp!)"
-      value-color="#313238"
+      value-color="var(--bkms-text-title)"
     >
     </FieldItem>
     <FieldItem
       class="col-span-2"
       container-height="auto"
-      field-color="#4D4F56"
+      field-color="var(--bkms-text-body)"
       :field-value="$t('持续时长')"
       :field-width="70"
       :value="durationTime"
-      value-color="#313238"
+      value-color="var(--bkms-text-title)"
     >
     </FieldItem>
     <FieldItem
       class="col-span-3"
       container-height="auto"
-      field-color="#4D4F56"
+      field-color="var(--bkms-text-body)"
       :field-value="$t('记录数')"
       :field-width="70"
       :value="data.recordCount"
-      value-color="#313238"
+      value-color="var(--bkms-text-title)"
     >
     </FieldItem>
     <FieldItem
       class="col-span-3"
       container-height="auto"
-      field-color="#4D4F56"
+      field-color="var(--bkms-text-body)"
       :field-value="$t('告警内容')"
       :field-width="70"
       :value="data.contextMsg"
-      value-color="#313238"
+      value-color="var(--bkms-text-title)"
     >
     </FieldItem>
     <FieldItem
       class="col-span-3 !items-start"
       container-height="auto"
-      field-color="#4D4F56"
+      field-color="var(--bkms-text-body)"
       :field-value="$t('解决方案')"
       :field-width="70"
-      value-color="#313238"
+      value-color="var(--bkms-text-title)"
     >
       <template #value>
         <MarkdownViewer
-          class="p-0 text-[12px] text-[#313238]"
+          class="p-0 text-[12px] bkms-text-title"
           :value="data.solutions"
         />
       </template>

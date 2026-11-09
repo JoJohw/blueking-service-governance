@@ -46,7 +46,7 @@
             </bk-tag>
             <span
               v-else
-              class="text-[var(--bkms-neutral-3)]"
+              class="bkms-text-secondary"
               >{{ $t('未部署') }}</span
             >
           </template>

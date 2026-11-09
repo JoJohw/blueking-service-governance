@@ -31,7 +31,7 @@
           class="mx-[12px]"
           direction="vertical"
         />
-        <div class="flex items-center text-[var(--bkms-neutral-3)] text-[14px] leading-[24px]">
+        <div class="flex items-center bkms-text-secondary text-[14px] leading-[24px]">
           <span class="mr-[30px]">{{ $t('已选 {0} 个实例', [instanceIds.length]) }}</span>
           <span
             v-if="envDisplayName"

@@ -28,8 +28,8 @@
       <span>
         <span class="bkms-custom-filter-title">{{ label }}</span>
         <i
-          class="cursor-pointer hover:text-[#606266] relative text-[var(--bkms-navy-5)] top-[1px] left-[4px] vxe-filter--btn vxe-table-icon-funnel"
-          :class="appliedFilters.length > 0 ? '!text-[var(--bkms-brand-2)]' : ''"
+          class="cursor-pointer hover:text-[#606266] relative text-bkms-navy-5 top-[1px] left-[4px] vxe-filter--btn vxe-table-icon-funnel"
+          :class="appliedFilters.length > 0 ? '!bkms-text-brand' : ''"
         ></i>
       </span>
     </slot>
@@ -67,7 +67,7 @@
                 <Checkbox
                   :key="getFilterItem(item).value"
                   :checked="getFilterItem(item).checked"
-                  class="!ml-0 w-full text-[12px] text-[var(--bkms-neutral-2)]"
+                  class="!ml-0 w-full text-[12px] bkms-text-body"
                   :indeterminate="getFilterItem(item).value === 'all' ? isIndeterminate : false"
                   :label="getFilterItem(item).value"
                 >
@@ -79,7 +79,7 @@
             </RecycleScroller>
           </Checkbox.Group>
         </div>
-        <div class="flex items-center justify-end h-[42px] border-t px-[8px] border-[var(--bkms-neutral-5)]">
+        <div class="flex items-center justify-end h-[42px] border-t px-[8px] border-t-bkms-neutral-5">
           <Button
             class="mr-[8px]"
             :disabled="activeFilters.length === 0"

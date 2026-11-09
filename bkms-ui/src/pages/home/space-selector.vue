@@ -30,7 +30,7 @@
       @toggle="isSpacePopoverShow = !isSpacePopoverShow"
     >
       <template #trigger>
-        <span class="flex items-center text-[#eaebf0] text-[14px] cursor-pointer">
+        <span class="flex items-center text-bkms-neutral-6 text-[14px] cursor-pointer">
           <Loading
             class="mr-[5px]"
             color="#182132"
@@ -39,7 +39,7 @@
             size="small"
             theme="default"
           >
-            <span class="text-[#DCDEE5]">{{ spaceName }}</span>
+            <span class="text-bkms-neutral-5">{{ spaceName }}</span>
           </Loading>
           <AngleDownFill :class="['ml-[5px] text-[12px]', isSpacePopoverShow ? '' : 'rotate-180']" />
         </span>

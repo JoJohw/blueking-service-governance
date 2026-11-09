@@ -23,7 +23,7 @@
     theme="dark"
   >
     <i
-      class="bkms-icon bkms-icon-return cursor-pointer text-[14px] hover:text-[var(--bkms-brand-2)]"
+      class="bkms-icon bkms-icon-return cursor-pointer text-[14px] hover:bkms-text-brand"
       :class="props.class"
       @click="handleClick"
     />

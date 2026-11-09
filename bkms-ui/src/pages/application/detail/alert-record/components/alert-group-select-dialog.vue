@@ -43,7 +43,7 @@
           show-overflow-tooltip
         >
           <template #default="{ row }">
-            <span class="text-[var(--bkms-neutral-1)]">{{ row.name || '--' }}</span>
+            <span class="bkms-text-title">{{ row.name || '--' }}</span>
           </template>
         </TableColumn>
         <!-- 成员 -->
@@ -59,9 +59,9 @@
             >
               <template #default="{ item }">
                 <span
-                  class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-[var(--bkms-neutral-6)] cursor-default"
+                  class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-bkms-neutral-6 cursor-default"
                 >
-                  <i class="bkms-icon bkms-icon-usergroup text-[var(--bkms-neutral-3)] text-[14px]"></i>
+                  <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
                   {{ item.display_name || item.id || '--' }}
                 </span>
               </template>
@@ -95,7 +95,7 @@
 
     <template #footer>
       <div class="flex items-center justify-end gap-[12px]">
-        <span class="text-[12px] text-[var(--bkms-neutral-3)]">
+        <span class="text-[12px] bkms-text-secondary">
           {{ $t('已选 {n} 个告警组', { n: checkedIds.length }) }}
         </span>
         <Button

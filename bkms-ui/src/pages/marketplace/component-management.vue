@@ -29,8 +29,8 @@
       <span class="align-bottom">
         <span>{{ isEditMode ? t('编辑组件') : t('新建组件') }}</span>
         <template v-if="isEditMode">
-          <span class="ml-[12px] mr-[9px] text-[#DCDEE5]">|</span>
-          <span class="text-[14px] text-[#979BA5]">
+          <span class="ml-[12px] mr-[9px] text-bkms-neutral-5">|</span>
+          <span class="text-[14px] bkms-text-secondary">
             {{ currentEditComponent?.displayName || currentEditComponent?.name }}
           </span>
         </template>
@@ -132,7 +132,7 @@
       </template>
       <template v-if="currentStep === 2">
         <div class="h-[calc(100vh-100px)] flex flex-col gap-[16px] overflow-y-auto px-[24px] py-[18px]">
-          <div class="bg-[#F1F2F6] text-[313238] font-bold text-[14px] px-[16px] py-[6px]">
+          <div class="bkms-bg-page text-[313238] font-bold text-[14px] px-[16px] py-[6px]">
             {{ $t('试运行结果预览') }}
           </div>
           <PatchPreviewCard

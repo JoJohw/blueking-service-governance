@@ -18,7 +18,7 @@
 
 <template>
   <Button
-    :class="['!px-[8px] !py-[6px] select-none', { '!bg-[var(--bkms-brand-6)] rounded-[2px]': !!active }]"
+    :class="['!px-[8px] !py-[6px] select-none', { '!bkms-bg-active rounded-[2px]': !!active }]"
     :disabled="disabled"
     text
     theme="primary"
@@ -26,11 +26,7 @@
   >
     <i
       v-if="icon"
-      :class="[
-        'text-[var(--bkms-brand-2)] text-[14px] mr-[4px]',
-        icon,
-        { 'text-[var(--bkms-neutral-5)] cursor-not-allowed': disabled },
-      ]"
+      :class="['bkms-text-brand text-[14px] mr-[4px]', icon, { 'text-bkms-neutral-5 cursor-not-allowed': disabled }]"
     ></i>
     <span class="text-[12px]">{{ text }}</span>
   </Button>

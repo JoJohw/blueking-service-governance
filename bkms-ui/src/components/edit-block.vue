@@ -25,7 +25,7 @@
     >
       <slot name="text"></slot>
       <Button
-        class="text-[var(--bkms-neutral-3)] ml-[5px]"
+        class="bkms-text-secondary ml-[5px]"
         :disabled="disabled"
         text
         @click="handleClickEdit"

@@ -17,9 +17,9 @@
 -->
 
 <template>
-  <div class="network-header-container bg-[#FFF] px-[24px]">
+  <div class="network-header-container bkms-bg-card px-[24px]">
     <div class="pt-[14px] pb-[10px]">
-      <span class="text-[16px] font-medium text-[var(--bkms-neutral-1)]">{{ title }}</span>
+      <span class="text-[16px] font-medium bkms-text-title">{{ title }}</span>
     </div>
     <Tab
       v-model:active="activeTabModel"
@@ -71,7 +71,7 @@
 
 <style lang="postcss" scoped>
   .network-header-container {
-    box-shadow: 0 3px 4px 0 #0000000a;
+    box-shadow: 0 3px 4px 0 var(--bkms-shadow-header);
     :deep(.bk-tab-header) {
       border: none !important;
     }

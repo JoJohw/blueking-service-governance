@@ -17,9 +17,9 @@
 -->
 
 <template>
-  <div class="h-full py-[12px] px-[16px] flex flex-col bg-[#fff]">
+  <div class="h-full py-[12px] px-[16px] flex flex-col bkms-bg-card">
     <div class="leading-[40px] flex items-center justify-between px-[10px]">
-      <span class="text-[var(--bkms-neutral-1)] font-bold">{{ $t('状态') }}</span>
+      <span class="bkms-text-title font-bold">{{ $t('状态') }}</span>
       <Button
         text
         theme="primary"
@@ -37,10 +37,10 @@
       <template #trigger>
         <div
           :class="[
-            'px-[12px] flex items-center justify-between group text-[var(--bkms-neutral-2)] border-[1px] h-full text-[14px] cursor-pointer rounded-[2px]',
+            'px-[12px] flex items-center justify-between group bkms-text-body border-[1px] h-full text-[14px] cursor-pointer rounded-[2px]',
             isStatusPopoverShow
-              ? 'bg-[#fff] border-[var(--bkms-brand-2)]'
-              : 'bg-[var(--bkms-neutral-6)] border-[transparent] hover:bg-[var(--bkms-neutral-6)]',
+              ? 'bkms-bg-card bkms-line-active'
+              : 'bg-bkms-neutral-6 border-[transparent] hover:bg-bkms-neutral-6',
           ]"
         >
           <div class="flex items-center gap-[8px]">
@@ -48,13 +48,13 @@
               :size="12"
               :type="status"
             />
-            <span class="whitespace-nowrap text-[var(--bkms-neutral-2)] text-[12px]">
+            <span class="whitespace-nowrap bkms-text-body text-[12px]">
               {{ statusLabel[status] }} ( {{ statusCounts[status] }} )
             </span>
           </div>
           <AngleDownFill
             :class="[
-              'text-[var(--bkms-navy-5)] group-hover:text-[var(--bkms-neutral-3)]',
+              'text-bkms-navy-5 group-hover:bkms-text-secondary',
               isStatusPopoverShow ? '' : 'rotate-180',
             ]"
           />
@@ -82,16 +82,16 @@
         :key="item.id"
         class="mt-[4px]"
       >
-        <div class="flex items-center h-[40px] px-[10px] text-[var(--bkms-neutral-1)] font-bold">
+        <div class="flex items-center h-[40px] px-[10px] bkms-text-title font-bold">
           {{ $t(item.label) }}
         </div>
 
         <FlexRow
           v-for="resource in item.kinds"
           :key="resource.kind"
-          class="h-[32px] px-[10px] text-[var(--bkms-neutral-3)] hover:bg-[var(--bkms-neutral-7)] cursor-pointer"
+          class="h-[32px] px-[10px] bkms-text-secondary hover:bkms-bg-page cursor-pointer"
           :class="{
-            '!bg-[var(--bkms-brand-7)] !text-[var(--bkms-brand-2)]': visibleResourceKinds.includes(resource.kind),
+            '!bkms-bg-brand-soft !bkms-text-brand': visibleResourceKinds.includes(resource.kind),
           }"
           lclass="flex items-center gap-[8px]"
           @click="toggleResourceNodes(resource)"
@@ -102,7 +102,7 @@
                 :is="KIND_ICON_ASIDE_MAP[resource.kind]"
                 :class="[
                   'w-[16px] h-[16px]',
-                  visibleResourceKinds.includes(resource.kind) ? '' : 'text-[var(--bkms-neutral-3)]',
+                  visibleResourceKinds.includes(resource.kind) ? '' : 'bkms-text-secondary',
                 ]"
               />
               <span
@@ -115,7 +115,7 @@
               <span
                 :class="[
                   'bkms-icon bkms-icon-space-basic text-[16px]',
-                  visibleResourceKinds.includes(resource.kind) ? '' : 'text-[var(--bkms-neutral-3)]',
+                  visibleResourceKinds.includes(resource.kind) ? '' : 'bkms-text-secondary',
                 ]"
               ></span>
               <span
@@ -127,9 +127,9 @@
           </template>
           <template #right>
             <span
-              class="bg-[var(--bkms-neutral-6)] px-[8px] py-[2px] rounded-[2px]"
+              class="bg-bkms-neutral-6 px-[8px] py-[2px] rounded-[2px]"
               :class="{
-                '!bg-[var(--bkms-brand-6)] !text-[var(--bkms-brand-2)]': visibleResourceKinds.includes(resource.kind),
+                '!bkms-bg-active !bkms-text-brand': visibleResourceKinds.includes(resource.kind),
               }"
               >{{ resource.nodes.length }}</span
             >

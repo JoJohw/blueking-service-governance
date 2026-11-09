@@ -24,8 +24,8 @@
     :collapsible="true"
   >
     <template #title>
-      <span class="text-[#313238]">{{ $t('开发模式') }}</span>
-      <span class="ml-[8px] flex items-center font-normal text-[12px] text-[#979BA5]">
+      <span class="bkms-text-title">{{ $t('开发模式') }}</span>
+      <span class="ml-[8px] flex items-center font-normal text-[12px] bkms-text-secondary">
         <i class="bkms-icon bkms-icon-circle-info mr-[4px] text-[14px]"></i>
         {{ $t('支持通过 bkms-cli 上传二进制的方式热更新服务，更新过程不会重启容器实例。') }}
       </span>
@@ -49,7 +49,7 @@
         </Button>
       </span>
     </template>
-    <div class="bg-[#FFF]">
+    <div class="bkms-bg-card">
       <Table
         v-bkloading="{ loading }"
         class="dev-mode-table"
@@ -257,22 +257,22 @@
 
 <style lang="postcss" scoped>
   .dev-mode-form-wrapper {
-    box-shadow: 0 2px 4px 0 #1919290d;
+    box-shadow: 0 2px 4px 0 var(--bkms-shadow-card);
   }
 
   :deep(.bkms-content-title) {
-    background-color: #eaebf0;
+    background-color: var(--bkms-bg-title);
     height: 42px;
   }
 
   /* 表头：背景白色 + 默认文字颜色 */
   :deep(.dev-mode-table .vxe-header--column) {
-    background-color: #fff;
-    color: #4d4f56;
+    background-color: var(--bkms-bg-card);
+    color: var(--bkms-text-body);
   }
 
   /* 表格正文：默认文字颜色 */
   :deep(.dev-mode-table .vxe-body--column .vxe-cell) {
-    color: #4d4f56;
+    color: var(--bkms-text-body);
   }
 </style>

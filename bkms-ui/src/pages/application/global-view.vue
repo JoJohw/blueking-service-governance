@@ -40,14 +40,14 @@
 
       <!-- 筛选工具栏：包含镜像 Tag 筛选和部署环境过滤选项 -->
       <div
-        class="flex h-[40px] items-center justify-between bg-[#fff] px-[16px] border-t border-l border-r border-[#e8eaec]"
+        class="flex h-[40px] items-center justify-between bkms-bg-card px-[16px] border-t border-l border-r border-[#e8eaec]"
       >
         <!-- 左侧筛选控件 -->
         <div class="flex items-center gap-[16px]">
           <!-- 镜像 Tag 下拉筛选框 -->
           <Select
             v-model="selectedImageTag"
-            class="w-[200px] bg-[#fff]"
+            class="w-[200px] bkms-bg-card"
             :clearable="false"
             filterable
             :placeholder="$t('全部')"
@@ -55,7 +55,7 @@
           >
             <template #prefix>
               <span
-                class="inline-flex h-full items-center border-r border-[var(--bkms-neutral-5)] px-[8px] text-[12px] text-[var(--bkms-neutral-2)] bg-[var(--bkms-neutral-8)]"
+                class="inline-flex h-full items-center border-r border-r-bkms-neutral-5 px-[8px] text-[12px] bkms-text-body bkms-bg-subtle"
               >
                 {{ $t('镜像 Tag') }}
               </span>
@@ -77,13 +77,13 @@
           </Checkbox>
         </div>
         <!-- 右侧图例说明：展示不同部署状态的颜色标识 -->
-        <div class="flex items-center gap-[12px] text-[12px] text-[var(--bkms-neutral-2)]">
+        <div class="flex items-center gap-[12px] text-[12px] bkms-text-body">
           <span>{{ $t('Tag 图例') }}：</span>
           <span class="inline-flex items-center gap-[6px]">
-            <i class="inline-block h-[14px] w-[14px] rounded-[2px] bg-[var(--bkms-success-5)]"></i>{{ $t('部署成功') }}
+            <i class="inline-block h-[14px] w-[14px] rounded-[2px] bg-bkms-success-5"></i>{{ $t('部署成功') }}
           </span>
           <span class="inline-flex items-center gap-[6px]">
-            <i class="inline-block h-[14px] w-[14px] rounded-[2px] bg-[#ffe1e1]"></i>{{ $t('部署失败') }}
+            <i class="inline-block h-[14px] w-[14px] rounded-[2px] bg-bkms-danger-5"></i>{{ $t('部署失败') }}
           </span>
           <span class="inline-flex items-center gap-[6px]">
             <i class="inline-block h-[14px] w-[14px] rounded-[2px] bg-[#d9e8ff]"></i>{{ $t('部署中') }}
@@ -302,9 +302,9 @@
 
   /** 环境分组 → 表头样式映射：不同环境类型使用不同的背景色和文字颜色 */
   const ENV_GROUP_HEADER_CLASS: Record<string, string> = {
-    development: '!text-[var(--bkms-brand-2)] bg-[var(--bkms-brand-7)]',
-    production: '!text-[var(--bkms-success-2)] bg-[var(--bkms-success-7)]',
-    test: '!text-[var(--bkms-warning-2)] bg-[var(--bkms-warning-7)]',
+    development: '!bkms-text-brand bkms-bg-brand-soft',
+    production: '!text-bkms-success-2 bkms-bg-success-soft',
+    test: '!text-bkms-warning-2 bkms-bg-warning-soft',
   };
 
   /** 自适应表格高度：监听容器尺寸和加载状态变化 */
@@ -556,7 +556,7 @@
    * @param { TableCellParams } params - 单元格参数
    */
   function handleHeaderCellClassName({ column }: TableCellParams) {
-    const defaultStyle = 'bg-[var(--bkms-neutral-8)] !font-bold';
+    const defaultStyle = 'bkms-bg-subtle !font-bold';
     if (column?.field) {
       return defaultStyle;
     }
@@ -665,7 +665,7 @@
             h('i', {
               class: [
                 'relative left-[4px] top-[1px] vxe-filter--btn vxe-table-icon-funnel',
-                selectedDeployStatus.value === 'all' ? 'text-[var(--bkms-navy-5)]' : 'text-[var(--bkms-brand-2)]',
+                selectedDeployStatus.value === 'all' ? 'text-bkms-navy-5' : 'bkms-text-brand',
               ],
             }),
           ]),
@@ -678,10 +678,10 @@
                 'div',
                 {
                   class: [
-                    'flex h-[36px] cursor-pointer items-center gap-[8px] px-[12px] text-[12px] hover:bg-[var(--bkms-neutral-7)]',
+                    'flex h-[36px] cursor-pointer items-center gap-[8px] px-[12px] text-[12px] hover:bkms-bg-page',
                     selectedDeployStatus.value === option.value
-                      ? 'bg-[var(--bkms-brand-6)] text-[var(--bkms-brand-2)]'
-                      : 'text-[var(--bkms-neutral-2)]',
+                      ? 'bkms-bg-active bkms-text-brand'
+                      : 'bkms-text-body',
                   ],
                   onClick: () => handleSelectDeployStatus(option.value),
                 },
@@ -705,7 +705,7 @@
    */
   function renderDeployCell(row: AppInfoOutputObj, env: EnvOutput) {
     const deployments = getCellDeployments(row, env.name || '');
-    if (!deployments.length) return h('span', { class: 'text-[var(--bkms-neutral-3)]' }, '--');
+    if (!deployments.length) return h('span', { class: 'bkms-text-secondary' }, '--');
 
     // 渲染该环境下所有部署记录（一个应用可能在同一环境多次部署）
     return h(
@@ -750,7 +750,7 @@
             content: () =>
               h('div', { class: 'leading-[20px]' }, [
                 h('div', `镜像 Tag：${tagText}`),
-                h('div', { class: 'text-[var(--bkms-navy-5)]' }, [
+                h('div', { class: 'text-bkms-navy-5' }, [
                   h('div', `环境：${env.displayName || env.name}`),
                   h(
                     'div',
@@ -789,7 +789,7 @@
         default: () => h('span', env.displayName || env.name),
         content: () => [
           h('div', env.displayName || env.name),
-          h('div', { class: 'text-[var(--bkms-navy-5)]' }, env.name),
+          h('div', { class: 'text-bkms-navy-5' }, env.name),
         ],
       },
     );

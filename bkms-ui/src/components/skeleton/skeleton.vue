@@ -51,7 +51,7 @@
   // 提供当前theme给Shape
   provide('theme', props.theme);
 
-  const containerBackgroundColor = computed(() => (props.theme === 'white' ? '#FFFFFF' : 'transparent'));
+  const containerBackgroundColor = computed(() => (props.theme === 'white' ? 'var(--bkms-bg-card)' : 'transparent'));
 
   const containerStyle = computed(() => ({
     opacity: 1,

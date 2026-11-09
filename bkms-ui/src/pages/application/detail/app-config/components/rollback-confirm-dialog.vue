@@ -29,32 +29,32 @@
           icon="bkms-icon-tishi"
           :width="42"
         />
-        <span class="text-[var(--bkms-neutral-1)] text-[20px] leading-[32px] text-center mt-[18px]">
+        <span class="bkms-text-title text-[20px] leading-[32px] text-center mt-[18px]">
           {{ $t('确认回滚到') }} V{{ versionData?.version }}？
         </span>
       </div>
     </template>
 
-    <div class="text-[14px] text-[var(--bkms-neutral-1)] mb-[16px] mt-[36px]">
+    <div class="text-[14px] bkms-text-title mb-[16px] mt-[36px]">
       {{ $t('回滚后，该版本将成为新的当前版本。原配置会保留在历史记录中，您仍可再次切换。') }}
     </div>
 
     <!-- 版本信息 -->
-    <div class="bg-[var(--bkms-neutral-7)] mb-[16px] py-[12px] px-[16px] text-[12px]">
+    <div class="bkms-bg-page mb-[16px] py-[12px] px-[16px] text-[12px]">
       <ul class="list-disc pl-[20px] leading-[20px]">
         <li>
-          <span class="text-[var(--bkms-neutral-2)]">{{ $t('回滚到') }}：</span>
-          <span class="text-[var(--bkms-neutral-1)]">V{{ versionData?.version }}</span>
+          <span class="bkms-text-body">{{ $t('回滚到') }}：</span>
+          <span class="bkms-text-title">V{{ versionData?.version }}</span>
         </li>
         <li>
-          <span class="text-[var(--bkms-neutral-2)]">{{ $t('版本时间') }}：</span>
-          <span class="text-[var(--bkms-neutral-1)]">
+          <span class="bkms-text-body">{{ $t('版本时间') }}：</span>
+          <span class="bkms-text-title">
             {{ versionData?.createdAt ? dayjs(versionData?.createdAt).format('YYYY-MM-DD HH:mm:ss') : '--' }}
           </span>
         </li>
         <li>
-          <span class="text-[var(--bkms-neutral-2)]">{{ $t('版本描述') }}：</span>
-          <span class="text-[var(--bkms-neutral-1)]">{{ versionData?.description || '--' }}</span>
+          <span class="bkms-text-body">{{ $t('版本描述') }}：</span>
+          <span class="bkms-text-title">{{ versionData?.description || '--' }}</span>
         </li>
       </ul>
     </div>

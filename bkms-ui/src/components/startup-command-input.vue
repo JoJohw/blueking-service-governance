@@ -49,10 +49,10 @@
     <div
       v-else
       class="grid grid-cols-2 gap-x-[24px]"
-      :class="{ 'bg-[var(--bkms-neutral-7)] p-[16px] py-[12px]': execBackground }"
+      :class="{ 'bkms-bg-page p-[16px] py-[12px]': execBackground }"
     >
       <div class="min-w-0">
-        <div class="mb-[8px] text-[12px] leading-[22px] text-[var(--bkms-neutral-2)]">{{ $t('启动命令') }}</div>
+        <div class="mb-[8px] text-[12px] leading-[22px] bkms-text-body">{{ $t('启动命令') }}</div>
         <RepeatableInput
           ref="commandRef"
           v-model="formData.command"
@@ -62,7 +62,7 @@
         />
       </div>
       <div class="min-w-0">
-        <div class="mb-[8px] text-[12px] leading-[22px] text-[var(--bkms-neutral-2)]">{{ $t('命令参数') }}</div>
+        <div class="mb-[8px] text-[12px] leading-[22px] bkms-text-body">{{ $t('命令参数') }}</div>
         <RepeatableInput
           ref="argsRef"
           v-model="formData.args"

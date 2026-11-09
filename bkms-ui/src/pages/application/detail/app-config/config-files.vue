@@ -90,12 +90,12 @@
             <template v-else>
               <div class="mb-[16px] shrink-0">
                 <BkmsContent
-                  class="info-title shadow-[0_2px_4px_0_#1919290d]"
+                  class="info-title shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
                   :show-edit-icon="!isFileInfoEditing && (isFrameworkFile || !envListLoadFailed)"
                   :title="$t('文件信息')"
                   @edit="handleFileInfoEdit"
                 >
-                  <div class="bg-[#fff] p-[16px]">
+                  <div class="bkms-bg-card p-[16px]">
                     <div
                       v-if="!isFileInfoEditing"
                       class="grid grid-cols-2 gap-[12px] gap-y-2 pl-[44px]"
@@ -106,7 +106,7 @@
                         :field-value="isFrameworkFile ? $t('框架配置文件') : $t('文件名')"
                       >
                         <template #value>
-                          <span class="text-[12px] text-[var(--bkms-neutral-1)]">
+                          <span class="text-[12px] bkms-text-title">
                             {{ activeDisplayName || '--' }}
                           </span>
                         </template>
@@ -118,7 +118,7 @@
                       >
                         <template #value>
                           <OverflowTitle
-                            class="max-w-[300px] text-[12px] text-[var(--bkms-neutral-1)]"
+                            class="max-w-[300px] text-[12px] bkms-text-title"
                             type="tips"
                           >
                             {{ activeDisplayPath || '--' }}
@@ -133,7 +133,7 @@
                         <template #value>
                           <span
                             v-if="isFrameworkFile || activeMountScope === 'all'"
-                            class="text-[12px] text-[var(--bkms-neutral-1)]"
+                            class="text-[12px] bkms-text-title"
                           >
                             {{ $t('所有环境') }}
                           </span>
@@ -193,7 +193,7 @@
                           clearable
                           :disabled="isFileInfoSaving"
                         />
-                        <div class="mt-[4px] text-[12px] text-[var(--bkms-neutral-3)]">
+                        <div class="mt-[4px] text-[12px] bkms-text-secondary">
                           {{ $t('文件最终挂载到 {0}', [mountPathPreview]) }}
                         </div>
                       </Form.FormItem>
@@ -221,7 +221,7 @@
                             size="small"
                             theme="primary"
                           />
-                          <span class="ml-[10px] text-[12px] text-[var(--bkms-neutral-3)]">
+                          <span class="ml-[10px] text-[12px] bkms-text-secondary">
                             {{ $t('开启后，文件内容中的 {0} 会在下发前被渲染为实际值', [envVarPlaceholder]) }}
                           </span>
                         </div>
@@ -247,9 +247,9 @@
                         </Button>
                         <div
                           v-show="showAdvancedFileSettings"
-                          class="mt-[8px] rounded-[2px] bg-[var(--bkms-neutral-7)] px-[16px] py-[12px]"
+                          class="mt-[8px] rounded-[2px] bkms-bg-page px-[16px] py-[12px]"
                         >
-                          <div class="mb-[10px] text-[12px] font-bold text-[var(--bkms-neutral-1)]">
+                          <div class="mb-[10px] text-[12px] font-bold bkms-text-title">
                             {{ $t('环境文件生效方式') }}
                           </div>
                           <Radio.Group
@@ -263,14 +263,14 @@
                               class="env-strategy-option !m-0 !h-auto !flex w-full items-center whitespace-normal rounded-[2px] border border-solid px-[16px] py-[8px]"
                               :class="
                                 fileInfoFormData.envContentStrategy === option.value
-                                  ? 'border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-7)]'
-                                  : 'border-[var(--bkms-neutral-5)] bg-white'
+                                  ? 'bkms-line-active bkms-bg-brand-soft'
+                                  : 'bkms-line-default bkms-bg-card'
                               "
                               :label="option.value"
                             >
                               <span class="inline-flex flex-wrap items-center gap-x-[8px] leading-[20px]">
-                                <span class="shrink-0 text-[var(--bkms-neutral-2)]">{{ $t(option.label) }}</span>
-                                <span class="text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">
+                                <span class="shrink-0 bkms-text-body">{{ $t(option.label) }}</span>
+                                <span class="text-[12px] leading-[20px] bkms-text-secondary">
                                   {{ $t(option.description) }}
                                 </span>
                               </span>
@@ -300,12 +300,12 @@
 
               <div class="min-h-[500px] flex-1">
                 <BkmsContent
-                  class="yaml-content info-title flex h-full flex-col shadow-[0_2px_4px_0_#1919290d]"
+                  class="yaml-content info-title flex h-full flex-col shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
                   :show-edit-icon="!isEditing && !isFileInfoEditing && effectiveEditableContentField !== 'none'"
                   @edit="handleStartEdit"
                 >
                   <template #title>
-                    <span class="text-[var(--bkms-neutral-1)]">{{ $t('文件内容') }}</span>
+                    <span class="bkms-text-title">{{ $t('文件内容') }}</span>
                   </template>
                   <template #action>
                     <div class="flex items-center">
@@ -335,10 +335,10 @@
 
                   <div
                     v-bkloading="{ loading: detailLoading || isModeSaving, zIndex: 1000 }"
-                    class="flex min-h-0 flex-1 flex-col bg-[#fff] p-[16px]"
+                    class="flex min-h-0 flex-1 flex-col bkms-bg-card p-[16px]"
                   >
                     <div class="mb-[12px] flex h-[32px] shrink-0 items-center">
-                      <span class="mr-[6px] text-[12px] text-[var(--bkms-neutral-2)]">{{ $t('按环境配置') }}：</span>
+                      <span class="mr-[6px] text-[12px] bkms-text-body">{{ $t('按环境配置') }}：</span>
                       <Tag
                         v-if="!isEditing"
                         :theme="isIndependentConfig ? 'success' : 'default'"
@@ -412,7 +412,7 @@
                                   <div class="flex h-full min-w-0 items-center">
                                     <span class="shrink-0">{{ editorLang }}</span>
                                     <template v-if="isIndependentConfig">
-                                      <div class="mx-[12px] h-[14px] w-px shrink-0 bg-[var(--bkms-neutral-2)]"></div>
+                                      <div class="mx-[12px] h-[14px] w-px shrink-0 bg-bkms-neutral-2"></div>
                                       <EnvPerspectiveSelect
                                         class="!h-[26px] !min-w-[240px] shrink-0"
                                         :env-list="perspectiveEnvList"
@@ -439,7 +439,7 @@
                                       class="ml-[8px] flex min-w-0 flex-1 items-center overflow-hidden"
                                     >
                                       <OverflowTitle
-                                        class="min-w-0 text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]"
+                                        class="min-w-0 text-[12px] leading-[20px] bkms-text-secondary"
                                         resizeable
                                         type="tips"
                                       >
@@ -462,18 +462,18 @@
                                   #tools
                                 >
                                   <div
-                                    class="mr-[8px] inline-flex h-[24px] items-stretch rounded-[2px] border border-[var(--bkms-neutral-2)] border-solid bg-transparent"
+                                    class="mr-[8px] inline-flex h-[24px] items-stretch rounded-[2px] border border-bkms-neutral-2 border-solid bg-transparent"
                                   >
                                     <button
                                       v-for="item in contentViewOptions"
                                       :key="item.value"
                                       :aria-pressed="contentView === item.value"
-                                      class="inline-flex h-full appearance-none items-center justify-center gap-[4px] whitespace-nowrap rounded-none border-0 border-solid bg-transparent px-[8px] text-[12px] leading-[22px] text-[var(--bkms-neutral-3)] outline-offset-[-1px] cursor-pointer focus-visible:outline focus-visible:outline-[1px] focus-visible:outline-[var(--bkms-brand-2)]"
+                                      class="inline-flex h-full appearance-none items-center justify-center gap-[4px] whitespace-nowrap rounded-none border-0 border-solid bg-transparent px-[8px] text-[12px] leading-[22px] bkms-text-secondary outline-offset-[-1px] cursor-pointer focus-visible:outline focus-visible:outline-[1px] focus-visible:outline-bkms-brand-2"
                                       :class="[
-                                        item.divider ? 'border-r border-r-[var(--bkms-neutral-2)]' : '',
+                                        item.divider ? 'border-r border-r-bkms-neutral-2' : '',
                                         contentView === item.value
-                                          ? '!bg-[#4d4d4d] text-[var(--bkms-navy-5)]'
-                                          : 'hover:bg-[#3a3a3a] hover:text-[var(--bkms-navy-5)]',
+                                          ? '!bg-[#4d4d4d] text-bkms-navy-5'
+                                          : 'hover:bg-[#3a3a3a] hover:text-bkms-navy-5',
                                       ]"
                                       type="button"
                                       @click="contentView = item.value"

@@ -23,21 +23,21 @@
     <div
       v-if="showEnvHeader && mode === 'multiEnv'"
       :class="[
-        'env-header flex items-center gap-[8px] h-[42px] px-[16px] bg-[var(--bkms-neutral-7)] cursor-pointer',
+        'env-header flex items-center gap-[8px] h-[42px] px-[16px] bkms-bg-page cursor-pointer',
         { collapsed: isCollapsed },
       ]"
       @click="toggleCollapse"
     >
       <RightShape
         :class="[
-          'text-[var(--bkms-neutral-3)] text-[14px] transition-transform duration-200',
+          'bkms-text-secondary text-[14px] transition-transform duration-200',
           { 'rotate-90': !isCollapsed },
         ]"
       />
-      <span class="font-medium text-[var(--bkms-neutral-1)]">{{ envDisplayName }}</span>
+      <span class="font-medium bkms-text-title">{{ envDisplayName }}</span>
       <Tag
         v-if="isFeatureEnv"
-        class="bg-[var(--bkms-cyan-6)] text-[var(--bkms-cyan-2)]"
+        class="bg-bkms-cyan-6 text-bkms-cyan-2"
       >
         {{ $t('特性') }}
       </Tag>
@@ -89,7 +89,7 @@
         <template #prepend>
           <div
             v-if="mode === 'single' && hasSelection"
-            class="flex items-center justify-center h-[30px] bg-[#ebecf0] text-[12px]"
+            class="flex items-center justify-center h-[30px] bg-bkms-neutral-6 text-[12px]"
           >
             <template v-if="isCrossPageSelection">
               <i18n-t keypath="已跨页全选 “{0}” 条，">
@@ -151,7 +151,7 @@
               >
                 <AngleDownLine
                   :class="[
-                    'ml-[8px] mt-[4px] text-[var(--bkms-neutral-3)] text-[12px] cursor-pointer transition-transform duration-200',
+                    'ml-[8px] mt-[4px] bkms-text-secondary text-[12px] cursor-pointer transition-transform duration-200',
                     { 'rotate-180': isDropdownOpen },
                   ]"
                 />
@@ -257,15 +257,15 @@
                   <template #content>
                     <div class="px-[4px] min-w-[500px]">
                       <div class="mb-[12px] flex items-center text-[14px] whitespace-nowrap">
-                        <span class="font-bold text-[var(--bkms-neutral-1)] shrink-0">{{ $t('北极星健康状态') }}</span>
+                        <span class="font-bold bkms-text-title shrink-0">{{ $t('北极星健康状态') }}</span>
                         <span
-                          class="text-[var(--bkms-neutral-3)] ml-[12px] truncate"
+                          class="bkms-text-secondary ml-[12px] truncate"
                           :title="row.id"
                         >
                           {{ row.id }}
                         </span>
                       </div>
-                      <div class="text-[12px] text-[var(--bkms-neutral-2)] mb-[12px]">
+                      <div class="text-[12px] bkms-text-body mb-[12px]">
                         <i class="bkms-icon bkms-icon-circle-info text-[14px] mr-[4px]"></i>
                         {{ $t('数据有 15s 左右延迟') }}
                       </div>
@@ -359,13 +359,13 @@
             <span
               v-else
               v-bk-tooltips="$t('实例是否可以接收流量')"
-              class="border-b border-dashed border-[var(--bkms-neutral-3)]"
+              class="border-b border-dashed border-b-bkms-neutral-3"
             >
               {{ $t('就绪') }}
             </span>
           </template>
           <template #default="{ row }: { row: AppInstanceOutputObj }">
-            <span :class="row.isHealthy ? 'text-[var(--bkms-success-2)]' : 'text-[var(--bkms-warning-2)]'">
+            <span :class="row.isHealthy ? 'text-bkms-success-2' : 'text-bkms-warning-2'">
               {{ row.isHealthy ? $t('是') : $t('否') }}
             </span>
           </template>
@@ -419,14 +419,14 @@
               <template #content>
                 <div class="w-full min-w-0 px-[4px]">
                   <div class="mb-[12px] flex items-center text-[14px] whitespace-nowrap">
-                    <span class="font-bold text-[var(--bkms-neutral-1)] shrink-0">{{ $t('热更新') }}</span>
+                    <span class="font-bold bkms-text-title shrink-0">{{ $t('热更新') }}</span>
                     <span
-                      class="text-[var(--bkms-neutral-3)] text-[12px] ml-[10px] truncate"
+                      class="bkms-text-secondary text-[12px] ml-[10px] truncate"
                       :title="row.id"
                       >{{ row.id }}</span
                     >
                   </div>
-                  <div class="text-[12px] text-[var(--bkms-neutral-2)] mb-[12px]">
+                  <div class="text-[12px] bkms-text-body mb-[12px]">
                     <i class="bkms-icon bkms-icon-circle-info text-[14px] mr-[4px]"></i>
                     {{ $t('展示该实例最近一次通过 bkms-cli 的热更新概要') }}
                   </div>
@@ -441,7 +441,7 @@
                       >
                         <span>{{ row.latestPublish.binaryName }}</span>
                         <Copy
-                          class="shrink-0 cursor-pointer text-[var(--bkms-brand-2)] opacity-0 transition group-hover:opacity-100"
+                          class="shrink-0 cursor-pointer bkms-text-brand opacity-0 transition group-hover:opacity-100"
                           :title="$t('复制')"
                           @click.stop="copyText(row.latestPublish.binaryName)"
                         />
@@ -460,11 +460,11 @@
                         theme="dark"
                       >
                         <div class="group inline-flex items-center gap-[4px]">
-                          <span class="cursor-pointer border-b border-dashed border-[var(--bkms-neutral-3)]">
+                          <span class="cursor-pointer border-b border-dashed border-b-bkms-neutral-3">
                             {{ row.latestPublish.md5.slice(0, 8) }}
                           </span>
                           <Copy
-                            class="shrink-0 cursor-pointer text-[var(--bkms-brand-2)] opacity-0 transition group-hover:opacity-100"
+                            class="shrink-0 cursor-pointer bkms-text-brand opacity-0 transition group-hover:opacity-100"
                             :title="$t('复制')"
                             @click.stop="copyText(row.latestPublish.md5)"
                           />
@@ -516,7 +516,7 @@
                         <div class="group flex min-w-0 items-center gap-[4px]">
                           <span class="block min-w-0 truncate">{{ row.latestPublish.message }}</span>
                           <Copy
-                            class="shrink-0 cursor-pointer text-[var(--bkms-brand-2)] opacity-0 transition group-hover:opacity-100"
+                            class="shrink-0 cursor-pointer bkms-text-brand opacity-0 transition group-hover:opacity-100"
                             :title="$t('复制')"
                             @click.stop="copyText(row.latestPublish.message)"
                           />
@@ -545,7 +545,7 @@
               v-if="getResourceText(row.resources)"
               placement="top"
             >
-              <span class="cursor-default border-b border-dashed border-[var(--bkms-neutral-3)]">{{
+              <span class="cursor-default border-b border-dashed border-b-bkms-neutral-3">{{
                 getResourceText(row.resources)
               }}</span>
               <template #content>

@@ -28,7 +28,7 @@
         :title="$t('关联环境')"
         :title-size="16"
       >
-        <span class="truncate text-[var(--bkms-neutral-3)]">
+        <span class="truncate bkms-text-secondary">
           {{ currentConfig?.polarisName || currentConfig?.name || '--' }}
         </span>
       </DividerHeader>
@@ -37,10 +37,10 @@
     <div class="px-[24px] py-[20px]">
       <section>
         <div class="mb-[12px] flex items-center">
-          <strong class="text-[14px] text-[var(--bkms-neutral-1)]"
+          <strong class="text-[14px] bkms-text-title"
             >{{ $t('已部署环境') }}（{{ deployedRows.length }}）</strong
           >
-          <span class="text-[var(--bkms-neutral-3)]">
+          <span class="bkms-text-secondary">
             {{ $t('权重调整后立即同步到该环境全部实例；健康实例数与总权重来自北极星，约有 15 秒延迟') }}
           </span>
           <Button
@@ -69,7 +69,7 @@
           >
             <template #default="{ row }">
               <div class="flex items-center">
-                <span class="truncate text-[var(--bkms-brand-2)]">{{ row.displayName }}</span>
+                <span class="truncate bkms-text-brand">{{ row.displayName }}</span>
                 <Tag
                   v-if="row.envTypeName"
                   class="ml-[8px] shrink-0"
@@ -124,7 +124,7 @@
                 {{ $t('健康实例数') }}
                 <i
                   v-bk-tooltips="$t('来自北极星实时数据，约 15 秒延迟')"
-                  class="bkms-icon bkms-icon-circle-info ml-[4px] cursor-pointer text-[14px] text-[var(--bkms-navy-5)]"
+                  class="bkms-icon bkms-icon-circle-info ml-[4px] cursor-pointer text-[14px] text-bkms-navy-5"
                 ></i>
               </span>
             </template>
@@ -140,13 +140,13 @@
                   v-bk-tooltips="
                     $t('按各健康实例的实际权重逐个求和，不是「单实例权重 × 健康实例数」；数据来自北极星，约 15 秒延迟')
                   "
-                  class="bkms-icon bkms-icon-circle-info ml-[4px] cursor-pointer text-[14px] text-[var(--bkms-navy-5)]"
+                  class="bkms-icon bkms-icon-circle-info ml-[4px] cursor-pointer text-[14px] text-bkms-navy-5"
                 ></i>
               </span>
             </template>
             <template #default="{ row }">
-              <span class="text-[var(--bkms-neutral-1)]">{{ getRowTotalWeight(row) }}</span>
-              <span class="ml-[6px] text-[var(--bkms-neutral-3)]">（{{ getRowPercent(row) }}）</span>
+              <span class="bkms-text-title">{{ getRowTotalWeight(row) }}</span>
+              <span class="ml-[6px] bkms-text-secondary">（{{ getRowPercent(row) }}）</span>
             </template>
           </TableColumn>
           <TableColumn
@@ -168,10 +168,10 @@
 
       <section class="mt-[24px]">
         <div class="mb-[12px] flex items-center">
-          <strong class="text-[14px] text-[var(--bkms-neutral-1)]"
+          <strong class="text-[14px] bkms-text-title"
             >{{ $t('未部署环境') }}（{{ undeployedRows.length }}）</strong
           >
-          <span class="text-[var(--bkms-neutral-3)]">{{ $t('权重在该环境首次部署时生效') }}</span>
+          <span class="bkms-text-secondary">{{ $t('权重在该环境首次部署时生效') }}</span>
         </div>
         <Table :data="undeployedRows">
           <template #empty>
@@ -184,7 +184,7 @@
           >
             <template #default="{ row }">
               <div class="flex items-center">
-                <span class="truncate text-[var(--bkms-brand-2)]">{{ row.displayName }}</span>
+                <span class="truncate bkms-text-brand">{{ row.displayName }}</span>
                 <Tag
                   v-if="row.envTypeName"
                   class="ml-[8px] shrink-0"

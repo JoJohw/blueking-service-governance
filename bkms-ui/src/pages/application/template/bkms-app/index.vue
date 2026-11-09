@@ -18,7 +18,7 @@
 
 <template>
   <ScrollLayout
-    class="bg-[#F5F7FA]"
+    class="bkms-bg-page"
     content-class="w-full relative !flex-1"
   >
     <Alert
@@ -51,7 +51,7 @@
         class="w-full max-w-[1400px] p-[20px]"
       >
         <ToggleCard
-          class="bg-[#fff] rounded-[2px] shadow-[0_2px_4px_0_#1919290d]"
+          class="bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           :name="$t('应用模板')"
           type="normal"
         >
@@ -63,7 +63,7 @@
               padding-right: clamp(24px, calc((100vw - 910px) / 2), 245px);
             "
           >
-            <div class="flex items-center rounded-[2px] bg-[#F5F7FA] px-[16px] py-[12px]">
+            <div class="flex items-center rounded-[2px] bkms-bg-page px-[16px] py-[12px]">
               <span class="template-summary-icon">
                 <TypeIcon
                   :framework="framework"
@@ -74,8 +74,8 @@
                 />
               </span>
               <div class="ml-[12px] min-w-0 flex-1">
-                <div class="text-[14px] font-bold leading-[22px] text-[#313238]">{{ selectedLabel }}</div>
-                <div class="mt-[2px] text-[12px] leading-[18px] text-[#979BA5]">
+                <div class="text-[14px] font-bold leading-[22px] bkms-text-title">{{ selectedLabel }}</div>
+                <div class="mt-[2px] text-[12px] leading-[18px] bkms-text-secondary">
                   {{ $t(selectedDescription) }}
                 </div>
               </div>
@@ -123,7 +123,7 @@
     <template #footer>
       <div
         v-if="runtime && form && step !== 4"
-        class="flex justify-center gap-[8px] bg-[#fff] py-[10px] shadow-[0_-3px_4px_0_#0000000a]"
+        class="flex justify-center gap-[8px] bkms-bg-card py-[10px] shadow-[0_-3px_4px_0_var(--bkms-shadow-header)]"
       >
         <Button
           class="min-w-[88px]"

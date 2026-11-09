@@ -18,9 +18,7 @@
 
 <template>
   <div class="flex h-full min-h-0 flex-col">
-    <FlexRow
-      class="mb-[16px] flex-shrink-0 bg-[var(--bkms-neutral-6)] px-[12px] py-[8px] shadow-[0_2px_4px_0_#0000001a]"
-    >
+    <FlexRow class="mb-[16px] flex-shrink-0 bg-bkms-neutral-6 px-[12px] py-[8px] shadow-[0_2px_4px_0_var(--bkms-shadow-hover)]">
       <template #left>
         <div class="flex">
           <EnvSelectPanel
@@ -33,14 +31,14 @@
       </template>
       <template #right>
         <i
-          class="bkms-icon bkms-icon-full-screen text-[16px] bg-[var(--bkms-neutral-8)] cursor-pointer p-[4px] rounded-[4px] hover:text-[var(--bkms-brand-2)]"
+          class="bkms-icon bkms-icon-full-screen text-[16px] bkms-bg-subtle cursor-pointer p-[4px] rounded-[4px] hover:bkms-text-brand"
           @click="handleFullScreen"
         ></i>
       </template>
     </FlexRow>
     <div
       ref="iframeContainerRef"
-      class="min-h-0 flex-1 bg-white"
+      class="min-h-0 flex-1 bkms-bg-card"
     >
       <MonitorIframe
         v-if="currentApm && !apmConfigMissing"
@@ -58,8 +56,8 @@
           <img src="/empty.svg" />
         </template>
         <template #description>
-          <div class="text-[#313238] text-[24px]">{{ $t('尚未开启观测功能') }}</div>
-          <div class="text-[#4D4F56] text-[14px] leading-[22px] mt-[16px]">
+          <div class="bkms-text-title text-[24px]">{{ $t('尚未开启观测功能') }}</div>
+          <div class="bkms-text-body text-[14px] leading-[22px] mt-[16px]">
             {{
               $t(
                 appDetailStore.appDetail?.framework === 'blank'
@@ -86,7 +84,7 @@
           <img src="/empty.svg" />
         </template>
         <template #description>
-          <div class="text-[var(--bkms-neutral-2)] text-[14px] leading-[22px]">{{ $t('当前环境未创建 APM 实例') }}</div>
+          <div class="bkms-text-body text-[14px] leading-[22px]">{{ $t('当前环境未创建 APM 实例') }}</div>
         </template>
         <Button
           theme="primary"
