@@ -1,0 +1,104 @@
+{
+  "description": "本次 merge（df448728 ← upstream/main 4ec999de）后恢复分支侧 token 替换的颜色备份：记录 merge 引入并替换的 hex、对应 token、CIEDE2000 色差及来源。替换值全部来自 mapping.json（设计已确认），不按 6 色差阈值筛选；distance 仅为参考（历史值复用 color-diff-backup.json，其余现算）。不作为自动替换输入。",
+  "distanceMetric": "CIEDE2000 (CIE 2000)",
+  "merge": {
+    "commit": "df448728",
+    "upstreamRef": "4ec999decb1655569c72bc741c79655f2417cfb3",
+    "files": [
+      "src/pages/application/template/index.vue",
+      "src/pages/application/detail/deploy/monitor-sideslider.vue",
+      "src/pages/application/detail/app-config/components/version-compare-dialog.vue"
+    ],
+    "keptLiterals": [
+      "#fff",
+      "#00000012",
+      "#65C389"
+    ]
+  },
+  "colors": [
+    {
+      "hex": "#313238",
+      "variable": "--bkms-neutral-1",
+      "distance": 10.34,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#f5f7fa",
+      "variable": "--bkms-neutral-7",
+      "distance": 1.65,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#1919290D",
+      "variable": "--bkms-shadow-card",
+      "distance": 0,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#979ba5",
+      "variable": "--bkms-neutral-3",
+      "distance": 7.77,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#dcdee5",
+      "variable": "--bkms-neutral-5",
+      "distance": 2.72,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#3a84ff",
+      "variable": "--bkms-brand-2",
+      "distance": 7.73,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#63656e",
+      "variable": "--bkms-neutral-2",
+      "distance": 9.07,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#c4c6cc",
+      "variable": "--bkms-navy-5",
+      "distance": 0,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#e1ecff",
+      "variable": "--bkms-brand-6",
+      "distance": 1.24,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#f0f5ff",
+      "variable": "--bkms-brand-7",
+      "distance": 0.79,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#fafbfd",
+      "variable": "--bkms-neutral-8",
+      "distance": 1.08,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#4d4f56",
+      "variable": "--bkms-neutral-2",
+      "distance": 9,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#eaebf0",
+      "variable": "--bkms-neutral-6",
+      "distance": 1.73,
+      "source": "merge-from-upstream"
+    },
+    {
+      "hex": "#ea3636",
+      "variable": "--bkms-danger-2",
+      "distance": 0,
+      "source": "merge-from-upstream"
+    }
+  ]
+}

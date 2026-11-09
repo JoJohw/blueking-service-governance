@@ -79,7 +79,7 @@
                 </div>
                 <span
                   v-else
-                  class="text-[#313238]"
+                  class="text-[var(--bkms-neutral-1)]"
                   >{{ getAppDisplayLabel(getFrameworkLanguages(item.id)[0]) }}</span
                 >
               </div>
@@ -247,15 +247,15 @@
 
 <style lang="postcss" scoped>
   .template-page {
-    @apply mx-auto flex min-h-full w-full max-w-[1400px] justify-center bg-[#F5F7FA] p-[20px];
+    @apply mx-auto flex min-h-full w-full max-w-[1400px] justify-center bg-[var(--bkms-neutral-7)] p-[20px];
   }
 
   .template-panel {
-    @apply w-full max-w-[1400px] self-start overflow-hidden rounded-[2px] bg-white shadow-[0_2px_4px_0_#1919290d];
+    @apply w-full max-w-[1400px] self-start overflow-hidden rounded-[2px] bg-white shadow-[0_2px_4px_0_var(--bkms-shadow-card)];
   }
 
   .template-header {
-    @apply select-none pt-[32px] text-center text-[24px] leading-[32px] text-[#313238];
+    @apply select-none pt-[32px] text-center text-[24px] leading-[32px] text-[var(--bkms-neutral-1)];
   }
 
   .template-content {
@@ -267,15 +267,15 @@
   }
 
   .section-heading h3 {
-    @apply m-0 text-[14px] font-bold leading-[22px] text-[#313238];
+    @apply m-0 text-[14px] font-bold leading-[22px] text-[var(--bkms-neutral-1)];
   }
 
   .section-heading > span {
-    @apply text-[12px] leading-[20px] text-[#979BA5];
+    @apply text-[12px] leading-[20px] text-[var(--bkms-neutral-3)];
   }
 
   .template-card {
-    @apply relative flex min-h-[92px] items-center gap-[12px] rounded-[2px] border border-[#DCDEE5] bg-white p-[16px] text-[#313238];
+    @apply relative flex min-h-[92px] items-center gap-[12px] rounded-[2px] border border-[var(--bkms-neutral-5)] bg-white p-[16px] text-[var(--bkms-neutral-1)];
   }
 
   .template-card-select {
@@ -283,7 +283,7 @@
   }
 
   .template-card-select:focus-visible {
-    outline: 2px solid #3a84ff;
+    outline: 2px solid var(--bkms-brand-2);
     outline-offset: 2px;
   }
 
@@ -305,11 +305,11 @@
   }
 
   .template-hint {
-    @apply mt-[2px] text-[12px] leading-[18px] text-[#979BA5];
+    @apply mt-[2px] text-[12px] leading-[18px] text-[var(--bkms-neutral-3)];
   }
 
   .framework-languages {
-    @apply mt-[8px] flex items-center gap-[8px] text-[12px] leading-[22px] text-[#63656E];
+    @apply mt-[8px] flex items-center gap-[8px] text-[12px] leading-[22px] text-[var(--bkms-neutral-2)];
   }
 
   .framework-language-options {
@@ -317,7 +317,7 @@
   }
 
   .framework-language-option {
-    @apply relative h-[24px] min-w-[40px] cursor-pointer whitespace-nowrap border border-[#C4C6CC] bg-white px-[10px] text-[12px] text-[#63656E];
+    @apply relative h-[24px] min-w-[40px] cursor-pointer whitespace-nowrap border border-[var(--bkms-navy-5)] bg-white px-[10px] text-[12px] text-[var(--bkms-neutral-2)];
   }
 
   .framework-language-option + .framework-language-option {
@@ -333,16 +333,16 @@
   }
 
   .framework-language-option:hover {
-    @apply text-[#3A84FF];
+    @apply text-[var(--bkms-brand-2)];
   }
 
   .framework-language-option.selected {
-    @apply z-[1] border-[#3A84FF] bg-[#E1ECFF] text-[#3A84FF];
+    @apply z-[1] border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-6)] text-[var(--bkms-brand-2)];
   }
 
   .template-card:hover,
   .template-card.selected {
-    @apply border-[#3A84FF] bg-[#F0F5FF];
+    @apply border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-7)];
   }
 
   .template-card:disabled,

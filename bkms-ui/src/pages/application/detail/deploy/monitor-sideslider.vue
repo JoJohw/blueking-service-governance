@@ -59,13 +59,13 @@
     </template>
 
     <div
-      class="monitor-toolbar flex-shrink-0 border-b border-[#DCDEE5] bg-[#fff] px-[24px] py-[8px] shadow-[0_3px_5.5px_0_#00000012]"
+      class="monitor-toolbar flex-shrink-0 border-b border-[var(--bkms-neutral-5)] bg-[#fff] px-[24px] py-[8px] shadow-[0_3px_5.5px_0_#00000012]"
     >
       <div class="flex items-center gap-[16px] min-w-0">
         <!-- 实例名称 -->
         <div class="flex items-center flex-1 min-w-0">
           <span
-            class="flex-shrink-0 whitespace-nowrap bg-[#FAFBFD] h-[32px] leading-[30px] text-[#4D4F56] text-[12px] px-[6px] b b-r-0 b-[#c4c6cc]"
+            class="flex-shrink-0 whitespace-nowrap bg-[var(--bkms-neutral-8)] h-[32px] leading-[30px] text-[var(--bkms-neutral-2)] text-[12px] px-[6px] b b-r-0 b-[var(--bkms-navy-5)]"
             >{{ $t('实例名称') }}</span
           >
           <Select
@@ -110,18 +110,18 @@
               @node-checked="handleNodeChecked"
             >
               <template #node="{ name }">
-                <span class="text-[12px] text-[#63656E] pr-[12px] cursor-pointer">{{ name }}</span>
+                <span class="text-[12px] text-[var(--bkms-neutral-2)] pr-[12px] cursor-pointer">{{ name }}</span>
               </template>
             </Tree>
             <div
               v-else
-              class="px-[12px] py-[8px] text-[12px] text-[#979BA5]"
+              class="px-[12px] py-[8px] text-[12px] text-[var(--bkms-neutral-3)]"
             >
               {{ searchText.trim() ? $t('暂无数据') : $t('共 {0} 个实例，输入名称后再选择', [instanceCount]) }}
             </div>
             <div
               v-if="hasMoreSearchResults"
-              class="px-[12px] py-[6px] text-[12px] text-[#979BA5]"
+              class="px-[12px] py-[6px] text-[12px] text-[var(--bkms-neutral-3)]"
             >
               {{ $t('仅展示前 100 个结果，请缩小搜索范围') }}
             </div>
@@ -133,7 +133,8 @@
           "
           class="flex items-center flex-shrink-0"
         >
-          <span class="bg-[#FAFBFD] h-[32px] leading-[30px] text-[#4D4F56] text-[12px] px-[6px] b b-r-0 b-[#c4c6cc]"
+          <span
+            class="bg-[var(--bkms-neutral-8)] h-[32px] leading-[30px] text-[var(--bkms-neutral-2)] text-[12px] px-[6px] b b-r-0 b-[var(--bkms-navy-5)]"
             >Limit</span
           >
           <Select
@@ -175,9 +176,10 @@
           :clearable="false"
         >
           <template #prefix>
-            <span class="bg-[#FAFBFD] leading-[32px] text-[#4D4F56] text-[12px] px-[6px] b-r b-[#c4c6cc]">{{
-              $t('汇聚周期')
-            }}</span>
+            <span
+              class="bg-[var(--bkms-neutral-8)] leading-[32px] text-[var(--bkms-neutral-2)] text-[12px] px-[6px] b-r b-[var(--bkms-navy-5)]"
+              >{{ $t('汇聚周期') }}</span
+            >
           </template>
           <Select.Option
             v-for="option in convergenceOptions"
@@ -192,9 +194,10 @@
           :clearable="false"
         >
           <template #prefix>
-            <span class="bg-[#FAFBFD] leading-[32px] text-[#4D4F56] text-[12px] px-[6px] b-r b-[#c4c6cc]">{{
-              $t('汇聚方法')
-            }}</span>
+            <span
+              class="bg-[var(--bkms-neutral-8)] leading-[32px] text-[var(--bkms-neutral-2)] text-[12px] px-[6px] b-r b-[var(--bkms-navy-5)]"
+              >{{ $t('汇聚方法') }}</span
+            >
           </template>
           <Select.Option
             v-for="option in methodOptions"
@@ -206,11 +209,11 @@
         <i
           v-if="method === 'count'"
           v-bk-tooltips="$t('COUNT 下使用率指标的分子、分母分别计数，结果恒为 100%')"
-          class="bkms-icon bkms-icon-help-document text-[#979BA5] ml-[-8px]"
+          class="bkms-icon bkms-icon-help-document text-[var(--bkms-neutral-3)] ml-[-8px]"
         />
         <!-- 时间对比 -->
         <div class="flex items-center flex-shrink-0">
-          <span class="text-[#4D4F56] text-[12px] mr-[8px]">{{ $t('时间对比') }}</span>
+          <span class="text-[var(--bkms-neutral-2)] text-[12px] mr-[8px]">{{ $t('时间对比') }}</span>
           <Switcher
             v-model="timeCompareEnabled"
             v-bk-tooltips="{ content: $t('多环境不支持时间对比'), disabled: !isMultiEnv, placement: 'top' }"
@@ -237,7 +240,7 @@
                 <div style="padding: 0 12px 6px">
                   <span
                     v-if="!showCustomInput"
-                    class="text-[#3A84FF] cursor-pointer text-[12px]"
+                    class="text-[var(--bkms-brand-2)] cursor-pointer text-[12px]"
                     @click="handleShowCustomInput"
                     >{{ $t('自定义') }}</span
                   >
@@ -251,12 +254,12 @@
                       <template #suffix>
                         <i
                           v-bk-tooltips="{ content: $t('自定义输入格式提示'), placement: 'top', boundary: 'parent' }"
-                          class="bkms-icon bkms-icon-help-document text-[#C4C6CC] flex items-center mr-[4px]"
+                          class="bkms-icon bkms-icon-help-document text-[var(--bkms-navy-5)] flex items-center mr-[4px]"
                         />
                       </template>
                       <template #append>
                         <span
-                          class="text-[#3A84FF] cursor-pointer"
+                          class="text-[var(--bkms-brand-2)] cursor-pointer"
                           @click="handleCustomOffsetConfirm"
                           >{{ $t('确定') }}</span
                         >
@@ -272,7 +275,7 @@
     </div>
     <div
       v-bkloading="{ loading: isShow && chartPlotWidth > 0 && !queryReady }"
-      class="min-h-0 flex-1 overflow-auto px-[24px] pt-[24px] pb-[24px] bg-[#F5F7FA]"
+      class="min-h-0 flex-1 overflow-auto px-[24px] pt-[24px] pb-[24px] bg-[var(--bkms-neutral-7)]"
     >
       <div class="mb-[24px] bg-[#fff] h-[48px] px-[16px] py-[8px] shadow-[0_3px_5.5px_0_#00000012]">
         <Radio.Group
@@ -312,13 +315,15 @@
             <div class="flex items-center">
               <Progress
                 v-if="row.cpuLimitUsageRate !== undefined"
-                color="#3A84FF"
+                color="var(--bkms-brand-2)"
                 :percent="Math.min(row.cpuLimitUsageRate, 100)"
                 :show-text="false"
                 :stroke-width="6"
                 type="line"
               />
-              <span class="text-[#63656E] text-[12px] ml-[4px]">{{ formatPercent(row.cpuLimitUsageRate) }}</span>
+              <span class="text-[var(--bkms-neutral-2)] text-[12px] ml-[4px]">{{
+                formatPercent(row.cpuLimitUsageRate)
+              }}</span>
             </div>
           </template>
         </TableColumn>
@@ -328,7 +333,7 @@
           :min-width="120"
         >
           <template #default="{ row }">
-            <span class="text-[#63656E] text-[12px]">{{ formatPercent(row.memLimitUsageRate) }}</span>
+            <span class="text-[var(--bkms-neutral-2)] text-[12px]">{{ formatPercent(row.memLimitUsageRate) }}</span>
           </template>
         </TableColumn>
         <TableColumn
@@ -364,7 +369,7 @@
           :class="['mb-[24px]', { '!mb-0': index === metricGroups.length - 1 }]"
           content-class="grid grid-cols-1 gap-[16px] pt-[6px]"
           :name="group.name"
-          normal-bg-color="#EAEBF0"
+          normal-bg-color="var(--bkms-neutral-6)"
           type="normal"
         >
           <chart-card-item
@@ -387,7 +392,7 @@
           >
             <template #title>
               <div class="flex items-center">
-                <span class="text-[#313238] text-[14px] font-[500] mr-[8px]">{{ item.title }}</span>
+                <span class="text-[var(--bkms-neutral-1)] text-[14px] font-[500] mr-[8px]">{{ item.title }}</span>
                 <Tag v-bk-tooltips="$t('数据步长')">{{ formatIntervalText(chartParams.interval || 0) }}</Tag>
               </div>
             </template>
