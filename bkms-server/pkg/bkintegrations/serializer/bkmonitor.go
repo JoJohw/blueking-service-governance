@@ -29,6 +29,20 @@ import (
 // DefaultInterval 默认汇聚周期（秒）
 const DefaultInterval int64 = 60
 
+// MaxInstances 一次最多查询的实例数
+const MaxInstances = 50
+
+// DefaultRankLimit 实例排名默认取前 N 个
+const DefaultRankLimit = 10
+
+// 实例排名方向
+const (
+	// RankTypeTop 按平均 CPU 使用量从高到低取前 N 个（默认）
+	RankTypeTop = "top"
+	// RankTypeBottom 按平均 CPU 使用量从低到高取前 N 个
+	RankTypeBottom = "bottom"
+)
+
 // --- BkMonitor URI 参数 ---
 
 // AppEnvURIInput 路径参数
@@ -143,11 +157,11 @@ type CreateEnvApmResp struct {
 
 // --- 实例时序指标查询 ---
 
-// GetInstanceTimeSeriesQueryInput 实例时序指标查询的 Query 参数
+// GetInstanceTimeSeriesQueryInput 实例时序指标查询的请求参数
 // 返回实例 内存、cpu、io、network 数据
 type GetInstanceTimeSeriesQueryInput struct {
-	// Instances 实例（Pod）名称列表
-	Instances []string `form:"instances" binding:"required,min=1"`
+	// Instances 实例（Pod）名称列表，过滤空白后需有 1~50 个；不校验实例是否属于该环境
+	Instances []string `json:"instances"`
 	// MetricKey 指定要查询的指标标识，可用值：
 	//   - cpu_usage: CPU 使用量（核数）
 	//   - cpu_request_usage: CPU Request 使用率
@@ -158,16 +172,19 @@ type GetInstanceTimeSeriesQueryInput struct {
 	//   - network_receive: 网络入带宽
 	//   - network_transmit: 网络出带宽
 	//   - disk_usage: 磁盘使用量
-	MetricKey string `form:"metricKey" binding:"required"`
+	MetricKey string `json:"metricKey" binding:"required,metric_key"`
 	// Interval 汇聚周期（秒），最小为 60 秒
-	Interval int64 `form:"interval"`
+	Interval int64 `json:"interval"`
 	// StartTime 开始时间（Unix 时间戳，秒）
-	StartTime int64 `form:"startTime" binding:"required,min=1"`
+	StartTime int64 `json:"startTime" binding:"required,min=1,ltefield=EndTime"`
 	// EndTime 结束时间（Unix 时间戳，秒）
-	EndTime int64 `form:"endTime" binding:"required,min=1"`
+	EndTime int64 `json:"endTime" binding:"required,min=1"`
+	// Method 汇聚方法，同一 Pod 内多个容器的数据如何合并，默认 sum；
+	// 使用率类指标的分子与分母使用同一方法（count 时比值恒为 1）
+	Method string `json:"method" binding:"omitempty,oneof=sum max min count avg" enums:"sum,max,min,count,avg"`
 }
 
-// Normalize 对输入进行值修正（过滤空白实例名称、设置默认汇聚周期）
+// Normalize 对输入进行值修正（过滤空白实例名称、设置默认汇聚周期与汇聚方法）
 func (r *GetInstanceTimeSeriesQueryInput) Normalize() {
 	// 过滤空白实例名称
 	instances := make([]string, 0, len(r.Instances))
@@ -181,6 +198,56 @@ func (r *GetInstanceTimeSeriesQueryInput) Normalize() {
 	if r.Interval < DefaultInterval {
 		r.Interval = DefaultInterval
 	}
+	if r.Method == "" {
+		r.Method = string(bkmmodel.AggMethodSum)
+	}
+}
+
+// --- 实例排名 ---
+
+// RankInstancesQueryInput 实例排名的 Query 参数
+type RankInstancesQueryInput struct {
+	// Limit 取前 N 个实例，取值 1~50，默认 10
+	Limit int `form:"limit" binding:"omitempty,min=1,max=50"`
+	// RankType 排名方向：top 按平均 CPU 使用量从高到低、bottom 从低到高，默认 top
+	RankType string `form:"rankType" binding:"omitempty,oneof=top bottom" enums:"top,bottom"`
+	// StartTime 排名时间范围的开始时间（Unix 时间戳，秒）
+	StartTime int64 `form:"startTime" binding:"required,min=1,ltefield=EndTime"`
+	// EndTime 排名时间范围的结束时间（Unix 时间戳，秒）
+	EndTime int64 `form:"endTime" binding:"required,min=1"`
+	// Interval 子查询步长（秒），最小为 60 秒，建议与图表汇聚周期一致
+	Interval int64 `form:"interval"`
+	// Method 同一 Pod 内多个容器的数据如何合并，默认 sum，建议与图表汇聚方法一致
+	Method string `form:"method" binding:"omitempty,oneof=sum max min count avg" enums:"sum,max,min,count,avg"`
+}
+
+// Normalize 设置默认的排名数量、方向、子查询步长与汇聚方法
+func (r *RankInstancesQueryInput) Normalize() {
+	if r.Limit <= 0 {
+		r.Limit = DefaultRankLimit
+	}
+	if r.RankType == "" {
+		r.RankType = RankTypeTop
+	}
+	if r.Interval < DefaultInterval {
+		r.Interval = DefaultInterval
+	}
+	if r.Method == "" {
+		r.Method = string(bkmmodel.AggMethodSum)
+	}
+}
+
+// InstanceRankOutput 实例排名结果
+type InstanceRankOutput struct {
+	// Instance 实例（Pod）名称
+	Instance string `json:"instance"`
+	// Value 时间范围内的平均 CPU 使用量（核数）
+	Value float64 `json:"value"`
+}
+
+// RankInstancesResp 实例排名的响应，已按 rankType 排好序
+type RankInstancesResp struct {
+	Data []*InstanceRankOutput `json:"data"`
 }
 
 // TimeSeriesItemStat 时序数据统计信息

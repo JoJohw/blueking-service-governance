@@ -1020,8 +1020,9 @@
   });
 
   watch(
-    displayTotal,
-    total => {
+    allInstances,
+    instances => {
+      const total = instances.length;
       const maxPage = Math.max(1, Math.ceil(total / paginationInternal.value.limit));
       if (paginationInternal.value.current > maxPage) {
         paginationInternal.value.current = maxPage;
@@ -1029,7 +1030,7 @@
       emit('data-loaded', {
         envName: props.envName,
         total,
-        instances: allInstances.value,
+        instances,
       });
     },
     { immediate: true },

@@ -21,16 +21,19 @@ package serializer_test
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
-	"github.com/go-playground/validator/v10"
+	"github.com/gin-gonic/gin/binding"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/samber/lo"
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/bkintegrations/serializer"
-	bkmmodel "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/observability/bkmonitor"
 )
+
+// makeInstances 生成 n 个不重复的实例名
+func makeInstances(n int) []string {
+	return lo.Times(n, func(i int) string { return fmt.Sprintf("pod-%d", i) })
+}
 
 var _ = Describe("BkMonitor Serializer - Response Structs", func() {
 	Describe("GetApmServiceNameResp", func() {
@@ -147,40 +150,12 @@ var _ = Describe("BkMonitor Serializer - Response Structs", func() {
 
 var _ = Describe("BkMonitor Serializer", func() {
 	Describe("GetInstanceTimeSeriesQueryInput", func() {
-		var validate *validator.Validate
-
-		BeforeEach(func() {
-			validate = validator.New()
-			validate.SetTagName("binding")
-			// 注册 struct-level 校验
-			validate.RegisterStructValidation(func(sl validator.StructLevel) {
-				input := sl.Current().Interface().(serializer.GetInstanceTimeSeriesQueryInput)
-				if input.StartTime > input.EndTime {
-					sl.ReportError(input.EndTime, "EndTime", "EndTime",
-						"start_time must be less than or equal to end_time", "")
-				}
-				if input.MetricKey != "" &&
-					!lo.ContainsBy(bkmmodel.MetricDefinitions, func(def bkmmodel.MetricDefinition) bool {
-						return def.Key == input.MetricKey
-					}) {
-					sl.ReportError(input.MetricKey, "MetricKey", "MetricKey",
-						fmt.Sprintf("invalid metric key: %s", input.MetricKey), "")
-				}
-				hasNonEmpty := lo.ContainsBy(input.Instances, func(inst string) bool {
-					return strings.TrimSpace(inst) != ""
-				})
-				if !hasNonEmpty {
-					sl.ReportError(input.Instances, "Instances", "Instances",
-						"instances must contain at least one non-empty value", "")
-				}
-			}, serializer.GetInstanceTimeSeriesQueryInput{})
-		})
-
-		Context("Struct-level validation", func() {
+		Context("Validation", func() {
 			DescribeTable(
 				"should validate correctly",
 				func(input serializer.GetInstanceTimeSeriesQueryInput, shouldFail bool) {
-					err := validate.Struct(input)
+					// 使用 gin 全局 validator，覆盖 init 中注册的自定义与结构体级校验
+					err := binding.Validator.ValidateStruct(&input)
 					if shouldFail {
 						Expect(err).To(HaveOccurred())
 					} else {
@@ -229,6 +204,38 @@ var _ = Describe("BkMonitor Serializer", func() {
 					StartTime: 1781366400,
 					EndTime:   1781452799,
 				}, false),
+				Entry("instances at the upper limit", serializer.GetInstanceTimeSeriesQueryInput{
+					Instances: makeInstances(serializer.MaxInstances),
+					MetricKey: "cpu_usage",
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}, false),
+				Entry("instances exceed the upper limit", serializer.GetInstanceTimeSeriesQueryInput{
+					Instances: makeInstances(serializer.MaxInstances + 1),
+					MetricKey: "cpu_usage",
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}, true),
+				Entry("blank instances are not counted", serializer.GetInstanceTimeSeriesQueryInput{
+					Instances: append(makeInstances(serializer.MaxInstances), "", "  "),
+					MetricKey: "cpu_usage",
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}, false),
+				Entry("valid method", serializer.GetInstanceTimeSeriesQueryInput{
+					Instances: []string{"pod-a"},
+					Method:    "count",
+					MetricKey: "cpu_usage",
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}, false),
+				Entry("invalid method", serializer.GetInstanceTimeSeriesQueryInput{
+					Instances: []string{"pod-a"},
+					Method:    "median",
+					MetricKey: "cpu_usage",
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}, true),
 			)
 		})
 
@@ -279,6 +286,107 @@ var _ = Describe("BkMonitor Serializer", func() {
 					Interval:  120,
 				}, []string{"pod-a"}, int64(120)),
 			)
+
+			It("defaults method to sum and keeps a specified one", func() {
+				input := serializer.GetInstanceTimeSeriesQueryInput{
+					Instances: []string{"pod-a"},
+					MetricKey: "cpu_usage",
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}
+				input.Normalize()
+				Expect(input.Method).To(Equal("sum"))
+
+				input.Method = "max"
+				input.Normalize()
+				Expect(input.Method).To(Equal("max"))
+			})
+		})
+	})
+
+	Describe("RankInstancesQueryInput", func() {
+		Context("Validation", func() {
+			DescribeTable(
+				"should validate correctly",
+				func(input serializer.RankInstancesQueryInput, shouldFail bool) {
+					err := binding.Validator.ValidateStruct(&input)
+					if shouldFail {
+						Expect(err).To(HaveOccurred())
+					} else {
+						Expect(err).NotTo(HaveOccurred())
+					}
+				},
+				Entry("only required time range", serializer.RankInstancesQueryInput{
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}, false),
+				Entry("all optional fields set", serializer.RankInstancesQueryInput{
+					Limit:     50,
+					RankType:  "bottom",
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+					Interval:  300,
+					Method:    "avg",
+				}, false),
+				Entry("missing start time", serializer.RankInstancesQueryInput{
+					EndTime: 1781452799,
+				}, true),
+				Entry("start_time greater than end_time", serializer.RankInstancesQueryInput{
+					StartTime: 1781452799,
+					EndTime:   1781366400,
+				}, true),
+				Entry("limit exceeds maximum", serializer.RankInstancesQueryInput{
+					Limit:     51,
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}, true),
+				Entry("negative limit", serializer.RankInstancesQueryInput{
+					Limit:     -1,
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}, true),
+				Entry("invalid rankType", serializer.RankInstancesQueryInput{
+					RankType:  "middle",
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}, true),
+				Entry("invalid method", serializer.RankInstancesQueryInput{
+					Method:    "median",
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+				}, true),
+			)
+		})
+
+		Context("Normalize", func() {
+			It("fills defaults for empty fields", func() {
+				input := serializer.RankInstancesQueryInput{
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+					Interval:  30,
+				}
+				input.Normalize()
+				Expect(input.Limit).To(Equal(serializer.DefaultRankLimit))
+				Expect(input.RankType).To(Equal(serializer.RankTypeTop))
+				Expect(input.Interval).To(Equal(serializer.DefaultInterval))
+				Expect(input.Method).To(Equal("sum"))
+			})
+
+			It("keeps specified values", func() {
+				input := serializer.RankInstancesQueryInput{
+					Limit:     5,
+					RankType:  serializer.RankTypeBottom,
+					StartTime: 1781366400,
+					EndTime:   1781452799,
+					Interval:  300,
+					Method:    "max",
+				}
+				input.Normalize()
+				Expect(input.Limit).To(Equal(5))
+				Expect(input.RankType).To(Equal(serializer.RankTypeBottom))
+				Expect(input.Interval).To(Equal(int64(300)))
+				Expect(input.Method).To(Equal("max"))
+			})
 		})
 	})
 

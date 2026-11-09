@@ -8141,7 +8141,7 @@
                 }
             }
         },
-        "/apps/{appID}/envs/{envName}/bkmonitor/instance-time-series": {
+        "/apps/{appID}/envs/{envName}/bkmonitor/instance-ranks": {
             "get": {
                 "security": [
                     {
@@ -8150,6 +8150,108 @@
                     {
                         "BkUserCredential": []
                     }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bkintegrations-bkmonitor"
+                ],
+                "summary": "按平均 CPU 使用量查询环境实例的 Top / Bottom N",
+                "operationId": "RankInstances",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用 ID",
+                        "name": "appID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "环境名称",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "取前 N 个实例，1~50，默认 10",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "top",
+                            "bottom"
+                        ],
+                        "type": "string",
+                        "description": "排名方向，默认 top",
+                        "name": "rankType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "排名时间范围的开始时间（Unix 时间戳，秒）",
+                        "name": "startTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "排名时间范围的结束时间（Unix 时间戳，秒）",
+                        "name": "endTime",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "子查询步长（秒），最小 60，默认 60",
+                        "name": "interval",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "sum",
+                            "max",
+                            "min",
+                            "count",
+                            "avg"
+                        ],
+                        "type": "string",
+                        "description": "汇聚方法，默认 sum",
+                        "name": "method",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/serializer.RankInstancesResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appID}/envs/{envName}/bkmonitor/instance-time-series": {
+            "post": {
+                "security": [
+                    {
+                        "BkUserInfo": []
+                    },
+                    {
+                        "BkUserCredential": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -8175,42 +8277,13 @@
                         "required": true
                     },
                     {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "collectionFormat": "csv",
-                        "description": "实例名称列表",
-                        "name": "instances",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "指标标识",
-                        "name": "metricKey",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "开始时间（Unix 时间戳）",
-                        "name": "startTime",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "结束时间（Unix 时间戳）",
-                        "name": "endTime",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "汇聚周期（秒），默认 60",
-                        "name": "interval",
-                        "in": "query"
+                        "description": "查询参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/serializer.GetInstanceTimeSeriesQueryInput"
+                        }
                     }
                 ],
                 "responses": {
@@ -10234,6 +10307,64 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/serializer.CreateAppInstanceWebConsoleOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/bkerrs.GinErrorOutput"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appID}/envs/{envName}/instances/{instanceID}/weterm": {
+            "post": {
+                "security": [
+                    {
+                        "BkUserInfo": []
+                    },
+                    {
+                        "BkUserCredential": []
+                    }
+                ],
+                "description": "未配置 WeTerm 环境 ID 时返回 NOT_IMPLEMENTED。",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "instance"
+                ],
+                "summary": "获取应用运行实例（Pod）WeTerm 登录链接",
+                "operationId": "CreateAppInstanceWeTerm",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用 ID",
+                        "name": "appID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "部署环境名称",
+                        "name": "envName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "实例 ID",
+                        "name": "instanceID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/serializer.CreateAppInstanceWeTermOutput"
                         }
                     },
                     "400": {
@@ -25554,6 +25685,14 @@
                 }
             }
         },
+        "serializer.CreateAppInstanceWeTermOutput": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/serializer.WeTermInfoOutputObj"
+                }
+            }
+        },
         "serializer.CreateAppInstanceWebConsoleInput": {
             "type": "object",
             "properties": {
@@ -28458,6 +28597,52 @@
                 }
             }
         },
+        "serializer.GetInstanceTimeSeriesQueryInput": {
+            "type": "object",
+            "required": [
+                "endTime",
+                "metricKey",
+                "startTime"
+            ],
+            "properties": {
+                "endTime": {
+                    "description": "EndTime 结束时间（Unix 时间戳，秒）",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "instances": {
+                    "description": "Instances 实例（Pod）名称列表，过滤空白后需有 1~50 个；不校验实例是否属于该环境",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "interval": {
+                    "description": "Interval 汇聚周期（秒），最小为 60 秒",
+                    "type": "integer"
+                },
+                "method": {
+                    "description": "Method 汇聚方法，同一 Pod 内多个容器的数据如何合并，默认 sum；\n使用率类指标的分子与分母使用同一方法（count 时比值恒为 1）",
+                    "type": "string",
+                    "enum": [
+                        "sum",
+                        "max",
+                        "min",
+                        "count",
+                        "avg"
+                    ]
+                },
+                "metricKey": {
+                    "description": "MetricKey 指定要查询的指标标识，可用值：\n  - cpu_usage: CPU 使用量（核数）\n  - cpu_request_usage: CPU Request 使用率\n  - cpu_limit_usage: CPU Limit 使用率\n  - memory_usage: 内存使用量（Working Set）\n  - memory_request_usage: 内存 Request 使用率\n  - memory_limit_usage: 内存 Limit 使用率\n  - network_receive: 网络入带宽\n  - network_transmit: 网络出带宽\n  - disk_usage: 磁盘使用量",
+                    "type": "string"
+                },
+                "startTime": {
+                    "description": "StartTime 开始时间（Unix 时间戳，秒）",
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
         "serializer.GetLatestAppModelDeployStatusOutput": {
             "type": "object",
             "properties": {
@@ -29279,6 +29464,19 @@
                 "success": {
                     "description": "命令执行是否成功",
                     "type": "boolean"
+                }
+            }
+        },
+        "serializer.InstanceRankOutput": {
+            "type": "object",
+            "properties": {
+                "instance": {
+                    "description": "Instance 实例（Pod）名称",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "Value 时间范围内的平均 CPU 使用量（核数）",
+                    "type": "number"
                 }
             }
         },
@@ -32388,6 +32586,17 @@
                 }
             }
         },
+        "serializer.RankInstancesResp": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/serializer.InstanceRankOutput"
+                    }
+                }
+            }
+        },
         "serializer.RecoverConditionInput": {
             "type": "object",
             "properties": {
@@ -32629,7 +32838,7 @@
                     }
                 },
                 "createdAt": {
-                    "description": "创建时间",
+                    "description": "创建时间, 对内置策略可能返回为空",
                     "type": "string"
                 },
                 "creator": {
@@ -35275,6 +35484,15 @@
                 },
                 "value": {
                     "description": "变量值",
+                    "type": "string"
+                }
+            }
+        },
+        "serializer.WeTermInfoOutputObj": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "description": "WeTerm 登录链接（weterm:// 协议，由本地 WeTerm 客户端打开）",
                     "type": "string"
                 }
             }

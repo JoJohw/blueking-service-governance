@@ -94,7 +94,12 @@
             </div>
           </div>
         </template>
-        <div class="px-[12px] py-[6px] text-[12px] text-[var(--bkms-neutral-3)]">{{ $t('框架配置文件') }}</div>
+        <div
+          v-if="frameworkFiles.length"
+          class="px-[12px] py-[6px] text-[12px] text-[#979BA5]"
+        >
+          {{ $t('框架配置文件') }}
+        </div>
         <FileItem
           v-for="file in frameworkFiles"
           :key="file.id"
@@ -104,8 +109,8 @@
         />
 
         <div class="mt-[8px] flex items-center justify-between px-[12px] py-[6px]">
-          <span class="text-[12px] text-[var(--bkms-neutral-3)]"
-            >{{ $t('其他配置文件') }}（{{ plainFiles.length }}）</span
+          <span class="text-[12px] text-[#979BA5]"
+            >{{ $t(frameworkFiles.length ? '其他配置文件' : '配置文件') }}（{{ plainFiles.length }}）</span
           >
           <Button
             :disabled="createDisabled"
@@ -140,9 +145,9 @@
           >
             <template #title><span /></template>
             <template #description>
-              <span class="text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">{{
-                $t('暂无其他配置文件，可点击新建')
-              }}</span>
+              <span class="text-[12px] leading-[20px] text-[#979BA5]">
+                {{ $t(frameworkFiles.length ? '暂无其他配置文件，可点击新建' : '暂无配置文件，可点击新建') }}
+              </span>
             </template>
           </Exception>
         </div>

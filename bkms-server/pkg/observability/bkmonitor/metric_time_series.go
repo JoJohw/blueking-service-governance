@@ -48,12 +48,6 @@ func NewMetricTimeSeriesService() *MetricTimeSeriesService {
 func (s *MetricTimeSeriesService) QueryTimeSeries(
 	ctx context.Context, query *MetricsQuery,
 ) (*MetricsResult, error) {
-	client, err := s.newClient(query.Username)
-	if err != nil {
-		return nil, errors.Wrap(err, "new bkmonitor client")
-	}
-	promQLs := NewPromQLBuilder(query).Build()
-
 	var targetDefs []MetricDefinition
 	if len(query.MetricKeys) > 0 {
 		targetDefs = lo.Filter(MetricDefinitions, func(def MetricDefinition, _ int) bool {
@@ -71,6 +65,17 @@ func (s *MetricTimeSeriesService) QueryTimeSeries(
 			}
 		}),
 	}
+
+	// 没有实例时直接返回各指标的空时序，不请求蓝鲸监控（空实例会拼出 pod_name=~"^()$" 的无效 PromQL）
+	if len(query.Instances) == 0 {
+		return result, nil
+	}
+
+	client, err := s.newClient(query.Username)
+	if err != nil {
+		return nil, errors.Wrap(err, "new bkmonitor client")
+	}
+	promQLs := NewPromQLBuilder(query).Build()
 
 	// 逐指标查询
 	for _, def := range targetDefs {
@@ -104,11 +109,7 @@ func (s *MetricTimeSeriesService) QueryTimeSeries(
 		// 解析响应，按 pod 维度提取时序数据
 		metricData := result.Metrics[def.Key]
 		for _, series := range resp.Series {
-			podName := lo.CoalesceOrEmpty(
-				series.Dimensions["pod"],
-				series.Dimensions["pod_name"],
-				series.Dimensions["instance"],
-			)
+			podName := podNameOf(series)
 			if podName == "" {
 				continue
 			}
@@ -125,4 +126,13 @@ func (s *MetricTimeSeriesService) QueryTimeSeries(
 	}
 
 	return result, nil
+}
+
+// podNameOf 从时序维度中取实例（Pod）名称，兼容 pod / pod_name / instance 三种维度名
+func podNameOf(series bkmapi.TimeSeriesData) string {
+	return lo.CoalesceOrEmpty(
+		series.Dimensions["pod"],
+		series.Dimensions["pod_name"],
+		series.Dimensions["instance"],
+	)
 }
