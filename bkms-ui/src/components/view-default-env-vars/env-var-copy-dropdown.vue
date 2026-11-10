@@ -25,7 +25,7 @@
   >
     <template #default="{ popoverShow }">
       <div
-        class="ml-[6px] inline-flex h-[22px] shrink-0 overflow-hidden rounded-[2px] bg-[#fff] border border-[var(--bkms-brand-2)] text-[var(--bkms-brand-2)] opacity-0 transition group-hover:opacity-100"
+        class="ml-[6px] inline-flex h-[22px] shrink-0 overflow-hidden rounded-[2px] bkms-bg-card border bkms-line-active bkms-text-brand opacity-0 transition group-hover:opacity-100"
         :class="{ 'opacity-100': popoverShow }"
       >
         <button
@@ -35,7 +35,7 @@
               : $t('复制 {0}', [primaryOption.format(variableKey)]),
             placement: 'top',
           }"
-          class="flex cursor-pointer items-center gap-[4px] border-0 bg-transparent px-[6px] text-inherit hover:bg-[#EAF3FF]"
+          class="flex cursor-pointer items-center gap-[4px] border-0 bg-transparent px-[6px] text-inherit hover:bkms-bg-brand-soft"
           type="button"
           @click.stop="handleCopy(primaryOption.format(variableKey))"
           @mousedown.stop
@@ -43,9 +43,9 @@
           <Copy class="text-[12px]" />
           <span>{{ $t('复制') }}</span>
         </button>
-        <span class="w-px bg-[var(--bkms-brand-2)]"></span>
+        <span class="w-px bg-bkms-brand-2"></span>
         <button
-          class="flex w-[20px] cursor-pointer items-center justify-center border-0 bg-transparent text-inherit hover:bg-[#EAF3FF]"
+          class="flex w-[20px] cursor-pointer items-center justify-center border-0 bg-transparent text-inherit hover:bkms-bg-brand-soft"
           type="button"
         >
           <AngleDownLine
@@ -61,14 +61,14 @@
           v-for="option in options"
           :key="option.id"
           class="group !h-auto !px-[12px] !py-[10px]"
-          :class="{ '!bg-[var(--bkms-brand-6)]': option.id === selectedOptionId }"
+          :class="{ '!bkms-bg-active': option.id === selectedOptionId }"
           @click="handleSelect(option)"
         >
           <div class="flex min-w-0 flex-col whitespace-normal leading-[20px]">
             <div class="flex min-w-0 items-center gap-[4px]">
               <span
-                class="min-w-0 truncate text-[var(--bkms-neutral-2)] group-hover:text-[var(--bkms-brand-2)]"
-                :class="{ '!text-[var(--bkms-brand-2)]': option.id === selectedOptionId }"
+                class="min-w-0 truncate bkms-text-body group-hover:bkms-text-brand"
+                :class="{ '!bkms-text-brand': option.id === selectedOptionId }"
               >
                 {{ option.format(variableKey) }}
               </span>
@@ -81,7 +81,7 @@
                 {{ $t('推荐') }}
               </Tag>
             </div>
-            <div class="text-[var(--bkms-neutral-3)]">{{ option.description }}</div>
+            <div class="bkms-text-secondary">{{ option.description }}</div>
           </div>
         </Dropdown.DropdownItem>
       </Dropdown.DropdownMenu>

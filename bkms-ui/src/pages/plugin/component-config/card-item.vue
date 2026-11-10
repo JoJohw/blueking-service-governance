@@ -47,7 +47,7 @@
       </div>
     </div>
     <!-- 描述 -->
-    <div class="text-[#4D4F56] text-warp break-all max-h-[200px] overflow-y-auto">
+    <div class="bkms-text-body text-warp break-all max-h-[200px] overflow-y-auto">
       {{ item.description || '--' }}
     </div>
     <Divider
@@ -83,13 +83,13 @@
     </div>
     <div
       v-else-if="footerType === 'builtin'"
-      class="text-[#C4C6CC]"
+      class="text-bkms-navy-5"
     >
       {{ t('内置组件，不可编辑') }}
     </div>
     <div
       v-else-if="footerType === 'shared'"
-      class="text-[#C4C6CC]"
+      class="text-bkms-navy-5"
     >
       {{ t('来自「{space}」', { space: item.managedByWorkspaceIDs?.join('、') ?? '' }) }}
     </div>

@@ -17,7 +17,7 @@
             direction="vertical"
             type="solid"
           />
-          <span class="text-[12px] font-normal text-[var(--bkms-neutral-3)]">
+          <span class="text-[12px] font-normal bkms-text-secondary">
             {{ targetLabel || $t('环境') }}：{{ targetName || '--' }}
           </span>
           <Tag
@@ -46,14 +46,14 @@
         @error="handleUploadError"
         @success="handlePreviewSuccess"
       >
-        <div class="flex h-[92px] flex-col items-center justify-center text-[14px] text-[var(--bkms-neutral-2)]">
+        <div class="flex h-[92px] flex-col items-center justify-center text-[14px] bkms-text-body">
           <UploadIcon
-            class="mb-[8px] text-[32px] text-[var(--bkms-neutral-3)]"
+            class="mb-[8px] text-[32px] bkms-text-secondary"
             height="32"
             width="32"
           />
           <span class="text-[12px]">
-            {{ $t('将文件拖到此处或') }} <span class="text-[var(--bkms-brand-2)]">{{ $t('点击上传') }}</span>
+            {{ $t('将文件拖到此处或') }} <span class="bkms-text-brand">{{ $t('点击上传') }}</span>
           </span>
         </div>
       </Upload>
@@ -72,8 +72,8 @@
         v-if="previewLoading"
         class="flex min-h-[360px] flex-col items-center justify-center"
       >
-        <Loading class="animate-spin text-[52px] text-[var(--bkms-brand-2)]" />
-        <div class="mt-[20px] text-[20px] text-[var(--bkms-neutral-1)]">{{ $t('文件正在解析中...') }}</div>
+        <Loading class="animate-spin text-[52px] bkms-text-brand" />
+        <div class="mt-[20px] text-[20px] bkms-text-title">{{ $t('文件正在解析中...') }}</div>
       </div>
       <section
         v-else-if="previewData"
@@ -91,7 +91,7 @@
               <span class="inline-flex items-center">
                 <i
                   class="bkms-icon bkms-icon-quanbu-xuanzhong mr-[4px]"
-                  :class="activeFilter === 'all' ? 'text-[var(--bkms-brand-2)]' : 'text-[var(--bkms-neutral-3)]'"
+                  :class="activeFilter === 'all' ? 'bkms-text-brand' : 'bkms-text-secondary'"
                 ></i>
                 {{ $t('全部') }} {{ totalCount }}
               </span>
@@ -126,7 +126,7 @@
             <template #default="{ row }">
               <template v-if="row.action === 'overwrite'">
                 <div class="leading-[20px]">{{ row.value || '--' }}</div>
-                <div class="text-[var(--bkms-neutral-3)] leading-[20px]">
+                <div class="bkms-text-secondary leading-[20px]">
                   {{ $t('原值') }}：{{ row.originalValue || '--' }}
                 </div>
               </template>
@@ -149,7 +149,7 @@
             <template #default="{ row }">
               <template v-if="!row.effectiveScope?.type">
                 <Tag theme="danger">{{ $t('缺失') }}</Tag>
-                <div class="text-[var(--bkms-neutral-3)] text-[12px] leading-[20px]">
+                <div class="bkms-text-secondary text-[12px] leading-[20px]">
                   {{ $t('默认设置为「所有」') }}
                 </div>
               </template>

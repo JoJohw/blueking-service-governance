@@ -18,11 +18,14 @@
 
 <template>
   <div
-    :class="[type === 'card' ? 'px-[20px] py-[24px] bg-[#fff] shadow-[0_2px_4px_0_#1919290d]' : '', 'flex flex-col']"
+    :class="[
+      type === 'card' ? 'px-[20px] py-[24px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]' : '',
+      'flex flex-col',
+    ]"
   >
     <div
       :class="[
-        'flex items-center justify-between cursor-pointer text-[var(--bkms-neutral-1)] leading-[22px]',
+        'flex items-center justify-between cursor-pointer bkms-text-title leading-[22px]',
         type === 'normal' ? 'px-[16px] py-[4px] text-[12px]' : 'text-[14px]',
         headerClass,
       ]"

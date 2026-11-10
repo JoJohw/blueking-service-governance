@@ -19,14 +19,14 @@
 <template>
   <div
     :class="[
-      'p-[12px] border border-[var(--bkms-neutral-5)] rounded-[2px] text-[var(--bkms-neutral-2)] hover:bg-[var(--bkms-brand-7)] hover:border-[var(--bkms-brand-2)] group',
-      { 'bg-[var(--bkms-neutral-8)] border-[var(--bkms-neutral-5)]': disabled },
-      active ? '!border-[var(--bkms-brand-2)]' : 'border-[var(--bkms-navy-5)]',
+      'p-[12px] border bkms-line-default rounded-[2px] bkms-text-body hover:bkms-bg-brand-soft hover:bkms-line-active group',
+      { 'bkms-bg-subtle bkms-line-default': disabled },
+      active ? '!bkms-line-active' : 'border-bkms-navy-5',
     ]"
   >
     <FlexRow class="mb-[4px]">
       <template #left>
-        <span class="font-bold text-[#000000]">{{ curCom?.displayName || curCom?.name || '--' }}</span>
+        <span class="font-bold bkms-text-title">{{ curCom?.displayName || curCom?.name || '--' }}</span>
       </template>
       <template #right>
         <span
@@ -36,7 +36,7 @@
           }"
         >
           <Button
-            :class="{ 'bg-[#fff]': !disabled }"
+            :class="{ 'bkms-bg-card': !disabled }"
             :disabled="active || disabled"
             size="small"
             @click="handleClick"
@@ -47,8 +47,8 @@
       </template>
     </FlexRow>
     <div class="flex">
-      <span class="text-[var(--bkms-neutral-3)] mr-[4px] shrink-0">{{ $t('说明') }} : </span>
-      <div class="text-[var(--bkms-neutral-1)]">{{ curCom?.description || '--' }}</div>
+      <span class="bkms-text-secondary mr-[4px] shrink-0">{{ $t('说明') }} : </span>
+      <div class="bkms-text-title">{{ curCom?.description || '--' }}</div>
     </div>
   </div>
 </template>

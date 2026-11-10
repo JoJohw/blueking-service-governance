@@ -84,7 +84,7 @@
                 <span
                   :class="[
                     'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-[8px]',
-                    componentType === key ? 'bg-[#E1ECFF] text-[#3A84FF]' : 'bg-[#fff]',
+                    componentType === key ? 'bkms-bg-active bkms-text-brand' : 'bkms-bg-card',
                   ]"
                 >
                   {{ value.value.length }}
@@ -97,7 +97,7 @@
           <div class="flex items-center justify-end gap-[8px] ml-[8px]">
             <SearchSelect
               v-model="searchValue"
-              class="w-[520px] bg-[#fff] relative z-[100]"
+              class="w-[520px] bkms-bg-card relative z-[100]"
               :data="componentSearchData"
               :placeholder="
                 createPlaceholder({

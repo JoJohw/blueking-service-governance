@@ -17,13 +17,13 @@
 -->
 
 <template>
-  <div class="probe-view-section border border-[var(--bkms-neutral-6)] rounded-[8px] flex-1 min-w-0 overflow-hidden">
+  <div class="probe-view-section border bkms-line-light rounded-[8px] flex-1 min-w-0 overflow-hidden">
     <!-- 卡片标题行 -->
-    <div class="card-header flex items-center gap-[10px] h-[32px] px-[12px] border-b border-[var(--bkms-neutral-6)]">
+    <div class="card-header flex items-center gap-[10px] h-[32px] px-[12px] border-b border-b-bkms-neutral-6">
       <div class="flex items-center gap-[6px]">
         <i
           v-if="modified"
-          class="w-[3px] h-[18px] bg-[var(--bkms-warning-2)] flex-shrink-0"
+          class="w-[3px] h-[18px] bg-bkms-warning-2 flex-shrink-0"
         ></i>
         <span class="probe-title text-[12px] font-bold">{{ label }}</span>
       </div>
@@ -34,7 +34,7 @@
         theme="dark"
       >
         <Button
-          class="!hover:text-[var(--bkms-brand-2)]"
+          class="!hover:bkms-text-brand"
           disabled
           text
         >
@@ -43,7 +43,7 @@
       </Popover>
       <Button
         v-else-if="showEditIcon && !disabled"
-        class="!hover:text-[var(--bkms-brand-2)]"
+        class="!hover:bkms-text-brand"
         text
         @click="$emit('edit')"
       >
@@ -143,7 +143,7 @@
               <!-- 探针描述 -->
               <div
                 v-if="description"
-                class="description p-[12px] mt-[8px] bg-[var(--bkms-neutral-7)] text-align-left"
+                class="description p-[12px] mt-[8px] bkms-bg-page text-align-left"
               >
                 {{ description }}
               </div>

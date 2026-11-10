@@ -36,8 +36,8 @@
         class="flex justify-between w-[240px] cursor-pointer"
         @click="handleClickDefaultValue"
       >
-        <span class="text-[var(--bkms-neutral-2)]">{{ defaultValue }}</span>
-        <span class="text-[var(--bkms-navy-5)]">&lt;{{ $t('默认值') }}&gt;</span>
+        <span class="bkms-text-body">{{ defaultValue }}</span>
+        <span class="text-bkms-navy-5">&lt;{{ $t('默认值') }}&gt;</span>
       </div>
     </template>
   </Popover>

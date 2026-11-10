@@ -77,7 +77,7 @@
           <div class="w-[52px] h-[22px] bg-[#1E3567] rounded-[2px]">
             {{ $t('操作前') }}
           </div>
-          <div class="w-[52px] h-[22px] bg-[#144628] rounded-[2px] text-[var(--bkms-success-2)]">
+          <div class="w-[52px] h-[22px] bg-[#144628] rounded-[2px] text-bkms-success-2">
             {{ $t('操作后') }}
           </div>
         </div>

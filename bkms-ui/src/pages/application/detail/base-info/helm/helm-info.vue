@@ -19,7 +19,7 @@
 <template>
   <div>
     <Skeleton
-      class="bg-[#fff] pb-[18px]"
+      class="bkms-bg-card pb-[18px]"
       :full-height="false"
       :loading="isLoading || appDetailStore.loading"
     >
@@ -58,10 +58,10 @@
       </template>
       <div class="flex flex-col gap-[16px]">
         <BkmsContent
-          class="info-title shadow-[0_2px_4px_0_#1919290d]"
+          class="info-title shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           :title="$t('基础信息')"
         >
-          <div class="grid grid-cols-[minmax(0,40%)_minmax(0,60%)] gap-[12px] gap-y-2 text-[12px] py-[16px] bg-[#fff]">
+          <div class="grid grid-cols-[minmax(0,40%)_minmax(0,60%)] gap-[12px] gap-y-2 text-[12px] py-[16px] bkms-bg-card">
             <DetailItem
               class="!h-[20px]"
               :label="$t('类型')"
@@ -69,7 +69,7 @@
             >
               <TypeIcon :type="isAgones ? 'agones' : 'helm'">
                 <template #label>
-                  <span class="text-[var(--bkms-neutral-1)] leading-[20px] ml-[6px]">
+                  <span class="bkms-text-title leading-[20px] ml-[6px]">
                     {{ $t(isAgones ? 'Agones 应用' : 'Helm 应用') }}
                   </span>
                 </template>
@@ -99,12 +99,12 @@
           </div>
         </BkmsContent>
         <BkmsContent
-          class="info-title shadow-[0_2px_4px_0_#1919290d]"
+          class="info-title shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           show-edit-icon
           :title="$t('Helm chart 配置')"
           @edit="showSourceConfig = true"
         >
-          <div class="grid grid-cols-[minmax(0,40%)_minmax(0,60%)] gap-[12px] gap-y-2 text-[12px] py-[16px] bg-[#fff]">
+          <div class="grid grid-cols-[minmax(0,40%)_minmax(0,60%)] gap-[12px] gap-y-2 text-[12px] py-[16px] bkms-bg-card">
             <DetailItem
               class="!h-[20px]"
               :label="$t('Helm Chart 来源')"
@@ -126,7 +126,7 @@
                     @click="copyText(appData?.helmSpec?.helmSource?.gitRepoConfig?.repoURL || '')"
                   >
                     <Copy
-                      class="hover:text-[var(--bkms-brand-2)]"
+                      class="hover:bkms-text-brand"
                       :title="$t('复制')"
                     />
                   </Button>
@@ -160,7 +160,7 @@
                     @click="copyText(appData?.helmSpec?.helmSource?.helmRepoConfig?.repoURL || '')"
                   >
                     <Copy
-                      class="hover:text-[var(--bkms-brand-2)]"
+                      class="hover:bkms-text-brand"
                       :title="$t('复制')"
                     />
                   </Button>
@@ -177,12 +177,12 @@
           </div>
         </BkmsContent>
         <BkmsContent
-          class="info-title shadow-[0_2px_4px_0_#1919290d]"
+          class="info-title shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           show-edit-icon
           :title="$t('构建配置')"
           @edit="showBuildConfig = true"
         >
-          <div class="grid grid-cols-[minmax(0,40%)_minmax(0,60%)] gap-[12px] gap-y-2 text-[12px] py-[16px] bg-[#fff]">
+          <div class="grid grid-cols-[minmax(0,40%)_minmax(0,60%)] gap-[12px] gap-y-2 text-[12px] py-[16px] bkms-bg-card">
             <DetailItem
               class="!h-[20px]"
               :label="$t('应用镜像来源')"
@@ -206,7 +206,7 @@
                   @click="copyText(repoURL)"
                 >
                   <Copy
-                    class="hover:text-[var(--bkms-brand-2)]"
+                    class="hover:bkms-text-brand"
                     :title="$t('复制')"
                   />
                 </Button>
@@ -269,8 +269,8 @@
             {{ $t('删除应用') }}
           </Button>
           <div class="flex items-center gap-[4px] text-[12px]">
-            <ExclamationCircleShape class="text-[14px] text-[var(--bkms-warning-2)]" />
-            <span class="text-[var(--bkms-neutral-2)]">
+            <ExclamationCircleShape class="text-[14px] text-bkms-warning-2" />
+            <span class="bkms-text-body">
               {{ $t('删除应用后，所有相关的配置、部署信息和操作记录将永久丢失，此操作不可恢复。') }}
             </span>
           </div>

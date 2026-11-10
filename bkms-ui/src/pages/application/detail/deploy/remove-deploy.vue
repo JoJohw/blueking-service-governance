@@ -30,12 +30,12 @@
           icon="bkms-icon-tishi"
           :width="42"
         />
-        <span class="text-[var(--bkms-neutral-1)] text-[20px] leading-[32px] text-center mt-[18px]">
+        <span class="bkms-text-title text-[20px] leading-[32px] text-center mt-[18px]">
           {{ $t('确认移除部署') }} ?
         </span>
       </div>
     </template>
-    <div class="mb-[16px] px-[16px] py-[12px] bg-[var(--bkms-neutral-8)] rounded-[2px]">
+    <div class="mb-[16px] px-[16px] py-[12px] bkms-bg-subtle rounded-[2px]">
       <div class="font-bold mb-[6px]">
         {{ $t('将移除应用在「{0}」的全部实例，移除后', [trpcDeployStore.curEnvItem?.displayName ?? '']) }}:
       </div>
@@ -45,7 +45,7 @@
     </div>
     <i18n-t keypath="该操作不可撤销，请输入环境名称：{0} 进行确认">
       <span
-        class="font-bold text-[var(--bkms-danger-2)] px-[3px] cursor-pointer hover:bg-[var(--bkms-danger-6)]"
+        class="font-bold text-bkms-danger-2 px-[3px] cursor-pointer hover:bkms-bg-danger"
         @click="copyText(currentEnvName)"
       >
         {{ currentEnvName }}

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="flex bg-[#FFFFFF] gap-[24px]">
+  <div class="flex bkms-bg-card gap-[24px]">
     <!-- 左侧：镜像详情 -->
     <div class="flex-1 min-w-0 py-[24px]">
       <FieldItem
@@ -43,7 +43,7 @@
         <template #value>
           <div
             v-if="row.sourceMaterial"
-            class="flex min-w-0 max-w-full items-center text-[var(--bkms-neutral-1)]"
+            class="flex min-w-0 max-w-full items-center bkms-text-title"
           >
             <!-- 与蓝盾一致：分支 / Tag / CommitID 都用分支图标标修订，短哈希另用 commit 图标 -->
             <span class="bkms-icon bkms-icon-branchs mr-[5px] shrink-0"></span>
@@ -63,7 +63,7 @@
           </div>
           <span
             v-else
-            class="text-[var(--bkms-neutral-1)]"
+            class="bkms-text-title"
             >--</span
           >
         </template>
@@ -96,7 +96,7 @@
         value-color="var(--bkms-neutral-1)"
       >
         <template #field>
-          <div class="w-[100px] min-h-[32px] leading-[32px] text-align-end text-[var(--bkms-neutral-3)]">
+          <div class="w-[100px] min-h-[32px] leading-[32px] text-align-end bkms-text-secondary">
             {{ t('已部署环境') }}：
           </div>
         </template>
@@ -116,7 +116,7 @@
               <Tag
                 v-for="env in envs"
                 :key="env.envName"
-                class="bg-[#fff]"
+                class="bkms-bg-card"
                 type="stroke"
               >
                 {{ getEnvDisplayName(env?.envName ?? '') }}
@@ -134,10 +134,10 @@
     </div>
 
     <!-- 右侧：部署记录时间线 -->
-    <div class="w-[400px] min-h-[180px] flex-shrink-0 px-[16px] pt-[8px] bg-[var(--bkms-neutral-8)]">
+    <div class="w-[400px] min-h-[180px] flex-shrink-0 px-[16px] pt-[8px] bkms-bg-subtle">
       <div class="flex items-center h-[32px] leading-[32px]">
-        <span class="text-[12px] text-[var(--bkms-neutral-1)]">{{ t('部署记录') }}</span>
-        <span class="text-[12px] text-[var(--bkms-neutral-3)] ml-[4px]"> ({{ $t('仅展示前 5 条') }}) </span>
+        <span class="text-[12px] bkms-text-title">{{ t('部署记录') }}</span>
+        <span class="text-[12px] bkms-text-secondary ml-[4px]"> ({{ $t('仅展示前 5 条') }}) </span>
       </div>
       <div
         v-bkloading="{ loading: isDeployRecordLoading, color: 'var(--bkms-neutral-7)]' }"
@@ -148,7 +148,7 @@
           :list="timelineList"
         >
           <template #content="{ content }">
-            <div class="text-[12px] text-[var(--bkms-neutral-3)]">{{ content }}</div>
+            <div class="text-[12px] bkms-text-secondary">{{ content }}</div>
           </template>
         </Timeline>
         <Exception

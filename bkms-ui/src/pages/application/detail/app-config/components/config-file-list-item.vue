@@ -21,14 +21,14 @@
     class="group cursor-pointer border-l-[2px] px-[12px] py-[8px]"
     :class="
       active
-        ? 'border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-6)]'
-        : 'border-transparent hover:bg-[var(--bkms-neutral-7)]'
+        ? 'bkms-line-active bkms-bg-active'
+        : 'border-transparent hover:bkms-bg-page'
     "
     @click="emit('click')"
   >
     <div class="relative flex min-w-0 items-center pr-[20px]">
       <OverflowTitle
-        class="min-w-0 text-[12px] text-[var(--bkms-neutral-1)]"
+        class="min-w-0 text-[12px] bkms-text-title"
         type="tips"
       >
         {{ file.displayName || '--' }}
@@ -49,19 +49,19 @@
           <template #content>
             <div class="mb-[4px]">
               <span>{{ $t('文件名') }}：</span>
-              <span class="text-[var(--bkms-neutral-1)]">{{ file.displayName || '--' }}</span>
+              <span class="bkms-text-title">{{ file.displayName || '--' }}</span>
             </div>
             <div>{{ $t('删除后不再挂载到容器内，文件内容与历史版本一并删除，需要重新部署后生效。') }}</div>
           </template>
           <Del
-            class="cursor-pointer p-[3px] text-[14px] text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-danger-2)]"
+            class="cursor-pointer p-[3px] text-[14px] bkms-text-secondary hover:text-bkms-danger-2"
             @click="deleting = true"
           />
         </PopConfirm>
       </div>
     </div>
     <OverflowTitle
-      class="mt-[2px] min-w-0 text-[12px] text-[var(--bkms-neutral-3)]"
+      class="mt-[2px] min-w-0 text-[12px] bkms-text-secondary"
       type="tips"
     >
       {{ file.displayPath || '--' }}
@@ -79,7 +79,7 @@
           >{{ scopeLabel }}</Tag
         >
         <template #content>
-          <div class="max-w-[420px] whitespace-pre-line text-[12px] text-[var(--bkms-neutral-1)]">{{ envTooltip }}</div>
+          <div class="max-w-[420px] whitespace-pre-line text-[12px] bkms-text-title">{{ envTooltip }}</div>
         </template>
       </Popover>
       <Tag

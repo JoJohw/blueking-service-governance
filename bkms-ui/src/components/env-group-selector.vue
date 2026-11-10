@@ -30,9 +30,9 @@
           {{ group.label }}
         </span>
         <div class="flex items-center">
-          <span class="text-[12px] text-[var(--bkms-neutral-2)] mr-[8px]">{{ $t('全选') }}</span>
+          <span class="text-[12px] bkms-text-body mr-[8px]">{{ $t('全选') }}</span>
           <Checkbox
-            class="bg-[#fff]"
+            class="bkms-bg-card"
             :disabled="props.disabled || getGroupEnvValues(group.envs).length === 0"
             :indeterminate="isGroupIndeterminate(group.envs)"
             :model-value="isGroupAllSelected(group.envs)"
@@ -50,7 +50,7 @@
             disabled: !getCustomDisabledReason(env),
             placement: 'bottom',
           }"
-          class="h-[32px] flex items-center px-[12px] bg-[var(--bkms-neutral-7)] cursor-pointer"
+          class="h-[32px] flex items-center px-[12px] bkms-bg-page cursor-pointer"
           :class="isEnvDisplayDisabled(env) ? 'opacity-60 cursor-not-allowed' : ''"
           @click="handleEnvItemClick(env)"
         >
@@ -62,14 +62,14 @@
               :size="14"
             />
             <span
-              class="min-w-0 truncate text-[12px] text-[var(--bkms-neutral-2)]"
+              class="min-w-0 truncate text-[12px] bkms-text-body"
               :title="env.displayName || env.name"
             >
               {{ env.displayName || env.name || '--' }}
             </span>
             <Tag
               v-if="isFeatureEnv(env)"
-              class="bg-[var(--bkms-cyan-6)] text-[var(--bkms-cyan-2)] ml-[6px] shrink-0"
+              class="bg-bkms-cyan-6 text-bkms-cyan-2 ml-[6px] shrink-0"
               size="small"
             >
               {{ $t('特性') }}
@@ -80,7 +80,7 @@
             @click.stop
           >
             <Checkbox
-              class="bg-[#fff]"
+              class="bkms-bg-card"
               :disabled="
                 props.disabled ||
                 !!getCustomDisabledReason(env) ||
@@ -94,7 +94,7 @@
         </div>
         <div
           v-if="group.envs.length === 0"
-          class="h-[40px] flex items-center justify-center bg-[var(--bkms-neutral-7)] text-[12px] text-[var(--bkms-neutral-3)]"
+          class="h-[40px] flex items-center justify-center bkms-bg-page text-[12px] bkms-text-secondary"
         >
           {{ $t('暂无数据') }}
         </div>

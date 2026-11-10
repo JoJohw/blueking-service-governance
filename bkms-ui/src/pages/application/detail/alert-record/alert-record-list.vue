@@ -15,7 +15,7 @@
       />
       <SearchSelect
         v-model="searchValue"
-        class="flex-1 bg-[#fff] relative z-[100]"
+        class="flex-1 bkms-bg-card relative z-[100]"
         :data="searchData"
         :placeholder="placeholder"
         unique-select
@@ -23,7 +23,7 @@
       />
       <DatePicker
         v-model="dateRange"
-        class="shrink-0 bg-[#fff]"
+        class="shrink-0 bkms-bg-card"
         format="YYYY-MM-DD HH:mm:ss"
         :need-timezone="false"
         :version="2"
@@ -214,8 +214,8 @@
   const expandConfig = {
     showIcon: true,
     trigger: 'row',
-    iconOpen: 'bkms-icon bkms-icon-down-shape !text-[var(--bkms-navy-5)] hover:!text-[var(--bkms-neutral-2)] p-[2px]',
-    iconClose: 'bkms-icon bkms-icon-right-shape !text-[var(--bkms-navy-5)] hover:!text-[var(--bkms-neutral-2)] p-[2px]',
+    iconOpen: 'bkms-icon bkms-icon-down-shape !text-bkms-navy-5 hover:!bkms-text-body p-[2px]',
+    iconClose: 'bkms-icon bkms-icon-right-shape !text-bkms-navy-5 hover:!bkms-text-body p-[2px]',
   };
 
   /** 服务端排序：remote 模式下点击表头仅触发 @sort-change，排序交给后端 ordering 处理 */

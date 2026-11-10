@@ -19,8 +19,8 @@
 <template>
   <div class="w-full">
     <!-- 自定义 Header -->
-    <div class="h-[52px] flex items-center justify-between px-[24px] bg-[#FFF] shadow-[0_3px_4px_0_#0000000a]">
-      <div class="text-[16px] text-[var(--bkms-neutral-1)]">{{ $t('构建管理') }}</div>
+    <div class="h-[52px] flex items-center justify-between px-[24px] bkms-bg-card shadow-[0_3px_4px_0_var(--bkms-shadow-header)]">
+      <div class="text-[16px] bkms-text-title">{{ $t('构建管理') }}</div>
       <Button
         text
         theme="primary"
@@ -108,7 +108,7 @@
                         />
                         <p
                           v-if="recommendTag"
-                          class="text-[var(--bkms-neutral-3)]"
+                          class="bkms-text-secondary"
                         >
                           {{ $t('推荐版本号') }}：{{ recommendTag }}
                         </p>
@@ -392,9 +392,9 @@
   };
   type statusType = 'FAILED' | 'RUNNING' | 'SUCCEED' | 'UNKNOWN';
   const statusColor: Record<statusType, string> = {
-    RUNNING: 'text-[var(--bkms-brand-3)]',
-    SUCCEED: 'text-[var(--bkms-success-2)]',
-    FAILED: 'text-[var(--bkms-danger-2)]',
+    RUNNING: 'text-bkms-brand-3',
+    SUCCEED: 'text-bkms-success-2',
+    FAILED: 'text-bkms-danger-2',
     UNKNOWN: 'text-[#ffb848]',
   };
   const failedStatus = ['failed', 'pollingBroken'];

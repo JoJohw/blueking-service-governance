@@ -28,7 +28,7 @@
         :title="t('版本详情')"
         :title-size="16"
       >
-        <span class="text-[14px] text-[var(--bkms-neutral-3)]">{{ `${t('版本号')}: ${chartVersion}` }}</span>
+        <span class="text-[14px] bkms-text-secondary">{{ `${t('版本号')}: ${chartVersion}` }}</span>
       </DividerHeader>
     </template>
     <Loading
@@ -54,10 +54,10 @@
           >
             <template #nodeType="node">
               <template v-if="node.isDir">
-                <i class="bkms-icon bkms-icon-folder text-[var(--bkms-navy-5)] text-[16px] mr-[12px]"></i>
+                <i class="bkms-icon bkms-icon-folder text-bkms-navy-5 text-[16px] mr-[12px]"></i>
               </template>
               <template v-else>
-                <i class="bkms-icon bkms-icon-file text-[var(--bkms-navy-5)] text-[16px] mr-[12px]"></i>
+                <i class="bkms-icon bkms-icon-file text-bkms-navy-5 text-[16px] mr-[12px]"></i>
               </template>
             </template>
           </Tree>

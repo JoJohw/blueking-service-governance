@@ -17,12 +17,12 @@
 -->
 
 <template>
-  <div class="tab-header-container relative z-10 bg-[#FFF] px-[24px]">
+  <div class="tab-header-container relative z-10 bkms-bg-card px-[24px]">
     <div
       v-if="title"
       :class="tabs.length > 0 ? 'pt-[14px] pb-[10px]' : 'h-[52px] flex items-center'"
     >
-      <span class="text-[16px] font-medium text-[var(--bkms-neutral-1)]">{{ title }}</span>
+      <span class="text-[16px] font-medium bkms-text-title">{{ title }}</span>
       <slot name="title-extra"></slot>
     </div>
 
@@ -95,7 +95,7 @@
 
 <style lang="postcss" scoped>
   .tab-header-container {
-    box-shadow: 0 3px 4px 0 #0000000a;
+    box-shadow: 0 3px 4px 0 var(--bkms-shadow-header);
     border-bottom: none;
 
     :deep(.bk-tab-header) {

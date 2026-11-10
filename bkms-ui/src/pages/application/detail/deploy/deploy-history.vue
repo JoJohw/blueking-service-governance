@@ -21,7 +21,7 @@
     <div :id="DEPLOY_ENV_SELECT_SLOT_ID"></div>
     <SearchSelect
       v-model="searchValue"
-      class="min-w-[560px] bg-[#fff] relative z-[100]"
+      class="min-w-[560px] bkms-bg-card relative z-[100]"
       :data="searchData"
       :placeholder="
         createPlaceholder({
@@ -40,7 +40,7 @@
     <template #loading>
       <Layout.table />
     </template>
-    <div class="bg-[#FFFFFF]">
+    <div class="bkms-bg-card">
       <!-- 表格 -->
       <Table
         :data="tableData"
@@ -73,8 +73,8 @@
               class="rounded-[2px] px-[8px] py-[2px] text-[12px]"
               :class="
                 isSourceBuild(row)
-                  ? 'bg-[var(--bkms-brand-6)] text-[var(--bkms-brand-2)]'
-                  : 'bg-[var(--bkms-neutral-6)] text-[var(--bkms-neutral-2)]'
+                  ? 'bkms-bg-active bkms-text-brand'
+                  : 'bg-bkms-neutral-6 bkms-text-body'
               "
             >
               {{ isSourceBuild(row) ? $t('源码构建') : $t('已构建镜像') }}

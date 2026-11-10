@@ -17,13 +17,13 @@
 -->
 
 <template>
-  <div class="bg-[var(--bkms-neutral-7)] mt-[16px] p-[16px]">
+  <div class="bkms-bg-page mt-[16px] p-[16px]">
     <Alert
       class="mb-[12px]"
       theme="warning"
     >
       <template #title>
-        <div class="flex items-center text-[var(--bkms-neutral-2)]">
+        <div class="flex items-center bkms-text-body">
           <i18n-t keypath="请先将自定义的镜像推送至空间，{0}">
             <CustomImagePushGuide
               :image-name="name"
@@ -110,7 +110,7 @@
       v-if="displayNames.length"
       class="mt-[8px] flex items-start text-[12px] leading-[20px]"
     >
-      <span class="text-[var(--bkms-neutral-3)] shrink-0 mr-[4px]">{{ $t('快捷填入镜像名称') }}：</span>
+      <span class="bkms-text-secondary shrink-0 mr-[4px]">{{ $t('快捷填入镜像名称') }}：</span>
       <div class="flex flex-wrap items-center gap-x-[12px] gap-y-[4px] min-w-[24px] min-h-[16px]">
         <Button
           v-for="item in displayNames"

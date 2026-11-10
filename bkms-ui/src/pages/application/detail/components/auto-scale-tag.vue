@@ -24,7 +24,7 @@
       disabled: !isError,
       modifiers: tooltipModifiers,
     }"
-    :class="!isError ? '!bg-[var(--bkms-purple-7)] !border-[var(--bkms-purple-5)] !text-[var(--bkms-purple-2)]' : ''"
+    :class="!isError ? '!bg-bkms-purple-7 !border-bkms-purple-5 !text-bkms-purple-2' : ''"
     :size="size"
     :theme="isError ? 'danger' : ''"
   >

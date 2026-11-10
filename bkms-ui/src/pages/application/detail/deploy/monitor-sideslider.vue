@@ -24,7 +24,7 @@
   >
     <template #header>
       <div class="w-full flex items-center justify-between px-[16px]">
-        <span class="text-[var(--bkms-neutral-1)] text-[16px]">{{ $t('实例监控') }}</span>
+        <span class="bkms-text-title text-[16px]">{{ $t('实例监控') }}</span>
         <div class="flex items-center">
           <DatePicker
             v-model="dateRangeValue"
@@ -59,13 +59,13 @@
     </template>
 
     <div
-      class="monitor-toolbar flex-shrink-0 border-b border-[var(--bkms-neutral-5)] bg-[#fff] px-[24px] py-[8px] shadow-[0_3px_5.5px_0_#00000012]"
+      class="monitor-toolbar flex-shrink-0 border-b border-b-bkms-neutral-5 bkms-bg-card px-[24px] py-[8px] shadow-[0_3px_5.5px_0_#00000012]"
     >
       <div class="flex items-center gap-[16px] min-w-0">
         <!-- 实例名称 -->
         <div class="flex items-center flex-1 min-w-0">
           <span
-            class="flex-shrink-0 whitespace-nowrap bg-[var(--bkms-neutral-8)] h-[32px] leading-[30px] text-[var(--bkms-neutral-2)] text-[12px] px-[6px] b b-r-0 b-[var(--bkms-navy-5)]"
+            class="flex-shrink-0 whitespace-nowrap bkms-bg-subtle h-[32px] leading-[30px] bkms-text-body text-[12px] px-[6px] b b-r-0 border-bkms-navy-5"
             >{{ $t('实例名称') }}</span
           >
           <Select
@@ -110,18 +110,18 @@
               @node-checked="handleNodeChecked"
             >
               <template #node="{ name }">
-                <span class="text-[12px] text-[var(--bkms-neutral-2)] pr-[12px] cursor-pointer">{{ name }}</span>
+                <span class="text-[12px] bkms-text-body pr-[12px] cursor-pointer">{{ name }}</span>
               </template>
             </Tree>
             <div
               v-else
-              class="px-[12px] py-[8px] text-[12px] text-[var(--bkms-neutral-3)]"
+              class="px-[12px] py-[8px] text-[12px] bkms-text-secondary"
             >
               {{ searchText.trim() ? $t('暂无数据') : $t('共 {0} 个实例，输入名称后再选择', [instanceCount]) }}
             </div>
             <div
               v-if="hasMoreSearchResults"
-              class="px-[12px] py-[6px] text-[12px] text-[var(--bkms-neutral-3)]"
+              class="px-[12px] py-[6px] text-[12px] bkms-text-secondary"
             >
               {{ $t('仅展示前 100 个结果，请缩小搜索范围') }}
             </div>
@@ -134,7 +134,7 @@
           class="flex items-center flex-shrink-0"
         >
           <span
-            class="bg-[var(--bkms-neutral-8)] h-[32px] leading-[30px] text-[var(--bkms-neutral-2)] text-[12px] px-[6px] b b-r-0 b-[var(--bkms-navy-5)]"
+            class="bkms-bg-subtle h-[32px] leading-[30px] bkms-text-body text-[12px] px-[6px] b b-r-0 border-bkms-navy-5"
             >Limit</span
           >
           <Select
@@ -177,7 +177,7 @@
         >
           <template #prefix>
             <span
-              class="bg-[var(--bkms-neutral-8)] leading-[32px] text-[var(--bkms-neutral-2)] text-[12px] px-[6px] b-r b-[var(--bkms-navy-5)]"
+              class="bkms-bg-subtle leading-[32px] bkms-text-body text-[12px] px-[6px] b-r border-r-bkms-navy-5"
               >{{ $t('汇聚周期') }}</span
             >
           </template>
@@ -195,7 +195,7 @@
         >
           <template #prefix>
             <span
-              class="bg-[var(--bkms-neutral-8)] leading-[32px] text-[var(--bkms-neutral-2)] text-[12px] px-[6px] b-r b-[var(--bkms-navy-5)]"
+              class="bkms-bg-subtle leading-[32px] bkms-text-body text-[12px] px-[6px] b-r border-r-bkms-navy-5"
               >{{ $t('汇聚方法') }}</span
             >
           </template>
@@ -209,11 +209,11 @@
         <i
           v-if="method === 'count'"
           v-bk-tooltips="$t('COUNT 下使用率指标的分子、分母分别计数，结果恒为 100%')"
-          class="bkms-icon bkms-icon-help-document text-[var(--bkms-neutral-3)] ml-[-8px]"
+          class="bkms-icon bkms-icon-help-document bkms-text-secondary ml-[-8px]"
         />
         <!-- 时间对比 -->
         <div class="flex items-center flex-shrink-0">
-          <span class="text-[var(--bkms-neutral-2)] text-[12px] mr-[8px]">{{ $t('时间对比') }}</span>
+          <span class="bkms-text-body text-[12px] mr-[8px]">{{ $t('时间对比') }}</span>
           <Switcher
             v-model="timeCompareEnabled"
             v-bk-tooltips="{ content: $t('多环境不支持时间对比'), disabled: !isMultiEnv, placement: 'top' }"
@@ -240,7 +240,7 @@
                 <div style="padding: 0 12px 6px">
                   <span
                     v-if="!showCustomInput"
-                    class="text-[var(--bkms-brand-2)] cursor-pointer text-[12px]"
+                    class="bkms-text-brand cursor-pointer text-[12px]"
                     @click="handleShowCustomInput"
                     >{{ $t('自定义') }}</span
                   >
@@ -254,12 +254,12 @@
                       <template #suffix>
                         <i
                           v-bk-tooltips="{ content: $t('自定义输入格式提示'), placement: 'top', boundary: 'parent' }"
-                          class="bkms-icon bkms-icon-help-document text-[var(--bkms-navy-5)] flex items-center mr-[4px]"
+                          class="bkms-icon bkms-icon-help-document text-bkms-navy-5 flex items-center mr-[4px]"
                         />
                       </template>
                       <template #append>
                         <span
-                          class="text-[var(--bkms-brand-2)] cursor-pointer"
+                          class="bkms-text-brand cursor-pointer"
                           @click="handleCustomOffsetConfirm"
                           >{{ $t('确定') }}</span
                         >
@@ -275,9 +275,9 @@
     </div>
     <div
       v-bkloading="{ loading: isShow && chartPlotWidth > 0 && !queryReady }"
-      class="min-h-0 flex-1 overflow-auto px-[24px] pt-[24px] pb-[24px] bg-[var(--bkms-neutral-7)]"
+      class="min-h-0 flex-1 overflow-auto px-[24px] pt-[24px] pb-[24px] bkms-bg-page"
     >
-      <div class="mb-[24px] bg-[#fff] h-[48px] px-[16px] py-[8px] shadow-[0_3px_5.5px_0_#00000012]">
+      <div class="mb-[24px] bkms-bg-card h-[48px] px-[16px] py-[8px] shadow-[0_3px_5.5px_0_#00000012]">
         <Radio.Group
           v-model="metricFilter"
           type="capsule"
@@ -321,7 +321,7 @@
                 :stroke-width="6"
                 type="line"
               />
-              <span class="text-[var(--bkms-neutral-2)] text-[12px] ml-[4px]">{{
+              <span class="bkms-text-body text-[12px] ml-[4px]">{{
                 formatPercent(row.cpuLimitUsageRate)
               }}</span>
             </div>
@@ -333,7 +333,7 @@
           :min-width="120"
         >
           <template #default="{ row }">
-            <span class="text-[var(--bkms-neutral-2)] text-[12px]">{{ formatPercent(row.memLimitUsageRate) }}</span>
+            <span class="bkms-text-body text-[12px]">{{ formatPercent(row.memLimitUsageRate) }}</span>
           </template>
         </TableColumn>
         <TableColumn
@@ -342,7 +342,7 @@
           :min-width="120"
         >
           <template #default="{ row }">
-            <span class="text-[var(--bkms-neutral-2)] text-[12px]">
+            <span class="bkms-text-body text-[12px]">
               {{ formatDecimal(row.cpuUsage) }}
             </span>
           </template>
@@ -353,7 +353,7 @@
           :min-width="120"
         >
           <template #default="{ row }">
-            <span class="text-[var(--bkms-neutral-2)] text-[12px]">
+            <span class="bkms-text-body text-[12px]">
               {{ formatBytes(row.memUsage) }}
             </span>
           </template>
@@ -392,7 +392,7 @@
           >
             <template #title>
               <div class="flex items-center">
-                <span class="text-[var(--bkms-neutral-1)] text-[14px] font-[500] mr-[8px]">{{ item.title }}</span>
+                <span class="bkms-text-title text-[14px] font-[500] mr-[8px]">{{ item.title }}</span>
                 <Tag v-bk-tooltips="$t('数据步长')">{{ formatIntervalText(chartParams.interval || 0) }}</Tag>
               </div>
             </template>

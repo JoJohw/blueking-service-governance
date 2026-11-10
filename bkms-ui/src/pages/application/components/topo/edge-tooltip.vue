@@ -24,7 +24,7 @@
       :style="{ left: `${x}px`, top: `${y}px` }"
     >
       <div
-        class="max-w-[max-content] bg-white rounded-[6px] shadow-[0_2px_12px_0_rgba(0,0,0,0.12)] py-[12px] px-[16px] text-[12px] leading-[20px] text-[var(--bkms-neutral-2)] break-all"
+        class="max-w-[max-content] bkms-bg-card rounded-[6px] shadow-[0_2px_12px_0_rgba(0,0,0,0.12)] py-[12px] px-[16px] text-[12px] leading-[20px] bkms-text-body break-all"
       >
         <div>{{ `${$t('关系')}：${relation}` }}</div>
         <template v-if="reason">
@@ -52,7 +52,7 @@
         </template>
       </div>
       <div
-        class="absolute right-[-5px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[6px] border-l-white drop-shadow-[2px_0_2px_rgba(0,0,0,0.06)]"
+        class="absolute right-[-5px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[6px] border-l-bkms-neutral-10 drop-shadow-[2px_0_2px_rgba(0,0,0,0.06)]"
       />
     </div>
   </Transition>

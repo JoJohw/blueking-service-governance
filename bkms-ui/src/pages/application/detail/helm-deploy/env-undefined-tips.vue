@@ -23,7 +23,7 @@
   >
     <template #header>
       <i18n-t
-        class="text-[16px] font-bold text-[var(--bkms-neutral-1)]"
+        class="text-[16px] font-bold bkms-text-title"
         keypath="部署预检发现{0}类问题"
       >
         <span class="font-bold px-[4px]">{{ problemCount }}</span>
@@ -39,7 +39,7 @@
     >
       <template #default>
         <i18n-t
-          class="text-[12px] leading-[20px] text-[var(--bkms-neutral-2)]"
+          class="text-[12px] leading-[20px] bkms-text-body"
           :keypath="panel.descriptionKeypath"
           tag="p"
         >
@@ -47,12 +47,12 @@
         </i18n-t>
 
         <i18n-t
-          class="mb-[8px] text-[12px] leading-[20px] text-[var(--bkms-neutral-2)]"
+          class="mb-[8px] text-[12px] leading-[20px] bkms-text-body"
           :keypath="panel.linkDescriptionKeypath"
           tag="p"
         >
           <span
-            class="cursor-pointer text-[var(--bkms-brand-2)]"
+            class="cursor-pointer bkms-text-brand"
             @click="panel.onLink"
           >
             「{{ $t(panel.linkTextKey) }}」
@@ -73,14 +73,14 @@
         </Button>
 
         <Button
-          class="mr-[8px] bg-[#fff] text-[var(--bkms-neutral-2)]"
+          class="mr-[8px] bkms-bg-card bkms-text-body"
           @click="handleStillDeploy"
         >
           {{ $t('仍然部署') }}
         </Button>
 
         <Button
-          class="!min-w-[60px] bg-[#fff] text-[var(--bkms-neutral-2)]"
+          class="!min-w-[60px] bkms-bg-card bkms-text-body"
           @click="handleCancel"
         >
           {{ $t('取消') }}

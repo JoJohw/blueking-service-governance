@@ -29,27 +29,27 @@
   >
     <div
       :class="[
-        'flex items-center px-[8px] rounded-[2px] cursor-pointer bg-white transition-all duration-200',
-        { 'text-[var(--bkms-brand-2)]': isPopoverShow },
+        'flex items-center px-[8px] rounded-[2px] cursor-pointer bkms-bg-card transition-all duration-200',
+        { 'bkms-text-brand': isPopoverShow },
       ]"
       :style="styleVars"
     >
       <span
         :class="[
           'flex-1 text-[12px] overflow-hidden text-ellipsis whitespace-nowrap',
-          displayText ? 'text-[var(--bkms-neutral-2)]' : 'text-[var(--bkms-neutral-4)]',
+          displayText ? 'bkms-text-body' : 'bkms-text-disabled',
         ]"
         :style="{ lineHeight: styleVars.lineHeight }"
       >
         {{ displayText || props.placeholder }}
       </span>
       <AngleDownLine
-        class="text-[11px] text-[var(--bkms-neutral-3)] ml-[4px] transition-transform duration-200"
+        class="text-[11px] bkms-text-secondary ml-[4px] transition-transform duration-200"
         :class="{ 'rotate-180': isPopoverShow }"
       />
       <!-- <i
         :class="[
-          'bkms-icon bkms-icon-angle-down shrink-0 text-[12px] text-[var(--bkms-neutral-3)] ml-[4px] transition-transform duration-200',
+          'bkms-icon bkms-icon-angle-down shrink-0 text-[12px] bkms-text-secondary ml-[4px] transition-transform duration-200',
           { 'rotate-180': isPopoverShow },
         ]"
       /> -->
@@ -93,11 +93,11 @@
                   <div class="grid grid-cols-2 w-[442px]">
                     <span class="text-[12px]">
                       {{ $t('选项文本（用于显示）') }}
-                      <span class="text-red text-[14px]">*</span>
+                      <span class="text-bkms-danger-2 text-[14px]">*</span>
                     </span>
                     <span class="text-[12px]">
                       {{ $t('选项值') }}
-                      <span class="text-red text-[14px]">*</span>
+                      <span class="text-bkms-danger-2 text-[14px]">*</span>
                     </span>
                   </div>
                 </template>
@@ -121,7 +121,7 @@
           </Form>
         </div>
         <FlexRow
-          class="h-[42px] px-[16px] bg-[var(--bkms-neutral-8)] border-t border-solid border-[var(--bkms-neutral-6)]"
+          class="h-[42px] px-[16px] bkms-bg-subtle border-t border-solid border-t-bkms-neutral-6"
         >
           <template #right>
             <div class="flex gap-[8px]">

@@ -46,7 +46,7 @@
         />
         <SearchSelect
           v-model="searchValue"
-          class="w-[520px] bg-[#fff] relative z-[100]"
+          class="w-[520px] bkms-bg-card relative z-[100]"
           :data="searchSelectData"
           :placeholder="
             createPlaceholder({
@@ -203,7 +203,7 @@
             <div class="w-[52px] h-[22px] bg-[#1E3567] rounded-[2px]">
               {{ $t('操作前') }}
             </div>
-            <div class="w-[52px] h-[22px] bg-[#144628] rounded-[2px] text-[#3FC362]">
+            <div class="w-[52px] h-[22px] bg-[#144628] rounded-[2px] text-bkms-success-2">
               {{ $t('操作后') }}
             </div>
           </div>

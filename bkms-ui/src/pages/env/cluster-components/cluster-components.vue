@@ -52,12 +52,12 @@
             <!-- 展开/收起图标 -->
             <i
               :class="[
-                'bkms-icon comp-expand-icon mr-[8px] cursor-pointer text-[14px] text-[#979BA5]',
+                'bkms-icon comp-expand-icon mr-[8px] cursor-pointer text-[14px] bkms-text-secondary',
                 expandedGroups.has(group.appType) ? 'bkms-icon-down-shape' : 'bkms-icon-right-shape',
               ]"
             ></i>
             <!-- 应用类型名称 -->
-            <span class="text-[12px] text-[#313238] font-bold mr-[8px] flex-shrink-0">
+            <span class="text-[12px] bkms-text-title font-bold mr-[8px] flex-shrink-0">
               {{ getAppTypeLabel(group.appType) }}
             </span>
             <!-- 应用类型整体状态 -->
@@ -75,17 +75,17 @@
               </div>
             </Tag>
             （
-            <div class="inline-flex items-center text-[#4D4F56] font-d flex-shrink-0 text-[12px]">
+            <div class="inline-flex items-center bkms-text-body font-d flex-shrink-0 text-[12px]">
               {{ $t('必选组件') }}：
-              <div class="font-bold text-[#4d4f56]">
-                <span :class="{ 'text-[#2DCB56]': group.requiredInstalledCount > 0 }">{{
+              <div class="font-bold bkms-text-body">
+                <span :class="{ 'text-bkms-success-2': group.requiredInstalledCount > 0 }">{{
                   group.requiredInstalledCount
                 }}</span
                 >/{{ group.requiredAddons.length }}
               </div>
               ，{{ $t('可选组件') }}：
-              <div class="font-bold text-[#4d4f56]">
-                <span :class="{ 'text-[#2DCB56]': group.optionalInstalledCount > 0 }">{{
+              <div class="font-bold bkms-text-body">
+                <span :class="{ 'text-bkms-success-2': group.optionalInstalledCount > 0 }">{{
                   group.optionalInstalledCount
                 }}</span
                 >/{{ group.optionalAddons.length }}
@@ -103,10 +103,10 @@
           <div
             v-for="item in group.allAddons"
             :key="item.addon.name"
-            class="rounded-[2px] border border-solid border-[#EAEBF0] mb-[8px] last:mb-0 px-[16px] h-[40px] flex items-center justify-between bg-[#FFF]"
+            class="rounded-[2px] border border-solid bkms-line-light mb-[8px] last:mb-0 px-[16px] h-[40px] flex items-center justify-between bkms-bg-card"
           >
             <div class="flex items-center flex-1 min-w-0">
-              <span class="text-[12px] font-700 text-[#313238] mr-[4px] flex-shrink-0">
+              <span class="text-[12px] font-700 bkms-text-title mr-[4px] flex-shrink-0">
                 {{ item.addon.displayName || item.addon.name }}
               </span>
               <Tag
@@ -120,7 +120,7 @@
               </span>
               <span
                 v-if="item.addon.description"
-                class="text-[12px] text-[#979BA5] ml-[4px] truncate"
+                class="text-[12px] bkms-text-secondary ml-[4px] truncate"
               >
                 {{ item.addon.description }}
               </span>
@@ -258,14 +258,14 @@
     theme: 'danger' | 'default' | 'success' | 'warning';
   }
 
-  const defaultStatusStyle = { borderColor: '#DCDEE5', background: '#FAFBFD' };
+  const defaultStatusStyle = { borderColor: 'var(--bkms-line-default)', background: 'var(--bkms-bg-subtle)' };
 
   // 统一状态映射配置
   const groupStatusConfigMap: Record<GroupStatus, GroupStatusConfig> = {
     [GroupStatus.Failed]: {
       icon: Warn,
       label: t('安装失败'),
-      style: { borderColor: '#F8B4B4', background: '#fff0f0b3' },
+      style: { borderColor: 'var(--bkms-danger-4)', background: '#fff0f0b3' },
       theme: 'danger',
     },
     [GroupStatus.NotInstalled]: {
@@ -283,7 +283,7 @@
     [GroupStatus.Ready]: {
       icon: Success,
       label: t('已就绪'),
-      style: { borderColor: '#A1E3BA', background: '#ebfaf0b3' },
+      style: { borderColor: 'var(--bkms-success-4)', background: '#ebfaf0b3' },
       theme: 'success',
     },
   };
@@ -407,11 +407,11 @@
   // 获取组件状态颜色 class
   function getAddonStatusClass(addon: ClusterAddonInfoOutput): string {
     const status = addon.installInfo?.status;
-    if (status === 'deployed') return 'text-[#2DCB56]'; // 已部署
-    if (status === 'failed') return 'text-[#EA3636]'; // 部署失败
-    if (status === 'uninstalling') return 'text-[#3A84FF]'; // 卸载中
-    if (status === 'unknown') return 'text-[#FF9C01]'; // 未知
-    return 'text-[#DCDEE5]'; // 已卸载/未安装
+    if (status === 'deployed') return 'text-bkms-success-2'; // 已部署
+    if (status === 'failed') return 'text-bkms-danger-2'; // 部署失败
+    if (status === 'uninstalling') return 'bkms-text-brand'; // 卸载中
+    if (status === 'unknown') return 'text-bkms-warning-2'; // 未知
+    return 'text-bkms-neutral-5'; // 已卸载/未安装
   }
 
   // 获取组件的安装状态标签

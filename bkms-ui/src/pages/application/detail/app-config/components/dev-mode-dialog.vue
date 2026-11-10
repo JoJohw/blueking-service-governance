@@ -59,7 +59,7 @@
         </ul>
       </Alert>
 
-      <div class="bg-[var(--bkms-neutral-7)] p-[12px]">
+      <div class="bkms-bg-page p-[12px]">
         <p>
           {{ $t('关闭后，仍需') }}&nbsp;
           <Button
@@ -155,7 +155,7 @@
   :deep(.bk-dialog-footer) {
     padding-top: 0;
     padding-bottom: 16px;
-    background-color: #fff;
+    background-color: var(--bkms-bg-card);
     border: none;
   }
 </style>

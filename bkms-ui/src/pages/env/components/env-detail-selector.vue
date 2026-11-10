@@ -29,13 +29,13 @@
     @after-show="handlePopoverShown"
   >
     <div
-      class="env-detail-selector flex items-center justify-between w-full h-full bg-[#F0F1F5] overflow-hidden group text-[#4D4F56] text-[12px] cursor-pointer rounded-[2px] hover:bg-[#EAEBF0]"
+      class="env-detail-selector flex items-center justify-between w-full h-full bg-bkms-neutral-6 overflow-hidden group bkms-text-body text-[12px] cursor-pointer rounded-[2px] hover:bg-bkms-neutral-6"
     >
       <div class="flex min-w-0 items-center">
         <div class="flex px-[10px] shrink-0 items-center justify-center">
           <!-- 首字母 -->
           <div
-            class="flex shrink-0 items-center justify-center w-[20px] h-[20px] text-[12px] font-bold text-white rounded-[2px]"
+            class="flex shrink-0 items-center justify-center w-[20px] h-[20px] text-[12px] font-bold bkms-text-inverse rounded-[2px]"
             :style="{ backgroundColor: currentEnvAvatarColor }"
           >
             {{ currentEnvInitial }}
@@ -56,7 +56,7 @@
       </div>
       <AngleDownFill
         :class="[
-          'env-detail-selector-arrow text-[14px] mr-[5px] text-[#C4C6CC] group-hover:text-[#979BA5]',
+          'env-detail-selector-arrow text-[14px] mr-[5px] text-bkms-navy-5 group-hover:bkms-text-secondary',
           isPopoverVisible ? '' : 'rotate-180',
         ]"
       />
@@ -72,7 +72,7 @@
           :placeholder="$t('请输入环境名称')"
         >
           <template #prefix>
-            <Search class="ml-[2px] text-[16px] text-[#979BA5]" />
+            <Search class="ml-[2px] text-[16px] bkms-text-secondary" />
           </template>
         </Input>
         <div
@@ -85,7 +85,7 @@
             :key="group.type"
             class="min-w-0"
           >
-            <div class="flex items-center h-[32px] px-[8px] bg-[#F5F7FA]">
+            <div class="flex items-center h-[32px] px-[8px] bkms-bg-page">
               <Tag :class="envTypeTagClassMap[group.type]">
                 {{ group.label }}
               </Tag>
@@ -95,9 +95,9 @@
                 v-for="env in group.envs"
                 :key="env.id"
                 :class="[
-                  'flex items-center h-[32px] px-[8px] cursor-pointer text-[12px] text-[#4D4F56] transition-bg-color duration-150',
-                  { '!bg-[#E1ECFF] !text-[#3A84FF]': env.id === props.modelValue },
-                  { 'hover:bg-[#F5F7FA]': env.id !== props.modelValue },
+                  'flex items-center h-[32px] px-[8px] cursor-pointer text-[12px] bkms-text-body transition-bg-color duration-150',
+                  { '!bkms-bg-active !bkms-text-brand': env.id === props.modelValue },
+                  { 'hover:bkms-bg-page': env.id !== props.modelValue },
                 ]"
                 @click="handleSelect(env.id)"
               >
@@ -108,7 +108,7 @@
         </div>
         <div
           v-else
-          class="py-[16px] text-center text-[12px] text-[#C4C6CC]"
+          class="py-[16px] text-center text-[12px] text-bkms-navy-5"
         >
           {{ $t('无匹配数据') }}
           <Button
@@ -121,9 +121,9 @@
           </Button>
         </div>
       </div>
-      <div class="grid grid-cols-2 h-[40px] -mx-[8px] mt-[8px] border-t border-[#DCDEE5]">
+      <div class="grid grid-cols-2 h-[40px] -mx-[8px] mt-[8px] border-t border-t-bkms-neutral-5">
         <div
-          class="flex h-full items-center justify-center gap-[6px] text-[12px] text-[#4D4F56] cursor-pointer hover:bg-[#F0F1F5]"
+          class="flex h-full items-center justify-center gap-[6px] text-[12px] bkms-text-body cursor-pointer hover:bg-bkms-neutral-6"
           @click="handleCreate"
         >
           <Plus
@@ -133,7 +133,7 @@
           <span>{{ $t('新建环境') }}</span>
         </div>
         <div
-          class="flex h-full items-center justify-center gap-[6px] text-[12px] text-[#4D4F56] cursor-pointer hover:bg-[#F0F1F5]"
+          class="flex h-full items-center justify-center gap-[6px] text-[12px] bkms-text-body cursor-pointer hover:bg-bkms-neutral-6"
           @click="handleBack"
         >
           <i class="bkms-icon bkms-icon-return"></i>
@@ -191,7 +191,9 @@
   const currentEnvType = computed(() => selectedEnv.value?.type || props.currentEnvType);
   const currentEnvLabel = computed(() => currentEnvName.value || t('请选择环境'));
   const currentEnvInitial = computed(() => currentEnvName.value?.slice(0, 1) || '-');
-  const currentEnvAvatarColor = computed(() => envTypeAvatarColorMap[currentEnvType.value || ''] || '#3A84FF');
+  const currentEnvAvatarColor = computed(
+    () => envTypeAvatarColorMap[currentEnvType.value || ''] || 'var(--bkms-brand-2)',
+  );
   const currentEnvTypeConfig = computed(() => {
     const type = currentEnvType.value;
     return type && envTypeMap[type] ? envTypeMap[type] : undefined;
@@ -248,7 +250,7 @@
 
 <style lang="postcss" scoped>
   :deep(.bk-input.is-simplicity) {
-    border-bottom-color: #dcdee5 !important;
+    border-bottom-color: var(--bkms-line-default) !important;
     border-radius: 0 !important;
 
     &:hover {
@@ -275,7 +277,7 @@
     padding: 0 8px !important;
     border: none;
     border-radius: 2px !important;
-    box-shadow: 0 2px 4px 0 #1919290d !important;
+    box-shadow: 0 2px 4px 0 var(--bkms-shadow-card) !important;
 
     .env-list-scroll {
       &::-webkit-scrollbar {
@@ -284,7 +286,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #dcdee5;
+        background: var(--bkms-bg-title);
       }
     }
   }

@@ -30,7 +30,7 @@
         :name="TAB_NAMES.space"
       >
         <template #label>
-          <span class="text-[14px] text-[#4D4F56]">
+          <span class="text-[14px] bkms-text-body">
             {{ t('空间组件') }}
           </span>
         </template>
@@ -41,11 +41,11 @@
         :name="TAB_NAMES.marketplace"
       >
         <template #label>
-          <span class="text-[14px] text-[#4D4F56]"> {{ t('市场组件') }}</span>
+          <span class="text-[14px] bkms-text-body"> {{ t('市场组件') }}</span>
         </template>
       </Tab.TabPanel>
       <!-- tab背景 -->
-      <div class="absolute w-[calc(100%+48px)] h-[54px] top-[-14px] left-[-24px] bg-[#EAEBF0] z-[-1]"></div>
+      <div class="absolute w-[calc(100%+48px)] h-[54px] top-[-14px] left-[-24px] bg-bkms-neutral-6 z-[-1]"></div>
     </Tab>
     <Skeleton :loading="isLoading">
       <template #loading>
@@ -82,7 +82,7 @@
           <div class="flex items-center justify-end">
             <SearchSelect
               v-model="searchValue"
-              class="w-[520px] bg-[#fff] relative z-[100]"
+              class="w-[520px] bkms-bg-card relative z-[100]"
               :data="componentSearchData"
               :placeholder="
                 createPlaceholder({

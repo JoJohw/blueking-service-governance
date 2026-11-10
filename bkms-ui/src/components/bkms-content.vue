@@ -20,12 +20,12 @@
   <div class="w-full bkms-content rounded-[2px] overflow-visible">
     <div
       :class="[
-        'flex items-center justify-between bg-[var(--bkms-neutral-7)] h-[32px] px-[16px] bkms-content-title',
+        'flex items-center justify-between bkms-bg-page h-[32px] px-[16px] bkms-content-title',
         { 'cursor-pointer': collapsible },
       ]"
       @click.stop="collapsible && handleToggle()"
     >
-      <div class="flex items-center text-[14px] font-bold text-[var(--bkms-neutral-2)] leading-[32px]">
+      <div class="flex items-center text-[14px] font-bold bkms-text-body leading-[32px]">
         <RightShape
           v-if="collapsible"
           :class="['transition duration-300 mr-[6px] mt-[-1px]', innerCollapsed ? '' : 'rotate-90']"
@@ -34,13 +34,13 @@
           :width="14"
         />
         <slot name="title">
-          <span class="text-[var(--bkms-neutral-1)]">{{ title }}</span>
+          <span class="bkms-text-title">{{ title }}</span>
         </slot>
         <Button
           v-if="showEditIcon"
           v-bk-tooltips="editTooltip"
           class="ml-[10px]"
-          :class="{ '!hover:text-[var(--bkms-brand-2)]': !editDisabled }"
+          :class="{ '!hover:bkms-text-brand': !editDisabled }"
           :disabled="editDisabled"
           text
           @click.stop="handleEdit"

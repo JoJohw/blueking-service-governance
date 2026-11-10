@@ -26,15 +26,15 @@
         type="rect"
         width="100%"
       />
-      <div class="overflow-hidden rounded-[2px] shadow-[0_2px_4px_0_#1919290d]">
-        <div class="flex h-[32px] items-center bg-[var(--bkms-neutral-6)] px-[16px]">
+      <div class="overflow-hidden rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+        <div class="flex h-[32px] items-center bg-bkms-neutral-6 px-[16px]">
           <Layout.shape
             height="16px"
             type="rect"
             width="64px"
           />
         </div>
-        <div class="bg-[#FFF] p-[16px]">
+        <div class="bkms-bg-card p-[16px]">
           <div class="host-port-panel">
             <!-- 左侧表格区域：表头 + 2 行 -->
             <div class="min-w-0 flex-1">
@@ -94,7 +94,7 @@
     <!-- 没有联邦集群环境时整个功能用不上，不给表单 -->
     <div
       v-else-if="showEmptyGuide"
-      class="host-port-empty-guide bg-[#FFF] rounded-[2px] py-[60px]"
+      class="host-port-empty-guide bkms-bg-card rounded-[2px] py-[60px]"
     >
       <Exception
         scene="part"
@@ -107,8 +107,8 @@
           />
         </template>
         <template #description>
-          <p class="text-[16px] text-[var(--bkms-neutral-1)]">{{ $t('当前空间没有绑定联邦集群的环境') }}</p>
-          <p class="mt-[8px] text-[12px] text-[var(--bkms-neutral-3)]">
+          <p class="text-[16px] bkms-text-title">{{ $t('当前空间没有绑定联邦集群的环境') }}</p>
+          <p class="mt-[8px] text-[12px] bkms-text-secondary">
             {{ $t('HostPort 目前仅对绑定联邦集群的环境生效') }}
           </p>
         </template>
@@ -139,12 +139,12 @@
       </Alert>
 
       <BkmsContent
-        class="info-title shadow-[0_2px_4px_0_#1919290d]"
+        class="info-title shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
         :show-edit-icon="!isEditing"
         :title="$t('端口声明')"
         @edit="handleEdit"
       >
-        <div class="bg-[#FFF] p-[16px]">
+        <div class="bkms-bg-card p-[16px]">
           <!-- 查看态：无端口且无待部署用空态；清空端口但仍待部署时展示「未配置」行 + 生效范围 -->
           <template v-if="!isEditing">
             <Exception
@@ -177,7 +177,7 @@
               <table class="min-w-0 flex-1 border-collapse">
                 <thead>
                   <tr
-                    class="host-port-row--head border-b border-[var(--host-port-border)] text-[var(--bkms-neutral-1)]"
+                    class="host-port-row--head border-b border-[var(--host-port-border)] bkms-text-title"
                   >
                     <th class="host-port-cell w-[120px] text-left font-normal">{{ $t('容器端口') }}</th>
                     <th class="host-port-cell text-left font-normal">{{ $t('节点端口的环境变量') }}</th>
@@ -189,7 +189,7 @@
                     v-if="declaredPorts.length === 0"
                     class="border-b border-[var(--host-port-border)] last:border-b-0"
                   >
-                    <td class="host-port-cell text-[var(--bkms-neutral-3)]">{{ $t('未配置') }}</td>
+                    <td class="host-port-cell bkms-text-secondary">{{ $t('未配置') }}</td>
                     <td class="host-port-cell"></td>
                   </tr>
                   <tr
@@ -197,12 +197,12 @@
                     :key="row.port"
                     class="border-b border-[var(--host-port-border)] last:border-b-0"
                   >
-                    <td class="host-port-cell text-[var(--bkms-neutral-1)]">{{ row.port }}</td>
+                    <td class="host-port-cell bkms-text-title">{{ row.port }}</td>
                     <td class="host-port-cell">
                       <div class="flex items-center flex-nowrap">
                         <span class="host-port-env-tag">{{ row.envName }}</span>
                         <Copy
-                          class="ml-[4px] shrink-0 cursor-pointer text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-brand-2)]"
+                          class="ml-[4px] shrink-0 cursor-pointer bkms-text-secondary hover:bkms-text-brand"
                           @click="handleCopy(row.envName)"
                         />
                       </div>
@@ -211,11 +211,11 @@
                 </tbody>
               </table>
               <div class="host-port-scope">
-                <div class="host-port-row host-port-row--head text-[var(--bkms-neutral-1)]">
+                <div class="host-port-row host-port-row--head bkms-text-title">
                   {{ $t('生效范围')
                   }}<span
                     v-if="pendingEnvCount > 0"
-                    class="text-[var(--bkms-neutral-3)]"
+                    class="bkms-text-secondary"
                     >（{{ $t('{count} 个环境待部署生效', { count: pendingEnvCount }) }}）</span
                   >
                 </div>
@@ -238,7 +238,7 @@
             :model="formModel"
           >
             <!-- 列标题：所有端口行共用 -->
-            <div class="mb-[8px] flex items-center min-w-0 text-[12px] leading-[20px] text-[var(--bkms-neutral-2)]">
+            <div class="mb-[8px] flex items-center min-w-0 text-[12px] leading-[20px] bkms-text-body">
               <span class="w-[160px] shrink-0">{{ $t('容器端口') }}</span>
               <span class="ml-[12px]">{{ $t('节点端口的环境变量') }}</span>
             </div>
@@ -274,7 +274,7 @@
                     @click="handleCopy(hostPortEnvName(portRow.port))"
                   >
                     <Copy
-                      class="text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-brand-2)]"
+                      class="bkms-text-secondary hover:bkms-text-brand"
                       height="12px"
                       width="12px"
                     />
@@ -283,7 +283,7 @@
 
                 <span
                   v-else
-                  class="text-[var(--bkms-navy-5)]"
+                  class="text-bkms-navy-5"
                 >
                   {{ $t('填写容器端口后自动生成') }}
                 </span>
@@ -294,7 +294,7 @@
                 @click="handleRemovePort(portIndex)"
               >
                 <Del
-                  class="text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-neutral-2)]"
+                  class="bkms-text-secondary hover:bkms-text-body"
                   height="14px"
                   width="14px"
                 />
@@ -312,12 +312,12 @@
 
             <div class="mt-[16px] pt-[16px] border-t border-[var(--host-port-border)]">
               <div class="flex items-center gap-[8px] mb-[8px]">
-                <span class="text-[14px] leading-[22px] text-[var(--bkms-neutral-1)]">{{ $t('生效范围') }}</span>
-                <span class="text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]">{{
+                <span class="text-[14px] leading-[22px] bkms-text-title">{{ $t('生效范围') }}</span>
+                <span class="text-[12px] leading-[20px] bkms-text-secondary">{{
                   $t('对所有绑定联邦集群的环境生效')
                 }}</span>
               </div>
-              <div class="bg-[var(--bkms-neutral-7)] rounded-[2px] px-[16px] py-[12px]">
+              <div class="bkms-bg-page rounded-[2px] px-[16px] py-[12px]">
                 <ScopeEnvList
                   :env-states="envStates"
                   :envs="scopeEnvs"

@@ -59,7 +59,7 @@
       <!-- 部署总览是跨环境视角，事件与部署历史只需要环境选择器，两者都不出现顶部栏；用 v-show 保留环境列表请求 -->
       <FlexRow
         v-show="isTopBarVisible"
-        class="mx-[24px] mt-[20px] mb-[16px] shrink-0 bg-[var(--bkms-neutral-6)] shadow-[0_2px_4px_0_#0000001a] px-[12px] py-[8px]"
+        class="mx-[24px] mt-[20px] mb-[16px] shrink-0 bg-bkms-neutral-6 shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] px-[12px] py-[8px]"
       >
         <template #left>
           <div class="flex">
@@ -104,14 +104,14 @@
                 :icon="curDeployStatus?.icon || ''"
                 :size="12"
               />
-              <span class="leading-[20px] text-[var(--bkms-neutral-2)]">{{ curDeployStatus?.text }}</span>
+              <span class="leading-[20px] bkms-text-body">{{ curDeployStatus?.text }}</span>
               <i
                 v-if="curDeployStatus?.isFailed && curDeployStatus?.message"
                 v-bk-tooltips="{
                   content: curDeployStatus?.message,
                   theme: 'dark',
                 }"
-                class="bkms-icon bkms-icon-circle-info ml-[4px] cursor-pointer text-[16px] text-[var(--bkms-navy-5)]"
+                class="bkms-icon bkms-icon-circle-info ml-[4px] cursor-pointer text-[16px] text-bkms-navy-5"
               ></i>
             </KeyValueBadge>
           </div>
@@ -144,8 +144,8 @@
           >
             <i
               :class="[
-                'inline-block bg-[#fff] ml-[6px] size-[32px] leading-[32px]',
-                'border border-[var(--bkms-navy-5)] rounded-[2px] cursor-pointer',
+                'inline-block bkms-bg-card ml-[6px] size-[32px] leading-[32px]',
+                'border border-bkms-navy-5 rounded-[2px] cursor-pointer',
                 'bkms-icon bkms-icon-more-fill',
               ]"
             ></i>
@@ -168,12 +168,12 @@
         type="empty"
       >
         <template #title>
-          <div class="text-[var(--bkms-neutral-1)] text-[20px] leading-[28px]">
+          <div class="bkms-text-title text-[20px] leading-[28px]">
             {{ $t('暂无可用的环境') }}
           </div>
         </template>
         <template #description>
-          <div class="text-[var(--bkms-neutral-2)] text-[14px] leading-[22px]">
+          <div class="bkms-text-body text-[14px] leading-[22px]">
             {{ $t('环境必须先配置集群资源后才能部署应用') }}
           </div>
         </template>
@@ -242,7 +242,7 @@
                 height="14px"
                 width="14px"
               />
-              <span class="text-[var(--bkms-neutral-2)] text-[12px] font-bold ml-[8px]">{{
+              <span class="bkms-text-body text-[12px] font-bold ml-[8px]">{{
                 buildAlertInfo!.statusText
               }}</span>
             </template>
@@ -303,7 +303,7 @@
                 <img src="/empty.svg" />
               </template>
               <template #description>
-                <div class="text-[var(--bkms-neutral-2)] text-[14px] leading-[22px]">
+                <div class="bkms-text-body text-[14px] leading-[22px]">
                   {{ $t('该环境尚未部署应用') }}
                 </div>
               </template>

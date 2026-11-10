@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="flex flex-col p-[16px] bg-white shadow-[0_2px_4px_0_#1919290d]">
+  <div class="flex flex-col p-[16px] bkms-bg-card shadow-[0_2px_4px_0_#1919290d]">
     <div class="flex items-center justify-between mb-[16px]">
       <Radio.Group
         class="shrink-0"
@@ -32,13 +32,13 @@
         >
           <span class="inline-flex gap-[7px] items-center">
             <span
-              class="w-[8px] h-[8px] rounded-full shadow-[0_0_0_3px_#f0f1f5]"
+              class="w-[8px] h-[8px] rounded-full shadow-[0_0_0_3px_var(--bkms-neutral-6)]"
               :style="{ backgroundColor: item.color }"
             />
             <span>{{ item.label }}</span>
             <span
-              class="min-w-[22px] px-[8px] leading-[20px] text-[#63656e] text-center bg-white rounded-[10px]"
-              :class="activeState === item.value ? '!text-[#3a84ff] !bg-[#E1ECFF]' : ''"
+              class="min-w-[22px] px-[8px] leading-[20px] bkms-text-body text-center bkms-bg-card rounded-[10px]"
+              :class="activeState === item.value ? '!bkms-text-brand !bkms-bg-active' : ''"
             >
               {{ formatCount(statusCounts[item.key]) }}
             </span>
@@ -48,7 +48,7 @@
 
       <SearchSelect
         v-model="searchSelectValue"
-        class="w-[420px] bg-white relative z-[100]"
+        class="w-[420px] bkms-bg-card relative z-[100]"
         :data="workspaceSearchData"
         :placeholder="t('搜索空间 ID、空间名称')"
         unique-select
@@ -90,19 +90,19 @@
         <template #default="{ row, rowIndex }: { row: WorkspaceWithStatsOutput; rowIndex?: number }">
           <div class="flex items-center min-w-0">
             <span
-              class="inline-flex shrink-0 items-center justify-center w-[40px] h-[40px] text-[16px] font-semibold text-white rounded-[4px]"
+              class="inline-flex shrink-0 items-center justify-center w-[40px] h-[40px] text-[16px] font-semibold bkms-text-inverse rounded-[4px]"
               :style="{ backgroundColor: getIconBackground(rowIndex) }"
             >
               {{ getWorkspaceInitial(row) }}
             </span>
             <span class="flex flex-col min-w-0 ml-[10px] leading-[20px]">
               <span
-                class="truncate text-[#3A84FF] cursor-pointer hover:text-[#1768ef]"
+                class="truncate bkms-text-brand cursor-pointer hover:bkms-text-brand"
                 @click="handleGotoWorkspaceDetail(row)"
               >
                 {{ row.displayName || '--' }}
               </span>
-              <span class="truncate text-[#979ba5]">
+              <span class="truncate bkms-text-secondary">
                 {{ row.id || '--' }}
               </span>
             </span>
@@ -149,7 +149,7 @@
         <template #default="{ row }: { row: WorkspaceWithStatsOutput }">
           <span class="inline-flex gap-[10px] items-center">
             <span
-              class="w-[8px] h-[8px] rounded-full shadow-[0_0_0_3px_#f0f1f5]"
+              class="w-[8px] h-[8px] rounded-full shadow-[0_0_0_3px_var(--bkms-neutral-6)]"
               :style="{ backgroundColor: getStateColor(row.state) }"
             />
             {{ getStateLabel(row.state) }}

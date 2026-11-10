@@ -26,7 +26,7 @@
       class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]"
       @click="zoomToOriginal"
     >
-      <i class="bkms-icon bkms-icon-reset-1_1 text-[var(--bkms-neutral-7)] text-[16px]" />
+      <i class="bkms-icon bkms-icon-reset-1_1 text-bkms-neutral-7 text-[16px]" />
     </span>
 
     <Divider
@@ -42,11 +42,11 @@
       class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]"
       @click="zoomOut"
     >
-      <i class="bkms-icon bkms-icon-jianhao text-[var(--bkms-neutral-7)] text-[16px]" />
+      <i class="bkms-icon bkms-icon-jianhao text-bkms-neutral-7 text-[16px]" />
     </span>
 
     <!-- 缩放比例 -->
-    <span class="min-w-[48px] text-center text-[13px] text-white tabular-nums">{{ zoomPercent }}%</span>
+    <span class="min-w-[48px] text-center text-[13px] bkms-text-inverse tabular-nums">{{ zoomPercent }}%</span>
 
     <!-- 放大 -->
     <span
@@ -54,7 +54,7 @@
       class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]"
       @click="zoomIn"
     >
-      <i class="bkms-icon bkms-icon-jiahao text-[var(--bkms-neutral-7)] text-[16px]" />
+      <i class="bkms-icon bkms-icon-jiahao text-bkms-neutral-7 text-[16px]" />
     </span>
 
     <Divider
@@ -69,16 +69,16 @@
       v-bk-tooltips="minimapDisabled ? $t('节点数量过多，已禁用缩略图') : $t('缩略图')"
       :class="[
         'flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]',
-        showMinimap ? '!bg-[var(--bkms-brand-2)]' : '',
+        showMinimap ? '!bg-bkms-brand-2' : '',
         minimapDisabled ? 'opacity-50 cursor-not-allowed hover:bg-transparent' : '',
       ]"
       @click="!minimapDisabled && changeShowMinimap()"
     >
-      <i class="bkms-icon bkms-icon-map text-[var(--bkms-neutral-7)] text-[16px]" />
+      <i class="bkms-icon bkms-icon-map text-bkms-neutral-7 text-[16px]" />
     </span>
 
     <div
-      class="custom-minimap !absolute top-[40px] left-0 rounded border-none overflow-hidden bg-[#e9eef5] shadow-[0_2px_10px_0_rgba(0,0,0,0.12)]"
+      class="custom-minimap !absolute top-[40px] left-0 rounded border-none overflow-hidden bg-bkms-neutral-6 shadow-[0_2px_10px_0_rgba(0,0,0,0.12)]"
       :style="{ display: showMinimap ? 'block' : 'none' }"
     ></div>
   </div>

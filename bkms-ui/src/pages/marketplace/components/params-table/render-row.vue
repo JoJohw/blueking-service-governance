@@ -65,20 +65,20 @@
         :width="400"
       >
         <div
-          class="flex items-center px-[8px] rounded-[2px] cursor-pointer bg-white"
+          class="flex items-center px-[8px] rounded-[2px] cursor-pointer bkms-bg-card"
           :style="{ height: '30px', lineHeight: '28px' }"
         >
           <span
             :class="[
               'flex-1 text-[12px] px-[8px] overflow-hidden text-ellipsis whitespace-nowrap',
-              mapDisplayText ? 'text-[#63656e]' : 'text-[#c4c6cc]',
+              mapDisplayText ? 'bkms-text-body' : 'text-bkms-navy-5',
             ]"
           >
             {{ mapDisplayText || t('请配置键值对') }}
           </span>
           <i
             :class="[
-              'bkms-icon bkms-icon-angle-down shrink-0 text-[12px] text-[#979ba5] ml-[4px] transition-transform duration-200',
+              'bkms-icon bkms-icon-angle-down shrink-0 text-[12px] bkms-text-secondary ml-[4px] transition-transform duration-200',
               { 'rotate-180': isMapPopoverShow },
             ]"
           />
@@ -110,17 +110,17 @@
       <div class="flex items-center gap-x-[18px] px-[16px]">
         <i
           v-bk-tooltips="$t('克隆')"
-          class="bkms-icon bkms-icon-clone cursor-pointer text-[16px] text-[#c4c6cc] hover:text-[#979ba5]"
+          class="bkms-icon bkms-icon-clone cursor-pointer text-[16px] text-bkms-navy-5 hover:bkms-text-secondary"
           @click="emit('copy')"
         />
         <i
           v-bk-tooltips="$t('新增')"
-          class="bkms-icon bkms-icon-plus-circle-shape cursor-pointer text-[16px] text-[#c4c6cc] hover:text-[#979ba5]"
+          class="bkms-icon bkms-icon-plus-circle-shape cursor-pointer text-[16px] text-bkms-navy-5 hover:bkms-text-secondary"
           @click="emit('add')"
         />
         <i
           v-bk-tooltips="$t('删除')"
-          class="bkms-icon bkms-icon-minus-circle-shape cursor-pointer text-[16px] text-[#c4c6cc] hover:text-[#979ba5]"
+          class="bkms-icon bkms-icon-minus-circle-shape cursor-pointer text-[16px] text-bkms-navy-5 hover:bkms-text-secondary"
           @click="emit('remove')"
         />
       </div>

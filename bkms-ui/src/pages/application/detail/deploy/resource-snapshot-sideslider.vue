@@ -45,8 +45,8 @@
               class="bkms-icon mr-[12px] text-[16px]"
               :class="
                 node.type === 'group'
-                  ? 'bkms-icon-folder text-[var(--bkms-neutral-3)]'
-                  : 'bkms-icon-file text-[var(--bkms-neutral-2)]'
+                  ? 'bkms-icon-folder bkms-text-secondary'
+                  : 'bkms-icon-file bkms-text-body'
               "
             ></i>
           </template>

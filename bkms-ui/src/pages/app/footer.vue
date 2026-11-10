@@ -18,11 +18,11 @@
 
 <template>
   <footer
-    class="w-full h-[50px] text-center text-[12px] leading-[12px] flex flex-col justify-center absolute bottom-0 border-t border-t-solid border-t-[#DCDEE5]"
+    class="w-full h-[50px] text-center text-[12px] leading-[12px] flex flex-col justify-center absolute bottom-0 border-t border-t-solid border-t-bkms-neutral-5"
   >
     <!-- <div v-if="platformConfig.i18n.footerInfoHTML">
-      <p class="mb-[8px] text-[#3A84FF]" v-html="platformConfig.i18n.footerInfoHTML"></p>
-      <p class="text-[#979ba5]">
+      <p class="mb-[8px] bkms-text-brand" v-html="platformConfig.i18n.footerInfoHTML"></p>
+      <p class="bkms-text-secondary">
           {{ platformConfig.footerCopyrightContent }}
       </p>
     </div> -->
@@ -32,7 +32,7 @@
         :key="index"
       >
         <a
-          class="text-[#3A84FF]"
+          class="bkms-text-brand"
           :href="item.href"
           :target="item.target"
         >
@@ -45,7 +45,7 @@
         >
       </li>
     </ul>
-    <p class="text-[#979ba5]">{{ Copyright }}</p>
+    <p class="bkms-text-secondary">{{ Copyright }}</p>
   </footer>
 </template>
 <script setup lang="ts">

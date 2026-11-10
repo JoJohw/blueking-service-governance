@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="relative bg-white shadow-[2px_2px_4px_0_#1919290d]">
+  <div class="relative bkms-bg-card shadow-[2px_2px_4px_0_var(--bkms-shadow-card)]">
     <!-- 可折叠面板 -->
     <div
       class="transition-all duration-300 flex-shrink-0 h-full"
@@ -38,13 +38,13 @@
     >
       <div class="flex">
         <div
-          class="flex items-center justify-center w-[16px] h-[64px] bg-[var(--bkms-neutral-5)] border-0 cursor-pointer"
+          class="flex items-center justify-center w-[16px] h-[64px] bkms-bg-title border-0 cursor-pointer"
           :style="collapsed ? buttonStyle.expand : buttonStyle.collapse"
           @click="toggle"
         >
           <component
             :is="collapsed ? expandIcon : collapseIcon"
-            class="text-[16px] text-[var(--bkms-neutral-2)]"
+            class="text-[16px] bkms-text-body"
           />
         </div>
       </div>

@@ -26,7 +26,7 @@
     @change="handleProjectChange"
   >
     <template #prefix>
-      <span class="px-[10px] text-[var(--bkms-neutral-2)] border-r-[var(--bkms-neutral-4)] border-r">
+      <span class="px-[10px] bkms-text-body border-r-bkms-neutral-4 border-r">
         {{ prefix || $t('工蜂Git') }}
       </span>
     </template>

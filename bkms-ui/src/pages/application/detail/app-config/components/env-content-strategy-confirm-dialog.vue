@@ -30,29 +30,29 @@
     @closed="finish(false)"
     @confirm="finish(true)"
   >
-    <div class="text-[14px] leading-[22px] text-[var(--bkms-neutral-2)]">
+    <div class="text-[14px] leading-[22px] bkms-text-body">
       <i18n-t
-        class="mb-[16px] bg-[var(--bkms-neutral-7)] px-[16px] py-[12px]"
+        class="mb-[16px] bkms-bg-page px-[16px] py-[12px]"
         keypath="切换后，这些环境的文件内容{0}。请在切换后{1}。"
         tag="div"
       >
-        <strong class="font-bold text-[var(--bkms-neutral-1)]">
+        <strong class="font-bold bkms-text-title">
           {{ strategy === 'overlay' ? $t('保持原样，不会自动按环境拆分差异') : $t('保持原样，不会自动合并') }}
         </strong>
-        <strong class="font-bold text-[var(--bkms-neutral-1)]">{{ $t('手动修改下列环境的文件内容') }}</strong>
+        <strong class="font-bold bkms-text-title">{{ $t('手动修改下列环境的文件内容') }}</strong>
       </i18n-t>
-      <div class="overflow-hidden rounded-[2px] border border-solid border-[var(--bkms-neutral-6)]">
-        <div class="bg-[var(--bkms-neutral-6)] px-[16px] py-[6px] text-[var(--bkms-neutral-1)]">
+      <div class="overflow-hidden rounded-[2px] border border-solid bkms-line-light">
+        <div class="bg-bkms-neutral-6 px-[16px] py-[6px] bkms-text-title">
           {{ $t('涉及 {0} 个环境', [affectedEnvs.length]) }}
         </div>
         <div class="max-h-[180px] overflow-y-auto">
           <div
             v-for="env in affectedEnvs"
             :key="env.name"
-            class="flex h-[36px] items-center px-[16px] text-[12px] even:bg-[var(--bkms-neutral-8)]"
+            class="flex h-[36px] items-center px-[16px] text-[12px] even:bkms-bg-subtle"
           >
             <span
-              class="truncate text-[var(--bkms-neutral-1)]"
+              class="truncate bkms-text-title"
               :title="env.name"
               >{{ env.displayName }}</span
             >

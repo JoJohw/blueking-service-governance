@@ -22,7 +22,7 @@
       <div class="flex items-start justify-end info-panel">
         <div class="flex items-center h-[80px] w-[400px]">
           <div class="flex-1 h-full rounded-tl-lg rounded-lg relative flex flex-col">
-            <div class="relative flex-1 flex items-center justify-around text-[#fff]">
+            <div class="relative flex-1 flex items-center justify-around bkms-text-inverse">
               <div
                 v-for="item in enabledSpaceStatisticsList"
                 :key="item.key"
@@ -56,7 +56,7 @@
           </FlexRow>
           <Layout.table class="mt-[10px]" />
         </template>
-        <div class="rounded-lg p-[24px] bg-[#fff] shadow-md">
+        <div class="rounded-lg p-[24px] bkms-bg-card shadow-md">
           <FlexRow>
             <template #left>
               <Button
@@ -76,7 +76,7 @@
                 </Tab>
                 <SearchSelect
                   v-model="searchValue"
-                  class="w-[520px] bg-[#fff] relative z-[100]"
+                  class="w-[520px] bkms-bg-card relative z-[100]"
                   :data="spaceSearchData"
                   :placeholder="
                     createPlaceholder({

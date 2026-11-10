@@ -18,7 +18,7 @@
 
 <template>
   <MsHeader
-    back-color="#3A84FF"
+    back-color="var(--bkms-brand-2)"
     class="env-header !fixed w-full z-[999]"
     :title="$t('集群健康诊断')"
     :trigger-back="handlePageBack"
@@ -28,8 +28,8 @@
       direction="vertical"
       type="solid"
     />
-    <span class="text-[#4D4F56]">{{ $t('集群') }}：</span>
-    <span class="text-[#4D4F56]">
+    <span class="bkms-text-body">{{ $t('集群') }}：</span>
+    <span class="bkms-text-body">
       {{ clusterData?.clusterID || '--' }}
     </span>
   </MsHeader>
@@ -48,7 +48,7 @@
           :height="252"
           width="100%"
         ></Layout.shape>
-        <div class="col-span-2 bg-[#fff] min-h-[calc(100vh_-_404px)]">
+        <div class="col-span-2 bkms-bg-card min-h-[calc(100vh_-_404px)]">
           <FlexRow>
             <template #left>
               <Layout.shape
@@ -114,18 +114,18 @@
         <!-- 集群健康分数 -->
         <ScoreCard
           :active="curScoreCardActive as string"
-          class="score-card rounded-[2px] shadow-[0_2px_4px_0_rgba(25,25,41,0.05)]"
+          class="score-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           :count="levelCount"
           :value="clusterData?.score || 0"
           @change="handleScoreCardChange"
         />
         <!-- 基础信息 -->
         <BasicInfoCard
-          class="rounded-[2px] shadow-[0_2px_4px_0_rgba(25,25,41,0.05)]"
+          class="rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           :cluster-info="clusterData?.clusterInfo"
         />
       </div>
-      <div class="col-span-2 bg-[#fff] px-[16px] mt-[16px] rounded-[2px] shadow-[0_2px_4px_0_rgba(25,25,41,0.05)]">
+      <div class="col-span-2 bkms-bg-card px-[16px] mt-[16px] rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
         <Tab
           :key="tabKey"
           :active="filterData.isRecovered"
@@ -154,7 +154,7 @@
             <template #label>
               <div class="flex items-center">
                 <span>{{ item.label }}</span>
-                <div class="bg-[#E1ECFF] h-[16px] leading-[16px] px-[8px] ml-[4px] rounded-[8px]">
+                <div class="bkms-bg-active h-[16px] leading-[16px] px-[8px] ml-[4px] rounded-[8px]">
                   {{ item.count }}
                 </div>
               </div>
@@ -381,8 +381,8 @@
   /** table折叠配置项 */
   const expandConfig = {
     showIcon: true,
-    iconOpen: 'bkms-icon bkms-icon-down-shape !text-[#C4C6CC] hover:!text-[#63656E]',
-    iconClose: 'bkms-icon bkms-icon-right-shape !text-[#C4C6CC] hover:!text-[#63656E]',
+    iconOpen: 'bkms-icon bkms-icon-down-shape !text-bkms-navy-5 hover:!bkms-text-body',
+    iconClose: 'bkms-icon bkms-icon-right-shape !text-bkms-navy-5 hover:!bkms-text-body',
   };
   /** Table排序配置 */
   const sortConfig = {

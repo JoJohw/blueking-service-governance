@@ -59,13 +59,13 @@
       <template #default="{ row }">
         <Done
           v-if="row.admin"
-          :fill="curColumn === 'admin' ? '#2CAF5E' : '#C4C6CC'"
+          :fill="curColumn === 'admin' ? 'var(--bkms-success-2)' : 'var(--bkms-text-disabled)'"
           :height="26"
           :width="24"
         />
         <Error
           v-else
-          :fill="curColumn === 'admin' ? '#EA3636' : '#C4C6CC'"
+          :fill="curColumn === 'admin' ? 'var(--bkms-danger-2)' : 'var(--bkms-text-disabled)'"
           :height="26"
           :width="18"
         />
@@ -78,13 +78,13 @@
       <template #default="{ row }">
         <Done
           v-if="row.developer"
-          :fill="curColumn === 'developer' ? '#2CAF5E' : '#C4C6CC'"
+          :fill="curColumn === 'developer' ? 'var(--bkms-success-2)' : 'var(--bkms-text-disabled)'"
           :height="26"
           :width="24"
         />
         <Error
           v-else
-          :fill="curColumn === 'developer' ? '#EA3636' : '#C4C6CC'"
+          :fill="curColumn === 'developer' ? 'var(--bkms-danger-2)' : 'var(--bkms-text-disabled)'"
           :height="26"
           :width="18"
         />
@@ -97,13 +97,13 @@
       <template #default="{ row }">
         <Done
           v-if="row.sre"
-          :fill="curColumn === 'sre' ? '#2CAF5E' : '#C4C6CC'"
+          :fill="curColumn === 'sre' ? 'var(--bkms-success-2)' : 'var(--bkms-text-disabled)'"
           :height="26"
           :width="24"
         />
         <Error
           v-else
-          :fill="curColumn === 'sre' ? '#EA3636' : '#C4C6CC'"
+          :fill="curColumn === 'sre' ? 'var(--bkms-danger-2)' : 'var(--bkms-text-disabled)'"
           :height="26"
           :width="18"
         />
@@ -116,13 +116,13 @@
       <template #default="{ row }">
         <Done
           v-if="row.operator"
-          :fill="curColumn === 'operator' ? '#2CAF5E' : '#C4C6CC'"
+          :fill="curColumn === 'operator' ? 'var(--bkms-success-2)' : 'var(--bkms-text-disabled)'"
           :height="26"
           :width="24"
         />
         <Error
           v-else
-          :fill="curColumn === 'operator' ? '#EA3636' : '#C4C6CC'"
+          :fill="curColumn === 'operator' ? 'var(--bkms-danger-2)' : 'var(--bkms-text-disabled)'"
           :height="26"
           :width="18"
         />
@@ -187,10 +187,10 @@
    */
   function handleCellClassName({ column }: { column: IColumn }) {
     if (curColumn.value === column.field && column.field === 'operator') {
-      return 'bg-[#F0F5FF] border-[#3A84FF] border-l-[1px] border-r-[2px] active-cell';
+      return 'bkms-bg-brand-soft bkms-line-active border-l-[1px] border-r-[2px] active-cell';
     }
     if (curColumn.value === column.field) {
-      return 'bg-[#F0F5FF] border-[#3A84FF] border-x active-cell';
+      return 'bkms-bg-brand-soft border-x-bkms-brand-2 border-x active-cell';
     }
     return '';
   }
@@ -199,10 +199,10 @@
    */
   function handleHeaderCellClassName({ column }: { column: IColumn }) {
     if (curColumn.value === column.field && column.field === 'operator') {
-      return 'border-[#3A84FF] border border-r-[2px] border-t-[2px] border-b-0';
+      return 'bkms-line-active border border-r-[2px] border-t-[2px] border-b-0';
     }
     if (curColumn.value === column.field) {
-      return 'border-[#3A84FF] border border-t-[2px] border-b-0';
+      return 'bkms-line-active border border-t-[2px] border-b-0';
     }
     return '';
   }
@@ -231,10 +231,10 @@
 <style scoped lang="postcss">
   :deep(.vxe-body--row.last-row) {
     .active-cell {
-      border-bottom: 2px solid var(--bkms-brand-2);
+      border-bottom: 2px solid var(--bkms-line-active);
     }
   }
   .col--current {
-    --vxe-ui-table-border-color: var(--bkms-brand-2);
+    --vxe-ui-table-border-color: var(--bkms-line-active);
   }
 </style>

@@ -19,14 +19,14 @@
 <template>
   <div class="text-[12px] flex w-full h-[30px]">
     <div
-      class="text-[var(--bkms-neutral-3)] text-right shrink-0"
+      class="bkms-text-secondary text-right shrink-0"
       :style="{
         minWidth: labelStyle,
       }"
     >
       {{ label }}：
     </div>
-    <div class="text-[var(--bkms-neutral-1)] text-wrap break-all">
+    <div class="bkms-text-title text-wrap break-all">
       <slot>{{ value ?? '--' }}</slot>
     </div>
   </div>

@@ -24,7 +24,7 @@
     :model="formData"
   >
     <ToggleCard
-      class="bg-[#fff] rounded-[2px] shadow-[0_2px_4px_0_#1919290d]"
+      class="bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
       :name="$t('启动配置')"
       type="normal"
     >
@@ -52,7 +52,7 @@
     </ToggleCard>
     <ToggleCard
       :class="[
-        'bg-[#fff] rounded-[2px] overflow-hidden shadow-[0_2px_4px_0_#1919290d] mt-[16px] min-h-0',
+        'bkms-bg-card rounded-[2px] overflow-hidden shadow-[0_2px_4px_0_var(--bkms-shadow-card)] mt-[16px] min-h-0',
         { 'flex-1 h-full': isYamlCardExpanded },
       ]"
       content-class="h-full px-[24px] pb-[24px] flex flex-col"
@@ -126,7 +126,7 @@
               >
                 <template #title>
                   <div class="flex items-center">
-                    <span class="text-[14px] text-[var(--bkms-navy-5)]">{{ formData.tafSpec.fileName }}</span>
+                    <span class="text-[14px] text-bkms-navy-5">{{ formData.tafSpec.fileName }}</span>
                     <Popover
                       v-model:is-show="isPopoverShow"
                       :padding="16"
@@ -137,7 +137,7 @@
                       @after-hidden="handlePopoverHidden"
                     >
                       <EditLine
-                        class="ml-[8px] text-[var(--bkms-neutral-3)] cursor-pointer hover:text-[var(--bkms-brand-2)]"
+                        class="ml-[8px] bkms-text-secondary cursor-pointer hover:bkms-text-brand"
                         @click="handleEdit"
                       />
                       <template #content>
@@ -188,7 +188,7 @@
       </ResizeLayout>
       <p
         v-show="isShowContentTip"
-        class="text-[var(--bkms-danger-2)]"
+        class="text-bkms-danger-2"
       >
         {{ $t('必填项') }}
       </p>

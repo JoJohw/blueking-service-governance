@@ -25,9 +25,9 @@
       <div
         v-for="index in 2"
         :key="index"
-        class="overflow-hidden rounded-[2px] bg-[#fff] shadow-[0_2px_4px_0_#1919290d]"
+        class="overflow-hidden rounded-[2px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
       >
-        <div class="flex h-[42px] items-center justify-between bg-[#f0f1f5] px-[16px]">
+        <div class="flex h-[42px] items-center justify-between bg-bkms-neutral-6 px-[16px]">
           <Layout.shape
             class="shrink-0"
             height="20px"
@@ -40,9 +40,9 @@
             width="74px"
           />
         </div>
-        <div class="bg-[#fff] pl-[16px] pr-[24px]">
+        <div class="bkms-bg-card pl-[16px] pr-[24px]">
           <div
-            class="grid min-h-[44px] items-center gap-[24px] border-b border-[#f0f1f5]"
+            class="grid min-h-[44px] items-center gap-[24px] border-b border-b-bkms-neutral-6"
             :style="skeletonTableStyle"
           >
             <Layout.shape
@@ -56,7 +56,7 @@
           <div
             v-for="(row, rowIndex) in skeletonRowWidths"
             :key="`row-${index}-${rowIndex}`"
-            class="grid min-h-[42px] items-center gap-[24px] border-b border-[#f0f1f5]"
+            class="grid min-h-[42px] items-center gap-[24px] border-b border-b-bkms-neutral-6"
             :style="skeletonTableStyle"
           >
             <Layout.shape
@@ -233,24 +233,24 @@
     justify-content: center;
     width: 100%;
     height: 52px;
-    color: #3a84ff;
+    color: var(--bkms-text-brand);
     font-size: 14px;
-    background-color: #ffffff;
-    border: 1px dashed #c4c6cc;
+    background-color: var(--bkms-bg-card);
+    border: 1px dashed var(--bkms-line-input);
     border-radius: 2px;
-    box-shadow: 0 2px 4px 0 #1919290d;
+    box-shadow: 0 2px 4px 0 var(--bkms-shadow-card);
     cursor: pointer;
 
     &:hover {
-      background-color: #f6f7fb;
+      background-color: var(--bkms-bg-hover);
     }
 
     /* 全部配置项已添加：整行禁用，不可打开菜单 */
     &.is-disabled {
-      color: #c4c6cc;
+      color: var(--bkms-text-disabled);
       cursor: not-allowed;
-      background-color: #fafbfd;
-      border-color: #dcdee5;
+      background-color: var(--bkms-bg-subtle);
+      border-color: var(--bkms-line-default);
       box-shadow: none;
     }
   }
@@ -261,20 +261,20 @@
   .bk-popover.bk-pop2-content.add-config-popover {
     padding: 0 !important;
     font-size: 12px;
-    background: #fff;
+    background: var(--bkms-bg-card);
     border: none;
-    box-shadow: 0 0 10px 0 #0000001a;
+    box-shadow: 0 0 10px 0 var(--bkms-shadow-hover);
   }
 
   .add-config-menu {
     width: 100%;
-    background: #fff;
+    background: var(--bkms-bg-card);
     border-radius: 8px;
   }
 
   .add-config-menu__title {
     padding: 16px;
-    color: #313238;
+    color: var(--bkms-text-title);
     font-size: 14px;
     font-weight: 700;
     line-height: 22px;
@@ -285,7 +285,7 @@
     cursor: pointer;
 
     &:hover {
-      background-color: #f6f7fb;
+      background-color: var(--bkms-bg-hover);
     }
   }
 
@@ -294,7 +294,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px 0;
-    border-top: 1px solid #eaebf0;
+    border-top: 1px solid var(--bkms-line-light);
   }
 
   .add-config-menu__info {
@@ -304,13 +304,13 @@
   }
 
   .add-config-menu__label {
-    color: #4d4f56;
+    color: var(--bkms-text-body);
     font-weight: 700;
     line-height: 20px;
   }
 
   .add-config-menu__desc {
-    color: #979ba5;
+    color: var(--bkms-text-secondary);
     line-height: 20px;
   }
 
@@ -318,7 +318,7 @@
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    color: #3a84ff;
+    color: var(--bkms-text-brand);
     font-size: 12px;
     line-height: 20px;
   }

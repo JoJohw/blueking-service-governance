@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div :class="['relative', { '!border-[var(--bkms-brand-2)]': checked }]">
+  <div :class="['relative', { '!bkms-line-active': checked }]">
     <slot></slot>
     <span
       v-show="checked"
@@ -62,7 +62,7 @@
     border-color: transparent var(--bkms-brand-2) transparent transparent;
     .nc-check-small {
       position: absolute;
-      color: #fff;
+      color: var(--bkms-text-inverse);
       top: 0;
       right: -44px;
     }

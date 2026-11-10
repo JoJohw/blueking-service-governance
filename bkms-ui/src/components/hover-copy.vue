@@ -22,7 +22,7 @@
       v-bk-tooltips="{ content: tooltip, disabled: disableOverflowTooltip || !tooltip }"
       class="max-w-[calc(100%-20px)]"
       :class="{
-        'border-b border-dashed border-[var(--bkms-neutral-3)] cursor-pointer': tooltip && !disableOverflowTooltip,
+        'border-b border-dashed border-b-bkms-neutral-3 cursor-pointer': tooltip && !disableOverflowTooltip,
       }"
     >
       <div
@@ -41,7 +41,7 @@
     <slot />
     <Copy
       v-if="copyValue"
-      class="cursor-pointer content-item hover:text-[var(--bkms-brand-2)]"
+      class="cursor-pointer content-item hover:bkms-text-brand"
       fill="var(--bkms-brand-2)"
       height="16"
       :title="$t('复制')"

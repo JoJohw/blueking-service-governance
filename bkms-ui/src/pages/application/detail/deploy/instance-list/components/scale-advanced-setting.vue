@@ -18,12 +18,12 @@
 
 <template>
   <div class="mt-[24px]">
-    <div class="mb-[6px] leading-[22px] text-[14px] text-[var(--bkms-neutral-2)]">{{ $t('高级设置') }}</div>
+    <div class="mb-[6px] leading-[22px] text-[14px] bkms-text-body">{{ $t('高级设置') }}</div>
     <div class="flex items-center gap-[8px] h-[22px]">
       <Checkbox v-model="enabledValue">
-        <span class="text-[var(--bkms-brand-2)]">{{ $t('定时扩缩容') }}</span>
+        <span class="bkms-text-brand">{{ $t('定时扩缩容') }}</span>
       </Checkbox>
-      <span class="text-[var(--bkms-neutral-3)] text-[12px]">
+      <span class="bkms-text-secondary text-[12px]">
         {{
           $t(
             '定时策略与触发条件同时生效时，取两者期望实例数的较大值执行；多条定时策略执行时间重叠时，同样取较大的期望实例数。',

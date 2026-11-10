@@ -28,12 +28,12 @@
             ),
             extCls: '!w-[400px]',
           }"
-          class="ml-[6px] text-[16px] text-[var(--bkms-neutral-3)] transform translate-y-[2px]"
+          class="ml-[6px] text-[16px] bkms-text-secondary transform translate-y-[2px]"
         />
       </template>
       <template #right>
         <div
-          class="flex items-center cursor-pointer text-[var(--bkms-brand-2)] text-[12px]"
+          class="flex items-center cursor-pointer bkms-text-brand text-[12px]"
           @click="handleAddFile"
         >
           <Plus
@@ -58,7 +58,7 @@
         <template #type>
           <img src="/empty.svg" />
         </template>
-        <span class="text-[var(--bkms-neutral-2)]">{{ $t('暂无文件') }}，</span>
+        <span class="bkms-text-body">{{ $t('暂无文件') }}，</span>
         <Button
           text
           theme="primary"
@@ -69,7 +69,7 @@
       </Exception>
       <div
         v-else
-        class="h-full text-[12px] text-[var(--bkms-neutral-1)]"
+        class="h-full text-[12px] bkms-text-title"
       >
         <Tree
           :key="treeUpdateKey"
@@ -94,7 +94,7 @@
                   class="bkms-icon mr-[12px] text-[14px]"
                   :class="[
                     !node.baseAppConfigFileId ? 'bkms-icon-file' : 'bkms-icon-shezhi',
-                    activeDefID === node.id ? 'text-[var(--bkms-brand-2)]' : 'text-[var(--bkms-neutral-3)]',
+                    activeDefID === node.id ? 'bkms-text-brand' : 'bkms-text-secondary',
                   ]"
                 ></i>
                 <span class="ellipsis">
@@ -104,7 +104,7 @@
               <div class="group-hover:hidden flex items-center">
                 <Tag
                   v-if="node.bscpConfig"
-                  class="!bg-[var(--bkms-warning-6)] ml-[4px] h-[16px] text-[10px] px-[4px]"
+                  class="!bkms-bg-warning ml-[4px] h-[16px] text-[10px] px-[4px]"
                   theme="warning"
                   >BSCP</Tag
                 >
@@ -118,7 +118,7 @@
               >
                 <!-- 编辑 -->
                 <EditLine
-                  class="cursor-pointer text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-brand-2)] p-[3px]"
+                  class="cursor-pointer bkms-text-secondary hover:bkms-text-brand p-[3px]"
                   @click.stop="handleEditFile(node)"
                 >
                 </EditLine>
@@ -134,13 +134,13 @@
                     <div class="pb-[16px] text-[12px]">
                       <div class="mb-[4px]">
                         {{ $t('文件名称') }}：
-                        <span class="text-[var(--bkms-neutral-1)]">{{ node?.name }}</span>
+                        <span class="bkms-text-title">{{ node?.name }}</span>
                       </div>
                       {{ $t('删除操作无法撤回，请谨慎操作！') }}
                     </div>
                   </template>
                   <Del
-                    class="cursor-pointer text-[var(--bkms-neutral-3)] hover:text-[var(--bkms-danger-2)] p-[3px]"
+                    class="cursor-pointer bkms-text-secondary hover:text-bkms-danger-2 p-[3px]"
                     :class="{ 'opacity-100': activePopConfirmId === node.id }"
                     @click="popConfirmShow(node.id)"
                   >

@@ -38,14 +38,15 @@ import {
  *
  * | 场景 | 写法 | 示例 |
  * | --- | --- | --- |
- * | 模板（推荐） | 注册类 / 别名 | `class="text-bkms-brand-2 bg-card hover:bg-active-hover"` |
+ * | 模板（推荐） | 注册类 / 别名 | `class="text-bkms-brand-2 bkms-bg-card hover:bkms-bg-active-hover"` |
  * | style 块 / inline style / 动态值 | CSS 变量 | `color: var(--bkms-text-title); background: var(--bkms-bg-card);` |
  *
  * ### 规则
  *
  * 1. 唯一强制项：不写色值字面量（stylelint `color-no-hex` + codemod 管辖）。
- * 2. 模板内任意值 `text-[var(--bkms-neutral-2)]` 合法但不推荐：拼错变量名会静默生成死规则。
- * 3. 半透明：纯 var() token 不支持 `/50` alpha 修饰符，用 `color-mix(in srgb, var(--bkms-brand-2) 25%, transparent)`。
+ * 2. semantic.css 已定义的变量优先使用 `bkms-text-*` / `bkms-bg-*` / `bkms-line-*` shortcut；未定义的色阶使用 `text-bkms-*` / `bg-bkms-*` / `border-bkms-*`。
+ * 3. 方向边框必须保留工具类方向：`border-t-[#...]` 只能转成 `border-t-bkms-*`，不能压平为 `bkms-line-*`；后者会生成通用 `border-color`。
+ * 4. 半透明：纯 var() token 不支持 `/50` alpha 修饰符，用 `color-mix(in srgb, var(--bkms-brand-2) 25%, transparent)`。
  */
 /**
  * 解析令牌目录。不能用 import.meta.url 单独定位：uno 的配置加载器（unconfig）会把本文件
@@ -55,7 +56,10 @@ import {
  */
 function resolveThemeDir() {
   const here = path.dirname(fileURLToPath(import.meta.url));
-  const candidates = [path.resolve(process.cwd(), 'src/styles/theme/tokens'), path.resolve(here, 'src/styles/theme/tokens')];
+  const candidates = [
+    path.resolve(process.cwd(), 'src/styles/theme/tokens'),
+    path.resolve(here, 'src/styles/theme/tokens'),
+  ];
   for (const dir of candidates) {
     if (fs.existsSync(path.join(dir, 'colors.css'))) return dir;
   }
@@ -76,7 +80,7 @@ function parseScaleColors() {
   return tokens;
 }
 
-// 语义变量：semantic.css → shortcuts 别名（text-title/bg-card 等），line 是边框色需映射为 border 前缀
+// 语义变量：semantic.css → bkms-* shortcuts。line 是通用边框色，映射为 UnoCSS 的 border 工具类；方向边框使用 parseScaleColors。
 function parseSemanticShortcuts() {
   const SEMANTIC_UTILITY_PREFIX: Record<string, string> = { text: 'text', line: 'border', bg: 'bg' };
   const SEMANTIC_RE = /--bkms-(text|line|bg)-([a-z-]+)\s*:/g;
@@ -84,7 +88,7 @@ function parseSemanticShortcuts() {
   for (const m of fs.readFileSync(path.join(THEME_DIR, 'semantic.css'), 'utf8').matchAll(SEMANTIC_RE)) {
     const [, group, name] = m;
     const utilityPrefix = SEMANTIC_UTILITY_PREFIX[group];
-    shortcuts.push([`${utilityPrefix}-${name}`, `${utilityPrefix}-[var(--bkms-${group}-${name})]`]);
+    shortcuts.push([`bkms-${group}-${name}`, `${utilityPrefix}-[var(--bkms-${group}-${name})]`]);
   }
   return shortcuts;
 }

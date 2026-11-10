@@ -18,13 +18,13 @@
 
 <template>
   <i18n-t
-    class="text-[var(--bkms-neutral-2)]"
+    class="bkms-text-body"
     :class="compact ? 'text-[12px] leading-[20px]' : 'text-[14px] leading-[22px]'"
     keypath="可嵌入蓝鲸监控仪表盘，查看应用指标。配置步骤见 {0}"
     tag="span"
   >
     <a
-      class="text-[var(--bkms-brand-2)]"
+      class="bkms-text-brand"
       :href="docUrl"
       rel="noopener noreferrer"
       target="_blank"

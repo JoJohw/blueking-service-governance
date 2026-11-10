@@ -112,14 +112,14 @@ const inFlightRequests = new Map<string, Promise<MonitorChartApiResult>>();
 const COMPARE_INSTANCE_PREFIX = '__CMP__';
 
 const COMPARE_PALETTE: string[] = [
-  '#EA3636',
-  '#FF9C01',
-  '#3A84FF',
-  '#2DCB56',
-  '#A855F7',
-  '#EC4899',
-  '#14B8A6',
-  '#6366F1',
+  'var(--bkms-danger-2)',
+  'var(--bkms-warning-2)',
+  'var(--bkms-brand-2)',
+  'var(--bkms-success-2)',
+  'var(--bkms-purple-3)',
+  'var(--bkms-purple-2)',
+  'var(--bkms-cyan-2)',
+  'var(--bkms-brand-1)',
 ];
 
 // ─── 导出函数（按字母序） ───────────────────────────────────────

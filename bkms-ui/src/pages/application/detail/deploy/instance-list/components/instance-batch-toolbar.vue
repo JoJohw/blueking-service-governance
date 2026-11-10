@@ -19,7 +19,7 @@
 <template>
   <div class="flex items-center gap-[8px]">
     <Button
-      class="bg-[#fff]"
+      class="bkms-bg-card"
       @click="emit('monitor')"
     >
       {{ $t('监控') }}
@@ -34,7 +34,7 @@
     >
       <span class="inline-flex">
         <Button
-          class="bg-[#fff]"
+          class="bkms-bg-card"
           :disabled="isDeleteDisabled"
           @click="emit('delete')"
         >
@@ -70,7 +70,7 @@
         content: $t('跨页全选后暂不支持执行管理命令'),
         disabled: !selectedCount || !disableAdminCommand,
       }"
-      class="bg-[#fff]"
+      class="bkms-bg-card"
       :disabled="!selectedCount || disableAdminCommand"
       @click="emit('admin-command')"
     >
@@ -81,7 +81,7 @@
         content: $t('未获取到北极星信息，无法调整权重'),
         disabled: !hasSelection || canAdjustWeight,
       }"
-      class="bg-[#fff]"
+      class="bkms-bg-card"
       :disabled="!hasSelection || !canAdjustWeight"
       @click="emit('weight')"
     >
@@ -94,7 +94,7 @@
     >
       <Button
         :aria-label="$t('更多操作')"
-        class="!min-w-[32px] !px-0 bg-[#fff]"
+        class="!min-w-[32px] !px-0 bkms-bg-card"
       >
         <i class="bkms-icon bkms-icon-more-fill"></i>
       </Button>
@@ -107,7 +107,7 @@
               placement: 'right',
             }"
             :aria-disabled="isGrayDisabled"
-            :class="{ '!text-[var(--bkms-navy-5)] !cursor-not-allowed hover:!bg-transparent': isGrayDisabled }"
+            :class="{ '!text-bkms-navy-5 !cursor-not-allowed hover:!bg-transparent': isGrayDisabled }"
             @click="handleGrayClick"
           >
             {{ $t('灰度') }}

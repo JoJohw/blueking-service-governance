@@ -43,7 +43,7 @@
         </Button>
       </span>
     </template>
-    <div class="bg-[#FFF]">
+    <div class="bkms-bg-card">
       <Table
         v-bkloading="{ loading }"
         class="resources-table"
@@ -61,7 +61,7 @@
               v-if="getResourceText(row.spec)"
               placement="top"
             >
-              <span class="cursor-default border-b border-dashed border-[#979BA5]">{{
+              <span class="cursor-default border-b border-dashed border-b-bkms-neutral-3">{{
                 getResourceText(row.spec)
               }}</span>
               <template #content>
@@ -275,22 +275,22 @@
 
 <style lang="postcss" scoped>
   .resources-form-wrapper {
-    box-shadow: 0 2px 4px 0 #1919290d;
+    box-shadow: 0 2px 4px 0 var(--bkms-shadow-card);
   }
 
   :deep(.bkms-content-title) {
-    background-color: #eaebf0;
+    background-color: var(--bkms-bg-title);
     height: 42px;
   }
 
   /* 表头：背景白色 + 默认文字颜色 */
   :deep(.resources-table .vxe-header--column) {
-    background-color: #fff;
-    color: #4d4f56;
+    background-color: var(--bkms-bg-card);
+    color: var(--bkms-text-body);
   }
 
   /* 表格正文：默认文字颜色 */
   :deep(.resources-table .vxe-body--column .vxe-cell) {
-    color: #4d4f56;
+    color: var(--bkms-text-body);
   }
 </style>

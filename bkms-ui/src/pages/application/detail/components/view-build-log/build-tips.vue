@@ -46,10 +46,10 @@
         height="16px"
         width="16px"
       />
-      <span class="text-[var(--bkms-neutral-2)] text-[12px] font-bold ml-[8px]">{{ $t(statusText) }}</span>
+      <span class="bkms-text-body text-[12px] font-bold ml-[8px]">{{ $t(statusText) }}</span>
     </template>
     <template #default>
-      <div class="flex px-[24px] gap-[36px] text-[12px] text-[var(--bkms-neutral-2)] h-[18px] leading-[18px]">
+      <div class="flex px-[24px] gap-[36px] text-[12px] bkms-text-body h-[18px] leading-[18px]">
         <span>{{ revisionLabel }}: {{ buildInfo.revision || '--' }}</span>
         <span>{{ $t('镜像 Tag') }}: {{ buildInfo.imageTag || '--' }}</span>
         <span>{{ $t('操作人') }}: {{ buildInfo.operator || '--' }}</span>

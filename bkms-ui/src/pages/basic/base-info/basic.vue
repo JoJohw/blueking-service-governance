@@ -18,7 +18,7 @@
 
 <template>
   <Skeleton
-    class="bg-[#fff] p-[24px]"
+    class="bkms-bg-card p-[24px]"
     :loading="isLoading"
   >
     <template #loading>
@@ -112,10 +112,12 @@
       <Layout.table class="mt-[16px] px-[40px]" />
     </template>
     <!-- 基本信息 -->
-    <div class="w-[clac(100% - 80px)] min-h-[172px] bg-[#fff] p-[24px] flex shadow-[0_2px_4px_0_#1919290d]">
+    <div
+      class="w-[clac(100% - 80px)] min-h-[172px] bkms-bg-card p-[24px] flex shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+    >
       <div class="w-[80px]">
-        <div class="w-[100%] h-[80px] bg-[#f0f5ff] rounded-lg flex items-center justify-center">
-          <span class="bkms-icon bkms-icon-space-basic text-[38px] text-[#3a84ff]"></span>
+        <div class="w-[100%] h-[80px] bkms-bg-brand-soft rounded-lg flex items-center justify-center">
+          <span class="bkms-icon bkms-icon-space-basic text-[38px] bkms-text-brand"></span>
         </div>
       </div>
       <div class="w-full">
@@ -129,7 +131,7 @@
           >
             <template #text>
               <span class="font-bold mr-[5px]">{{ curSpace?.displayName || '--' }}</span>
-              <span class="ml-[5px] mr-[5px] text-[12px] text-[#979BA5]">
+              <span class="ml-[5px] mr-[5px] text-[12px] bkms-text-secondary">
                 {{ curSpace?.id ? `( ${curSpace?.id} )` : '' }}
               </span>
             </template>
@@ -185,7 +187,7 @@
       </div>
     </div>
 
-    <div class="w-[clac(100% - 80px)] bg-[#fff] p-[24px] mt-[16px] shadow-[0_2px_4px_0_#1919290d]">
+    <div class="w-[clac(100% - 80px)] bkms-bg-card p-[24px] mt-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
       <!-- 空间仓库 -->
       <BkmsContent :title="$t('镜像仓库')">
         <div class="grid grid-cols-4 gap-4 mt-[16px] text-[12px] w-full pl-[80px] place-items-center">
@@ -213,7 +215,7 @@
                 v-bk-tooltips="{
                   content: $t('复制凭据信息'),
                 }"
-                class="ml-[6px] cursor-pointer hover:text-[#3A84FF]"
+                class="ml-[6px] cursor-pointer hover:bkms-text-brand"
                 :title="$t('复制')"
                 @click="copyText(imageRegistryInfo.copy)"
               >
@@ -240,7 +242,7 @@
               <div class="flex">
                 <div>{{ $t('蓝盾') }}</div>
                 <Share
-                  class="text-[#3A84FF] mx-[5px] cursor-pointer"
+                  class="bkms-text-brand mx-[5px] cursor-pointer"
                   @click="() => handleToLink('devops', curSpace?.bkSystems?.bkCIProjectID)"
                 >
                 </Share>
@@ -249,7 +251,7 @@
               <div class="flex">
                 <div>{{ $t('容器项目') }}</div>
                 <Share
-                  class="text-[#3A84FF] mx-[5px] cursor-pointer"
+                  class="bkms-text-brand mx-[5px] cursor-pointer"
                   @click="() => handleToLink('bcs', curSpace?.bkSystems?.bkBCSProjectCode)"
                 >
                 </Share>
@@ -258,7 +260,7 @@
               <div class="flex">
                 <div>{{ $t('监控') }}</div>
                 <Share
-                  class="text-[#3A84FF] mx-[5px] cursor-pointer"
+                  class="bkms-text-brand mx-[5px] cursor-pointer"
                   @click="() => handleToLink('monitor', curSpace?.bkSystems?.bkMonitorProjectID)"
                 >
                 </Share>
@@ -269,7 +271,7 @@
       </BkmsContent>
     </div>
 
-    <div class="w-[clac(100% - 80px)] bg-[#fff] p-[24px] mt-[16px] shadow-[0_2px_4px_0_#1919290d]">
+    <div class="w-[clac(100% - 80px)] bkms-bg-card p-[24px] mt-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
       <BkmsContent :title="$t('成员管理')">
         <div class="pt-[16px] px-[40px]">
           <FlexRow
@@ -624,19 +626,19 @@
   const roleMap = {
     admin: {
       label: t('管理员'),
-      style: 'bg-[#DAF6E5] text-[#299E56] text-[10px]',
+      style: 'bkms-bg-success text-bkms-success-1 text-[10px]',
     },
     developer: {
       label: t('开发者'),
-      style: 'bg-[#FDEED8] text-[#E38B02] text-[10px]',
+      style: 'bkms-bg-warning text-bkms-warning-1 text-[10px]',
     },
     sre: {
       label: 'SRE',
-      style: 'bg-[#E1ECFF] text-[#1768EF] text-[10px]',
+      style: 'bkms-bg-active bkms-text-brand text-[10px]',
     },
     operator: {
       label: t('运营者'),
-      style: 'bg-[#D6F0F9] text-[#428499] text-[10px]',
+      style: 'bg-bkms-cyan-5 text-bkms-cyan-1 text-[10px]',
     },
   };
   const memberRoleMap = ref<Partial<Record<RoleCode, string[]>>>({});
@@ -697,7 +699,7 @@
         h('div', t('成员：{0}', [row.username])),
         h(
           'p',
-          { class: 'mt-[16px] px-[16px] py-[12px] bg-[#F5F7FA]' },
+          { class: 'mt-[16px] px-[16px] py-[12px] bkms-bg-page' },
           t('删除后该用户将失去此空间的所有权限，请谨慎操作'),
         ),
       ]),

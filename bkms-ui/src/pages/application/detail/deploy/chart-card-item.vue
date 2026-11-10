@@ -17,14 +17,14 @@
 -->
 
 <template>
-  <div class="chart-card-item flex flex-col bg-[#fff] rounded-[4px] h-[180px]">
+  <div class="chart-card-item flex flex-col bkms-bg-card rounded-[4px] h-[180px]">
     <!-- 头部 -->
     <div class="flex items-center justify-between px-[16px] py-[12px]">
       <slot name="title">
-        <span class="text-[var(--bkms-neutral-1)] text-[14px] font-medium leading-[22px]">{{ title }}</span>
+        <span class="bkms-text-title text-[14px] font-medium leading-[22px]">{{ title }}</span>
       </slot>
       <!-- <i
-        class="bkms-icon bkms-icon-filliscreen-line text-[var(--bkms-neutral-3)] text-[14px] cursor-pointer hover:text-[var(--bkms-brand-2)]"
+        class="bkms-icon bkms-icon-filliscreen-line bkms-text-secondary text-[14px] cursor-pointer hover:bkms-text-brand"
         @click="handleFullscreen"
       ></i> -->
     </div>
@@ -66,7 +66,7 @@
         :sort-config="sortConfig"
       >
         <template #empty>
-          <span class="text-[var(--bkms-neutral-3)] text-[12px]">{{ $t('暂无数据') }}</span>
+          <span class="bkms-text-secondary text-[12px]">{{ $t('暂无数据') }}</span>
         </template>
         <TableColumn
           field="name"

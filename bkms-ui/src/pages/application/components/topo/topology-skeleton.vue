@@ -19,7 +19,7 @@
 <template>
   <div class="flex flex-col h-full custom-resource-topology">
     <!-- 顶部工具栏骨架 -->
-    <div class="flex items-center justify-between h-[48px] py-[8px] px-[16px] shrink-0 shadow-[0_2px_4px_0_#0000001a]">
+    <div class="flex items-center justify-between h-[48px] py-[8px] px-[16px] shrink-0 shadow-[0_2px_4px_0_var(--bkms-shadow-hover)]">
       <div class="flex items-center gap-[8px]">
         <Layout.shape
           :height="32"

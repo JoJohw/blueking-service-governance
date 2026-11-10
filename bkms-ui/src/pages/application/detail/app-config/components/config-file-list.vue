@@ -17,13 +17,13 @@
 -->
 
 <template>
-  <div class="flex h-full w-full flex-col bg-[#fff]">
-    <div class="flex shrink-0 items-center border-b border-[var(--bkms-neutral-6)] px-[12px] py-[16px]">
-      <span class="text-[14px] font-bold leading-[22px] text-[var(--bkms-neutral-1)]">{{ $t('文件列表') }}</span>
+  <div class="flex h-full w-full flex-col bkms-bg-card">
+    <div class="flex shrink-0 items-center border-b border-b-bkms-neutral-6 px-[12px] py-[16px]">
+      <span class="text-[14px] font-bold leading-[22px] bkms-text-title">{{ $t('文件列表') }}</span>
       <a
         v-bk-tooltips="$t('点击查看配置文件说明')"
         :aria-label="$t('点击查看配置文件说明')"
-        class="ml-[6px] flex items-center text-[16px] text-[var(--bkms-brand-2)]"
+        class="ml-[6px] flex items-center text-[16px] bkms-text-brand"
         :href="configFileDocUrl"
         rel="noopener noreferrer"
         target="_blank"
@@ -96,7 +96,7 @@
         </template>
         <div
           v-if="frameworkFiles.length"
-          class="px-[12px] py-[6px] text-[12px] text-[#979BA5]"
+          class="px-[12px] py-[6px] text-[12px] bkms-text-secondary"
         >
           {{ $t('框架配置文件') }}
         </div>
@@ -109,7 +109,7 @@
         />
 
         <div class="mt-[8px] flex items-center justify-between px-[12px] py-[6px]">
-          <span class="text-[12px] text-[#979BA5]"
+          <span class="text-[12px] bkms-text-secondary"
             >{{ $t(frameworkFiles.length ? '其他配置文件' : '配置文件') }}（{{ plainFiles.length }}）</span
           >
           <Button
@@ -145,7 +145,7 @@
           >
             <template #title><span /></template>
             <template #description>
-              <span class="text-[12px] leading-[20px] text-[#979BA5]">
+              <span class="text-[12px] leading-[20px] bkms-text-secondary">
                 {{ $t(frameworkFiles.length ? '暂无其他配置文件，可点击新建' : '暂无配置文件，可点击新建') }}
               </span>
             </template>

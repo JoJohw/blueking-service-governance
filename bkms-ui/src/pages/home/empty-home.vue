@@ -18,7 +18,7 @@
 
 <template>
   <div
-    class="flex items-center justify-center mx-[100px] my-[24px] rounded-[8px] bg-[#FFF] shadow-[0_2px_4px_0_#1919290d] min-h-[calc(100vh-150px)]"
+    class="flex items-center justify-center mx-[100px] my-[24px] rounded-[8px] bkms-bg-card shadow-[0_2px_4px_0_#1919290d] min-h-[calc(100vh-150px)]"
   >
     <div class="flex flex-col items-center">
       <img
@@ -27,8 +27,8 @@
         src="@/assets/home-platform-logo.png"
       />
 
-      <h1 class="text-[24px] font-bold text-[#313238] mb-[16px]">{{ $t('欢迎使用蓝鲸服务治理平台') }}</h1>
-      <p class="text-[14px] text-[#4D4F56]">
+      <h1 class="text-[24px] font-bold bkms-text-title mb-[16px]">{{ $t('欢迎使用蓝鲸服务治理平台') }}</h1>
+      <p class="text-[14px] bkms-text-body">
         {{ $t('一站式应用全生命周期管理服务，从开发、构建、部署到运维的完整解决方案') }}
       </p>
 
@@ -44,12 +44,12 @@
             :style="{ background: feature.bgGradient }"
           >
             <i
-              class="text-[22px] text-[#fff]"
+              class="text-[22px] bkms-text-inverse"
               :class="feature.icon"
             />
           </div>
-          <div class="text-[14px] font-bold text-[#313238] mb-[8px]">{{ feature.title }}</div>
-          <div class="text-[12px] text-[#4D4F56] leading-[20px]">{{ feature.desc }}</div>
+          <div class="text-[14px] font-bold bkms-text-title mb-[8px]">{{ feature.title }}</div>
+          <div class="text-[12px] bkms-text-body leading-[20px]">{{ feature.desc }}</div>
         </div>
       </div>
 

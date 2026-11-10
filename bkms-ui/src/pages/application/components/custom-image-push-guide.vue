@@ -26,13 +26,13 @@
     <slot />
     <template #content>
       <div class="push-guide-content w-[520px] p-[4px]">
-        <div class="text-[14px] font-bold text-[var(--bkms-neutral-1)] leading-[22px] mb-[16px]">
+        <div class="text-[14px] font-bold bkms-text-title leading-[22px] mb-[16px]">
           {{ $t('推送指引') }}
         </div>
-        <div class="text-[12px] text-[var(--bkms-neutral-2)] leading-[20px] mb-[4px]">
+        <div class="text-[12px] bkms-text-body leading-[20px] mb-[4px]">
           {{ $t('请将镜像推送至当前空间绑定仓库后使用。凭证可在「空间设置 → 基本信息」查看。') }}
         </div>
-        <div class="bg-[var(--bkms-neutral-8)] px-[16px] py-[12px]">
+        <div class="bkms-bg-subtle px-[16px] py-[12px]">
           <FieldItem
             class="leading-[20px]"
             :container-height="20"
@@ -41,14 +41,14 @@
           >
             <template #value>
               <span
-                class="push-guide-command-string push-guide-mono text-[14px] font-mono break-all !text-[var(--bkms-neutral-1)]"
+                class="push-guide-command-string push-guide-mono text-[14px] font-mono break-all !bkms-text-title"
                 >{{ repositoryAddress }}</span
               >
               <Copy
                 v-bk-tooltips="{
                   content: $t('复制仓库地址'),
                 }"
-                class="ml-[6px] cursor-pointer hover:text-[var(--bkms-brand-2)] shrink-0"
+                class="ml-[6px] cursor-pointer hover:bkms-text-brand shrink-0"
                 fill="var(--bkms-neutral-3)"
                 :title="$t('复制')"
                 @click="copyText(repositoryAddress)"
@@ -76,7 +76,7 @@
                 v-bk-tooltips="{
                   content: $t('复制凭证'),
                 }"
-                class="ml-[6px] cursor-pointer hover:text-[var(--bkms-brand-2)] shrink-0"
+                class="ml-[6px] cursor-pointer hover:bkms-text-brand shrink-0"
                 fill="var(--bkms-neutral-3)"
                 :title="$t('复制')"
                 @click="copyText(password)"
@@ -90,7 +90,7 @@
         <div class="mt-[18px] flex items-center justify-between">
           <div class="flex items-center">
             <span class="push-guide-step-circle">1</span>
-            <span class="ml-[8px] text-[12px] font-bold text-[var(--bkms-neutral-2)]">{{ $t('登录镜像仓库') }}</span>
+            <span class="ml-[8px] text-[12px] font-bold bkms-text-body">{{ $t('登录镜像仓库') }}</span>
           </div>
           <Button
             text
@@ -101,7 +101,7 @@
             {{ $t('复制') }}
           </Button>
         </div>
-        <div class="bg-[var(--bkms-neutral-7)] mt-[6px] px-[12px] ml-[28px] py-[16px]">
+        <div class="bkms-bg-page mt-[6px] px-[12px] ml-[28px] py-[16px]">
           <pre
             v-bk-xss-html="highlightedLoginCommand"
             class="push-guide-mono push-guide-pre m-0 whitespace-pre-wrap break-all"
@@ -112,7 +112,7 @@
         <div class="mt-[6px] flex items-center justify-between">
           <div class="flex items-center">
             <span class="push-guide-step-circle">2</span>
-            <span class="ml-[8px] text-[12px] font-bold text-[var(--bkms-neutral-2)]">{{ $t('推送到空间仓库') }}</span>
+            <span class="ml-[8px] text-[12px] font-bold bkms-text-body">{{ $t('推送到空间仓库') }}</span>
           </div>
           <Button
             text
@@ -123,7 +123,7 @@
             {{ $t('复制') }}
           </Button>
         </div>
-        <div class="bg-[var(--bkms-neutral-7)] mt-[6px] px-[12px] ml-[28px] py-[16px]">
+        <div class="bkms-bg-page mt-[6px] px-[12px] ml-[28px] py-[16px]">
           <pre
             v-bk-xss-html="highlightedPushCommand"
             class="push-guide-mono push-guide-pre m-0 whitespace-pre-wrap break-all"

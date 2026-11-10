@@ -21,7 +21,7 @@
     <!-- 文件列表面板 -->
     <CollapsiblePanel
       v-model:collapsed="isFileListCollapsed"
-      panel-class="box-shadow-[#191929] bg-[#fff]"
+      panel-class="box-shadow-[#191929] bkms-bg-card"
       position="left"
       :width="260"
     >
@@ -37,7 +37,7 @@
     <!-- 空状态 -->
     <div
       v-if="!fileList?.length"
-      class="flex-1 h-full flex items-center min-w-0 bg-[var(--bkms-neutral-7)]"
+      class="flex-1 h-full flex items-center min-w-0 bkms-bg-page"
     >
       <Exception
         class="large-exception"
@@ -48,20 +48,20 @@
           <img src="/empty.svg" />
         </template>
         <template #description>
-          <div class="text-[var(--bkms-neutral-2)] text-[14px] leading-[22px]">{{ $t('请先在左侧添加文件') }}</div>
+          <div class="bkms-text-body text-[14px] leading-[22px]">{{ $t('请先在左侧添加文件') }}</div>
         </template>
       </Exception>
     </div>
     <div
       v-else
-      class="flex-1 h-full pt-[12px] flex flex-col min-w-0 bg-[var(--bkms-neutral-7)]"
+      class="flex-1 h-full pt-[12px] flex flex-col min-w-0 bkms-bg-page"
     >
       <FlexRow class="mb-[8px] mx-[24px]">
         <template #left>
           <span class="font-bold text-[14px]">{{ curFileInfo?.name || '' }}</span>
           <span
             v-if="isReadonlyFile"
-            class="text-[var(--bkms-warning-2)] text-[12px]"
+            class="text-bkms-warning-2 text-[12px]"
             >{{ $t('（来源于 BSCP 的文件仅能查看，不能编辑）') }}</span
           >
           <Tag
@@ -155,7 +155,7 @@
                     extCls: '!w-[400px]',
                     theme: 'light',
                   }"
-                  class="ml-[6px] text-[14px] text-[var(--bkms-neutral-3)] transform translate-y-[2px]"
+                  class="ml-[6px] text-[14px] bkms-text-secondary transform translate-y-[2px]"
                 />
               </template>
             </MsHighlightjs>
@@ -211,7 +211,7 @@
                       width="240"
                     >
                       <Tag
-                        class="!text-[var(--bkms-brand-5)] !bg-[#2759AE] ml-[4px] h-[16px] text-[10px] px-[4px]"
+                        class="!text-bkms-brand-5 !bg-[#2759AE] ml-[4px] h-[16px] text-[10px] px-[4px]"
                         theme="info"
                       >
                         {{ $t('覆盖层') }}
@@ -236,7 +236,7 @@
                       theme="light"
                     >
                       <Tag
-                        class="!text-[var(--bkms-warning-7)] !bg-[#6D5B42] ml-[4px] h-[16px] text-[10px] px-[4px]"
+                        class="!text-bkms-warning-7 !bg-[#6D5B42] ml-[4px] h-[16px] text-[10px] px-[4px]"
                         theme="warning"
                       >
                         BSCP

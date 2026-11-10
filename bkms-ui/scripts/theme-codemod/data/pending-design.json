@@ -1,4 +1,9 @@
 {
+  "blue": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/basic/base-info/permissionModel.vue 中的 CSS 颜色关键字，暂不自动归类"
+  },
   "182132": {
     "occ": 3,
     "suggest": "--bkms-navy-1",
@@ -119,6 +124,11 @@
     "suggest": "--bkms-brand-2",
     "note": "iView 蓝；最近候选 --bkms-brand-2（色差 33.48 > 6，待设计确认）"
   },
+  "2dcb9d": {
+    "occ": 0,
+    "suggest": "待设计确认",
+    "note": "青绿色；当前 mapping.json 指向 --bkms-cyan-3（#3ED2DA），CIEDE2000 色差 17.78 > 6；可优先评估 --bkms-success-3（#65C389），待设计确认"
+  },
   "2e2e2e": {
     "occ": 4,
     "suggest": "待设计确认",
@@ -128,11 +138,6 @@
     "occ": 1,
     "suggest": "--bkms-cyan-1",
     "note": "src/pages/application unknown；最近候选 --bkms-cyan-1（色差 27.37 > 6，待设计确认）"
-  },
-  "2dcb9d": {
-    "occ": 0,
-    "suggest": "待设计确认",
-    "note": "青绿色；当前 mapping.json 指向 --bkms-cyan-3（#3ED2DA），CIEDE2000 色差 17.78 > 6；可优先评估 --bkms-success-3（#65C389），待设计确认"
   },
   "3785ff": {
     "occ": 4,
@@ -324,6 +329,11 @@
     "suggest": "--bkms-navy-5",
     "note": "银灰；最近候选 --bkms-navy-5（色差 14.00 > 6，待设计确认）"
   },
+  "cccccc4d": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "components 滚动条阴影中的半透明灰色，未被颜色规范或人工确认覆盖，暂不自动归类"
+  },
   "c3cdd7": {
     "occ": 2,
     "suggest": "--bkms-navy-5",
@@ -399,6 +409,11 @@
     "suggest": "--bkms-neutral-5",
     "note": "src/pages/application unknown；最近候选 --bkms-neutral-5（色差 13.64 > 6，待设计确认）"
   },
+  "e5e7eb": {
+    "occ": 3,
+    "suggest": "待设计确认",
+    "note": "src/pages/env unknown；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
+  },
   "e6c07b": {
     "occ": 1,
     "suggest": "整体保留",
@@ -454,6 +469,26 @@
     "suggest": "--bkms-neutral-8",
     "note": "灰系散色；最近候选 --bkms-neutral-8（色差 6.32 > 6，待设计确认）"
   },
+  "f8f8f9": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/env unknown；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
+  },
+  "ebfaf0b3": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/env unknown；成功状态半透明背景，未被颜色规范或人工确认覆盖，暂不自动归类"
+  },
+  "fdf4e8b3": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/env unknown；部分安装状态半透明背景，未被颜色规范或人工确认覆盖，暂不自动归类"
+  },
+  "fff0f0b3": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/env unknown；失败状态半透明背景，未被颜色规范或人工确认覆盖，暂不自动归类"
+  },
   "fbe9e7": {
     "occ": 1,
     "suggest": "待设计确认",
@@ -508,5 +543,40 @@
     "occ": 2,
     "suggest": "--bkms-danger-7",
     "note": "src/pages/application unknown；最近候选 --bkms-danger-7（色差 7.07 > 6，待设计确认）"
+  },
+  "0000000f": {
+    "occ": 2,
+    "suggest": "待设计确认",
+    "note": "src/pages/application unknown；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
+  },
+  "00000012": {
+    "occ": 2,
+    "suggest": "待设计确认",
+    "note": "src/pages/application unknown；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
+  },
+  "0000002d": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/application unknown；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
+  },
+  "1912290d": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/application unknown；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
+  },
+  "1919291f": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/application unknown；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
+  },
+  "2d8a54": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/application unknown；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
+  },
+  "f0fff4": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/application unknown；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
   }
 }

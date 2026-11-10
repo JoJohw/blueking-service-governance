@@ -20,18 +20,18 @@
   <div class="text-left text-[14px]">
     <div class="mb-[16px]">
       <div>
-        <span class="text-[var(--bkms-neutral-2)]">{{ t('环境') }}：</span>
-        <span class="text-[var(--bkms-neutral-1)]">{{ displayName || curEnv }}</span>
+        <span class="bkms-text-body">{{ t('环境') }}：</span>
+        <span class="bkms-text-title">{{ displayName || curEnv }}</span>
       </div>
       <p
         v-if="laneName"
         class="mt-[8px]"
       >
-        <span class="text-[var(--bkms-neutral-2)]">{{ t('泳道') }}：</span>
-        <span class="text-[var(--bkms-neutral-1)]">{{ laneName }}</span>
+        <span class="bkms-text-body">{{ t('泳道') }}：</span>
+        <span class="bkms-text-title">{{ laneName }}</span>
       </p>
     </div>
-    <div class="px-[16px] py-[12px] bg-[#f6f7fa] rounded-[2px] text-[14px]">
+    <div class="px-[16px] py-[12px] bkms-bg-subtle rounded-[2px] text-[14px]">
       <p>{{ t('移除后将无法恢复，请谨慎操作') }}</p>
     </div>
   </div>

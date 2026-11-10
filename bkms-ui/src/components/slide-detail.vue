@@ -35,7 +35,7 @@
         <AngleRight class="text-[22px]" />
       </span>
     </span>
-    <div class="absolute left-[-24px] h-full w-[24px] bg-[var(--bkms-neutral-7)]"></div>
+    <div class="absolute left-[-24px] h-full w-[24px] bkms-bg-page"></div>
     <div
       ref="resizeRef"
       :class="SlideDetailClass['resize-line']"

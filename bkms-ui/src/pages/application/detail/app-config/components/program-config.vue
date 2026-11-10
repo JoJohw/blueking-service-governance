@@ -36,7 +36,7 @@
         </Tag>
       </div>
     </template>
-    <div class="bg-[#FFF] p-[16px]">
+    <div class="bkms-bg-card p-[16px]">
       <!-- 查看态 -->
       <template v-if="!isEditing">
         <FieldItem
@@ -77,7 +77,7 @@
                 </div>
                 <span
                   v-if="!appModelSpec?.command?.length"
-                  class="text-[12px] text-[var(--bkms-neutral-1)]"
+                  class="text-[12px] bkms-text-title"
                   >--</span
                 >
               </div>
@@ -101,7 +101,7 @@
                 </div>
                 <span
                   v-if="!appModelSpec?.args?.length"
-                  class="text-[12px] text-[var(--bkms-neutral-1)]"
+                  class="text-[12px] bkms-text-title"
                   >--
                 </span>
               </div>

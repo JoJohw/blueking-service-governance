@@ -18,7 +18,7 @@
 
 <template>
   <span
-    class="flex items-center justify-center border-r-[1px] border-[var(--bkms-navy-5)] bg-[var(--bkms-neutral-8)] px-[8px] text-[var(--bkms-neutral-2)]"
+    class="flex items-center justify-center border-r-[1px] border-bkms-navy-5 bkms-bg-subtle px-[8px] bkms-text-body"
   >
     {{ label }}
   </span>

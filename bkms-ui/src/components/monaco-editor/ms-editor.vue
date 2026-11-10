@@ -24,13 +24,13 @@
   >
     <!-- 工具栏 -->
     <div
-      :class="['h-[40px] px-[16px] rounded-t-sm ms-editor', lightTheme ? 'bg-[var(--bkms-neutral-5)]' : 'bg-[#2E2E2E]']"
+      :class="['h-[40px] px-[16px] rounded-t-sm ms-editor', lightTheme ? 'bkms-bg-title' : 'bg-[#2E2E2E]']"
     >
       <div class="flex items-center justify-between h-full">
         <div
           :class="[
             'flex-1 min-w-0 ms-editor-title text-[14px] leading-none',
-            lightTheme ? 'text-[var(--bkms-neutral-1)]' : 'text-[var(--bkms-navy-5)]',
+            lightTheme ? 'bkms-text-title' : 'text-bkms-navy-5',
           ]"
         >
           <slot name="title">

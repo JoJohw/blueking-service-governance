@@ -148,7 +148,7 @@
               content: $t('同一适用范围在本配置项中只能有一条规则；越具体的范围优先级越高。'),
               placement: 'top',
             }"
-            class="bkms-icon bkms-icon-warning-circle ml-[8px] text-[16px] text-[#979BA5]"
+            class="bkms-icon bkms-icon-warning-circle ml-[8px] text-[16px] bkms-text-secondary"
           ></i>
         </div>
         <div class="pt-[16px]">
@@ -429,11 +429,11 @@
     align-items: center;
     height: 32px;
     padding: 0 16px;
-    color: #313238;
+    color: var(--bkms-text-title);
     font-size: 14px;
     font-weight: 700;
     line-height: 22px;
-    background-color: #f5f7fa;
+    background-color: var(--bkms-bg-page);
     border-radius: 2px;
   }
 </style>

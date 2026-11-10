@@ -79,7 +79,7 @@
                 </div>
                 <span
                   v-else
-                  class="text-[var(--bkms-neutral-1)]"
+                  class="bkms-text-title"
                   >{{ getAppDisplayLabel(getFrameworkLanguages(item.id)[0]) }}</span
                 >
               </div>
@@ -247,15 +247,15 @@
 
 <style lang="postcss" scoped>
   .template-page {
-    @apply mx-auto flex min-h-full w-full max-w-[1400px] justify-center bg-[var(--bkms-neutral-7)] p-[20px];
+    @apply mx-auto flex min-h-full w-full max-w-[1400px] justify-center bkms-bg-page p-[20px];
   }
 
   .template-panel {
-    @apply w-full max-w-[1400px] self-start overflow-hidden rounded-[2px] bg-white shadow-[0_2px_4px_0_var(--bkms-shadow-card)];
+    @apply w-full max-w-[1400px] self-start overflow-hidden rounded-[2px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)];
   }
 
   .template-header {
-    @apply select-none pt-[32px] text-center text-[24px] leading-[32px] text-[var(--bkms-neutral-1)];
+    @apply select-none pt-[32px] text-center text-[24px] leading-[32px] bkms-text-title;
   }
 
   .template-content {
@@ -267,15 +267,15 @@
   }
 
   .section-heading h3 {
-    @apply m-0 text-[14px] font-bold leading-[22px] text-[var(--bkms-neutral-1)];
+    @apply m-0 text-[14px] font-bold leading-[22px] bkms-text-title;
   }
 
   .section-heading > span {
-    @apply text-[12px] leading-[20px] text-[var(--bkms-neutral-3)];
+    @apply text-[12px] leading-[20px] bkms-text-secondary;
   }
 
   .template-card {
-    @apply relative flex min-h-[92px] items-center gap-[12px] rounded-[2px] border border-[var(--bkms-neutral-5)] bg-white p-[16px] text-[var(--bkms-neutral-1)];
+    @apply relative flex min-h-[92px] items-center gap-[12px] rounded-[2px] border bkms-line-default bkms-bg-card p-[16px] bkms-text-title;
   }
 
   .template-card-select {
@@ -305,11 +305,11 @@
   }
 
   .template-hint {
-    @apply mt-[2px] text-[12px] leading-[18px] text-[var(--bkms-neutral-3)];
+    @apply mt-[2px] text-[12px] leading-[18px] bkms-text-secondary;
   }
 
   .framework-languages {
-    @apply mt-[8px] flex items-center gap-[8px] text-[12px] leading-[22px] text-[var(--bkms-neutral-2)];
+    @apply mt-[8px] flex items-center gap-[8px] text-[12px] leading-[22px] bkms-text-body;
   }
 
   .framework-language-options {
@@ -317,7 +317,7 @@
   }
 
   .framework-language-option {
-    @apply relative h-[24px] min-w-[40px] cursor-pointer whitespace-nowrap border border-[var(--bkms-navy-5)] bg-white px-[10px] text-[12px] text-[var(--bkms-neutral-2)];
+    @apply relative h-[24px] min-w-[40px] cursor-pointer whitespace-nowrap border border-bkms-navy-5 bkms-bg-card px-[10px] text-[12px] bkms-text-body;
   }
 
   .framework-language-option + .framework-language-option {
@@ -333,16 +333,16 @@
   }
 
   .framework-language-option:hover {
-    @apply text-[var(--bkms-brand-2)];
+    @apply bkms-text-brand;
   }
 
   .framework-language-option.selected {
-    @apply z-[1] border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-6)] text-[var(--bkms-brand-2)];
+    @apply z-[1] bkms-line-active bkms-bg-active bkms-text-brand;
   }
 
   .template-card:hover,
   .template-card.selected {
-    @apply border-[var(--bkms-brand-2)] bg-[var(--bkms-brand-7)];
+    @apply bkms-line-active bkms-bg-brand-soft;
   }
 
   .template-card:disabled,

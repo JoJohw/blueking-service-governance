@@ -11,9 +11,9 @@
           </span>
           <span class="font-mono font-bold">go build -o、cp</span>
         </i18n-t>
-        <div class="flex items-center justify-between bg-[#fff] mt-[8px] h-[52px] px-[12px]">
+        <div class="flex items-center justify-between bkms-bg-card mt-[8px] h-[52px] px-[12px]">
           <code class="font-mono">
-            go build -o <span class="text-[var(--bkms-brand-2)]">{{ buildOutputPath }}</span>
+            go build -o <span class="bkms-text-brand">{{ buildOutputPath }}</span>
           </code>
           <Button
             text

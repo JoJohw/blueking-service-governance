@@ -18,7 +18,7 @@
 
 <template>
   <div class="flex flex-col h-full">
-    <FlexRow class="px-[12px] py-[8px] bg-[var(--bkms-neutral-6)] shadow-[0_2px_4px_0_#0000001a] mb-[16px]">
+    <FlexRow class="px-[12px] py-[8px] bg-bkms-neutral-6 shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] mb-[16px]">
       <template #left>
         <div class="flex items-center">
           <EnvSelectPanel
@@ -39,9 +39,9 @@
           />
           <div
             v-if="deployHistoryList.length"
-            class="flex items-center border border-[var(--bkms-navy-5)] bg-[#fff]"
+            class="flex items-center border border-bkms-navy-5 bkms-bg-card"
           >
-            <span class="px-[8px] py-[6px] border-r border-r-[var(--bkms-navy-5)]">{{ $t('部署状态') }}</span>
+            <span class="px-[8px] py-[6px] border-r border-r-bkms-navy-5">{{ $t('部署状态') }}</span>
             <StatusIcon
               class="px-[8px]"
               :status="latestDeployStatus"
@@ -74,11 +74,11 @@
             theme="light"
           >
             <Ellipsis
-              class="transform-rotate-90 w-[24px] h-[24px] p-[3px] rounded-full cursor-pointer text-[var(--bkms-neutral-2)] text-[20px] hover:bg-gray-200"
+              class="transform-rotate-90 w-[24px] h-[24px] p-[3px] rounded-full cursor-pointer bkms-text-body text-[20px] hover:bkms-bg-hover"
             />
             <template #content>
               <div
-                class="px-[12px] py-[6px] cursor-pointer hover:bg-[var(--bkms-neutral-6)] hover:text-[var(--bkms-brand-2)]"
+                class="px-[12px] py-[6px] cursor-pointer hover:bg-bkms-neutral-6 hover:bkms-text-brand"
                 @click="handleRemoveDeploy"
               >
                 {{ $t('移除部署') }}
@@ -134,7 +134,7 @@
             <img src="/empty.svg" />
           </template>
           <template #description>
-            <div class="text-[var(--bkms-neutral-2)] text-[14px] leading-[22px]">{{ $t('该环境尚未部署应用') }}</div>
+            <div class="bkms-text-body text-[14px] leading-[22px]">{{ $t('该环境尚未部署应用') }}</div>
           </template>
           <Button
             v-bk-tooltips="{ content: currentEnvDeployDisabledReason, disabled: !currentEnvDeployDisabledReason }"
@@ -397,7 +397,7 @@
 
 <style lang="postcss" scoped>
   :deep(.bk-tab-header) {
-    background-color: #fff;
+    background-color: var(--bkms-bg-card);
     padding: 0 24px;
   }
   :deep(.bk-tab-header-nav .bk-tab-header-item) {
@@ -406,7 +406,7 @@
     font-size: 14px;
   }
   :deep(.bk-tab-content) {
-    background-color: #fff;
+    background-color: var(--bkms-bg-card);
     height: 100%;
     overflow: auto;
     &:has(.custom-resource-topology) {

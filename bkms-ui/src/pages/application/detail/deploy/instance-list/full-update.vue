@@ -105,7 +105,7 @@
           />
           <div
             v-if="hasInvalidEffectiveReplicas"
-            class="mt-[4px] text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]"
+            class="mt-[4px] text-[12px] leading-[20px] bkms-text-secondary"
           >
             {{ $t('实例删除后副本数已变为 0，请填写期望实例数后重新部署') }}
           </div>

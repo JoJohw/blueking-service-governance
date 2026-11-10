@@ -67,7 +67,7 @@
       >
         <template #trigger>
           <div
-            class="flex items-center justify-between bg-[var(--bkms-neutral-6)] overflow-hidden group text-[var(--bkms-neutral-2)] h-full text-[14px] cursor-pointer rounded-[2px] hover:bg-[var(--bkms-neutral-6)]"
+            class="flex items-center justify-between bg-bkms-neutral-6 overflow-hidden group bkms-text-body h-full text-[14px] cursor-pointer rounded-[2px] hover:bg-bkms-neutral-6"
           >
             <div class="flex items-center min-w-[43px] overflow-hidden">
               <TypeIcon
@@ -81,7 +81,7 @@
             </div>
             <AngleDownFill
               :class="[
-                'mr-[5px] shrink-0 text-[#C4C6CC] group-hover:text-[#979BA5]',
+                'mr-[5px] shrink-0 text-bkms-navy-5 group-hover:bkms-text-secondary',
                 { 'rotate-180': isSpacePopoverShow },
               ]"
             />

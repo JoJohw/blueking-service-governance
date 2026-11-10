@@ -31,7 +31,7 @@
       >
         <Button
           v-if="envDetailStore.error === 'request'"
-          class="mr-[8px] bg-[#fff]"
+          class="mr-[8px] bkms-bg-card"
           @click="loadCurrentEnv(currentEnvId)"
           >{{ $t('重试') }}</Button
         >

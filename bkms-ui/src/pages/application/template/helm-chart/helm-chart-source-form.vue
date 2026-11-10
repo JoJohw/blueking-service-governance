@@ -139,7 +139,7 @@
           />
         </Form.FormItem>
       </div>
-      <div class="text-[var(--bkms-neutral-3)] text-[12px] leading-[20px]">
+      <div class="bkms-text-secondary text-[12px] leading-[20px]">
         {{ $t('私有仓库需要填写凭证才能拉取 chart') }}
       </div>
     </Form.FormItem>

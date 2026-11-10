@@ -20,7 +20,7 @@
   <div class="py-[16px] h-full w-full max-w-[1400px] overflow-auto">
     <div
       v-if="data.status === 'SUCCESS'"
-      class="bg-[#fff] min-w-[600px] p-[60px] flex flex-col items-center mt-[20px] shadow-[0_2px_4px_0_#1919290d]"
+      class="bkms-bg-card min-w-[600px] p-[60px] flex flex-col items-center mt-[20px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
     >
       <Success
         class="mb-[36px]"
@@ -29,7 +29,7 @@
         width="64px"
       />
       <span class="text-[24px] leading-[32px] mb-[16px]">{{ $t('{name} 应用创建成功', { name: data.name }) }}</span>
-      <span class="text-[14px] text-[var(--bkms-neutral-2)] leading-[22px] mb-[28px]">
+      <span class="text-[14px] bkms-text-body leading-[22px] mb-[28px]">
         <template v-if="!isHelmLikeAppType(appType)">
           {{ $t('接下来你可以直接 “查看应用” 或 继续 “创建应用”') }}
         </template>
@@ -67,7 +67,7 @@
     </div>
     <div
       v-else-if="data.status === 'FAILED'"
-      class="bg-[#fff] min-w-[600px] p-[60px] flex flex-col items-center mt-[20px]"
+      class="bkms-bg-card min-w-[600px] p-[60px] flex flex-col items-center mt-[20px]"
     >
       <Close
         class="mb-[36px]"
@@ -76,7 +76,7 @@
         width="64px"
       />
       <span class="text-[24px] leading-[32px] mb-[16px]">{{ $t('{name} 应用创建失败', data.name) }}</span>
-      <span class="text-[14px] text-[var(--bkms-neutral-2)] leading-[22px] mb-[28px]">{{
+      <span class="text-[14px] bkms-text-body leading-[22px] mb-[28px]">{{
         $t('接下来你可以根据失败的原因，重新修改配置')
       }}</span>
       <div class="mb-[24px]">
@@ -98,7 +98,7 @@
     </div>
     <div
       v-else-if="data.status === 'CREATING'"
-      class="bg-[#fff] min-w-[600px] p-[60px] flex flex-col items-center mt-[20px]"
+      class="bkms-bg-card min-w-[600px] p-[60px] flex flex-col items-center mt-[20px]"
     >
       <Loading
         mode="spin"

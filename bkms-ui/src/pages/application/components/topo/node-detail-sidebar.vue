@@ -39,19 +39,19 @@
             />
             <span
               v-else
-              class="text-[16px] font-600 text-[#fff]"
+              class="text-[16px] font-600 bkms-text-inverse"
             >
               {{ nodeData?.kind?.charAt(0) || '?' }}
             </span>
           </div>
           <div class="flex flex-col">
             <span
-              class="text-[12px] text-[#000000] fw-[500]"
+              class="text-[12px] bkms-text-title fw-[500]"
               :title="nodeData?.name"
             >
               {{ nodeData?.name }}
             </span>
-            <div class="flex items-center gap-[16px] text-[12px] text-[var(--bkms-navy-4)]">
+            <div class="flex items-center gap-[16px] text-[12px] text-bkms-navy-4">
               <span> {{ $t('类型') }}：{{ nodeData?.kind }} </span>
               <div class="flex items-center gap-[4px]">
                 <span>{{ $t('状态') }}：</span>
@@ -291,7 +291,7 @@
 
   :deep(.bk-tab-header) {
     padding: 0 24px;
-    background-color: #fff;
+    background-color: var(--bkms-bg-card);
   }
   :deep(.bk-modal-content) {
     overflow: hidden !important;

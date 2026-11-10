@@ -35,9 +35,9 @@
         'flex items-center min-w-[280px] h-[32px] rounded-[2px] cursor-pointer overflow-hidden transition-all duration-200',
         isDarkTheme
           ? 'h-full bg-[#4A4A4A] hover:bg-[#545454]'
-          : 'border border-[var(--bkms-navy-5)] bg-[#FFF] transition-border-color hover:border-[var(--bkms-neutral-3)]',
+          : 'border border-bkms-navy-5 bkms-bg-card transition-border-color hover:bkms-line-hover',
         {
-          'border-[var(--bkms-brand-2)] shadow-[0_0_3px_0_var(--bkms-brand-4)]': isPopoverVisible && !isDarkTheme,
+          'bkms-line-active shadow-[0_0_3px_0_var(--bkms-brand-4)]': isPopoverVisible && !isDarkTheme,
         },
       ]"
       :data-selected-env="modelValue"
@@ -46,7 +46,7 @@
       <div
         :class="[
           'flex items-center h-full px-[10px] border-r-[1px] text-[12px]',
-          isDarkTheme ? 'text-[var(--bkms-neutral-3)] border-[var(--bkms-neutral-2)]' : 'border-[var(--bkms-navy-5)]',
+          isDarkTheme ? 'bkms-text-secondary border-bkms-neutral-2' : 'border-bkms-navy-5',
         ]"
       >
         {{ displayLabel }}
@@ -56,7 +56,7 @@
           v-if="selectedEnvItem"
           :class="[
             'inline-flex items-center gap-[4px] min-w-0 text-[12px] leading-[22px]',
-            isDarkTheme ? 'text-[var(--bkms-neutral-5)]' : 'text-[var(--bkms-neutral-2)]',
+            isDarkTheme ? 'text-bkms-neutral-5' : 'bkms-text-body',
           ]"
         >
           <span class="truncate">{{ selectedEnvItem.displayName }}</span>
@@ -69,7 +69,7 @@
           </Tag>
           <Tag
             v-if="isFeatureEnv(selectedEnvItem)"
-            class="bg-[var(--bkms-cyan-6)] text-[var(--bkms-cyan-2)] shrink-0"
+            class="bg-bkms-cyan-6 text-bkms-cyan-2 shrink-0"
             size="small"
           >
             {{ $t('特性') }}
@@ -79,14 +79,14 @@
           v-else-if="isDefaultSelected"
           :class="[
             'text-[12px] leading-[22px]',
-            isDarkTheme ? 'text-[var(--bkms-neutral-5)]' : 'text-[var(--bkms-neutral-2)]',
+            isDarkTheme ? 'text-bkms-neutral-5' : 'bkms-text-body',
           ]"
         >
           {{ $t('默认配置') }}
         </span>
         <span
           v-else
-          :class="['text-[14px] leading-[22px]', isDarkTheme ? 'text-[#74767E]' : 'text-[var(--bkms-navy-5)]']"
+          :class="['text-[14px] leading-[22px]', isDarkTheme ? 'text-[#74767E]' : 'text-bkms-navy-5']"
         >
           {{ $t('请选择') }}
         </span>
@@ -94,7 +94,7 @@
       <AngleDownLine
         :class="[
           'text-[10px] mr-[10px] transition-transform duration-200',
-          isDarkTheme ? 'text-[var(--bkms-navy-5)]' : 'text-[var(--bkms-neutral-3)]',
+          isDarkTheme ? 'text-bkms-navy-5' : 'bkms-text-secondary',
           { 'rotate-180': isPopoverVisible },
         ]"
       />
@@ -115,19 +115,19 @@
             :placeholder="$t('请输入关键词')"
           >
             <template #prefix>
-              <div class="flex items-center justify-center text-[var(--bkms-neutral-3)]">
+              <div class="flex items-center justify-center bkms-text-secondary">
                 <Search class="ml-[2px] text-[16px]" />
               </div>
             </template>
           </Input>
           <div
-            class="h-[40px] flex items-center border-l-[1px] border-b-[1px] border-[var(--bkms-neutral-5)] ml-[-1px] pl-[8px] pb-[2px]"
+            class="h-[40px] flex items-center border-l-[1px] border-b-[1px] bkms-line-default ml-[-1px] pl-[8px] pb-[2px]"
           >
             <Checkbox
               v-model="onlyModified"
               class="shrink-0"
             >
-              <span class="text-[12px] text-[var(--bkms-neutral-2)]">{{ displayFilterLabel }}</span>
+              <span class="text-[12px] bkms-text-body">{{ displayFilterLabel }}</span>
             </Checkbox>
           </div>
         </div>
@@ -144,7 +144,7 @@
           >
             <!-- 分组标题 -->
             <div
-              class="h-[32px] flex items-center px-[8px] bg-[var(--bkms-neutral-7)] text-[12px] font-bold text-[var(--bkms-neutral-2)]"
+              class="h-[32px] flex items-center px-[8px] bkms-bg-page text-[12px] font-bold bkms-text-body"
               :class="envTypeTagClassMap[group.type] || ''"
             >
               {{ group.label }}
@@ -155,10 +155,10 @@
                 v-for="env in group.envs"
                 :key="env.name"
                 :class="[
-                  'flex flex-col justify-center h-[42px] px-[8px] cursor-pointer text-[12px] text-[var(--bkms-neutral-2)] transition-bg-color duration-150',
+                  'flex flex-col justify-center h-[42px] px-[8px] cursor-pointer text-[12px] bkms-text-body transition-bg-color duration-150',
                   { 'feature-env-child': env.isFeatureChild },
-                  { '!bg-[var(--bkms-brand-6)] !text-[var(--bkms-brand-2)]': isSelected(env) },
-                  { 'hover:bg-[var(--bkms-neutral-7)]': !isSelected(env) },
+                  { '!bkms-bg-active !bkms-text-brand': isSelected(env) },
+                  { 'hover:bkms-bg-page': !isSelected(env) },
                 ]"
                 :data-env-name="env.name"
                 :data-env-type="env.type"
@@ -178,7 +178,7 @@
                   </OverflowTitle>
                   <Tag
                     v-if="isFeatureEnv(env)"
-                    class="bg-[var(--bkms-cyan-6)] text-[var(--bkms-cyan-2)] ml-[4px] shrink-0"
+                    class="bg-bkms-cyan-6 text-bkms-cyan-2 ml-[4px] shrink-0"
                     size="small"
                   >
                     {{ $t('特性') }}
@@ -189,7 +189,7 @@
                   v-if="env.type !== 'default'"
                   :class="[
                     'text-[10px] shrink-0',
-                    isModified(env.name) ? 'text-[#F8B64F]' : 'text-[var(--bkms-navy-5)]',
+                    isModified(env.name) ? 'text-[#F8B64F]' : 'text-bkms-navy-5',
                   ]"
                 >
                   {{ isModified(env.name) ? displayStatusLabels.active : displayStatusLabels.inactive }}
@@ -201,7 +201,7 @@
         <!-- 全局空状态：筛选后无匹配数据 -->
         <div
           v-else
-          class="py-[16px] px-[12px] text-[12px] text-[var(--bkms-navy-5)] text-center"
+          class="py-[16px] px-[12px] text-[12px] text-bkms-navy-5 text-center"
         >
           {{ $t('无匹配数据') }}
         </div>
@@ -475,7 +475,7 @@
     padding: 0 8px 8px !important;
     border: none;
     border-radius: 2px !important;
-    box-shadow: 0 2px 4px 0 #1919290d !important;
+    box-shadow: 0 2px 4px 0 var(--bkms-shadow-card) !important;
 
     .env-list-scroll {
       &::-webkit-scrollbar {

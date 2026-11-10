@@ -17,13 +17,13 @@
 -->
 
 <template>
-  <section class="text-[12px] border border-solid border-[#dcdee5]">
-    <div class="px-[16px] py-[10px] bg-[#f5f7fa]">
+  <section class="text-[12px] border border-solid bkms-line-default">
+    <div class="px-[16px] py-[10px] bkms-bg-page">
       <span class="font-bold">{{ $t('配置差异') }}</span>
-      <span class="ml-[8px] text-[#979BA5]">{{ $t('仅展示发生变化的配置项') }}</span>
+      <span class="ml-[8px] bkms-text-secondary">{{ $t('仅展示发生变化的配置项') }}</span>
     </div>
     <table
-      class="w-full table-fixed border-collapse [&_:is(th,td)]:(px-[16px] py-[10px] text-left [overflow-wrap:anywhere] border-t border-r border-solid border-[#eaebf0]) [&_th]:(font-normal bg-[#fafbfd])"
+      class="w-full table-fixed border-collapse [&_:is(th,td)]:(px-[16px] py-[10px] text-left [overflow-wrap:anywhere] border-t border-r border-solid bkms-line-light) [&_th]:(font-normal bkms-bg-subtle)"
     >
       <colgroup>
         <col class="w-[15%]" />

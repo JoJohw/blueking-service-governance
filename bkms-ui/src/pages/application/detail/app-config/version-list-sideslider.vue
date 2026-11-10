@@ -37,7 +37,7 @@
             direction="vertical"
             type="solid"
           />
-          <span class="text-[14px] ml-[16px] text-[var(--bkms-neutral-3)]">{{ activeFileName }}</span>
+          <span class="text-[14px] ml-[16px] bkms-text-secondary">{{ activeFileName }}</span>
         </div>
       </div>
     </template>
@@ -64,7 +64,7 @@
       <!-- 搜索框 -->
       <SearchSelect
         v-model="searchValue"
-        class="w-full bg-[#fff]"
+        class="w-full bkms-bg-card"
         :data="versionSearchData"
         :placeholder="
           createPlaceholder({
@@ -107,26 +107,26 @@
                 theme="dark"
               >
                 <div class="flex items-center cursor-pointer">
-                  <i class="bkms-icon bkms-icon-warning-circle text-[16px] text-[var(--bkms-neutral-3)]"></i>
+                  <i class="bkms-icon bkms-icon-warning-circle text-[16px] bkms-text-secondary"></i>
                 </div>
                 <template #content>
-                  <div class="max-w-[238px] text-[#fff]">
-                    <div class="leading-[20px] text-[var(--bkms-neutral-3)]">
+                  <div class="max-w-[238px] bkms-text-inverse">
+                    <div class="leading-[20px] bkms-text-secondary">
                       {{ $t('版本号自动生成规则') }}
                     </div>
                     <div class="text-[12px] leading-[20px]">
                       {{ $t('每次保存或回滚将自动递增生成新版本号，格式为') }}
                       <span
-                        class="inline-block h-[16px] leading-[16px] bg-[var(--bkms-neutral-2)] text-[#AD7A6B] text-[10px] px-[4px] rounded-[2px]"
+                        class="inline-block h-[16px] leading-[16px] bg-bkms-neutral-2 text-[#AD7A6B] text-[10px] px-[4px] rounded-[2px]"
                         >VN
                       </span>
                       {{ $t('。') }}
                     </div>
-                    <div class="text-[12px] leading-[20px] mb-[8px] text-[var(--bkms-neutral-3)]">
+                    <div class="text-[12px] leading-[20px] mb-[8px] bkms-text-secondary">
                       {{ $t('示例：（ V1:V2:V3... ）') }}
                     </div>
                     <div
-                      class="border-t border-[var(--bkms-neutral-2)] pt-[8px] text-[12px] leading-[20px] text-[var(--bkms-neutral-3)]"
+                      class="border-t border-bkms-neutral-2 pt-[8px] text-[12px] leading-[20px] bkms-text-secondary"
                     >
                       {{ $t('回滚操作也会生成新版本号，原历史记录始终保留，不会被覆盖。') }}
                     </div>

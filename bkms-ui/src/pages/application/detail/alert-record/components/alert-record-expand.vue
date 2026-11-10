@@ -43,13 +43,13 @@
       value-color="var(--bkms-neutral-1)"
     >
       <template #field>
-        <div class="w-[100px] min-h-[32px] leading-[32px] text-align-end text-[var(--bkms-neutral-3)]">
+        <div class="w-[100px] min-h-[32px] leading-[32px] text-align-end bkms-text-secondary">
           {{ t('告警内容') }}：
         </div>
       </template>
       <template #value>
         <div
-          class="pt-[8px] pb-[4px] text-[12px] text-[var(--bkms-neutral-1)] break-all whitespace-pre-wrap"
+          class="pt-[8px] pb-[4px] text-[12px] bkms-text-title break-all whitespace-pre-wrap"
           style="max-height: 120px; overflow: auto"
         >
           {{ row.description || '--' }}

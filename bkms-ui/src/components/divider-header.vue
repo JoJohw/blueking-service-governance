@@ -20,7 +20,7 @@
   <div class="flex items-center">
     <slot name="title">
       <span
-        class="text-[var(--bkms-neutral-1)] mr-[6px]"
+        class="bkms-text-title mr-[6px]"
         :style="{ fontSize: parseCss(props.titleSize) }"
         >{{ title || '--' }}</span
       >
@@ -32,7 +32,7 @@
       direction="vertical"
       type="solid"
     />
-    <span class="flex items-center gap-[20px] text-[14px] text-[var(--bkms-neutral-3)] flex-1 overflow-hidden">
+    <span class="flex items-center gap-[20px] text-[14px] bkms-text-secondary flex-1 overflow-hidden">
       <slot></slot>
     </span>
   </div>

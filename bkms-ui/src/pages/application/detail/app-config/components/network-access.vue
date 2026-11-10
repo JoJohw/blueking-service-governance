@@ -26,7 +26,7 @@
       <EnvScopeTag :current-env="currentEnv" />
     </template>
 
-    <div class="bg-[#FFF] p-[16px] !text-[12px] text-[var(--bkms-neutral-2)]">
+    <div class="bkms-bg-card p-[16px] !text-[12px] bkms-text-body">
       <div class="flex items-center">
         <PopConfirm
           :cancel-text="$t('取消')"
@@ -46,7 +46,7 @@
             :value="enabled"
           />
         </PopConfirm>
-        <span class="font-bold text-[var(--bkms-neutral-1)] mr-[4px]">{{ $t('VPC 网络（underlay）') }}</span>
+        <span class="font-bold bkms-text-title mr-[4px]">{{ $t('VPC 网络（underlay）') }}</span>
         <span>{{ $t('为容器分配 VPC IP，可以腾讯自研云（IDC）直接互通') }}</span>
         <Tag
           v-if="isCustom"

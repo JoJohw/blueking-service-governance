@@ -30,10 +30,12 @@
           icon="bkms-icon-tishi"
           :width="42"
         />
-        <span class="text-[#313238] text-[20px] leading-[32px] text-center mt-[18px]"> {{ $t('确定删除环境') }}? </span>
+        <span class="bkms-text-title text-[20px] leading-[32px] text-center mt-[18px]">
+          {{ $t('确定删除环境') }}?
+        </span>
       </div>
     </template>
-    <div class="bg-[#F5F7FA] mb-[10px] py-[12px] px-[14px] text-[12px]">
+    <div class="bkms-bg-page mb-[10px] py-[12px] px-[14px] text-[12px]">
       {{ $t('删除环境后，所有配置、环境变量和操作记录将永久删除') }}
     </div>
     <i18n-t
@@ -42,7 +44,7 @@
     >
       <span
         v-bk-tooltips="$t('点击复制')"
-        class="font-bold text-[#EA3636] cursor-pointer rounded-[2px] px-[4px] hover:bg-[#FFEBEB]"
+        class="font-bold text-bkms-danger-2 cursor-pointer rounded-[2px] px-[4px] hover:bkms-bg-danger"
         @click="copyText(envName)"
       >
         {{ envName }}

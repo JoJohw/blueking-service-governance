@@ -20,20 +20,20 @@
 <template>
   <div
     ref="highlightRef"
-    class="flex flex-col border-[1px] border-[var(--bkms-neutral-5)] w-full h-full"
+    class="flex flex-col border-[1px] bkms-line-default w-full h-full"
   >
     <!-- 工具栏 -->
     <FlexRow
       :class="[
-        'h-[40px] px-[16px] rounded-t-sm border-b-[1px] border-[var(--bkms-neutral-5)]',
-        lightTheme ? 'bg-[var(--bkms-neutral-7)]' : 'bg-[#2E2E2E]',
+        'h-[40px] px-[16px] rounded-t-sm border-b-[1px] border-b-bkms-neutral-5',
+        lightTheme ? 'bkms-bg-page' : 'bg-[#2E2E2E]',
       ]"
     >
       <template #left>
         <span
           :class="[
             'text-[14px] leading-none',
-            lightTheme ? 'text-[var(--bkms-neutral-1)]' : 'text-[var(--bkms-navy-5)]',
+            lightTheme ? 'bkms-text-title' : 'text-bkms-navy-5',
           ]"
         >
           <slot name="title">{{ title }}</slot>

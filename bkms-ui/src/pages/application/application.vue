@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <main class="flex flex-col h-full w-full relative overflow-hidden bg-[var(--bkms-neutral-7)] px-[24px] py-[16px]">
+  <main class="flex flex-col h-full w-full relative overflow-hidden bkms-bg-page px-[24px] py-[16px]">
     <Skeleton
       :loading="isLoading"
       theme="gray"
@@ -56,7 +56,7 @@
           <div class="flex items-center gap-[12px] justify-end">
             <SearchSelect
               v-model="searchValue"
-              class="w-[520px] bg-[#fff] relative z-[100]"
+              class="w-[520px] bkms-bg-card relative z-[100]"
               :data="appSearchData"
               :placeholder="
                 createPlaceholder({
@@ -72,7 +72,7 @@
             <div class="flex items-center">
               <Select
                 v-model="curSortOption"
-                class="w-[136px] bg-[#fff]"
+                class="w-[136px] bkms-bg-card"
                 :clearable="false"
               >
                 <Select.Option
@@ -85,7 +85,7 @@
               <Button
                 :key="`${curSortOption}-${sortOrder}`"
                 v-bk-tooltips="sortTip"
-                class="!min-w-[32px] !px-[8px] !ml-[-1px] text-[var(--bkms-brand-2)]"
+                class="!min-w-[32px] !px-[8px] !ml-[-1px] bkms-text-brand"
                 @click="toggleSortOrder"
               >
                 <i :class="['bkms-icon', sortOrder === 'asc' ? 'bkms-icon-shengxu' : 'bkms-icon-jiangxu']" />
@@ -244,7 +244,7 @@
                           :size="14"
                         />
                         <span>{{ item.displayName || item.name }}</span>
-                        <span class="text-[var(--bkms-neutral-3)]">
+                        <span class="bkms-text-secondary">
                           （{{ getDeployStatusInfo(row.type as AppType, item.deployStatus || '').text }}）
                         </span>
                       </div>

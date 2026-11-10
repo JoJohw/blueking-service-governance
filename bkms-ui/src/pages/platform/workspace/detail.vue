@@ -17,13 +17,13 @@
 -->
 
 <template>
-  <section class="min-h-full bg-[#F5F7FA]">
+  <section class="min-h-full bkms-bg-page">
     <MsHeader
       :title="t('空间详情')"
       :trigger-back="handleBack"
     >
-      <span class="mx-[8px] h-[20px] w-[1px] bg-[#dcdee5]"></span>
-      <span class="text-[16px] leading-[24px] text-[#979ba5]">{{ workspaceTitle }}</span>
+      <span class="mx-[8px] h-[20px] w-[1px] bkms-bg-title"></span>
+      <span class="text-[16px] leading-[24px] bkms-text-secondary">{{ workspaceTitle }}</span>
     </MsHeader>
 
     <div class="p-[24px]">
@@ -111,16 +111,16 @@
         </template>
 
         <!-- 空间基本信息 -->
-        <div class="flex items-center min-h-[160px] p-[24px] pt-[28px] bg-white shadow-[0_2px_4px_0_#1919290d]">
+        <div class="flex items-center min-h-[160px] p-[24px] pt-[28px] bkms-bg-card shadow-[0_2px_4px_0_#1919290d]">
           <!-- 首字母头像 -->
           <div
-            class="relative flex shrink-0 items-center justify-center w-[72px] h-[72px] text-[32px] font-bold text-white rounded-[8px] bg-[#3a84ff]"
+            class="relative flex shrink-0 items-center justify-center w-[72px] h-[72px] text-[32px] font-bold bkms-text-inverse rounded-[8px] bg-bkms-brand-2"
           >
             {{ workspaceInitial }}
           </div>
 
           <div class="min-w-0 ml-[26px] flex flex-col">
-            <div class="text-[16px] font-bold text-[#313238] truncate">
+            <div class="text-[16px] font-bold bkms-text-title truncate">
               {{ workspaceTitle }}
             </div>
             <div class="flex flex-col">
@@ -165,10 +165,10 @@
           :title="t('镜像仓库')"
           @edit="handleEditImageRegistry"
         >
-          <div class="flex items-center min-h-[80px] px-[120px] bg-[#fff]">
+          <div class="flex items-center min-h-[80px] px-[120px] bkms-bg-card">
             <div
               v-if="imageRegistryLoadFailed"
-              class="flex items-center text-[14px] text-[#ea3636]"
+              class="flex items-center text-[14px] text-bkms-danger-2"
             >
               <span>{{ t('镜像仓库加载失败') }}</span>
               <Button
@@ -182,7 +182,7 @@
             </div>
             <div
               v-else-if="!imageRegistry?.registry"
-              class="text-[14px] text-[#979ba5]"
+              class="text-[14px] bkms-text-secondary"
             >
               {{ t('暂未配置镜像仓库') }}
             </div>
@@ -221,9 +221,9 @@
           :collapsible="true"
           :title="t('快捷操作')"
         >
-          <div class="flex items-center h-[100px] px-[120px] text-[14px] text-[#63656e] bg-[#fff]">
+          <div class="flex items-center h-[100px] px-[120px] text-[14px] bkms-text-body bkms-bg-card">
             <span>{{ t('空间权限') }}：</span>
-            <span class="mr-[12px] text-[#313238]">{{ quickPermissionText }}</span>
+            <span class="mr-[12px] bkms-text-title">{{ quickPermissionText }}</span>
             <!-- 管理员：退出空间 | 非管理员：成为管理员 -->
             <Button
               :class="{ 'mr-[1px]': !isCurrentUserWorkspaceAdmin }"
