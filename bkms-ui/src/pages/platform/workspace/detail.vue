@@ -111,7 +111,7 @@
         </template>
 
         <!-- 空间基本信息 -->
-        <div class="flex items-center min-h-[160px] p-[24px] pt-[28px] bkms-bg-card shadow-[0_2px_4px_0_#1919290d]">
+        <div class="flex items-center min-h-[160px] p-[24px] pt-[28px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <!-- 首字母头像 -->
           <div
             class="relative flex shrink-0 items-center justify-center w-[72px] h-[72px] text-[32px] font-bold bkms-text-inverse rounded-[8px] bg-bkms-brand-2"
@@ -157,7 +157,7 @@
 
         <!-- 镜像仓库 -->
         <BkmsContent
-          class="mt-[24px] shadow-[0_2px_4px_0_#1919290d]"
+          class="mt-[24px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           :collapsible="true"
           :edit-disabled="imageRegistryLoadFailed"
           :edit-disabled-tips="t('镜像仓库加载失败，请刷新页面后再修改')"
@@ -217,7 +217,7 @@
 
         <!-- 快捷操作 -->
         <BkmsContent
-          class="mt-[24px] shadow-[0_2px_4px_0_#1919290d]"
+          class="mt-[24px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           :collapsible="true"
           :title="t('快捷操作')"
         >
@@ -524,6 +524,6 @@
 <style lang="postcss" scoped>
   /* 折叠面板标题背景 */
   :deep(.bkms-content-title) {
-    background-color: #eaebf0;
+    background-color: var(--bkms-bg-title);
   }
 </style>

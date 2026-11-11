@@ -13,7 +13,7 @@
         <template v-if="showTargetInfo">
           <Divider
             class="h-[14px] mx-[0] text-[12px]"
-            color="var(--bkms-neutral-5)"
+            color="var(--bkms-line-default)"
             direction="vertical"
             type="solid"
           />

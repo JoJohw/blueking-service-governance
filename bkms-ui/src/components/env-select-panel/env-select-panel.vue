@@ -1092,7 +1092,7 @@
     height: 32px;
     border: none !important;
     border-radius: 0 !important;
-    border-right: 1px solid var(--bkms-neutral-4) !important;
+    border-right: 1px solid var(--bkms-line-input) !important;
     background: transparent !important;
     .bk-input {
       border: none !important;
@@ -1100,11 +1100,11 @@
     }
     .bk-select-tag {
       font-size: 12px;
-      color: var(--bkms-neutral-2);
+      color: var(--bkms-text-body);
     }
   }
   :deep(.bk-input.is-simplicity) {
-    border-bottom-color: var(--bkms-neutral-5) !important;
+    border-bottom-color: var(--bkms-line-default) !important;
     border-radius: 0 !important;
     &:hover {
       background-color: transparent !important;
@@ -1135,8 +1135,8 @@
       left: -8px;
       width: 16px;
       height: 16px;
-      border-left: 1px solid var(--bkms-neutral-5);
-      border-bottom: 1px solid var(--bkms-neutral-5);
+      border-left: 1px solid var(--bkms-line-default);
+      border-bottom: 1px solid var(--bkms-line-default);
       border-bottom-left-radius: 8px;
       content: '';
     }

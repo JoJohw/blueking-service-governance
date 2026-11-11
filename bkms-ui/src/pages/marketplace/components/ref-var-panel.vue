@@ -32,7 +32,7 @@
         @click="emit('close')"
       >
         <CloseLine
-          fill="#979BA5"
+          fill="var(--bkms-neutral-3)"
           height="12"
           width="12"
         />

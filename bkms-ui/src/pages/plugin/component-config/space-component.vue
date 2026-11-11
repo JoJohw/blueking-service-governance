@@ -529,7 +529,7 @@
       height: 200px;
     }
     .bk-exception-title {
-      color: #4d4f56;
+      color: var(--bkms-text-body);
     }
   }
   .square-radio-button {

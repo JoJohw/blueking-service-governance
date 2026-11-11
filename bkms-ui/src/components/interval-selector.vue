@@ -33,7 +33,7 @@
       </span>
       <Divider
         class="h-[12px] min-h-[16px] mx-[12px]"
-        color="var(--bkms-neutral-5)"
+        color="var(--bkms-line-default)"
         direction="vertical"
         type="solid"
       />

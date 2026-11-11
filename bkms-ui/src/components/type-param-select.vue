@@ -93,11 +93,11 @@
                   <div class="grid grid-cols-2 w-[442px]">
                     <span class="text-[12px]">
                       {{ $t('选项文本（用于显示）') }}
-                      <span class="text-bkms-danger-2 text-[14px]">*</span>
+                      <span class="text-[#f87171] text-[14px]">*</span>
                     </span>
                     <span class="text-[12px]">
                       {{ $t('选项值') }}
-                      <span class="text-bkms-danger-2 text-[14px]">*</span>
+                      <span class="text-[#f87171] text-[14px]">*</span>
                     </span>
                   </div>
                 </template>
@@ -120,9 +120,7 @@
             </div>
           </Form>
         </div>
-        <FlexRow
-          class="h-[42px] px-[16px] bkms-bg-subtle border-t border-solid border-t-bkms-neutral-6"
-        >
+        <FlexRow class="h-[42px] px-[16px] bkms-bg-subtle border-t border-solid border-t-bkms-neutral-6">
           <template #right>
             <div class="flex gap-[8px]">
               <Button
@@ -388,7 +386,7 @@
 
   :deep(.params-type) {
     .bk-form-label {
-      color: var(--bkms-neutral-1);
+      color: var(--bkms-text-title);
       font-weight: bold;
     }
   }

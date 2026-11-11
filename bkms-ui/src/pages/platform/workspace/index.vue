@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="flex flex-col p-[16px] bkms-bg-card shadow-[0_2px_4px_0_#1919290d]">
+  <div class="flex flex-col p-[16px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
     <div class="flex items-center justify-between mb-[16px]">
       <Radio.Group
         class="shrink-0"
@@ -213,11 +213,18 @@
   type StatusCountKey = 'all' | 'disabled' | 'ready';
   type WorkspaceStateOption = 'all' | 'Disabled' | 'Ready';
 
-  const ICON_COLORS = ['#3A84FF', '#2CAF5E', '#F59500', '#6228FF', '#EF6317', '#EA3636'];
+  const ICON_COLORS = [
+    'var(--bkms-brand-2)',
+    'var(--bkms-success-2)',
+    'var(--bkms-warning-2)',
+    'var(--bkms-purple-2)',
+    '#EF6317',
+    'var(--bkms-danger-2)',
+  ];
   const STATUS_COLORS: Record<string, string> = {
-    Ready: '#2CAF5E',
-    Processing: '#F59500',
-    Disabled: '#C4C6CC',
+    Ready: 'var(--bkms-success-2)',
+    Processing: 'var(--bkms-warning-2)',
+    Disabled: 'var(--bkms-text-disabled)',
   };
 
   const { t } = useI18n();
@@ -265,7 +272,7 @@
     },
   ]);
   const statusOptions = computed(() => [
-    { key: 'all' as const, label: t('全部'), value: 'all' as const, color: '#3A84FF' },
+    { key: 'all' as const, label: t('全部'), value: 'all' as const, color: 'var(--bkms-brand-2)' },
     { key: 'ready' as const, label: t('启用中'), value: 'Ready' as const, color: STATUS_COLORS.Ready },
     { key: 'disabled' as const, label: t('已停用'), value: 'Disabled' as const, color: STATUS_COLORS.Disabled },
   ]);
@@ -321,7 +328,7 @@
   }
 
   function getStateColor(state?: string) {
-    return STATUS_COLORS[state || ''] || '#C4C6CC';
+    return STATUS_COLORS[state || ''] || 'var(--bkms-text-disabled)';
   }
 
   function getStateLabel(state?: string) {

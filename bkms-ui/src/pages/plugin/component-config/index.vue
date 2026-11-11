@@ -73,7 +73,7 @@
 </script>
 <style lang="postcss" scoped>
   :deep(.bk-tab-header) {
-    box-shadow: 0 3px 4px 0 #0000000a;
+    box-shadow: 0 3px 4px 0 var(--bkms-shadow-header);
     border-bottom: none;
     z-index: 1;
     padding-left: 24px !important;
@@ -84,7 +84,7 @@
     min-height: 0px;
     min-width: 0px;
     overflow: auto;
-    background-color: #f5f7fa;
+    background-color: var(--bkms-bg-page);
     padding: 0 !important;
 
     .bk-tab-panel {

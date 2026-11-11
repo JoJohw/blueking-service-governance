@@ -280,7 +280,7 @@
       position: relative;
     }
     .bk-option-group-label {
-      border-bottom: 1px solid var(--bkms-neutral-5);
+      border-bottom: 1px solid var(--bkms-line-default);
       margin: 0 16px;
       padding: 0 !important;
     }

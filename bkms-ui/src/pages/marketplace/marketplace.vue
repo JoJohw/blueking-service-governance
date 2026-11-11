@@ -453,11 +453,11 @@
 
   :deep(.bk-tab-header--active) {
     span {
-      color: #3a84ff;
+      color: var(--bkms-text-brand);
     }
   }
 
   :deep(.bk-tab-header-item:not(.bk-tab-header--active)) {
-    background-color: #dcdee5;
+    background-color: var(--bkms-bg-title);
   }
 </style>
