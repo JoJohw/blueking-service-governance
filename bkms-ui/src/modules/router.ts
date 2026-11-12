@@ -241,6 +241,7 @@ const routes = setupLayouts([
             component: CustomRouterComponent,
             meta: {
               layout: 'content',
+              contentPadding: true,
               menuId: 'BASIC',
             },
           },

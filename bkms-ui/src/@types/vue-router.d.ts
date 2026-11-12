@@ -26,6 +26,7 @@ declare module 'vue-router' {
   import type { RouteLocationRaw } from 'vue-router';
 
   interface RouteMeta {
+    contentPadding?: boolean;
     layout?: 'content' | 'default' | 'empty' | 'main';
     menuId?: 'COMPONENT' | MenuId;
     title?: string;

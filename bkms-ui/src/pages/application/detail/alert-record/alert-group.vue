@@ -1,145 +1,141 @@
 <template>
-  <div
-    ref="containerRef"
-    class="rounded-[2px] flex flex-col gap-[16px]"
-  >
-    <!-- 告警组空间级资源提示 -->
-    <Alert
-      class="w-full"
-      theme="info"
-    >
-      {{ $t('告警组空间级资源提示') }}
-    </Alert>
-
-    <!-- 顶部工具栏 -->
+  <div class="rounded-[6px] flex min-h-0 flex-col gap-[16px]">
+    <!-- 头部区域：Alert + 工具栏 -->
     <div
-      ref="searchBarRef"
-      class="flex items-center justify-between gap-[16px]"
+      ref="headerRef"
+      class="flex flex-col gap-[16px] shrink-0"
     >
-      <Button
-        theme="primary"
-        @click="handleCreate"
+      <!-- 告警组空间级资源提示 -->
+      <Alert
+        class="w-full"
+        theme="info"
       >
-        <Plus
-          class="mr-[4px]"
-          :height="24"
-          :width="24"
+        {{ $t('告警组空间级资源提示') }}
+      </Alert>
+
+      <!-- 顶部工具栏 -->
+      <div class="flex items-center justify-between gap-[16px]">
+        <Button
+          theme="primary"
+          @click="handleCreate"
+        >
+          <Plus
+            class="mr-[4px]"
+            :height="24"
+            :width="24"
+          />
+          {{ $t('新建告警组') }}
+        </Button>
+        <SearchSelect
+          v-model="searchValue"
+          class="w-[480px] bkms-bg-card"
+          :data="searchData"
+          :placeholder="placeholder"
+          unique-select
+          value-behavior="need-key"
         />
-        {{ $t('新建告警组') }}
-      </Button>
-      <SearchSelect
-        v-model="searchValue"
-        class="w-[480px] bkms-bg-card"
-        :data="searchData"
-        :placeholder="placeholder"
-        unique-select
-        value-behavior="need-key"
-      />
+      </div>
     </div>
 
-    <!-- 表格：max-height 限制在父容器剩余空间内 -->
-    <div class="flex-1">
-      <Table
-        v-bkloading="{ loading: isLoading, zIndex: 6 }"
-        :data="filteredData"
-        :max-height="tableMaxHeight"
-        :pagination="pagination"
-        :row-config="{ isHover: true }"
-        @page-limit-change="pageSizeChange"
-        @page-value-change="pageChange"
+    <!-- 表格区域：max-height 由可用高度 - 头部高度 - gap 计算 -->
+    <Table
+      v-bkloading="{ loading: isLoading, zIndex: 6 }"
+      :data="filteredData"
+      :max-height="tableMaxHeight"
+      :pagination="tablePagination"
+      :row-config="{ isHover: true }"
+      @page-limit-change="pageSizeChange"
+      @page-value-change="pageChange"
+    >
+      <template #empty>
+        <TableException
+          :type="filteredData.length === 0 && hasFilter ? 'search' : 'empty'"
+          @clear="handleClearFilters"
+        />
+      </template>
+      <!-- 告警组名称 -->
+      <TableColumn
+        field="name"
+        :label="$t('告警组名称')"
+        :min-width="200"
+        show-overflow="tooltip"
       >
-        <template #empty>
-          <TableException
-            :type="filteredData.length === 0 && hasFilter ? 'search' : 'empty'"
-            @clear="handleClearFilters"
-          />
+        <template #default="{ row }">
+          <span
+            class="bkms-text-brand cursor-pointer"
+            @click="handleEdit(row)"
+          >
+            {{ row.name || '--' }}
+          </span>
         </template>
-        <!-- 告警组名称 -->
-        <TableColumn
-          field="name"
-          :label="$t('告警组名称')"
-          :min-width="200"
-          show-overflow="tooltip"
-        >
-          <template #default="{ row }">
-            <span
-              class="bkms-text-brand cursor-pointer"
+      </TableColumn>
+      <!-- 成员 -->
+      <TableColumn
+        :label="$t('成员')"
+        :min-width="200"
+      >
+        <template #default="{ row }: { row: UserGroup }">
+          <MoreTag
+            v-if="row.users?.length"
+            :data="row.users"
+            overflow-mode="popover"
+          >
+            <template #default="{ item }: { item: UserGroupUser }">
+              <span class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-bkms-neutral-6 cursor-default">
+                <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
+                {{ item.display_name || item.id || '--' }}
+              </span>
+            </template>
+          </MoreTag>
+          <span v-else>--</span>
+        </template>
+      </TableColumn>
+      <!-- 关联策略数 -->
+      <TableColumn
+        field="strategy_count"
+        :width="120"
+      >
+        <template #header>
+          <UnderLineTips :description="$t('关联策略数提示')">
+            {{ $t('关联策略数') }}
+          </UnderLineTips>
+        </template>
+        <template #default="{ row }: { row: UserGroup }">
+          <span>{{ row.strategy_count || '--' }}</span>
+        </template>
+      </TableColumn>
+      <!-- 操作 -->
+      <TableColumn
+        fixed="right"
+        :label="$t('操作')"
+        :width="140"
+      >
+        <template #default="{ row }">
+          <div class="flex items-center gap-[12px]">
+            <Button
+              :disabled="!row.edit_allowed"
+              text
+              theme="primary"
               @click="handleEdit(row)"
             >
-              {{ row.name || '--' }}
-            </span>
-          </template>
-        </TableColumn>
-        <!-- 成员 -->
-        <TableColumn
-          :label="$t('成员')"
-          :min-width="200"
-        >
-          <template #default="{ row }: { row: UserGroup }">
-            <MoreTag
-              v-if="row.users?.length"
-              :data="row.users"
-              overflow-mode="popover"
+              {{ $t('编辑') }}
+            </Button>
+            <Button
+              v-bk-tooltips="{
+                content: $t('存在关联的策略，不可删除'),
+                disabled: row.delete_allowed !== false,
+              }"
+              :disabled="row.delete_allowed === false"
+              text
+              theme="primary"
+              @click="handleDelete(row)"
             >
-              <template #default="{ item }: { item: UserGroupUser }">
-                <span
-                  class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-bkms-neutral-6 cursor-default"
-                >
-                  <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
-                  {{ item.display_name || item.id || '--' }}
-                </span>
-              </template>
-            </MoreTag>
-            <span v-else>--</span>
-          </template>
-        </TableColumn>
-        <!-- 关联策略数 -->
-        <TableColumn
-          field="strategy_count"
-          :width="120"
-        >
-          <template #header>
-            <UnderLineTips :description="$t('关联策略数提示')">
-              {{ $t('关联策略数') }}
-            </UnderLineTips>
-          </template>
-          <template #default="{ row }: { row: UserGroup }">
-            <span>{{ row.strategy_count || '--' }}</span>
-          </template>
-        </TableColumn>
-        <!-- 操作 -->
-        <TableColumn
-          fixed="right"
-          :label="$t('操作')"
-          :width="140"
-        >
-          <template #default="{ row }">
-            <div class="flex items-center gap-[12px]">
-              <Button
-                :disabled="!row.edit_allowed"
-                text
-                theme="primary"
-                @click="handleEdit(row)"
-              >
-                {{ $t('编辑') }}
-              </Button>
-              <Button
-                v-bk-tooltips="{
-                  content: $t('存在关联的策略，不可删除'),
-                  disabled: row.delete_allowed !== false,
-                }"
-                :disabled="row.delete_allowed === false"
-                text
-                theme="primary"
-                @click="handleDelete(row)"
-              >
-                {{ $t('删除') }}
-              </Button>
-            </div>
-          </template>
-        </TableColumn>
-      </Table>
-    </div>
+              {{ $t('删除') }}
+            </Button>
+          </div>
+        </template>
+      </TableColumn>
+    </Table>
 
     <!-- 新建 / 编辑 / 查看 告警组侧滑表单 -->
     <AlertGroupForm
@@ -153,7 +149,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, h, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
+  import { computed, h, inject, ref, shallowRef, watch } from 'vue';
+  import type { Ref } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
   import { Alert, Button, InfoBox, Message, SearchSelect } from 'bkui-vue';
@@ -195,6 +192,17 @@
   const tableData = ref<UserGroup[]>([]);
   const isLoading = ref(false);
 
+  /** 由 index.vue provide 的可用区域高度 */
+  const availableHeight = inject<Ref<number>>('alertAvailableHeight', ref(400));
+  /** 头部区域（Alert + 工具栏） */
+  const headerRef = ref<HTMLElement>();
+  const { height: headerHeight } = useElementHeight(headerRef, {
+    watchSource: isLoading,
+    defaultHeight: 80,
+  });
+  /** 表格最大高度 = 可用高度 - 头部高度 - 间距(16) */
+  const tableMaxHeight = computed(() => Math.max(availableHeight.value - headerHeight.value - 16, 0));
+
   /** 新建/编辑/查看 告警组侧滑表单显隐 */
   const isFormShow = ref(false);
 
@@ -204,40 +212,8 @@
   /** 编辑/查看模式下的告警组 ID */
   const formGroupID = ref<number>();
 
-  const containerRef = ref<HTMLElement>();
-  const searchBarRef = ref<HTMLElement>();
-  /** 父容器（index.vue 的 flex-1 容器）内容区高度 */
-  const parentContentHeight = ref(400);
-  const { height: searchBarHeight } = useElementHeight(searchBarRef, {
-    watchSource: isLoading,
-    defaultHeight: 40,
-  });
-
-  /** 测量父容器内容区高度 */
-  function updateParentHeight() {
-    const parent = containerRef.value?.parentElement;
-    if (!parent) return;
-    const rect = parent.getBoundingClientRect();
-    const parentStyle = getComputedStyle(parent);
-    const padTop = Number.parseFloat(parentStyle.paddingTop) || 0;
-    const padBottom = Number.parseFloat(parentStyle.paddingBottom) || 0;
-    parentContentHeight.value = rect.height - padTop - padBottom;
-  }
-
-  onMounted(() => {
-    updateParentHeight();
-    window.addEventListener('resize', updateParentHeight);
-  });
-
-  onBeforeUnmount(() => {
-    window.removeEventListener('resize', updateParentHeight);
-  });
-
   /** 是否有任意筛选条件 */
   const hasFilter = computed(() => searchValue.value.length > 0);
-
-  /** 表格最大高度 */
-  const tableMaxHeight = computed(() => Math.max(parentContentHeight.value - searchBarHeight.value - 24 * 2 - 16, 0));
 
   /** 前端筛选 */
   const filteredData = computed(() => {
@@ -277,6 +253,7 @@
     },
     filteredCount,
   );
+  const tablePagination = computed(() => (Number(pagination.value.count) > 0 ? pagination.value : undefined));
 
   /** 拉取告警组列表 */
   async function fetchList() {

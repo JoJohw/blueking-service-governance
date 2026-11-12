@@ -7,19 +7,28 @@
       :title="$t('监控告警')"
     />
 
-    <div class="flex-1 overflow-hidden px-[24px] py-[20px]">
-      <component :is="currentComponent" />
+    <div
+      ref="wrapperRef"
+      class="min-h-0 flex-1 overflow-hidden p-[16px]"
+    >
+      <div
+        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]"
+      >
+        <component :is="currentComponent" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
   import type { Component } from 'vue';
-  import { computed, onMounted } from 'vue';
+  import { computed, onMounted, provide, ref } from 'vue';
+  import type { Ref } from 'vue';
 
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
   import TabHeader from '~/components/tab-header.vue';
+  import { useElementHeight } from '~/composables/use-element-height';
 
   import AlertGroup from './alert-group.vue';
   import AlertRecordList from './alert-record-list.vue';
@@ -31,6 +40,13 @@
 
   const route = useRoute();
   const router = useRouter();
+
+  /** 外层容器（固定高度），测量其高度供子页面计算表格 max-height */
+  const wrapperRef = ref<HTMLElement>();
+  const { height: wrapperHeight } = useElementHeight(wrapperRef);
+  /** 可用高度 = 外层容器高度 - 外层 padding(16×2) - 白卡片 padding(16×2) */
+  const availableHeight = computed(() => Math.max(wrapperHeight.value - 64, 0));
+  provide<Ref<number>>('alertAvailableHeight', availableHeight);
 
   // Tab 配置（扩展 TabItem，添加组件字段）
   interface TabConfig extends TabItem {

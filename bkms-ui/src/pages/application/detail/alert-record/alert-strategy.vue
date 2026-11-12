@@ -1,12 +1,9 @@
 <template>
-  <div
-    ref="containerRef"
-    class="rounded-[2px] flex flex-col gap-[16px]"
-  >
+  <div class="rounded-[6px] flex min-h-0 flex-col gap-[16px]">
     <!-- 顶部工具栏 -->
     <div
-      ref="searchBarRef"
-      class="flex items-center justify-between gap-[350px]"
+      ref="headerRef"
+      class="flex items-center justify-between gap-[350px] shrink-0"
     >
       <Button
         theme="primary"
@@ -29,181 +26,179 @@
       />
     </div>
 
-    <!-- 表格：max-height 限制在父容器剩余空间内，筛选栏高度 + 表格高度不超过父元素 -->
-    <div class="flex-1">
-      <Table
-        v-bkloading="{ loading: isLoading, zIndex: 6 }"
-        :data="filteredData"
-        :max-height="tableMaxHeight"
-        :pagination="pagination"
-        :row-config="{ isHover: true }"
-        :row-height="56"
-        @filter-change="handleFilterChange"
-        @page-limit-change="pageSizeChange"
-        @page-value-change="pageChange"
+    <!-- 表格区域：max-height 由可用高度 - 头部高度 - gap 计算 -->
+    <Table
+      v-bkloading="{ loading: isLoading, zIndex: 6 }"
+      :data="filteredData"
+      :max-height="tableMaxHeight"
+      :pagination="tablePagination"
+      :row-config="{ isHover: true }"
+      :row-height="56"
+      @filter-change="handleFilterChange"
+      @page-limit-change="pageSizeChange"
+      @page-value-change="pageChange"
+    >
+      <template #empty>
+        <TableException
+          :type="filteredData.length === 0 && hasFilter ? 'search' : 'empty'"
+          @clear="handleClearFilters"
+        />
+      </template>
+      <!-- 策略名称 -->
+      <TableColumn
+        field="displayName"
+        :label="$t('策略名称')"
+        :min-width="200"
+        show-overflow="tooltip"
       >
-        <template #empty>
-          <TableException
-            :type="filteredData.length === 0 && hasFilter ? 'search' : 'empty'"
-            @clear="handleClearFilters"
-          />
+        <template #default="{ row }">
+          <span
+            class="bkms-text-brand cursor-pointer"
+            @click="handleEdit(row)"
+            >{{ row.displayName || '--' }}</span
+          >
         </template>
-        <!-- 策略名称 -->
-        <TableColumn
-          field="displayName"
-          :label="$t('策略名称')"
-          :min-width="200"
-          show-overflow="tooltip"
-        >
-          <template #default="{ row }">
-            <span
-              class="bkms-text-brand cursor-pointer"
-              @click="handleEdit(row)"
-              >{{ row.displayName || '--' }}</span
-            >
-          </template>
-        </TableColumn>
-        <!-- 监控指标 -->
-        <TableColumn
-          field="monitorMetric"
-          filter-multiple
-          :filters="filterOptions.monitorMetric"
-          :label="$t('监控指标')"
-          :min-width="160"
-          show-overflow="tooltip"
-        >
-          <template #default="{ row }">
-            <span class="flex flex-col">
-              <span>{{ monitorMetricNameMap.get(row.monitorMetric || '') || row.monitorMetric || '--' }}</span>
-              <span class="bkms-text-secondary text-[12px] font-mono">{{ row.monitorMetric }}</span>
-            </span>
-          </template>
-        </TableColumn>
-        <!-- 告警条件 -->
-        <TableColumn
-          field="threshold"
-          :label="$t('告警条件')"
-          :min-width="160"
-        >
-          <template #default="{ row }">
-            {{ formatThreshold(row.threshold, row.monitorMetric) }}
-          </template>
-        </TableColumn>
-        <!-- 告警级别 -->
-        <TableColumn
-          field="severity"
-          filter-multiple
-          :filters="filterOptions.severity"
-          :label="$t('告警级别')"
-          :width="120"
-        >
-          <template #default="{ row }">
-            <SeverityLabel :severity="row.severity" />
-          </template>
-        </TableColumn>
-        <!-- 生效环境 -->
-        <TableColumn
-          field="effectiveScope.type"
-          filter-multiple
-          :filters="filterOptions['effectiveScope.type']"
-          :label="$t('生效环境')"
-          :min-width="200"
-        >
-          <template #default="{ row }">
-            <span v-if="row.effectiveScope?.type === 'all'">{{ $t('所有环境') }}</span>
-            <span v-else-if="row.effectiveScope?.type === 'env_type'">{{ $t('按环境类型') }}</span>
-            <span v-else-if="row.effectiveScope?.type === 'specific_envs'">{{ $t('部分环境') }}</span>
-            <span v-else>--</span>
-          </template>
-        </TableColumn>
-        <!-- 告警组 -->
-        <TableColumn
-          field="noticeGroupIDs"
-          filter-multiple
-          :filters="filterOptions.noticeGroupIDs"
-          :label="$t('告警组')"
-          :min-width="220"
-        >
-          <template #default="{ row }">
-            <MoreTag
-              v-if="row.noticeGroupIDs?.length"
-              :data="row.noticeGroupIDs"
-              overflow-mode="popover"
-            >
-              <template #default="{ item }">
-                <span
-                  v-bk-tooltips="{
-                    content: getUserGroupUsers(item)
-                      .map(u => u.display_name || u.id || '--')
-                      .join('，'),
-                    delay: 300,
-                    disabled: !getUserGroupUsers(item).length,
-                  }"
-                  class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-bkms-neutral-6 cursor-default"
-                >
-                  <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
-                  {{ userGroupMap.get(String(item))?.name || item }}
-                </span>
-              </template>
-            </MoreTag>
-            <span v-else>--</span>
-          </template>
-        </TableColumn>
-        <!-- 启/停用 -->
-        <TableColumn
-          field="enabled"
-          fixed="right"
-          :label="$t('启/停用')"
-          :width="100"
-        >
-          <template #default="{ row }">
-            <PopConfirm
-              v-if="row.enabled"
-              :confirm-text="$t('停用')"
-              :content="$t('确定停用该策略？')"
-              placement="top"
-              trigger="click"
-              width="280"
-              @confirm="() => handleSwitch(row)"
-            >
-              <Switcher
-                theme="primary"
-                :value="row.enabled"
-              />
-            </PopConfirm>
+      </TableColumn>
+      <!-- 监控指标 -->
+      <TableColumn
+        field="monitorMetric"
+        filter-multiple
+        :filters="filterOptions.monitorMetric"
+        :label="$t('监控指标')"
+        :min-width="160"
+        show-overflow="tooltip"
+      >
+        <template #default="{ row }">
+          <span class="flex flex-col">
+            <span>{{ monitorMetricNameMap.get(row.monitorMetric || '') || row.monitorMetric || '--' }}</span>
+            <span class="bkms-text-secondary text-[12px] font-mono">{{ row.monitorMetric }}</span>
+          </span>
+        </template>
+      </TableColumn>
+      <!-- 告警条件 -->
+      <TableColumn
+        field="threshold"
+        :label="$t('告警条件')"
+        :min-width="160"
+      >
+        <template #default="{ row }">
+          {{ formatThreshold(row.threshold, row.monitorMetric) }}
+        </template>
+      </TableColumn>
+      <!-- 告警级别 -->
+      <TableColumn
+        field="severity"
+        filter-multiple
+        :filters="filterOptions.severity"
+        :label="$t('告警级别')"
+        :width="120"
+      >
+        <template #default="{ row }">
+          <SeverityLabel :severity="row.severity" />
+        </template>
+      </TableColumn>
+      <!-- 生效环境 -->
+      <TableColumn
+        field="effectiveScope.type"
+        filter-multiple
+        :filters="filterOptions['effectiveScope.type']"
+        :label="$t('生效环境')"
+        :min-width="200"
+      >
+        <template #default="{ row }">
+          <span v-if="row.effectiveScope?.type === 'all'">{{ $t('所有环境') }}</span>
+          <span v-else-if="row.effectiveScope?.type === 'env_type'">{{ $t('按环境类型') }}</span>
+          <span v-else-if="row.effectiveScope?.type === 'specific_envs'">{{ $t('部分环境') }}</span>
+          <span v-else>--</span>
+        </template>
+      </TableColumn>
+      <!-- 告警组 -->
+      <TableColumn
+        field="noticeGroupIDs"
+        filter-multiple
+        :filters="filterOptions.noticeGroupIDs"
+        :label="$t('告警组')"
+        :min-width="220"
+      >
+        <template #default="{ row }">
+          <MoreTag
+            v-if="row.noticeGroupIDs?.length"
+            :data="row.noticeGroupIDs"
+            overflow-mode="popover"
+          >
+            <template #default="{ item }">
+              <span
+                v-bk-tooltips="{
+                  content: getUserGroupUsers(item)
+                    .map(u => u.display_name || u.id || '--')
+                    .join('，'),
+                  delay: 300,
+                  disabled: !getUserGroupUsers(item).length,
+                }"
+                class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-bkms-neutral-6 cursor-default"
+              >
+                <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
+                {{ userGroupMap.get(String(item))?.name || item }}
+              </span>
+            </template>
+          </MoreTag>
+          <span v-else>--</span>
+        </template>
+      </TableColumn>
+      <!-- 启/停用 -->
+      <TableColumn
+        field="enabled"
+        fixed="right"
+        :label="$t('启/停用')"
+        :width="100"
+      >
+        <template #default="{ row }">
+          <PopConfirm
+            v-if="row.enabled"
+            :confirm-text="$t('停用')"
+            :content="$t('确定停用该策略？')"
+            placement="top"
+            trigger="click"
+            width="280"
+            @confirm="() => handleSwitch(row)"
+          >
             <Switcher
-              v-else
-              :before-change="() => handleSwitch(row)"
               theme="primary"
               :value="row.enabled"
             />
-          </template>
-        </TableColumn>
-        <!-- 操作 -->
-        <TableColumn
-          fixed="right"
-          :label="$t('操作')"
-          :width="140"
-        >
-          <template #default="{ row }">
-            <div class="flex items-center gap-[12px]">
-              <Button
-                text
-                theme="primary"
-                @click="handleEdit(row)"
-                >{{ $t('编辑') }}</Button
-              >
-              <Button
-                text
-                theme="primary"
-                @click="handleDelete(row)"
-                >{{ $t('删除') }}</Button
-              >
-            </div>
-          </template>
-        </TableColumn>
-      </Table>
-    </div>
+          </PopConfirm>
+          <Switcher
+            v-else
+            :before-change="() => handleSwitch(row)"
+            theme="primary"
+            :value="row.enabled"
+          />
+        </template>
+      </TableColumn>
+      <!-- 操作 -->
+      <TableColumn
+        fixed="right"
+        :label="$t('操作')"
+        :width="140"
+      >
+        <template #default="{ row }">
+          <div class="flex items-center gap-[12px]">
+            <Button
+              text
+              theme="primary"
+              @click="handleEdit(row)"
+              >{{ $t('编辑') }}</Button
+            >
+            <Button
+              text
+              theme="primary"
+              @click="handleDelete(row)"
+              >{{ $t('删除') }}</Button
+            >
+          </div>
+        </template>
+      </TableColumn>
+    </Table>
 
     <!-- 新建/编辑/查看策略侧滑 -->
     <StrategyForm
@@ -217,7 +212,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, h, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
+  import { computed, h, inject, ref, shallowRef, watch } from 'vue';
+  import type { Ref } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
   import { Button, InfoBox, Message, PopConfirm, SearchSelect, Switcher } from 'bkui-vue';
@@ -342,43 +338,22 @@
 
   const tableData = ref<AlertStrategyOutput[]>([]);
   const isLoading = ref(false);
-  /** 当前正在切换启停状态的策略 ID（用于 Switcher loading） */
-  const switchingId = ref<string>('');
 
-  const containerRef = ref<HTMLElement>();
-  const searchBarRef = ref<HTMLElement>();
-  /** 父容器（index.vue 的 flex-1 容器）内容区高度：边框盒高度 - 垂直内边距 */
-  const parentContentHeight = ref(400);
-  const { height: searchBarHeight } = useElementHeight(searchBarRef, {
+  /** 由 index.vue provide 的可用区域高度 */
+  const availableHeight = inject<Ref<number>>('alertAvailableHeight', ref(400));
+  /** 头部区域（工具栏） */
+  const headerRef = ref<HTMLElement>();
+  const { height: headerHeight } = useElementHeight(headerRef, {
     watchSource: isLoading,
     defaultHeight: 40,
   });
-
-  /** 测量父容器内容区高度：getBoundingClientRect 为边框盒（含 padding），需扣除父元素垂直内边距 */
-  function updateParentHeight() {
-    const parent = containerRef.value?.parentElement;
-    if (!parent) return;
-    const rect = parent.getBoundingClientRect();
-    const parentStyle = getComputedStyle(parent);
-    const padTop = Number.parseFloat(parentStyle.paddingTop) || 0;
-    const padBottom = Number.parseFloat(parentStyle.paddingBottom) || 0;
-    parentContentHeight.value = rect.height - padTop - padBottom;
-  }
-
-  onMounted(() => {
-    updateParentHeight();
-    window.addEventListener('resize', updateParentHeight);
-  });
-
-  onBeforeUnmount(() => {
-    window.removeEventListener('resize', updateParentHeight);
-  });
+  /** 表格最大高度 = 可用高度 - 头部高度 - 间距(16) */
+  const tableMaxHeight = computed(() => Math.max(availableHeight.value - headerHeight.value - 16, 0));
+  /** 当前正在切换启停状态的策略 ID（用于 Switcher loading） */
+  const switchingId = ref<string>('');
 
   /** 是否有任意筛选条件 */
   const hasFilter = computed(() => searchValue.value.length > 0);
-
-  /** 表格最大高度：父容器内容区高度 - 根容器内边距(24×2) - 筛选栏高度 - 间距(16)，确保不超出父元素 */
-  const tableMaxHeight = computed(() => Math.max(parentContentHeight.value - searchBarHeight.value - 24 * 2 - 16, 0));
 
   /** 前端筛选后的数据（后端 listAlertStrategies 暂不支持搜索参数，采用前端过滤） */
   const filteredData = computed(() => {
@@ -423,6 +398,7 @@
     },
     filteredCount,
   );
+  const tablePagination = computed(() => (Number(pagination.value.count) > 0 ? pagination.value : undefined));
 
   /** 拉取告警策略列表 */
   async function fetchList() {
@@ -517,9 +493,7 @@
       footerAlign: 'center',
       content: h('div', { class: 'text-left' }, [
         h('div', [t('策略名称: {name}', { name: row.displayName || row.id })]),
-        h('div', { class: 'mt-[14px] bkms-bg-page py-[12px] px-[16px]' }, [
-          t('删除后，将不可恢复，请谨慎操作！'),
-        ]),
+        h('div', { class: 'mt-[14px] bkms-bg-page py-[12px] px-[16px]' }, [t('删除后，将不可恢复，请谨慎操作！')]),
       ]),
       confirmButtonTheme: 'danger',
       confirmText: t('删除'),

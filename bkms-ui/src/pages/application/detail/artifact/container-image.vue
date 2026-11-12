@@ -97,7 +97,7 @@
         class="mt-[16px] w-full artifact-table"
         :data="artifactList"
         :expand-config="expandConfig"
-        :pagination="pagination"
+        :pagination="count > 0 ? pagination : undefined"
         :row-config="{
           isHover: true,
           isCurrent: true,

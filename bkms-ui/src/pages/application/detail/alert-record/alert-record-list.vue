@@ -1,12 +1,9 @@
 <template>
-  <div
-    ref="containerRef"
-    class="rounded-[2px] flex flex-col gap-[16px]"
-  >
+  <div class="rounded-[6px] flex min-h-0 flex-col gap-[16px]">
     <!-- 顶部搜索栏 -->
     <div
-      ref="searchBarRef"
-      class="flex items-center gap-[12px]"
+      ref="headerRef"
+      class="flex items-center gap-[12px] shrink-0"
     >
       <EnvSelectPanel
         v-model="selectedEnv"
@@ -31,133 +28,132 @@
       />
     </div>
 
-    <!-- 表格：max-height 限制在父容器剩余空间内，筛选栏高度 + 表格高度不超过父元素 -->
-    <div class="flex-1">
-      <Table
-        v-bkloading="{ loading: isLoading, zIndex: 6 }"
-        :data="tableData"
-        :expand-config="expandConfig"
-        :max-height="tableMaxHeight"
-        :pagination="pagination"
-        :row-class-name="getAlertRowClass"
-        :row-config="{ isHover: true }"
-        :sort-config="sortConfig"
-        @filter-change="handleFilterChange"
-        @page-limit-change="pageSizeChange"
-        @page-value-change="pageChange"
-        @sort-change="handleSortChange"
-        @toggle-row-expand="handleExpandChange"
+    <!-- 表格区域：max-height 由可用高度 - 头部高度 - gap 计算，内容不足时跟随内容撑开 -->
+    <Table
+      v-bkloading="{ loading: isLoading, zIndex: 6 }"
+      :data="tableData"
+      :expand-config="expandConfig"
+      :max-height="tableMaxHeight"
+      :pagination="tablePagination"
+      :row-class-name="getAlertRowClass"
+      :row-config="{ isHover: true }"
+      :sort-config="sortConfig"
+      @filter-change="handleFilterChange"
+      @page-limit-change="pageSizeChange"
+      @page-value-change="pageChange"
+      @sort-change="handleSortChange"
+      @toggle-row-expand="handleExpandChange"
+    >
+      <template #empty>
+        <TableException
+          :type="tableData.length === 0 && hasFilter ? 'search' : 'empty'"
+          @clear="handleClearFilters"
+        />
+      </template>
+      <!-- 展开行（type="expand" 列不能加 fixed，否则展开内容会被左侧固定列遮挡） -->
+      <TableColumn
+        type="expand"
+        width="30"
       >
-        <template #empty>
-          <TableException
-            :type="tableData.length === 0 && hasFilter ? 'search' : 'empty'"
-            @clear="handleClearFilters"
+        <template #content="{ row }">
+          <AlertRecordExpand :row="row" />
+        </template>
+      </TableColumn>
+      <!-- 开始时间 -->
+      <TableColumn
+        field="beginTime"
+        :label="$t('开始时间')"
+        sortable
+        :width="180"
+      >
+        <template #default="{ row }">
+          {{ row.beginTime ? formatDateString(row.beginTime * 1000) : '--' }}
+        </template>
+      </TableColumn>
+      <!-- 告警级别 -->
+      <TableColumn
+        field="severity"
+        :label="$t('告警级别')"
+        sortable
+        :width="120"
+      >
+        <template #default="{ row }">
+          <SeverityLabel :severity="row.severity" />
+        </template>
+      </TableColumn>
+      <!-- 告警名称 -->
+      <TableColumn
+        field="alertDisplayName"
+        :label="$t('告警名称')"
+        :min-width="200"
+        show-overflow="tooltip"
+      >
+        <template #default="{ row }">
+          {{ row.alertDisplayName || '--' }}
+        </template>
+      </TableColumn>
+      <!-- 持续时间 -->
+      <TableColumn
+        field="duration"
+        :label="$t('持续时间')"
+        sortable
+        :width="120"
+      >
+        <template #default="{ row }">
+          {{ row.duration || '--' }}
+        </template>
+      </TableColumn>
+      <!-- 告警内容 -->
+      <TableColumn
+        field="description"
+        :label="$t('告警内容')"
+        :min-width="200"
+        show-overflow="tooltip"
+      >
+        <template #default="{ row }">
+          {{ row.description || '--' }}
+        </template>
+      </TableColumn>
+      <!-- 状态 -->
+      <TableColumn
+        field="status"
+        :filter-multiple="true"
+        :filters="statusFilterOptions"
+        :label="$t('状态')"
+        :width="120"
+      >
+        <template #default="{ row }">
+          <StatusIcon
+            :status="normalizeStatus(row.status)"
+            :status-color-map="statusColorMap"
+            :status-text-map="statusTextMap"
           />
         </template>
-        <!-- 展开行（type="expand" 列不能加 fixed，否则展开内容会被左侧固定列遮挡） -->
-        <TableColumn
-          type="expand"
-          width="30"
-        >
-          <template #content="{ row }">
-            <AlertRecordExpand :row="row" />
-          </template>
-        </TableColumn>
-        <!-- 开始时间 -->
-        <TableColumn
-          field="beginTime"
-          :label="$t('开始时间')"
-          sortable
-          :width="180"
-        >
-          <template #default="{ row }">
-            {{ row.beginTime ? formatDateString(row.beginTime * 1000) : '--' }}
-          </template>
-        </TableColumn>
-        <!-- 告警级别 -->
-        <TableColumn
-          field="severity"
-          :label="$t('告警级别')"
-          sortable
-          :width="120"
-        >
-          <template #default="{ row }">
-            <SeverityLabel :severity="row.severity" />
-          </template>
-        </TableColumn>
-        <!-- 告警名称 -->
-        <TableColumn
-          field="alertDisplayName"
-          :label="$t('告警名称')"
-          :min-width="200"
-          show-overflow="tooltip"
-        >
-          <template #default="{ row }">
-            {{ row.alertDisplayName || '--' }}
-          </template>
-        </TableColumn>
-        <!-- 持续时间 -->
-        <TableColumn
-          field="duration"
-          :label="$t('持续时间')"
-          sortable
-          :width="120"
-        >
-          <template #default="{ row }">
-            {{ row.duration || '--' }}
-          </template>
-        </TableColumn>
-        <!-- 告警内容 -->
-        <TableColumn
-          field="description"
-          :label="$t('告警内容')"
-          :min-width="200"
-          show-overflow="tooltip"
-        >
-          <template #default="{ row }">
-            {{ row.description || '--' }}
-          </template>
-        </TableColumn>
-        <!-- 状态 -->
-        <TableColumn
-          field="status"
-          :filter-multiple="true"
-          :filters="statusFilterOptions"
-          :label="$t('状态')"
-          :width="120"
-        >
-          <template #default="{ row }">
-            <StatusIcon
-              :status="normalizeStatus(row.status)"
-              :status-color-map="statusColorMap"
-              :status-text-map="statusTextMap"
-            />
-          </template>
-        </TableColumn>
-        <!-- 操作 -->
-        <TableColumn
-          fixed="right"
-          :label="$t('操作')"
-          :width="80"
-        >
-          <template #default="{ row }">
-            <Button
-              text
-              theme="primary"
-              @click="handleToAlertDetail(row)"
-            >
-              {{ $t('详情') }}
-            </Button>
-          </template>
-        </TableColumn>
-      </Table>
-    </div>
+      </TableColumn>
+      <!-- 操作 -->
+      <TableColumn
+        fixed="right"
+        :label="$t('操作')"
+        :width="80"
+      >
+        <template #default="{ row }">
+          <Button
+            text
+            theme="primary"
+            @click="handleToAlertDetail(row)"
+          >
+            {{ $t('详情') }}
+          </Button>
+        </template>
+      </TableColumn>
+    </Table>
   </div>
 </template>
 
 <script lang="ts" setup>
   import type { Component } from 'vue';
-  import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
+  import type { Ref } from 'vue';
+  import { computed, defineAsyncComponent, inject, ref, shallowRef, watch } from 'vue';
 
   import DatePicker from '@blueking/date-picker';
   import { Table, TableColumn } from '@blueking/table';
@@ -280,40 +276,19 @@
   const count = ref(0);
   const isLoading = ref(false);
 
-  const containerRef = ref<HTMLElement>();
-  const searchBarRef = ref<HTMLElement>();
-  /** 父容器（index.vue 的 flex-1 容器）内容区高度：边框盒高度 - 垂直内边距 */
-  const parentContentHeight = ref(400);
-  const { height: searchBarHeight } = useElementHeight(searchBarRef, {
+  /** 由 index.vue provide 的可用区域高度 */
+  const availableHeight = inject<Ref<number>>('alertAvailableHeight', ref(400));
+  /** 头部区域（搜索栏） */
+  const headerRef = ref<HTMLElement>();
+  const { height: headerHeight } = useElementHeight(headerRef, {
     watchSource: isLoading,
     defaultHeight: 40,
   });
-
-  /** 测量父容器内容区高度：getBoundingClientRect 为边框盒（含 padding），需扣除父元素垂直内边距 */
-  function updateParentHeight() {
-    const parent = containerRef.value?.parentElement;
-    if (!parent) return;
-    const rect = parent.getBoundingClientRect();
-    const parentStyle = getComputedStyle(parent);
-    const padTop = Number.parseFloat(parentStyle.paddingTop) || 0;
-    const padBottom = Number.parseFloat(parentStyle.paddingBottom) || 0;
-    parentContentHeight.value = rect.height - padTop - padBottom;
-  }
-
-  onMounted(() => {
-    updateParentHeight();
-    window.addEventListener('resize', updateParentHeight);
-  });
-
-  onBeforeUnmount(() => {
-    window.removeEventListener('resize', updateParentHeight);
-  });
+  /** 表格最大高度 = 可用高度 - 头部高度 - 间距(16) */
+  const tableMaxHeight = computed(() => Math.max(availableHeight.value - headerHeight.value - 16, 0));
 
   /** 是否有任意筛选条件 */
   const hasFilter = computed(() => searchValue.value.length > 0 || (dateRange.value?.length ?? 0) > 0);
-
-  /** 表格最大高度：父容器内容区高度 - 根容器内边距(24×2) - 筛选栏高度 - 间距(16)，确保不超出父元素 */
-  const tableMaxHeight = computed(() => Math.max(parentContentHeight.value - searchBarHeight.value - 24 * 2 - 16, 0));
 
   const { pagination, pageChange, pageSizeChange, handleResetPage } = usePageConf(
     tableData,
@@ -326,6 +301,7 @@
     },
     count,
   );
+  const tablePagination = computed(() => (Number(pagination.value.count) > 0 ? pagination.value : undefined));
 
   /** 当前空间绑定的蓝鲸监控业务 ID（可能为空：未配置蓝鲸监控的空间） */
   const bkMonitorProjectID = computed(() => spaceStore.workspaceDetail?.bkSystems?.bkMonitorProjectID ?? '');
