@@ -45,7 +45,7 @@
 
       <!-- 顶部操作栏：环境类型是总览表格的一级筛选，部署按钮复用部署管理现有侧栏。 -->
       <div
-        class="mb-[16px] flex shrink-0 items-center justify-between gap-[16px] bg-bkms-neutral-6 px-[12px] py-[8px] shadow-[0_2px_4px_0_var(--bkms-shadow-hover)]"
+        class="mb-[16px] flex shrink-0 items-center justify-between gap-[16px] bkms-filter-bar px-[12px] py-[8px] shadow-[0_2px_4px_0_var(--bkms-shadow-hover)]"
       >
         <Radio.Group
           v-model="globalTypeFilter"

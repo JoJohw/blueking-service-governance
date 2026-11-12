@@ -62,10 +62,9 @@
                 v-for="item in navList"
                 :key="item.name"
                 :class="[
-                  'px-[16px] text-bkms-navy-4',
+                  'bkms-nav-item',
                   {
                     'bkms-active-nav': item.id === route.meta.menuId,
-                    'hover:text-[#C2CEE5]': item.id !== route.meta.menuId,
                   },
                 ]"
                 :to="{ name: item.name, params: item.params }"
@@ -271,8 +270,5 @@
 <style lang="postcss" scoped>
   :deep(.bk-navigation-title) {
     flex: 0 0 360px;
-  }
-  .bkms-active-nav {
-    color: var(--bkms-text-inverse);
   }
 </style>

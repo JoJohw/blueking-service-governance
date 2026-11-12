@@ -1,0 +1,85 @@
+/*
+ * bkms 专属定制样式：应用壳层（顶部导航/左侧菜单/bk-navigation）与散落页面的颜色语义 class。
+ * 颜色一律引用 --bkms-* token，不写色值字面量。
+ */
+
+/* bk-navigation 主内容区去掉默认内边距，间距由页面级容器自行控制 */
+.bk-navigation-wrapper .navigation-container .container-content {
+  padding: 0 !important;
+}
+
+/* 顶部导航链接：对齐 design-visual（默认 / hover 药丸 / 选中底部渐变指示条） */
+.bkms-nav-item {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 8px;
+  margin-right: 16px;
+  border-radius: 6px;
+  color: var(--bkms-navy-4);
+
+  &:hover {
+    color: var(--bkms-text-inverse);
+    background-color: var(--bkms-navy-2);
+  }
+
+  &.bkms-active-nav {
+    position: relative;
+    color: var(--bkms-text-inverse);
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 24px;
+      height: 4px;
+      border-radius: 6px;
+      background: linear-gradient(
+        155deg,
+        var(--bkms-nav-indicator-1) 0%,
+        var(--bkms-nav-indicator-2) 51%,
+        var(--bkms-nav-indicator-3) 100%
+      );
+      transform: translateX(-50%);
+    }
+  }
+}
+
+/* 左侧菜单（bk-menu）：对齐 design-visual（圆角留边、hover/选中渐变底、选中图标渐变字） */
+/* width:auto 抵消 bk-menu 内部的 width:100%，否则 margin 0 8px 会让圆角块向右溢出菜单 */
+.bkms-themed .bk-menu .bk-menu-item {
+  width: auto;
+  margin: 0 8px;
+  border-radius: 8px;
+
+  &:hover {
+    background-image: linear-gradient(
+      155deg,
+      var(--bkms-neutral-7) 0%,
+      var(--bkms-neutral-6) 51%,
+      var(--bkms-neutral-5) 100%
+    );
+  }
+
+  &.is-active {
+    background-image: linear-gradient(
+      155deg,
+      var(--bkms-brand-7) 0%,
+      var(--bkms-brand-6) 51%,
+      var(--bkms-brand-5) 100%
+    );
+
+    .item-icon i {
+      color: transparent;
+      background-image: linear-gradient(180deg, var(--bkms-brand-3) 0%, var(--bkms-brand-1) 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+  }
+}
+
+/* 筛选条底色（design-visual 规范 #e4e9f2） */
+.bkms-filter-bar {
+  background-color: var(--bkms-neutral-5);
+}

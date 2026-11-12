@@ -17,6 +17,7 @@
  */
 
 @import '@/fonts/style.css';
+@import './bkms.css';
 
 html,
 body,

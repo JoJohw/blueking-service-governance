@@ -59,7 +59,7 @@
       <!-- 部署总览是跨环境视角，事件与部署历史只需要环境选择器，两者都不出现顶部栏；用 v-show 保留环境列表请求 -->
       <FlexRow
         v-show="isTopBarVisible"
-        class="mx-[24px] mt-[20px] mb-[16px] shrink-0 bg-bkms-neutral-6 shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] px-[12px] py-[8px]"
+        class="mx-[24px] mt-[20px] mb-[16px] shrink-0 bkms-filter-bar shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] px-[12px] py-[8px]"
       >
         <template #left>
           <div class="flex">

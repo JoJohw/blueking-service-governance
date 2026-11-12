@@ -20,7 +20,7 @@
   <div class="h-full overflow-auto flex flex-col">
     <!-- 环境选择器 -->
     <div
-      class="bg-bkms-neutral-6 shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] px-[12px] py-[8px] mx-[24px] mt-[20px] mb-[16px] flex items-center gap-[10px] flex-shrink-0"
+      class="bkms-filter-bar shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] px-[12px] py-[8px] mx-[24px] mt-[20px] mb-[16px] flex items-center gap-[10px] flex-shrink-0"
     >
       <EnvPerspectiveSelect
         data-testid="deploy-config-env-select"

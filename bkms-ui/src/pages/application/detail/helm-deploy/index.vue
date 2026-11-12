@@ -18,7 +18,7 @@
 
 <template>
   <div class="flex flex-col h-full">
-    <FlexRow class="px-[12px] py-[8px] bg-bkms-neutral-6 shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] mb-[16px]">
+    <FlexRow class="px-[12px] py-[8px] bkms-filter-bar shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] mb-[16px]">
       <template #left>
         <div class="flex items-center">
           <EnvSelectPanel

@@ -63,9 +63,7 @@
         v-else
         class="flex min-h-0 flex-1 flex-col px-[24px] py-[20px]"
       >
-        <FlexRow
-          class="mb-[16px] flex-shrink-0 bg-bkms-neutral-6 px-[12px] py-[8px] shadow-[0_2px_4px_0_var(--bkms-shadow-hover)]"
-        >
+        <FlexRow class="mb-[16px] flex-shrink-0 bkms-filter-bar px-[12px] py-[8px] shadow-[0_2px_4px_0_var(--bkms-shadow-hover)]">
           <template #left>
             <Select
               ref="dashboardSelectRef"
