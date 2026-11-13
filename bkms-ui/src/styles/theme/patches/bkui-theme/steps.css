@@ -1,9 +1,9 @@
 /* bkui Steps 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-steps .icon-circle-4-1 {
-  border: 2px solid #fff; /* 原值保留（keep：#fff） */
+  border: 2px solid var(--bkms-neutral-10); /* 原 #fff */
   border-right: 0; /* 原值保留 */
   border-bottom: 0; /* 原值保留 */
   border-left: 0; /* 原值保留 */
@@ -20,7 +20,7 @@
 
 .bkms-themed .bk-steps .bk-step .bk-step-indicator {
   color: var(--bkms-neutral-3); /* 原 #979ba5 */
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
   border: 1px solid var(--bkms-neutral-3); /* 原 #979ba5 */
 }
 
@@ -37,26 +37,126 @@
 }
 
 .bkms-themed .bk-steps-primary .bk-step.current .bk-step-number,.bk-steps-primary .bk-step.current .bk-step-icon,.bk-steps-primary .bk-step.current .bk-step-text {
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   background-color: var(--primary-color); /* 原值保留 */
   border-color: var(--primary-color); /* 原值保留 */
 }
 
 .bkms-themed .bk-steps-warning .bk-step.current .bk-step-number,.bk-steps-warning .bk-step.current .bk-step-icon,.bk-steps-warning .bk-step.current .bk-step-text {
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   background-color: var(--warning-color); /* 原值保留 */
   border-color: var(--warning-color); /* 原值保留 */
 }
 
 .bkms-themed .bk-steps-success .bk-step.current .bk-step-number,.bk-steps-success .bk-step.current .bk-step-icon,.bk-steps-success .bk-step.current .bk-step-text {
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   background-color: var(--success-color); /* 原值保留 */
   border-color: var(--success-color); /* 原值保留 */
 }
 
 .bkms-themed .bk-steps-danger .bk-step.current .bk-step-number,.bk-steps-danger .bk-step.current .bk-step-icon,.bk-steps-danger .bk-step.current .bk-step-text {
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   background-color: var(--danger-color); /* 原值保留 */
   border-color: var(--danger-color); /* 原值保留 */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-steps .bk-step.done .bk-step-title {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-steps .bk-step.done:has(+.current.is-error) .bk-step-title:after,.bk-steps .bk-step.done:has(+.current.bk-step-error) .bk-step-title:after,.bk-steps .bk-step.done:has(+.current.is-error) .bk-step-indicator:after,.bk-steps .bk-step.done:has(+.current.bk-step-error) .bk-step-indicator:after {
+  background-image: linear-gradient(to right,var(--bkms-danger-2) 50%,transparent 0%); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-steps .bk-step.current .bk-step-title,.bk-steps .bk-step.current .bk-step-description {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-steps .bk-step.current.bk-step-error .bk-step-indicator {
+  background-color: var(--bkms-danger-2); /* 原 #ea3636 */
+  border-color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-steps .bk-step.current.bk-step-error .bk-step-title,.bk-steps .bk-step.current.bk-step-error .bk-step-description {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-steps .bk-step.is-error .bk-step-indicator {
+  background-color: var(--bkms-danger-2)!important; /* 原 #ea3636 */
+  border-color: var(--bkms-danger-2)!important; /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-steps .bk-step.is-error .bk-step-content .bk-step-title {
+  color: var(--bkms-danger-2)!important; /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-steps-primary .bk-step.done .bk-step-number,.bk-steps-primary .bk-step.done .bk-step-icon,.bk-steps-primary .bk-step.done .bk-step-text {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-steps-primary .bk-step.done .bk-step-title:after,.bk-steps-primary .bk-step.done .bk-step-indicator:after {
+  background-image: linear-gradient(to right,var(--bkms-brand-2) 50%,transparent 0%); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-steps-primary .bk-step.done:after {
+  background-image: linear-gradient(var(--bkms-brand-2) 50%,transparent 0%); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-steps-warning .bk-step.done .bk-step-number,.bk-steps-warning .bk-step.done .bk-step-icon,.bk-steps-warning .bk-step.done .bk-step-text {
+  color: var(--bkms-warning-2); /* 原 #ff9c01 */
+  border-color: var(--bkms-warning-2); /* 原 #ff9c01 */
+}
+
+.bkms-themed .bk-steps-warning .bk-step.done .bk-step-title:after,.bk-steps-warning .bk-step.done .bk-step-indicator:after {
+  background-image: linear-gradient(to right,var(--bkms-warning-2) 50%,transparent 0%); /* 原 #ff9c01 */
+}
+
+.bkms-themed .bk-steps-warning .bk-step.done:after {
+  background-image: linear-gradient(var(--bkms-warning-2) 50%,transparent 0%); /* 原 #ff9c01 */
+}
+
+.bkms-themed .bk-steps-success .bk-step.done .bk-step-number,.bk-steps-success .bk-step.done .bk-step-icon,.bk-steps-success .bk-step.done .bk-step-text {
+  color: var(--bkms-success-2); /* 原 #2dcb56 */
+  border-color: var(--bkms-success-2); /* 原 #2dcb56 */
+}
+
+.bkms-themed .bk-steps-success .bk-step.done .bk-step-title:after,.bk-steps-success .bk-step.done .bk-step-indicator:after {
+  background-image: linear-gradient(to right,var(--bkms-success-2) 50%,transparent 0%); /* 原 #2dcb56 */
+}
+
+.bkms-themed .bk-steps-success .bk-step.done:after {
+  background-image: linear-gradient(var(--bkms-success-2) 50%,transparent 0%); /* 原 #2dcb56 */
+}
+
+.bkms-themed .bk-steps-danger .bk-step.done .bk-step-number,.bk-steps-danger .bk-step.done .bk-step-icon,.bk-steps-danger .bk-step.done .bk-step-text {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+  border-color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-steps-danger .bk-step.done .bk-step-title:after,.bk-steps-danger .bk-step.done .bk-step-indicator:after {
+  background-image: linear-gradient(to right,var(--bkms-danger-2) 50%,transparent 0%); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-steps-danger .bk-step.done:after {
+  background-image: linear-gradient(var(--bkms-danger-2) 50%,transparent 0%); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-steps-dashed .bk-step .bk-step-title:after,.bk-steps-dashed .bk-step .bk-step-indicator:after {
+  background-image: linear-gradient(to right,var(--bkms-navy-5) 50%,transparent 0%); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-steps-solid .bk-step .bk-step-title:after,.bk-steps-solid .bk-step .bk-step-indicator:after {
+  background-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-steps-vertical .bk-step:after {
+  background-image: linear-gradient(var(--bkms-navy-5) 50%,transparent 0%); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-steps-vertical .bk-step.done:has(+.current.is-error):after,.bk-steps-vertical .bk-step.done:has(+.current.bk-step-error):after {
+  background-image: linear-gradient(var(--bkms-danger-2) 50%,transparent 0%); /* 原 #ea3636 */
 }
 

@@ -1,12 +1,30 @@
 /* bkui Progress 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-progress .progress-bar {
   background: var(--bkms-neutral-6); /* 原 #f0f1f5 */
 }
 
 .bkms-themed .bk-progress .inner-text {
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-progress .progress-inner.bk-primary {
+  background: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-progress .progress-inner.bk-success {
+  background: var(--bkms-success-2); /* 原 #2dcb56 */
+}
+
+.bkms-themed .bk-progress .progress-inner.bk-warning {
+  background: var(--bkms-warning-2); /* 原 #ff9c01 */
+}
+
+.bkms-themed .bk-progress .progress-inner.bk-danger {
+  background: var(--bkms-danger-2); /* 原 #ea3636 */
 }
 

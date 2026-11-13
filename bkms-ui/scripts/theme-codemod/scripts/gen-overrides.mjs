@@ -11,7 +11,8 @@
  * 未归属规则不静默丢弃，进 reports/gen-summary.md 供人工收编。
  *
  * 产出：
- *   - src/styles/theme/patches/bkui-theme/<kebab>.css（bkui 组件覆写，按组件族每组件一文件；手写业务补丁在 patches/bkms/，生成器不触碰）
+ *   - src/styles/theme/patches/bkui-theme/<kebab>.css（bkui 组件覆写，按组件族每组件一文件，含变量版段+字面量段；
+ *     手写业务补丁在 patches/bkms/，生成器不触碰）
  *   - reports/gen-summary.md（生成摘要 + 未归属规则 + 未收录 hex）
  *   - reports/pending-values.md（占位值台账，按待确认清单分组）
  *
@@ -25,10 +26,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../../..');
 const DIST = path.join(ROOT, 'node_modules/bkui-vue/dist');
 const PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme');
-const LITERAL_PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme-literal');
 const REPORTS = path.join(__dirname, '../reports');
 
 const readJson = f => JSON.parse(fs.readFileSync(path.join(__dirname, f), 'utf8'));
+
+// 防御性检测：usage.json 是白名单基线（stats-usage.mjs 的产物），缺失时引导生成而非抛裸 ENOENT
+const USAGE_PATH = path.join(__dirname, '../reports/usage.json');
+if (!fs.existsSync(USAGE_PATH)) {
+  console.error(
+    '[gen-overrides] 缺少白名单基线 reports/usage.json，请先执行：node scripts/theme-codemod/scripts/stats-usage.mjs',
+  );
+  process.exit(1);
+}
 const usage = readJson('../reports/usage.json');
 const MAPPING = readJson('../data/mapping.json');
 const KEEP = readJson('../data/keep.json');
@@ -74,7 +83,7 @@ const PREFIX_ALIAS = {
 
 /** 两个产物源：变量版 = 项目引入的 style.variable.css；字面量版 = dist/style.css（lib/*.less 的编译合体，
  * dev 下组件入口 lib/<comp>/index.js 按需加载 .less，选择器与变量版不完全一致（如 .bk-button.bk-button-primary），
- * 同 specificity 下后加载的字面量版会赢——必须单独生成覆写压制（patches/bkui-theme-literal/） */
+ * 同 specificity 下后加载的字面量版会赢——单独生成字面量段压制（排在变量版段之后） */
 const DIST_FILES = ['style.variable.css'];
 const LITERAL_DIST_FILE = 'style.css';
 
@@ -172,7 +181,7 @@ function rewriteValue(rawValue) {
     return { value: rawValue.trim(), comment: `原值保留（keep：${rawHexes}）`, pendingHexes: [] };
   }
   if (pendingHexes.length > 0) {
-    return { value: rawValue.trim(), comment: `pending: 待设计确认（原值）`, pendingHexes };
+    return { value: rawValue.trim(), comment: 'pending: 待设计确认（原值）', pendingHexes };
   }
   let out = rawValue;
   let comment = `原 #${kinds.map(k => k.base6).join(' #')}`;
@@ -313,20 +322,31 @@ function cleanGeneratedDir(dir) {
 }
 cleanGeneratedDir(PATCHES_DIR);
 
+// 文件内段标记：check-overrides.mjs 依赖此字符串切分校验源（两处须同步）
+const LITERAL_SECTION_MARKER =
+  '/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */';
+
 let emittedRules = 0;
 let emittedDecls = 0;
+let literalRules = 0;
+let literalDecls = 0;
 const perComponent = [];
 
-for (const [kebab, bucket] of [...patches.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+// 同名组件一文件两段：变量版段在前、字面量段在后——字面量源选择器可能更具体，
+// 同 specificity 下后者胜，后置即压制
+for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].sort((a, b) => a.localeCompare(b))) {
   const name = COMPONENT_NAME.get(kebab) ?? kebab;
+  const varBucket = patches.get(kebab);
+  const litBucket = literalPatches.get(kebab);
   const lines = [
     `/* bkui ${name} 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */`,
     '',
-    `/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */`,
+    '/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */',
     '',
   ];
-  let ruleCount = 0;
-  for (const { selector, media, decls } of bucket.values()) {
+  let varRuleCount = 0;
+  let varDeclCount = 0;
+  for (const { selector, media, decls } of varBucket?.values() ?? []) {
     if (decls.size === 0) continue;
     const pad = media ? '  ' : '';
     if (media) lines.push(`${media} {`);
@@ -334,82 +354,63 @@ for (const [kebab, bucket] of [...patches.entries()].sort((a, b) => a[0].localeC
     for (const [prop, r] of decls) {
       lines.push(`${pad}  ${prop}: ${r.value}; /* ${r.comment} */`);
       emittedDecls++;
+      varDeclCount++;
     }
     lines.push(`${pad}}`);
-    if (media) lines.push(`}`);
+    if (media) lines.push('}');
     lines.push('');
-    ruleCount++;
+    varRuleCount++;
   }
-  if (ruleCount > 0) {
-    fs.writeFileSync(path.join(PATCHES_DIR, `${kebab}.css`), `${lines.join('\n')}\n`);
-    emittedRules += ruleCount;
-    perComponent.push({
-      kebab,
-      name,
-      rules: ruleCount,
-      decls: [...bucket.values()].reduce((s, b) => s + b.decls.size, 0),
-    });
-  } else {
-    fs.rmSync(path.join(PATCHES_DIR, `${kebab}.css`), { force: true });
-  }
-}
+  emittedRules += varRuleCount;
 
-// 字面量版输出：剔除变量版已覆盖的（media::selector::prop 同键取一，两源同规则无需重复覆写）
-cleanGeneratedDir(LITERAL_PATCHES_DIR);
-
-let literalRules = 0;
-let literalDecls = 0;
-const literalPerComponent = [];
-
-for (const [kebab, bucket] of [...literalPatches.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
-  const name = COMPONENT_NAME.get(kebab) ?? kebab;
-  const varBucket = patches.get(kebab);
-  const lines = [
-    `/* bkui ${name} 字面量覆写 — 压制 lib/*.less 的字面量旧色（选择器逐字复刻 dist/style.css），由 gen-overrides.mjs 生成 */`,
-    '',
-    `/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记 */`,
-    '',
-  ];
-  let ruleCount = 0;
-  for (const { selector, media, decls } of bucket.values()) {
+  // 字面量段：剔除变量版已覆盖的（media::selector::prop 同键取一，两源同规则无需重复覆写）
+  const litLines = [];
+  let litRuleCount = 0;
+  let litDeclCount = 0;
+  for (const { selector, media, decls } of litBucket?.values() ?? []) {
     const varEntry = varBucket?.get(`${media ?? ''}::${selector}`);
     const fresh = [...decls].filter(([prop]) => !varEntry?.decls.has(prop));
     if (fresh.length === 0) continue;
     const pad = media ? '  ' : '';
-    if (media) lines.push(`${media} {`);
-    lines.push(`${pad}.bkms-themed ${selector} {`);
+    if (media) litLines.push(`${media} {`);
+    litLines.push(`${pad}.bkms-themed ${selector} {`);
     for (const [prop, r] of fresh) {
-      lines.push(`${pad}  ${prop}: ${r.value}; /* ${r.comment} */`);
+      litLines.push(`${pad}  ${prop}: ${r.value}; /* ${r.comment} */`);
       literalDecls++;
+      litDeclCount++;
     }
-    lines.push(`${pad}}`);
-    if (media) lines.push(`}`);
-    lines.push('');
-    ruleCount++;
+    litLines.push(`${pad}}`);
+    if (media) litLines.push('}');
+    litLines.push('');
+    litRuleCount++;
   }
-  if (ruleCount > 0) {
-    fs.writeFileSync(path.join(LITERAL_PATCHES_DIR, `${kebab}.css`), `${lines.join('\n')}\n`);
-    literalRules += ruleCount;
-    literalPerComponent.push({ kebab, name, rules: ruleCount });
-  } else {
-    fs.rmSync(path.join(LITERAL_PATCHES_DIR, `${kebab}.css`), { force: true });
+  literalRules += litRuleCount;
+  if (litRuleCount > 0) {
+    lines.push(LITERAL_SECTION_MARKER, '');
+    lines.push(...litLines);
+  }
+
+  if (varRuleCount + litRuleCount > 0) {
+    fs.writeFileSync(path.join(PATCHES_DIR, `${kebab}.css`), `${lines.join('\n')}\n`);
+    perComponent.push({
+      kebab,
+      name,
+      varRules: varRuleCount,
+      litRules: litRuleCount,
+      varDecls: varDeclCount,
+      litDecls: litDeclCount,
+    });
   }
 }
 
 // 域内聚合入口：每个 patches 子目录一个 index.css，theme/index.css 只引各域这一个文件
-// （variables.css 不进域内清单——它由 bkui.ts 紧随产物加载，见 src/styles/theme/variables.css）
 function writeDomainIndex(dir, files, header) {
   fs.writeFileSync(path.join(dir, 'index.css'), [...header, ...files.map(f => `@import './${f}';`), ''].join('\n'));
 }
 writeDomainIndex(
   PATCHES_DIR,
   perComponent.map(p => `${p.kebab}.css`),
-  ['/* bkui 变量版覆写清单 — 由 gen-overrides.mjs 生成，重跑整体覆盖；variables.css 为手工桥接，不在此列 */'],
-);
-writeDomainIndex(
-  LITERAL_PATCHES_DIR,
-  literalPerComponent.map(p => `${p.kebab}.css`),
-  ['/* bkui 字面量覆写清单（压制 lib/*.less 旧色）— 由 gen-overrides.mjs 生成，重跑整体覆盖 */'],
+  ['/* bkui 覆写清单 — 由 gen-overrides.mjs 生成，重跑整体覆盖；variables.css 为手工桥接，不在此列 */'],
 );
 // patches/bkms/index.css 为手工维护（feedback/table 清单），生成器不触碰
 
@@ -420,17 +421,20 @@ const summary = [
   '# gen-overrides 生成摘要',
   '',
   `- 生成时间：${new Date().toISOString()}`,
-  `- dist 数据源：${DIST_FILES.join(', ')}`,
+  `- dist 数据源：${DIST_FILES.join(', ')} + ${LITERAL_DIST_FILE}（字面量段）`,
   `- 扫描含 hex 声明：${scannedDecls}；归属组件：${perComponent.length} 个；生成覆写规则：${emittedRules} 条 / ${emittedDecls} 声明`,
-  `- 字面量源（dist/style.css）：${literalRules} 条 / ${literalDecls} 声明（bkui-theme-literal/，${literalPerComponent.length} 个组件；未归属 ${literalUnassigned} 条不计入台账）`,
+  `- 字面量段（dist/style.css）：${literalRules} 条 / ${literalDecls} 声明（并入 bkui-theme/ 组件文件，${perComponent.filter(p => p.litRules > 0).length} 个组件含字面量段；未归属 ${literalUnassigned} 条不计入台账）`,
   `- 未归属规则（选择器无白名单组件前缀）：${unassigned.length} 条`,
   `- 未收录 hex（不在 mapping/keep/pending 任一清单）：${unknownHexes.size} 种`,
   '',
   '## 按组件产出',
   '',
-  '| 文件 | 组件 | 规则数 | 声明数 |',
+  '| 文件 | 组件 | 规则数（变量+字面量） | 声明数（变量+字面量） |',
   '| --- | --- | --- | --- |',
-  ...perComponent.map(p => `| patches/bkui-theme/${p.kebab}.css | ${p.name} | ${p.rules} | ${p.decls} |`),
+  ...perComponent.map(
+    p =>
+      `| patches/bkui-theme/${p.kebab}.css | ${p.name} | ${p.varRules}+${p.litRules} | ${p.varDecls}+${p.litDecls} |`,
+  ),
   '',
 ];
 if (unassigned.length > 0) {
@@ -475,7 +479,7 @@ for (const [hex, meta] of Object.entries(PENDING)) {
 const ledger = [
   '# 占位值台账（待设计确认）',
   '',
-  '> 覆写文件中标记 `pending: 待设计确认` 的原色值清单。设计拍板后：确认值写入 mapping.json → apply 换值脚本清除标记 → 重跑漂移自检。',
+  '> 覆写文件中标记 `pending: 待设计确认` 的原色值清单。设计拍板后：确认值写入 mapping.json → 重跑 theme:gen 换 token → theme:check 自检。',
   '',
 ];
 for (const [group, items] of groups) {
@@ -509,7 +513,9 @@ if (rulePending.size > 0) {
 }
 fs.writeFileSync(path.join(REPORTS, 'pending-values.md'), ledger.join('\n'));
 
-console.log(`components: ${perComponent.length}, rules: ${emittedRules}, decls: ${emittedDecls}`);
+console.log(
+  `components: ${perComponent.length}, rules: ${emittedRules}+${literalRules}literal, decls: ${emittedDecls}+${literalDecls}literal`,
+);
 console.log(
   `unassigned rules: ${unassigned.length}, unknown hexes: ${unknownHexes.size}, in-rule pending: ${rulePending.size}`,
 );

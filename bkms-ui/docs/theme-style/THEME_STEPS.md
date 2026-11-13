@@ -11,7 +11,7 @@
 
 ## Step 0 前置准备（已执行）
 
-已落地：`scripts/theme-codemod/`（`mapping.json` / `keep.json` / `pending-design.json`、`codemod.mjs`、`extract-root-vars.mjs`、reports）、`src/styles/theme/` 结构（tokens/colors + tokens/semantic + bridge + patches/bkui-theme + patches/bkms + themes + index.css）。
+已落地：`scripts/theme-codemod/`（`mapping.json` / `keep.json` / `pending-design.json`、`codemod.mjs`、`extract-root-vars.mjs`、reports）、`src/styles/theme/` 结构（tokens/colors + tokens/semantic + variables.css 桥接聚合 + patches/bkui-theme + patches/bkms + themes + index.css）。
 
 **实施调整**：
 

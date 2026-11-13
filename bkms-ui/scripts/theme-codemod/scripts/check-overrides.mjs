@@ -17,7 +17,6 @@ const ROOT = path.resolve(__dirname, '../../..');
 const DIST_FILE = path.join(ROOT, 'node_modules/bkui-vue/dist/style.variable.css');
 const LITERAL_DIST_FILE = path.join(ROOT, 'node_modules/bkui-vue/dist/style.css');
 const PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme');
-const LITERAL_PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme-literal');
 
 const HEX_RE = /#[0-9a-f]{3,8}\b/gi;
 const SCOPE = '.bkms-themed ';
@@ -66,25 +65,17 @@ function collectBlocks(text, media, out) {
 const distIndex = buildDistIndex(DIST_FILE);
 const literalDistIndex = buildDistIndex(LITERAL_DIST_FILE);
 
-// 扫描 patches：变量版对 style.variable.css 校验，字面量版对 style.css 校验
-const sources = [
-  { dir: PATCHES_DIR, index: distIndex, label: '' },
-  { dir: LITERAL_PATCHES_DIR, index: literalDistIndex, label: '[literal] ' },
-];
-const patchFiles = [];
-for (const s of sources) {
-  for (const f of fs.existsSync(s.dir) ? fs.readdirSync(s.dir).filter(f => f.endsWith('.css')) : []) {
-    patchFiles.push({ ...s, file: f });
-  }
-}
+// 扫描 patches：每组件文件含两段——标记行之前为变量版段（对 style.variable.css 校验），
+// 之后为字面量段（对 dist/style.css 校验）；标记串与 gen-overrides.mjs 须同步
+const LITERAL_SECTION_MARKER = '/* 字面量版源：dist/style.css';
+
+const patchFiles = fs.existsSync(PATCHES_DIR) ? fs.readdirSync(PATCHES_DIR).filter(f => f.endsWith('.css')) : [];
 let checked = 0;
 const failures = [];
 
-for (const { dir, index, label, file } of patchFiles) {
-  const rules = [];
-  collectBlocks(fs.readFileSync(path.join(dir, file), 'utf8'), null, rules);
+function checkRules(rules, index, file, label) {
   for (const rule of rules) {
-    // 首条规则的 prelude 混有文件头注释（解析器取"上一个 } 到 {"的文本），先剥注释再判定
+    // 首条规则的 prelude 混有文件头/段标记注释（解析器取"上一个 } 到 {"的文本），先剥注释再判定
     const selector = rule.selector
       .replace(/\/\*[\s\S]*?\*\//g, ' ')
       .replace(/\s+/g, ' ')
@@ -120,6 +111,20 @@ for (const { dir, index, label, file } of patchFiles) {
         });
       }
     }
+  }
+}
+
+for (const file of patchFiles) {
+  const text = fs.readFileSync(path.join(PATCHES_DIR, file), 'utf8');
+  const markerIdx = text.indexOf(LITERAL_SECTION_MARKER);
+  const varText = markerIdx === -1 ? text : text.slice(0, markerIdx);
+  const varRules = [];
+  collectBlocks(varText, null, varRules);
+  checkRules(varRules, distIndex, file, '');
+  if (markerIdx !== -1) {
+    const litRules = [];
+    collectBlocks(text.slice(markerIdx), null, litRules);
+    checkRules(litRules, literalDistIndex, file, '[literal] ');
   }
 }
 

@@ -1,6 +1,6 @@
 # 主题色适配指南（多主题体系）
 
-> 版本记录：v0 = `THEME.md`（初版）；v1~v4 见 git 历史（`THEME-v1.md` ~ `THEME-v4.md`，2026-11-06 起文件名不再带版本后缀，历史版本只存在于 git）。本文为现行版，含 2026-11-06 目录重排：theme 移入 `src/styles/theme/`、令牌收进 `tokens/`、patches 按 `bkui-theme/`（生成）与 `bkms/`（手写）分域；设计确认值全部收编（mapping 199），覆写内 pending 清零。
+> 版本记录：v0 = `THEME.md`（初版）；v1~v4 见 git 历史（`THEME-v1.md` ~ `THEME-v4.md`，2026-11-06 起文件名不再带版本后缀，历史版本只存在于 git）。本文为现行版，含 2026-11-06 目录重排：theme 移入 `src/styles/theme/`、令牌收进 `tokens/`、patches 按 `bkui-theme/`（生成）与 `bkms/`（手写）分域；设计确认值全部收编（mapping 230，含 2026-11-13 pending-designer-review 建议值拍板批），覆写内 pending 清零。
 > **关键决策（方向性变更）**：① **编译期替换层（postcss-theme-replace）退役**，组件库写死 hex 改由 **class 选择器覆写**承担；② 覆写层组织规约：按组件域分文件 + `body.bkms-themed` 统一作用域 + 全局无包裹段分离；③ specificity 策略、stylelint 豁免、漂移自检脚本明确；④ DoD 口径更换；⑤ 沿用已定内容：mapping 拆分「spec 已收录 / 待设计确认」、bridge 语义映射写死、UnoCSS 接入、多主题预留、dark 审计备注。
 > 本文数字均于 2026-11-03 对 `node_modules/bkui-vue/dist/style.variable.css`（v2.0.2-beta.97，226KB）实测复核，统计口径随数字标注。
 > 原则：重分析、轻方案；色值真源 = `bkms-color-spec.md`；`--bkms-*` 色阶唯一写在 tokens。
@@ -54,7 +54,7 @@ themes/             主题扩展位           [data-theme] 第二主题时启用
 
 | 色出现位置 | 归属 | 手段 |
 | --- | --- | --- |
-| bkui 变量定义值（prop 以 `--` 开头） | bridge.css | 重声明同名变量指向 `var(--bkms-*)` |
+| bkui 变量定义值（prop 以 `--` 开头） | patches/*/variables.css | 重声明同名变量指向 `var(--bkms-*)` |
 | bkui 组件规则字面量（含渐变/阴影函数参数） | **patches/（class 覆写）** | 复刻原选择器 + `var(--bkms-*)` 整值重写 |
 | 业务代码（`src/**` hex） | codemod | 源码期脚本替换 |
 
@@ -66,7 +66,7 @@ src/styles/theme/
 │   ├── colors.css      # 色阶（唯一写色值处）
 │   └── semantic.css    # 语义层
 ├── patches/
-│   ├── bkui-theme/     # class 覆写，按组件域分文件（生成器管理，重跑整体覆盖；variables.css 为手工桥接，生成器保留）
+│   ├── bkui-theme/     # class 覆写，按组件域分文件（生成器管理，重跑整体覆盖；每文件含变量版段+字面量段；variables.css 为手工桥接，生成器保留）
 │   │   ├── variables.css
 │   │   ├── form.css
 │   │   ├── dialog.css
@@ -79,7 +79,7 @@ src/styles/theme/
 **引入顺序**：
 
 1. `src/main.ts`：`import '~/styles/theme/index.css';`（整包：tokens + patches，放 CSS 组末尾）—— `--bkms-*` 最早有定义。
-2. `src/modules/bkui.ts`：`import 'bkui-vue/dist/style.variable.css';` **紧接其后** `import patches/bkui-theme/variables.css + patches/bkms/variables.css;` —— ES module 规范保证变量桥接后于组件库样式加载。
+2. `src/modules/bkui.ts`：`import 'bkui-vue/dist/style.variable.css';` **紧接其后** `import patches/bkui-theme/variables.css + patches/bkms/variables.css;`（经 theme/variables.css 聚合）—— ES module 规范保证变量桥接后于组件库样式加载。
 3. `src/main.ts` 启动时 `document.body.classList.add('bkms-themed')` —— 覆写作用域运行时挂载（见第五节）。
 
 ## 五、覆写层组织规约
@@ -99,8 +99,8 @@ src/styles/theme/
 ## 六、质量基建
 
 - **stylelint**：`patches/bkui-theme/` 与 `patches/bkms/` 豁免**形态类规则**（`no-descending-specificity`、`selector-class-pattern`、`selector-pseudo-element-colon-notation`、`selector-attribute-quotes`、`order/properties-order`）——覆写逐字复刻 bkui/vxe 产物形态，按本项目规约改写选择器会破坏匹配；`color-no-hex` 全局启用仍待存量清完（排最后），覆写内原值只准进注释。
-- **漂移自检（必要基建，非可选）**：`check-overrides.mjs` 校验 `patches/bkui-theme/` 每条选择器仍存在于 bkui dist css 且原 hex 仍在，失效即报警；`npm run theme:check`，库升级后必跑（当前 270/270 有效）。注意实现细节：覆写文件首条规则的 prelude 混有文件头注释，解析时需先剥注释再判定。
-- **工具链 npm scripts**：`theme:usage`（组件使用统计）→ `theme:gen`（生成覆写）→ `theme:check`（漂移自检），数据基线为 `reports/usage.json` + `mapping/keep/pending-design.json`。
+- **漂移自检（必要基建，非可选）**：`check-overrides.mjs` 校验 `patches/bkui-theme/` 每条选择器仍存在于 bkui dist css 且原 hex 仍在，失效即报警，库升级后必跑。注意实现细节：覆写文件首条规则的 prelude 混有文件头注释，解析时需先剥注释再判定。
+- **工具链 scripts**（直接 node 执行，不占 package.json）：`stats-usage.mjs`（组件使用统计）→ `gen-overrides.mjs`（生成覆写）→ `check-overrides.mjs`（漂移自检），数据基线为 `reports/usage.json` + `mapping/keep/pending-design.json`。
 - **生成器**：`gen-overrides.mjs` 从 bkui dist css 抽取"prop 非 `--` 开头且 value 含 6 位 hex"的 declaration，按选择器+prop 聚合，**只对设计已确认的值**生成覆写草稿，按组件域写入 `patches/bkui-theme/` 输出，人工只审不写；每次重跑 `rmSync` 整个 `bkui-theme/` 重建，但**绝不触碰 `patches/bkms/`**（手写补丁目录，index.css 的 bkms 段由生成器扫描追加 import）。
 - **纪律**：进 `patches/` 前先试 bridge（变量定义值都能走 bridge）；patches 内禁止裸 hex。
 
@@ -137,7 +137,7 @@ src/styles/theme/
 ## 十一、流程约定
 
 - 新增颜色先查 spec 色阶；禁止业务代码直接写新 hex；`--bkms-*` 色阶只在 colors.css 定义。
-- 改组件库变量声明只允许出现在 bridge.css。
+- 改组件库变量声明只允许出现在 patches/*/variables.css。
 - patches 内禁止裸 hex（原值只准进注释）；进 patches 前先试 bridge。
 - 映射字典与 spec 同步维护；未命中色值走统一消化流程，禁止静默跳过。
 - stylelint `color-no-hex` 全局启用替代人工 grep。

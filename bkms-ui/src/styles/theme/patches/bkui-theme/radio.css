@@ -1,10 +1,10 @@
 /* bkui Radio 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-radio-input {
-  color: #fff; /* 原值保留（keep：#fff） */
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
   border: var(--border-width-base) var(--border-style-base) var(--light-gray); /* 原值保留 */
   outline: none; /* 原值保留 */
 }
@@ -18,6 +18,79 @@
 }
 
 .bkms-themed .bk-radio-capsule .is-checked {
-  background: #fff; /* 原值保留（keep：#fff） */
+  background: var(--bkms-neutral-10); /* 原 #fff */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-radio {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-radio.is-checked .bk-radio-input {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+  background-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-radio.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-radio.is-disabled.is-checked .bk-radio-input {
+  background-color: var(--bkms-brand-4); /* 原 #a3c5fd */
+  border-color: var(--bkms-brand-4); /* 原 #a3c5fd */
+}
+
+.bkms-themed .bk-radio.is-disabled .bk-radio-input {
+  border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-radio.is-focused .bk-radio-input {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-radio-input:hover {
+  border-color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-radio-button {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-radio-button .bk-radio-button-label {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-radio-button.is-checked .bk-radio-button-label {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-radio-button.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-radio-tab .bk-radio-button.is-checked .bk-radio-button-label,.bk-radio-card .bk-radio-button.is-checked .bk-radio-button-label {
+  background: var(--bkms-brand-6); /* 原 #e1ecff */
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-radio-tab .bk-radio-button.is-disabled .bk-radio-button-label,.bk-radio-card .bk-radio-button.is-disabled .bk-radio-button-label {
+  background: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-radio-tab .bk-radio-button.is-focused .bk-radio-button-label,.bk-radio-card .bk-radio-button.is-focused .bk-radio-button-label {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-radio-tab .bk-radio-button-label,.bk-radio-card .bk-radio-button-label {
+  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-radio-tab .bk-radio-button-label:hover,.bk-radio-card .bk-radio-button-label:hover {
+  border-color: var(--bkms-neutral-3); /* 原 #979ba5 */
 }
 

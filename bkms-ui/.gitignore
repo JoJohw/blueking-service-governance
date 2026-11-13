@@ -19,3 +19,6 @@ pre-*-bkcodeai
 .env.development
 .env.test
 tsconfig.tsbuildinfo
+
+# 主题工具链产物（theme-codemod 脚本可重建）
+scripts/theme-codemod/reports/*

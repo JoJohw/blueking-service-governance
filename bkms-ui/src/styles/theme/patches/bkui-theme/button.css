@@ -1,11 +1,13 @@
-/* bkui Button 字面量覆写 — 压制 lib/*.less 的字面量旧色（选择器逐字复刻 dist/style.css），由 gen-overrides.mjs 生成 */
+/* bkui Button 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记 */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
 
 .bkms-themed .bk-button {
   color: var(--bkms-neutral-2); /* 原 #63656e */
   text-decoration: none; /* 原值保留 */
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
   border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
   outline: none; /* 原值保留 */
 }
@@ -38,7 +40,7 @@
 
 .bkms-themed .bk-button-group .bk-button:not(.is-disabled) {
   color: var(--bkms-neutral-2); /* 原 #63656e */
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
@@ -48,7 +50,7 @@
 
 .bkms-themed .bk-button-group .bk-button:hover:not(.is-disabled),.bk-button-group .bk-button.is-selected:not(.is-disabled) {
   color: var(--bkms-brand-2); /* 原 #3a84ff */
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
@@ -62,7 +64,7 @@
 
 .bkms-themed .bk-button.bk-button-primary,.bk-button-group .is-selected:not(.is-disabled).bk-button-primary {
   background-color: var(--bkms-brand-2); /* 原 #3a84ff */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
@@ -74,25 +76,25 @@
 .bkms-themed .bk-button.bk-button-primary:active,.bk-button-group .is-selected:not(.is-disabled).bk-button-primary:active {
   background-color: var(--bkms-brand-1); /* 原 #2c77f4 */
   border-color: var(--bkms-brand-1); /* 原 #2c77f4 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-primary.is-outline,.bk-button-group .is-selected:not(.is-disabled).bk-button-primary.is-outline {
   color: var(--bkms-brand-2); /* 原 #3a84ff */
   border-color: var(--bkms-brand-2); /* 原 #3a84ff */
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-primary.is-outline:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-primary.is-outline:hover {
   background-color: var(--bkms-brand-3); /* 原 #5594fa */
   border-color: var(--bkms-brand-3); /* 原 #5594fa */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-primary.is-outline:active,.bk-button-group .is-selected:not(.is-disabled).bk-button-primary.is-outline:active {
   background-color: var(--bkms-brand-1); /* 原 #2c77f4 */
   border-color: var(--bkms-brand-1); /* 原 #2c77f4 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-primary.is-text,.bk-button-group .is-selected:not(.is-disabled).bk-button-primary.is-text {
@@ -111,19 +113,19 @@
 
 .bkms-themed .bk-button.bk-button-primary.is-disabled:not(.is-text),.bk-button-group .is-selected:not(.is-disabled).bk-button-primary.is-disabled:not(.is-text) {
   background-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-button.bk-button-hover-primary:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-hover-primary:hover {
   background-color: var(--bkms-brand-3); /* 原 #5594fa */
   border-color: var(--bkms-brand-3); /* 原 #5594fa */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-warning,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning {
   background-color: var(--bkms-warning-2); /* 原 #ff9c01 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--bkms-warning-2); /* 原 #ff9c01 */
 }
 
@@ -135,25 +137,25 @@
 .bkms-themed .bk-button.bk-button-warning:active,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning:active {
   background-color: var(--bkms-warning-1); /* 原 #eb9000 */
   border-color: var(--bkms-warning-1); /* 原 #eb9000 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-warning.is-outline,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-outline {
   color: var(--bkms-warning-2); /* 原 #ff9c01 */
   border-color: var(--bkms-warning-2); /* 原 #ff9c01 */
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-warning.is-outline:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-outline:hover {
   background-color: #ffb848; /* 原值保留（keep：#ffb848） */
   border-color: #ffb848; /* 原值保留（keep：#ffb848） */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-warning.is-outline:active,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-outline:active {
   background-color: var(--bkms-warning-1); /* 原 #eb9000 */
   border-color: var(--bkms-warning-1); /* 原 #eb9000 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-warning.is-text,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-text {
@@ -172,19 +174,19 @@
 
 .bkms-themed .bk-button.bk-button-warning.is-disabled:not(.is-text),.bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-disabled:not(.is-text) {
   background-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-button.bk-button-hover-warning:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-hover-warning:hover {
   background-color: #ffb848; /* 原值保留（keep：#ffb848） */
   border-color: #ffb848; /* 原值保留（keep：#ffb848） */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-success,.bk-button-group .is-selected:not(.is-disabled).bk-button-success {
   background-color: var(--bkms-success-2); /* 原 #2dcb56 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--bkms-success-2); /* 原 #2dcb56 */
 }
 
@@ -196,25 +198,25 @@
 .bkms-themed .bk-button.bk-button-success:active,.bk-button-group .is-selected:not(.is-disabled).bk-button-success:active {
   background-color: var(--bkms-success-2); /* 原 #1ab943 */
   border-color: var(--bkms-success-2); /* 原 #1ab943 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-success.is-outline,.bk-button-group .is-selected:not(.is-disabled).bk-button-success.is-outline {
   color: var(--bkms-success-2); /* 原 #2dcb56 */
   border-color: var(--bkms-success-2); /* 原 #2dcb56 */
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-success.is-outline:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-success.is-outline:hover {
   background-color: var(--bkms-success-2); /* 原 #45e35f */
   border-color: var(--bkms-success-2); /* 原 #45e35f */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-success.is-outline:active,.bk-button-group .is-selected:not(.is-disabled).bk-button-success.is-outline:active {
   background-color: var(--bkms-success-2); /* 原 #1ab943 */
   border-color: var(--bkms-success-2); /* 原 #1ab943 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-success.is-text,.bk-button-group .is-selected:not(.is-disabled).bk-button-success.is-text {
@@ -233,19 +235,19 @@
 
 .bkms-themed .bk-button.bk-button-success.is-disabled:not(.is-text),.bk-button-group .is-selected:not(.is-disabled).bk-button-success.is-disabled:not(.is-text) {
   background-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-button.bk-button-hover-success:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-hover-success:hover {
   background-color: var(--bkms-success-2); /* 原 #45e35f */
   border-color: var(--bkms-success-2); /* 原 #45e35f */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-danger,.bk-button-group .is-selected:not(.is-disabled).bk-button-danger {
   background-color: var(--bkms-danger-2); /* 原 #ea3636 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
@@ -257,25 +259,25 @@
 .bkms-themed .bk-button.bk-button-danger:active,.bk-button-group .is-selected:not(.is-disabled).bk-button-danger:active {
   background-color: var(--bkms-danger-1); /* 原 #db2626 */
   border-color: var(--bkms-danger-1); /* 原 #db2626 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-danger.is-outline,.bk-button-group .is-selected:not(.is-disabled).bk-button-danger.is-outline {
   color: var(--bkms-danger-2); /* 原 #ea3636 */
   border-color: var(--bkms-danger-2); /* 原 #ea3636 */
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-danger.is-outline:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-danger.is-outline:hover {
   background-color: var(--bkms-danger-3); /* 原 #ff5656 */
   border-color: var(--bkms-danger-3); /* 原 #ff5656 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-danger.is-outline:active,.bk-button-group .is-selected:not(.is-disabled).bk-button-danger.is-outline:active {
   background-color: var(--bkms-danger-1); /* 原 #db2626 */
   border-color: var(--bkms-danger-1); /* 原 #db2626 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-button.bk-button-danger.is-text,.bk-button-group .is-selected:not(.is-disabled).bk-button-danger.is-text {
@@ -294,13 +296,13 @@
 
 .bkms-themed .bk-button.bk-button-danger.is-disabled:not(.is-text),.bk-button-group .is-selected:not(.is-disabled).bk-button-danger.is-disabled:not(.is-text) {
   background-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-button.bk-button-hover-danger:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-hover-danger:hover {
   background-color: var(--bkms-danger-3); /* 原 #ff5656 */
   border-color: var(--bkms-danger-3); /* 原 #ff5656 */
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
 }
 

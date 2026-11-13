@@ -129,7 +129,7 @@ describe('高度链契约（关键页面的高度角色声明）', () => {
 
   it('观测数据页 observation.vue：iframe 容器声明 flex-1 + min-h-0（高度链收口环）', () => {
     const wrapper = mount(AppDetailObservation, mountOptions());
-    const container = wrapper.find('div.bg-white');
+    const container = wrapper.find('div.bkms-bg-card');
     expect(container.exists()).toBe(true);
     expect(container.classes(), 'iframe 容器必须 flex-1 撑满且 min-h-0 可收缩').toEqual(
       expect.arrayContaining(['flex-1', 'min-h-0']),

@@ -1,6 +1,6 @@
 /* bkui Select 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-select.is-focus:not(.is-disabled).normal .bk-select-trigger .bk-select-tag {
   border-color: var(--primary-color); /* 原值保留 */
@@ -40,5 +40,78 @@
   color: var(--bkms-neutral-2); /* 原 #63656e */
   background-color: var(--select-hover-color); /* 原值保留 */
   border-right: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-select.is-focus:not(.is-disabled).simplicity .bk-select-trigger .bk-select-tag {
+  border-bottom-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-select.is-focus .bk-input {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  outline: 0; /* 原值保留 */
+  box-shadow: 0 0 3px var(--bkms-brand-4); /* 原 #a3c5fd */
+}
+
+.bkms-themed .bk-select.is-focus .bk-input.is-simplicity {
+  border-color: transparent; /* 原值保留 */
+  border-bottom-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  box-shadow: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-select.is-focus .bk-input.is-simplicity .bk-input--text {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+
+.bkms-themed .bk-select .bk-input.is-focused {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  outline: 0; /* 原值保留 */
+  box-shadow: 0 0 3px var(--bkms-brand-4); /* 原 #a3c5fd */
+}
+
+.bkms-themed .bk-select .bk-input.is-focused.is-simplicity {
+  border-color: transparent; /* 原值保留 */
+  border-bottom-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  box-shadow: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-select .bk-input--text {
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
+  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag::placeholder {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-simplicity {
+  background-color: transparent; /* 原值保留 */
+  border-color: transparent; /* 原值保留 */
+  border-bottom-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-simplicity:hover {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+  border-color: transparent; /* 原值保留 */
+  border-bottom-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  box-shadow: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag-input {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  background-color: transparent; /* 原值保留 */
+  border: none; /* 原值保留 */
+  outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag-input::placeholder {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 

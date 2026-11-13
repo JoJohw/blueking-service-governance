@@ -1,6 +1,6 @@
 /* bkui Menu 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-menu-submenu .submenu-header-icon .menu-icon {
   color: var(--bkms-navy-5); /* 原 #b0bdd5 */
@@ -17,5 +17,51 @@
 .bkms-themed .bk-menu-item:hover {
   color: var(--menu-active-color); /* 原值保留 */
   background-color: var(--bkms-navy-2); /* 原 #31394f */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-menu {
+  background-color: var(--bkms-navy-1); /* 原 #182132 */
+}
+
+.bkms-themed .bk-menu-submenu.is-opened {
+  background: var(--bkms-navy-1); /* 原 #151d2c */
+}
+
+.bkms-themed .bk-menu-submenu:hover {
+  color: var(--bkms-neutral-10); /* 原 #fff */
+}
+
+.bkms-themed .bk-menu-submenu .submenu-header.is-collapse {
+  color: var(--bkms-neutral-10); /* 原 #fff */
+  background: linear-gradient(90deg,var(--bkms-brand-2),var(--bkms-brand-2)); /* 原 #3f87ff #3a84ff */
+}
+
+.bkms-themed .bk-menu-item {
+  color: var(--bkms-navy-4); /* 原 #96a2b9 */
+}
+
+.bkms-themed .bk-menu-item.is-active {
+  color: var(--bkms-neutral-10); /* 原 #fff */
+  background: linear-gradient(90deg,var(--bkms-brand-2),var(--bkms-brand-2)); /* 原 #3f87ff #3a84ff */
+}
+
+.bkms-themed .bk-menu-item.is-disabled {
+  color: var(--bkms-neutral-2); /* 原 #6e788b */
+}
+
+.bkms-themed .bk-menu-item.is-disabled:hover {
+  color: var(--bkms-neutral-2); /* 原 #6e788b */
+  background: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-menu-item .item-icon .default-icon {
+  background: var(--bkms-neutral-2); /* 原 #6e788b */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
+}
+
+.bkms-themed .bk-menu-group .group-name {
+  color: var(--bkms-neutral-2); /* 原 #6e788b */
 }
 

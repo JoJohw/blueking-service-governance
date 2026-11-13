@@ -1,6 +1,6 @@
 /* bkui DatePicker 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-date-picker-dropdown {
   background-color: var(--date-picker-dropdown-bg); /* 原值保留 */
@@ -119,7 +119,7 @@
 }
 
 .bkms-themed .bk-date-picker-cells-cell-selected em,.bk-date-picker-cells-cell-selected:hover em {
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   background-color: var(--bkms-brand-2); /* 原 #3a84ff */
   box-shadow: 0 0 0 1px var(--bkms-brand-2) inset; /* 原 #3a84ff */
 }
@@ -130,7 +130,7 @@
 }
 
 .bkms-themed .bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em:after {
-  background: #fff; /* 原值保留（keep：#fff） */
+  background: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em,.bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em:hover {
@@ -147,5 +147,58 @@
 
 .bkms-themed .bk-time-picker-with-range .bk-picker-panel-content:after {
   background: var(--bkms-neutral-5); /* 原 #e8eaec */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor.only-bottom-border {
+  border-color: transparent transparent var(--bkms-navy-5) transparent; /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor.only-bottom-border:focus {
+  border-color: transparent transparent var(--bkms-brand-2) transparent; /* 原 #3a84ff */
+  box-shadow: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor.only-bottom-border[disabled],.bk-date-picker-rel .bk-date-picker-editor.only-bottom-border.readonly {
+  border-color: transparent transparent var(--bkms-neutral-5) transparent; /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor:focus {
+  border: 1px solid var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor::placeholder {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor[disabled] {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor.readonly {
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-date-picker-rel .clear-action {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-date-picker-rel .clear-action:hover {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-date-picker-rel .icon-wrapper {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  background-color: transparent; /* 原值保留 */
 }
 

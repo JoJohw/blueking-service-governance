@@ -1,6 +1,6 @@
 /* bkui ScrollUtil（第三方滚动条） 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .scroll-bar-style::-webkit-scrollbar-thumb {
   background: var(--bkms-neutral-5); /* 原 #ddd */

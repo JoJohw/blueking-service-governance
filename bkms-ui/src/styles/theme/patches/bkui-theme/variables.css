@@ -1,9 +1,8 @@
 /*
  * bkui 域变量桥接：重声明 style.variable.css :root 同名变量指向 --bkms-* 令牌。
  * 加载点在 src/modules/bkui.ts（紧随 style.variable.css），不随生成器重建；
- * 逐值清单原存 reports/root-vars.txt（已删，git 可查），未重声明项及原因见 scripts/theme-codemod/docs/bridge-notes.md。
+ * 未重声明项及原因见 scripts/theme-codemod/docs/bridge-notes.md。
  * 语义映射口径（THEME 写死）：white→neutral-10、whitesmoke→neutral-8、gray→neutral-3、light-gray→neutral-4。
- * 待补（设计已拍板）：--menu-bg-color/--nav-header-bg-color/--nav-bg-color → navy-1，见 docs/theme-style/UNASSIGNED-RULES.md 待办 6。
  */
 :root {
   --primary-color: var(--bkms-brand-2);
@@ -23,6 +22,7 @@
   --input-block-color: var(--bkms-neutral-7);
   --input-block-hover-color: var(--bkms-neutral-6);
   --input-maxlength-color: var(--bkms-neutral-3);
+  --input-bg: var(--bkms-neutral-10);
   --button-primary-hover-color: var(--bkms-brand-3);
   --button-danger-hover-color: var(--bkms-danger-3);
   --button-warning-hover-color: var(--bkms-warning-3);
@@ -30,6 +30,10 @@
   --button-primary-active-color: var(--bkms-brand-1);
   --button-selected-bg-color: var(--bkms-brand-6);
   --button-disabled-selected-bg-color: var(--bkms-neutral-6);
+  --button-success-hover-color: var(--bkms-success-2);
+  --button-success-active-color: var(--bkms-success-2);
+  --button-danger-active-color: var(--bkms-danger-1);
+  --button-warning-active-color: var(--bkms-warning-1);
   --radio-font-color: var(--bkms-neutral-2);
   --radio-active-color: var(--bkms-brand-2);
   --radio-hover-border-color: var(--bkms-neutral-3);
@@ -40,6 +44,7 @@
   --radio-button-disabled-checked-bg: var(--bkms-neutral-8);
   --checkbox-disabled-checked-bg: var(--bkms-brand-4);
   --switch-grey-color: var(--bkms-neutral-4);
+  --switch-default-color: var(--bkms-neutral-10);
   --breadcrumb-black-color: var(--bkms-neutral-3);
   --breadcrumb-primary-hover-color: var(--bkms-brand-2);
   --breadcrumb-fn-main-color: var(--bkms-neutral-2);
@@ -48,11 +53,36 @@
   --link-danger-hover-color: var(--bkms-danger-3);
   --link-default-disabled-color: var(--bkms-neutral-5);
   --link-primary-disabled-color: var(--bkms-brand-4);
+  --link-success-hover-color: var(--bkms-success-2);
+  --link-success-disabled-color: var(--bkms-success-4);
+  --link-warning-disabled-color: var(--bkms-warning-4);
+  --link-danger-disabled-color: var(--bkms-danger-4);
   --message-primary-border-color: var(--bkms-brand-6);
   --message-warning-border-color: var(--bkms-warning-5);
+  --message-success-border-color: var(--bkms-success-6);
+  --message-danger-border-color: var(--bkms-danger-5);
+  --message-primary-bg-color: var(--bkms-brand-7);
+  --message-warning-bg-color: var(--bkms-warning-7);
+  --message-success-bg-color: var(--bkms-success-7);
+  --message-danger-bg-color: var(--bkms-danger-6);
+  --message-primary-shadow-color: var(--bkms-neutral-5);
+  --message-warning-shadow-color: var(--bkms-warning-6);
+  --message-success-shadow-color: var(--bkms-success-5);
+  --message-danger-shadow-color: var(--bkms-danger-5);
+  --date-picker-disabled-bg: var(--bkms-neutral-8);
+  --date-picker-dropdown-bg: var(--bkms-neutral-10);
   --slider-default-bg: var(--bkms-neutral-5);
   --slider-disable-bar-bg: var(--bkms-neutral-3);
   --menu-color: var(--bkms-navy-4);
+  --menu-bg-color: var(--bkms-navy-1);
+  --submenu-bg-color: var(--bkms-navy-1);
+  --menu-active-bg-color: var(--bkms-brand-2);
+  --menu-group-color: var(--bkms-neutral-2);
+  --menu-active-color: var(--bkms-neutral-10);
+  --nav-header-bg-color: var(--bkms-navy-1);
+  --nav-bg-color: var(--bkms-navy-1);
+  --fixed-navbar-background: var(--bkms-neutral-10);
+  --table-bg-color: var(--bkms-neutral-10);
   --table-border-color: var(--bkms-neutral-5);
   --table-strip-color: var(--bkms-neutral-8);
   --table-head-bg-color: var(--bkms-neutral-8);
@@ -63,6 +93,7 @@
   --cascader-panel-border-color: var(--bkms-neutral-5);
   --cascader-panel-hover: var(--bkms-neutral-7);
   --cascader-panel-active: var(--bkms-brand-6);
+  --cascader-panel-disabled-bg: var(--bkms-neutral-10);
   --search-select-focus-color: var(--bkms-brand-3);
   --select-active-color: var(--bkms-brand-6);
   --select-hover-color: var(--bkms-neutral-7);

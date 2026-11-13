@@ -1,6 +1,6 @@
 /* bkui ResizeLayout 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-resize-layout-border {
   border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
@@ -37,7 +37,7 @@
 }
 
 .bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-collapse {
-  color: #fff; /* 原值保留（keep：#fff） */
+  color: var(--bkms-neutral-10); /* 原 #fff */
   background: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 

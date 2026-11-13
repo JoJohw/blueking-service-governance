@@ -1,6 +1,8 @@
-/* bkui Loading 字面量覆写 — 压制 lib/*.less 的字面量旧色（选择器逐字复刻 dist/style.css），由 gen-overrides.mjs 生成 */
+/* bkui Loading 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记 */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
 
 .bkms-themed .bk-loading-wrapper .oval {
   background-color: var(--bkms-neutral-2); /* 原 #63656e */
@@ -23,7 +25,7 @@
 }
 
 .bkms-themed .bk-loading-wrapper .bk-loading-indicator.bk-loading-white .oval,.bk-loading-wrapper .bk-loading-indicator.bk-loading-white .dot,.bk-loading-wrapper .bk-loading-indicator.bk-loading-white .dot-1,.bk-loading-wrapper .bk-loading-indicator.bk-loading-white .dot-2,.bk-loading-wrapper .bk-loading-indicator.bk-loading-white .dot-3,.bk-loading-wrapper .bk-loading-indicator.bk-loading-white .dot-4 {
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-loading-wrapper .bk-loading-indicator.bk-loading-default .oval,.bk-loading-wrapper .bk-loading-indicator.bk-loading-default .dot,.bk-loading-wrapper .bk-loading-indicator.bk-loading-default .dot-1,.bk-loading-wrapper .bk-loading-indicator.bk-loading-default .dot-2,.bk-loading-wrapper .bk-loading-indicator.bk-loading-default .dot-3,.bk-loading-wrapper .bk-loading-indicator.bk-loading-default .dot-4 {

@@ -1,6 +1,6 @@
 /* bkui Tab 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-tab--left .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,.bk-tab--right .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,.bk-tab--left .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic,.bk-tab--right .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
   background-color: var(--bkms-brand-4); /* 原 #a3c5fd */
@@ -21,7 +21,7 @@
 }
 
 .bkms-themed .bk-tab-header-next,.bk-tab-header-prev {
-  background: #fff; /* 原值保留（keep：#fff） */
+  background: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-tab--card-tab .bk-tab-header-item:not(:first-of-type):before,.bk-tab--card-tab .bk-tab-header-item:last-of-type:after {
@@ -38,11 +38,11 @@
 }
 
 .bkms-themed .bk-tab--card-tab .bk-tab-header--active,.bk-tab--vertical-tab .bk-tab-header--active {
-  background: #fff; /* 原值保留（keep：#fff） */
+  background: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-tab--card-grid .bk-tab-header--active {
-  background: #fff; /* 原值保留（keep：#fff） */
+  background: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square {
@@ -54,7 +54,95 @@
 }
 
 .bkms-themed .bk-tab--card-grid .bk-tab-content {
-  background: #fff; /* 原值保留（keep：#fff） */
+  background: var(--bkms-neutral-10); /* 原 #fff */
   box-shadow: 0 2px 4px var(--bkms-shadow-card); /* 原 #1919290d */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-tab-header {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-tab--left .bk-tab-header {
+  border-right: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--right .bk-tab-header {
+  border-left: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--card-tab .bk-tab-header .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-square {
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
+}
+
+.bkms-themed .bk-tab--card-tab .bk-tab-header .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-tab--card .bk-tab-header,.bk-tab--vertical-card .bk-tab-header {
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--border-card .bk-tab-header {
+  border: solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--unborder-card .bk-tab-header {
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--card .bk-tab-header-nav,.bk-tab--border-card .bk-tab-header-nav,.bk-tab--vertical-card .bk-tab-header-nav {
+  border-left: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--card .bk-tab-header-item,.bk-tab--vertical-card .bk-tab-header-item {
+  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab--card .bk-tab-header-item,.bk-tab--border-card .bk-tab-header-item,.bk-tab--vertical-card .bk-tab-header-item {
+  border-right: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-tab-header-item .bk-tab-header--has-num-right {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-default,.bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-bracket {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-tab-header-item:hover {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-tab-header-item:hover .bk-tab-header--close {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-tab-header--active {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-tab--card .bk-tab-header--active,.bk-tab--border-card .bk-tab-header--active,.bk-tab--vertical-card .bk-tab-header--active {
+  background: var(--bkms-neutral-10); /* 原 #fff */
+  border-bottom-color: var(--bkms-neutral-10); /* 原 #fff */
+}
+
+.bkms-themed .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-bracket,.bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,.bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-tab-header--close {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tab-header-active-bar {
+  background: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-tab--border-card .bk-tab-content,.bk-tab--vertical-card .bk-tab-content {
+  border: solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 

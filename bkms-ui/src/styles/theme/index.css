@@ -3,5 +3,4 @@
 @import './tokens/colors.css';
 @import './tokens/semantic.css';
 @import './patches/bkui-theme/index.css';
-@import './patches/bkui-theme-literal/index.css';
 @import './patches/bkms/index.css';

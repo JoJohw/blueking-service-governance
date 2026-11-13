@@ -79,6 +79,12 @@
   }
 }
 
+/* 菜单分组标题：对齐图标列。bkui 默认 18px 是按整宽菜单项（无留边）算的，
+   上面给菜单项加了 8px 圆角留边，图标列随之右移，标题需同步补 8px 才能保持与图标列的相对位置 */
+.bkms-themed .bk-menu .bk-menu-group .group-name {
+  margin: 0 18px 0 26px;
+}
+
 /* 筛选条底色（design-visual 规范 #e4e9f2） */
 .bkms-filter-bar {
   background-color: var(--bkms-neutral-5);

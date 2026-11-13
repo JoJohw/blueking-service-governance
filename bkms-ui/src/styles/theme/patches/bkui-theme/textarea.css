@@ -1,10 +1,10 @@
 /* bkui Textarea（Input textarea 形态） 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-textarea {
   color: var(--input-color); /* 原值保留 */
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
   border: var(--border-width-base) var(--border-style-base) var(--input-border-color); /* 原值保留 */
 }
 
@@ -14,5 +14,38 @@
 
 .bkms-themed .bk-textarea--suffix-icon:hover {
   color: var(--bkms-neutral-1); /* 原 #313238 */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-textarea ::placeholder {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-textarea.is-disabled,.bk-textarea.is-readonly {
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-textarea.is-disabled input,.bk-textarea.is-readonly input,.bk-textarea.is-disabled textarea,.bk-textarea.is-readonly textarea {
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+}
+
+.bkms-themed .bk-textarea--max-length.is-over-limit {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-textarea--max-length span {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-textarea.is-focused:not(.is-readonly) {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  outline: 0; /* 原值保留 */
+  box-shadow: 0 0 3px var(--bkms-brand-4); /* 原 #a3c5fd */
+}
+
+.bkms-themed .bk-textarea--suffix-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
 }
 

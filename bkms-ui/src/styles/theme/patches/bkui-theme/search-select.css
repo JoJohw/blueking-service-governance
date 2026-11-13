@@ -1,16 +1,16 @@
 /* bkui SearchSelect 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-search-select .focus {
   color: var(--search-select-focus-color); /* 原值保留 */
-  background: #fff!important; /* 原值保留（keep：#fff） */
+  background: var(--bkms-neutral-10)!important; /* 原 #fff */
   border-color: var(--search-select-focus-border-color)!important; /* 原值保留 */
 }
 
 .bkms-themed .bk-search-select-container.is-focus {
   color: var(--search-select-focus-color); /* 原值保留 */
-  background: #fff!important; /* 原值保留（keep：#fff） */
+  background: var(--bkms-neutral-10)!important; /* 原 #fff */
   border-color: var(--search-select-focus-border-color)!important; /* 原值保留 */
 }
 
@@ -33,7 +33,7 @@
 
 .bkms-themed .bk-search-select-container .search-nextfix .search-nextfix-icon.is-focus {
   color: var(--search-select-focus-color); /* 原值保留 */
-  background: #fff!important; /* 原值保留（keep：#fff） */
+  background: var(--bkms-neutral-10)!important; /* 原 #fff */
   border-color: var(--search-select-focus-border-color)!important; /* 原值保留 */
 }
 
@@ -47,7 +47,7 @@
 }
 
 .bkms-themed .bk-search-select-menu .menu-disabled-mixin:hover {
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-search-select-menu .menu-header-item:hover {
@@ -55,7 +55,7 @@
 }
 
 .bkms-themed .bk-search-select-menu .menu-header-item.is-disabled:hover {
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-search-select-menu .menu-content-wrapper .menu-condition {
@@ -72,10 +72,104 @@
 }
 
 .bkms-themed .bk-search-select-menu .menu-content .menu-item.is-disabled:hover {
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
 .bkms-themed .bk-search-select-menu .menu-footer-btn.is-disabled:hover {
-  background-color: #fff; /* 原值保留（keep：#fff） */
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-search-select-container {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-search-select-container .search-container-selected:hover .selected-clear {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-search-select-container .search-container-input {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-search-select-container .search-container-input .input-before:after {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-container .search-container-input .input-after:after {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-container .search-container .selected-input {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+  border: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-search-select-container .search-nextfix {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-container .search-nextfix .search-clear {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-tips {
+  color: var(--bkms-danger-2); /* 原 #ea3636 */
+}
+
+.bkms-themed .bk-search-select-menu {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-search-select-menu .menu-disabled-mixin {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-menu .menu-header {
+  border-bottom: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-menu .menu-header-item.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item .is-keyword {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item.is-hover .menu-name {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item.is-disabled .menu-name {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-search-select-menu .menu-content .menu-item .menu-name {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-search-select-menu .menu-footer {
+  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-search-select-menu .menu-footer-btn:first-child {
+  border-right: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-search-select-menu .menu-footer-btn:hover {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-search-select-menu .menu-footer-btn.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 

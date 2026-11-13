@@ -1,6 +1,6 @@
 /* bkui TagInput 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-form-item.is-error .bk-input,.bk-form-item.is-error .bk-textarea,.bk-form-item.is-error .bk-cascader,.bk-form-item.is-error .bk-date-picker-editor,.bk-form-item.is-error .bk-select-tag,.bk-form-item.is-error .bk-tag-input {
   border-color: var(--bkms-danger-2); /* 原 #ea3636 */
@@ -53,5 +53,66 @@
 
 .bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item:hover {
   background-color: var(--bkms-brand-7); /* 原 #eaf3ff */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger {
+  background: var(--bkms-neutral-10); /* 原 #fff */
+  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger.active {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger .placeholder {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger .clear-icon {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger .clear-icon:hover {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger .copy-icon {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger .copy-icon:hover {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item {
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
+  border-right: var(--bkms-navy-5); /* 原 #c4c6cc */
+  border-left: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item:first-child {
+  border-top: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item:last-child {
+  border-bottom: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item.disabled {
+  background: var(--bkms-neutral-10); /* 原 #fff */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item.disabled .text {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item .text {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item .highlight-text {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 

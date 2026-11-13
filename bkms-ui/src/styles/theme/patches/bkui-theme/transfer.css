@@ -1,6 +1,6 @@
 /* bkui Transfer 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-transfer .source-list .content li.custom-item:hover:not(.is-disabled),.bk-transfer .target-list .content li.custom-item:hover:not(.is-disabled),.bk-transfer .source-list .content li .item-content:hover:not(.is-disabled),.bk-transfer .target-list .content li .item-content:hover:not(.is-disabled),.bk-transfer .source-list .content .checkbox-item:hover:not(.is-disabled),.bk-transfer .target-list .content .checkbox-item:hover:not(.is-disabled) {
   color: var(--primary-color); /* 原值保留 */
@@ -9,5 +9,62 @@
 
 .bkms-themed .bk-transfer .source-list .content::-webkit-scrollbar-thumb,.bk-transfer .target-list .content::-webkit-scrollbar-thumb {
   background-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-transfer .bk-transfer-icon {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-transfer .transfer-button-group .transfer-button {
+  color: var(--bkms-neutral-10); /* 原 #fff */
+  background-color: var(--bkms-brand-2); /* 原 #3a84ff */
+  border: 1px solid var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-transfer .transfer-button-group .transfer-button.disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-transfer .source-list,.bk-transfer .target-list {
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
+  border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-transfer .source-list .slot-header,.bk-transfer .target-list .slot-header,.bk-transfer .source-list .header,.bk-transfer .target-list .header {
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
+.bkms-themed .bk-transfer .source-list .header .select-all,.bk-transfer .target-list .header .select-all {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-transfer .source-list .header .select-all.disabled,.bk-transfer .target-list .header .select-all.disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-transfer .source-list .header .select-total-count,.bk-transfer .target-list .header .select-total-count {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-transfer .source-list .transfer-search-input,.bk-transfer .target-list .transfer-search-input {
+  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-transfer .source-list .transfer-search-input .bk-icon-search,.bk-transfer .target-list .transfer-search-input .bk-icon-search {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-transfer .source-list .empty,.bk-transfer .target-list .empty {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-transfer .source-list .content li.custom-item.is-disabled,.bk-transfer .target-list .content li.custom-item.is-disabled,.bk-transfer .source-list .content li .item-content.is-disabled,.bk-transfer .target-list .content li .item-content.is-disabled,.bk-transfer .source-list .content .checkbox-item.is-disabled,.bk-transfer .target-list .content .checkbox-item.is-disabled {
+  color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 

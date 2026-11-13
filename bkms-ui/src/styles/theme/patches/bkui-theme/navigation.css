@@ -1,6 +1,6 @@
 /* bkui Navigation 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后由 apply 脚本换 token） */
+/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-navigation-title .title-icon {
   color: var(--bkms-neutral-3); /* 原 #768197 */
@@ -29,7 +29,7 @@
 }
 
 .bkms-themed .bk-navigation-wrapper .navigation-container .container-header {
-  background: #fff; /* 原值保留（keep：#fff） */
+  background: var(--bkms-neutral-10); /* 原 #fff */
   border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
   box-shadow: 0 3px 4px color-mix(in srgb, var(--bkms-brand-3) 6%, transparent); /* 原 #4070cb0f */
 }
@@ -40,5 +40,15 @@
 
 .bkms-themed .bk-navigation-wrapper .navigation-container .container-content {
   background: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-navigation-header {
+  background: var(--bkms-navy-1); /* 原 #182132 */
+}
+
+.bkms-themed .bk-navigation-wrapper .navigation-nav .nav-slider {
+  background-color: var(--bkms-navy-1); /* 原 #182132 */
 }
 
