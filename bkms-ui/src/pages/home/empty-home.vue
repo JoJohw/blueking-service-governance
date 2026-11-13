@@ -18,7 +18,7 @@
 
 <template>
   <div
-    class="flex items-center justify-center mx-[100px] my-[24px] rounded-[8px] bkms-bg-card shadow-[0_2px_4px_0_#1919290d] min-h-[calc(100vh-150px)]"
+    class="flex items-center justify-center mx-[100px] my-[24px] rounded-[8px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)] min-h-[calc(100vh-150px)]"
   >
     <div class="flex flex-col items-center">
       <img
@@ -87,19 +87,19 @@
   const features = [
     {
       icon: 'bkms-icon bkms-icon-auto-refresh-line',
-      bgGradient: 'linear-gradient(180deg, #76AAFF 0%, #3A84FF 100%)',
+      bgGradient: 'linear-gradient(180deg, var(--bkms-brand-3) 0%, var(--bkms-brand-2) 100%)',
       title: t('全流程自动化'),
       desc: t('打通代码构建、部署到运维观测的完整闭环'),
     },
     {
       icon: 'bkms-icon bkms-icon-jicheng',
-      bgGradient: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
+      bgGradient: 'linear-gradient(135deg, var(--bkms-cyan-2) 0%, var(--bkms-cyan-3) 100%)',
       title: t('深度生态集成'),
       desc: t('集成配置管理、服务发现、全链路追踪'),
     },
     {
       icon: 'bkms-icon bkms-icon-shipei',
-      bgGradient: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+      bgGradient: 'linear-gradient(135deg, var(--bkms-purple-3) 0%, var(--bkms-purple-4) 100%)',
       title: t('多场景适配'),
       desc: t('支持 tRPC、Helm、TAF 等多种应用类型'),
     },

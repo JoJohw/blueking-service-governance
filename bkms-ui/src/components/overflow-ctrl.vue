@@ -163,12 +163,12 @@
     width: 16px;
     height: 32px;
     cursor: pointer;
-    color: var(--bkms-neutral-3);
+    color: var(--bkms-text-secondary);
     transition: color 0.2s;
     background-color: var(--bkms-neutral-6);
 
     &:hover {
-      color: var(--bkms-brand-2);
+      color: var(--bkms-text-brand);
     }
 
     &.left {

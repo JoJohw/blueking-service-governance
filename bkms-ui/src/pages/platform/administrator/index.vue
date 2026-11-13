@@ -25,7 +25,7 @@
       :title="$t('管理员能查看并执行“平台管理”导航下所有操作。')"
     />
 
-    <div class="p-[16px] bkms-bg-card shadow-[0_2px_4px_0_#1919290d]">
+    <div class="p-[16px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
       <div class="flex justify-between mb-[16px]">
         <Button
           theme="primary"

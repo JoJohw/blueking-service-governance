@@ -295,7 +295,7 @@
   :deep(.bk-input.is-simplicity) {
     &.is-focused {
       .custom-filter-search-icon {
-        color: var(--bkms-brand-2);
+        color: var(--bkms-text-brand);
       }
     }
     &:hover:not(.is-disabled) {
@@ -320,9 +320,9 @@
     padding: 8px 10px 8px 12px;
     display: inline-block;
     &:hover {
-      background-color: var(--bkms-neutral-7);
+      background-color: var(--bkms-bg-hover);
       .bk-checkbox-input {
-        border-color: var(--bkms-brand-2);
+        border-color: var(--bkms-line-active);
         box-shadow: 0 0 0 1px var(--bkms-brand-3);
       }
     }
@@ -331,8 +331,8 @@
       width: 14px;
       height: 14px;
       border-radius: 3px;
-      border-color: var(--bkms-neutral-5);
-      box-shadow: 0 0 0 1px var(--bkms-neutral-5);
+      border-color: var(--bkms-line-default);
+      box-shadow: 0 0 0 1px var(--bkms-line-default);
     }
     .bk-checkbox-label {
       width: calc(100% - 22px);
@@ -343,7 +343,7 @@
   }
   :deep(.bk-checkbox.is-checked) {
     .bk-checkbox-label {
-      color: var(--bkms-brand-2);
+      color: var(--bkms-text-brand);
     }
   }
 </style>

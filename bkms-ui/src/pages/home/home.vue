@@ -80,10 +80,12 @@
 
             <!-- 顶部问候栏 -->
             <div
-              class="flex items-center justify-between p-[16px] mb-[24px] rounded-[8px] bkms-bg-card shadow-[0_2px_4px_0_#1919290d]"
+              class="flex items-center justify-between p-[16px] mb-[24px] rounded-[8px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
             >
               <div class="flex items-center">
-                <div class="w-[60px] h-[60px] rounded-[12px] bkms-bg-brand-soft flex items-center justify-center mr-[16px]">
+                <div
+                  class="w-[60px] h-[60px] rounded-[12px] bkms-bg-brand-soft flex items-center justify-center mr-[16px]"
+                >
                   <Coffee class="w-[28px] h-[28px] animate-bounce-coffee" />
                 </div>
                 <div>
@@ -126,7 +128,7 @@
               <div
                 v-for="(space, spaceIndex) in overviewList"
                 :key="space.id"
-                class="bkms-bg-card rounded-[8px] shadow-[0_2px_4px_0_#1919290d] overflow-hidden"
+                class="bkms-bg-card rounded-[8px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)] overflow-hidden"
               >
                 <!-- 卡片头部 -->
                 <div class="flex items-center justify-between p-[16px]">
@@ -335,7 +337,14 @@
   );
 
   // 空间 icon 颜色循环
-  const spaceColors = ['#3A84FF', '#2CAF5E', '#F59500', '#6228FF', '#EF6317', '#EA3636'];
+  const spaceColors = [
+    'var(--bkms-brand-2)',
+    'var(--bkms-success-2)',
+    'var(--bkms-warning-2)',
+    'var(--bkms-purple-2)',
+    '#EF6317',
+    'var(--bkms-danger-2)',
+  ];
 
   function getGroupedEnvCount(item: unknown): number {
     return isGroupedEnv(item) ? item.count : 0;

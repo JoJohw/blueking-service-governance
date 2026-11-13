@@ -18,7 +18,16 @@
 
 <template>
   <!-- 自定义内容 -->
-  <main class="h-full w-full relative overflow-x-hidden bkms-bg-page px-[24px] py-[16px]">
+  <main
+    class="h-full w-full relative overflow-x-hidden bkms-bg-page"
+    :class="route.meta.contentPadding ? 'p-[16px]' : 'px-[24px] py-[16px]'"
+  >
     <RouterView />
   </main>
 </template>
+
+<script setup lang="ts">
+  import { useRoute } from 'vue-router';
+
+  const route = useRoute();
+</script>

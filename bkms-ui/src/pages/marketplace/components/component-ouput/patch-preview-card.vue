@@ -61,6 +61,6 @@
 
 <style lang="postcss" scoped>
   :deep(.monaco-diff-editor) .diffOverview {
-    background-color: #1e1e1e;
+    background-color: var(--bkms-neutral-1);
   }
 </style>

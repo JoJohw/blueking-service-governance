@@ -512,13 +512,13 @@
   }
   .version-active,
   .version-content:hover {
-    border-color: #3a84ff;
+    border-color: var(--bkms-line-active);
     .version {
-      color: #3a84ff;
+      color: var(--bkms-text-brand);
     }
     .reference-count {
-      color: #3a84ff;
-      background-color: #e1ecff;
+      color: var(--bkms-text-brand);
+      background-color: var(--bkms-bg-active);
     }
   }
   .version-content:hover {

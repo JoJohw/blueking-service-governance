@@ -63,7 +63,7 @@
       class="bkms-bg-card px-[16px] pb-[4px]"
     >
       <div
-        class="pending-redeploy-grid border-b border-bkms-warning-6 py-[8px] text-[12px] bkms-text-secondary"
+        class="pending-redeploy-grid border-b border-b-bkms-warning-6 py-[8px] text-[12px] bkms-text-secondary"
       >
         <span>{{ $t('待部署环境') }}</span>
         <span>{{ $t('北极星服务名') }}</span>
@@ -73,7 +73,7 @@
       <div
         v-for="group in pendingRedeployGroups"
         :key="group.envName"
-        class="pending-redeploy-grid border-b border-bkms-neutral-7 last:border-b-0"
+        class="pending-redeploy-grid border-b border-b-bkms-neutral-7 last:border-b-0"
       >
         <div class="flex min-w-0 items-center">
           <OverflowTitle
@@ -95,7 +95,7 @@
           <div
             v-for="item in group.items"
             :key="item.configName"
-            class="pending-redeploy-item-grid border-b border-bkms-neutral-7 py-[10px] last:border-b-0"
+            class="pending-redeploy-item-grid border-b border-b-bkms-neutral-7 py-[10px] last:border-b-0"
           >
             <div class="w-full min-w-0 overflow-hidden">
               <OverflowTitle

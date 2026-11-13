@@ -33,7 +33,7 @@
         <span class="flex items-center text-bkms-neutral-6 text-[14px] cursor-pointer">
           <Loading
             class="mr-[5px]"
-            color="#182132"
+            color="var(--bkms-navy-1)"
             :loading="spaceStore.isLoading"
             :opacity="1"
             size="small"

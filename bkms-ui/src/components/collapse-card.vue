@@ -67,7 +67,7 @@
       margin: 0 16px;
       padding: unset;
       width: calc(100% - 32px);
-      border-color: var(--bkms-neutral-5);
+      border-color: var(--bkms-line-default);
       cursor: auto;
     }
     & :deep(.bk-card-body) {

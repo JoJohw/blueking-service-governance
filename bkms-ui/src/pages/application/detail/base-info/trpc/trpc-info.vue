@@ -217,7 +217,7 @@
                         class="rounded-[2px] overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
                         header-class="!hover:bg-bkms-neutral-6"
-                        normal-bg-color="var(--bkms-neutral-7)"
+                        normal-bg-color="var(--bkms-bg-page)"
                         type="normal"
                       >
                         <template #icon>
@@ -239,7 +239,7 @@
                         class="rounded-[2px] overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
                         header-class="!hover:bg-bkms-neutral-6"
-                        normal-bg-color="var(--bkms-neutral-7)"
+                        normal-bg-color="var(--bkms-bg-page)"
                         type="normal"
                       >
                         <template #icon>
@@ -261,7 +261,7 @@
                         class="rounded-[2px] overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
                         header-class="!hover:bg-bkms-neutral-6"
-                        normal-bg-color="var(--bkms-neutral-7)"
+                        normal-bg-color="var(--bkms-bg-page)"
                         type="normal"
                       >
                         <template #icon>
@@ -283,7 +283,7 @@
                         class="rounded-[2px] overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
                         header-class="!hover:bg-bkms-neutral-6"
-                        normal-bg-color="var(--bkms-neutral-7)"
+                        normal-bg-color="var(--bkms-bg-page)"
                         type="normal"
                       >
                         <template #icon>
@@ -305,7 +305,7 @@
                         class="rounded-[2px] overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
                         header-class="!hover:bg-bkms-neutral-6"
-                        normal-bg-color="var(--bkms-neutral-7)"
+                        normal-bg-color="var(--bkms-bg-page)"
                         type="normal"
                       >
                         <template #icon>

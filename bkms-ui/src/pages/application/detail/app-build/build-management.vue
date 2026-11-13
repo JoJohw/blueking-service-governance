@@ -19,7 +19,9 @@
 <template>
   <div class="w-full">
     <!-- 自定义 Header -->
-    <div class="h-[52px] flex items-center justify-between px-[24px] bkms-bg-card shadow-[0_3px_4px_0_var(--bkms-shadow-header)]">
+    <div
+      class="h-[52px] flex items-center justify-between px-[24px] bkms-bg-card shadow-[0_3px_4px_0_var(--bkms-shadow-header)]"
+    >
       <div class="text-[16px] bkms-text-title">{{ $t('构建管理') }}</div>
       <Button
         text
@@ -30,7 +32,7 @@
         <span class="text-[14px]">{{ $t('构建配置') }}</span>
       </Button>
     </div>
-    <div class="px-[24px] py-[20px]">
+    <div class="p-[16px]">
       <Skeleton
         :loading="loading"
         theme="gray"
@@ -45,243 +47,245 @@
           <Layout.shape :width="400" />
           <Layout.table class="mt-[10px]" />
         </template>
-        <FlexRow>
-          <template #left>
-            <div class="flex">
-              <Button
-                v-if="isImageRegistry"
-                v-bk-tooltips="$t('应用的镜像来源为镜像仓库，无需执行构建')"
-                class="mr-[10px] w-[80px]"
-                disabled
-                theme="primary"
-              >
-                {{ $t('执行构建') }}
-              </Button>
-              <Popover
-                v-else
-                hide-ignore-reference
-                :is-show="showPopConfirm"
-                placement="bottom-start"
-                theme="light"
-                trigger="manual"
-              >
+        <div class="overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]">
+          <FlexRow>
+            <template #left>
+              <div class="flex">
                 <Button
+                  v-if="isImageRegistry"
+                  v-bk-tooltips="$t('应用的镜像来源为镜像仓库，无需执行构建')"
                   class="mr-[10px] w-[80px]"
+                  disabled
                   theme="primary"
-                  @click="showPopConfirm = true"
                 >
                   {{ $t('执行构建') }}
                 </Button>
-                <template #content>
-                  <div @mousedown="dismissBranchSelectOnOutsideMouseDown">
-                    <div class="pb-[16px] text-[14px]">{{ $t('执行配置') }}</div>
-                    <Form
-                      ref="executeFormRef"
-                      form-type="vertical"
-                      :model="formData"
-                      :rules="rules"
-                    >
-                      <CodeRevisionField
-                        ref="branchSelectRef"
-                        v-model="formData.revision"
-                        v-model:revision-type="formData.revisionType"
-                        control-class="w-[400px]"
-                        :default-revision="defaultRevision"
-                        :description="$t('值会通过变量 {0} 传给流水线', ['BKMS_REPO_REVISION'])"
-                        :repository-id="repoAlias"
-                        :required="isBuildFieldRequired"
-                        :show-source="showCodeSource"
-                        :workspace-id="workspaceId"
-                        @confirm="handleRevisionConfirm"
-                      />
-                      <Form.FormItem
-                        :description="$t('值会通过变量 {0} 传给流水线', ['BKMS_IMAGE_TAG'])"
-                        :label="$t('版本号（镜像 Tag）')"
-                        property="tag"
-                        :required="isBuildFieldRequired"
-                      >
-                        <Input
-                          v-model.trim="formData.tag"
-                          class="w-[400px]"
-                          clearable
-                          :placeholder="`${$t('请输入，例如')}v1.0.0-alpha.1`"
-                        />
-                        <p
-                          v-if="recommendTag"
-                          class="bkms-text-secondary"
-                        >
-                          {{ $t('推荐版本号') }}：{{ recommendTag }}
-                        </p>
-                      </Form.FormItem>
-                    </Form>
-                    <div class="flex justify-end mt-[10px]">
-                      <Button
-                        :loading="isLoading"
-                        size="small"
-                        theme="primary"
-                        @click="handleExecuteSource"
-                      >
-                        {{ $t('确认') }}
-                      </Button>
-                      <Button
-                        class="ml-[8px]"
-                        size="small"
-                        @click="showPopConfirm = false"
-                      >
-                        {{ $t('取消') }}
-                      </Button>
-                    </div>
-                  </div>
-                </template>
-              </Popover>
-              <Input
-                v-model.trim="searchValue"
-                class="w-[400px]"
-                clearable
-                :placeholder="
-                  createPlaceholder({
-                    labels: ['制品', '触发人'],
-                  })
-                "
-                type="search"
-                @focus="showPopConfirm = false"
-              />
-            </div>
-          </template>
-        </FlexRow>
-        <Table
-          auto-resize
-          class="mt-[16px] w-full build-table"
-          :data="buildList"
-          :pagination="pagination"
-          :row-config="{
-            isHover: true,
-            isCurrent: true,
-          }"
-          :settings="settings"
-          :show-settings="true"
-          :sort-config="sortConfig"
-          sync-resize
-          :tooltip-config="tooltipConfig"
-          @page-limit-change="pageSizeChange"
-          @page-value-change="pageChange"
-          @setting-change="handleSettingChange"
-        >
-          <template #empty>
-            <TableException
-              :type="curExceptionType"
-              @clear="handleClearFilters"
-              @refresh="fetchBuildList"
-            >
-            </TableException>
-          </template>
-          <TableColumn
-            field="buildNum"
-            fixed="left"
-            :label="$t('构建号')"
-            show-overflow="tooltip"
-            :width="100"
-          >
-            <template #default="{ row }">
-              <div
-                class="cursor-pointer flex items-center"
-                @click.stop="handleOpenBuildLog(row)"
-              >
-                <span
-                  v-if="row.buildNum"
-                  :class="[getColor(row.status)]"
+                <Popover
+                  v-else
+                  hide-ignore-reference
+                  :is-show="showPopConfirm"
+                  placement="bottom-start"
+                  theme="light"
+                  trigger="manual"
                 >
-                  {{ `#${row.buildNum}` }}
-                </span>
-                <span v-else>--</span>
-                <StatusIcon
-                  v-if="isRunning(row.status)"
-                  class="ml-[6px]"
-                  hide-text
-                  pending
+                  <Button
+                    class="mr-[10px] w-[80px]"
+                    theme="primary"
+                    @click="showPopConfirm = true"
+                  >
+                    {{ $t('执行构建') }}
+                  </Button>
+                  <template #content>
+                    <div @mousedown="dismissBranchSelectOnOutsideMouseDown">
+                      <div class="pb-[16px] text-[14px]">{{ $t('执行配置') }}</div>
+                      <Form
+                        ref="executeFormRef"
+                        form-type="vertical"
+                        :model="formData"
+                        :rules="rules"
+                      >
+                        <CodeRevisionField
+                          ref="branchSelectRef"
+                          v-model="formData.revision"
+                          v-model:revision-type="formData.revisionType"
+                          control-class="w-[400px]"
+                          :default-revision="defaultRevision"
+                          :description="$t('值会通过变量 {0} 传给流水线', ['BKMS_REPO_REVISION'])"
+                          :repository-id="repoAlias"
+                          :required="isBuildFieldRequired"
+                          :show-source="showCodeSource"
+                          :workspace-id="workspaceId"
+                          @confirm="handleRevisionConfirm"
+                        />
+                        <Form.FormItem
+                          :description="$t('值会通过变量 {0} 传给流水线', ['BKMS_IMAGE_TAG'])"
+                          :label="$t('版本号（镜像 Tag）')"
+                          property="tag"
+                          :required="isBuildFieldRequired"
+                        >
+                          <Input
+                            v-model.trim="formData.tag"
+                            class="w-[400px]"
+                            clearable
+                            :placeholder="`${$t('请输入，例如')}v1.0.0-alpha.1`"
+                          />
+                          <p
+                            v-if="recommendTag"
+                            class="bkms-text-secondary"
+                          >
+                            {{ $t('推荐版本号') }}：{{ recommendTag }}
+                          </p>
+                        </Form.FormItem>
+                      </Form>
+                      <div class="flex justify-end mt-[10px]">
+                        <Button
+                          :loading="isLoading"
+                          size="small"
+                          theme="primary"
+                          @click="handleExecuteSource"
+                        >
+                          {{ $t('确认') }}
+                        </Button>
+                        <Button
+                          class="ml-[8px]"
+                          size="small"
+                          @click="showPopConfirm = false"
+                        >
+                          {{ $t('取消') }}
+                        </Button>
+                      </div>
+                    </div>
+                  </template>
+                </Popover>
+                <Input
+                  v-model.trim="searchValue"
+                  class="w-[400px]"
+                  clearable
+                  :placeholder="
+                    createPlaceholder({
+                      labels: ['制品', '触发人'],
+                    })
+                  "
+                  type="search"
+                  @focus="showPopConfirm = false"
                 />
               </div>
             </template>
-          </TableColumn>
-          <TableColumn
-            field="sourceMaterial"
-            :label="$t('源材料')"
-            show-overflow="tooltip"
-            :width="200"
+          </FlexRow>
+          <Table
+            auto-resize
+            class="mt-[16px] w-full build-table"
+            :data="buildList"
+            :pagination="count > 0 ? pagination : null"
+            :row-config="{
+              isHover: true,
+              isCurrent: true,
+            }"
+            :settings="settings"
+            :show-settings="true"
+            :sort-config="sortConfig"
+            sync-resize
+            :tooltip-config="tooltipConfig"
+            @page-limit-change="pageSizeChange"
+            @page-value-change="pageChange"
+            @setting-change="handleSettingChange"
           >
-            <template #default="{ row }">
-              <div
-                v-if="row.sourceMaterial"
-                class="flex min-w-0 max-w-full items-center"
+            <template #empty>
+              <TableException
+                :type="curExceptionType"
+                @clear="handleClearFilters"
+                @refresh="fetchBuildList"
               >
-                <!-- 与蓝盾一致：分支 / Tag / CommitID 都用分支图标标修订，短哈希另用 commit 图标 -->
-                <span class="bkms-icon bkms-icon-branchs mr-[5px] shrink-0"></span>
-                <span class="truncate">{{ row.sourceMaterial.revision }}</span>
-                <span class="bkms-icon bkms-icon-commit mx-[5px] shrink-0 text-[18px]"></span>
-                <Button
-                  class="shrink-0"
-                  :disabled="!row.sourceMaterial.commitID"
-                  text
-                  theme="primary"
-                  @click.stop="handleToCommit(row.sourceMaterial.commitUrl)"
+              </TableException>
+            </template>
+            <TableColumn
+              field="buildNum"
+              fixed="left"
+              :label="$t('构建号')"
+              show-overflow="tooltip"
+              :width="100"
+            >
+              <template #default="{ row }">
+                <div
+                  class="cursor-pointer flex items-center"
+                  @click.stop="handleOpenBuildLog(row)"
                 >
-                  {{ row.sourceMaterial.commitID.slice(0, 8) }}
-                </Button>
-              </div>
-              <span v-else>--</span>
-            </template>
-          </TableColumn>
-          <TableColumn
-            field="creator"
-            :label="$t('触发人')"
-            show-overflow="tooltip"
-            :width="120"
-          >
-            <template #default="{ row }">
-              <span class="text-[12px]">{{ row?.creator || '--' }}</span>
-            </template>
-          </TableColumn>
-          <TableColumn
-            field="createAt"
-            :label="$t('构建开始时间')"
-            show-overflow="tooltip"
-            sortable
-            :width="180"
-          >
-          </TableColumn>
-          <TableColumn
-            field="updatedAt"
-            :label="$t('构建结束时间')"
-            show-overflow="tooltip"
-            sortable
-            :width="180"
-          >
-          </TableColumn>
-          <TableColumn
-            field="constructionTime"
-            :label="$t('构建耗时')"
-            show-overflow="tooltip"
-            sortable
-            :width="120"
-          >
-            <template #default="{ row }">
-              {{ row?.constructionTime || '--' }}
-            </template>
-          </TableColumn>
-          <TableColumn
-            field="products"
-            :label="$t('制品')"
-            :min-width="200"
-            show-overflow="tooltip"
-          >
-            <template #default="{ row }">
-              <HoverCopy
-                :copy-value="row?.products"
-                :text="row?.products"
-              />
-            </template>
-          </TableColumn>
-        </Table>
+                  <span
+                    v-if="row.buildNum"
+                    :class="[getColor(row.status)]"
+                  >
+                    {{ `#${row.buildNum}` }}
+                  </span>
+                  <span v-else>--</span>
+                  <StatusIcon
+                    v-if="isRunning(row.status)"
+                    class="ml-[6px]"
+                    hide-text
+                    pending
+                  />
+                </div>
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="sourceMaterial"
+              :label="$t('源材料')"
+              show-overflow="tooltip"
+              :width="200"
+            >
+              <template #default="{ row }">
+                <div
+                  v-if="row.sourceMaterial"
+                  class="flex min-w-0 max-w-full items-center"
+                >
+                  <!-- 与蓝盾一致：分支 / Tag / CommitID 都用分支图标标修订，短哈希另用 commit 图标 -->
+                  <span class="bkms-icon bkms-icon-branchs mr-[5px] shrink-0"></span>
+                  <span class="truncate">{{ row.sourceMaterial.revision }}</span>
+                  <span class="bkms-icon bkms-icon-commit mx-[5px] shrink-0 text-[18px]"></span>
+                  <Button
+                    class="shrink-0"
+                    :disabled="!row.sourceMaterial.commitID"
+                    text
+                    theme="primary"
+                    @click.stop="handleToCommit(row.sourceMaterial.commitUrl)"
+                  >
+                    {{ row.sourceMaterial.commitID.slice(0, 8) }}
+                  </Button>
+                </div>
+                <span v-else>--</span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="creator"
+              :label="$t('触发人')"
+              show-overflow="tooltip"
+              :width="120"
+            >
+              <template #default="{ row }">
+                <span class="text-[12px]">{{ row?.creator || '--' }}</span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="createAt"
+              :label="$t('构建开始时间')"
+              show-overflow="tooltip"
+              sortable
+              :width="180"
+            >
+            </TableColumn>
+            <TableColumn
+              field="updatedAt"
+              :label="$t('构建结束时间')"
+              show-overflow="tooltip"
+              sortable
+              :width="180"
+            >
+            </TableColumn>
+            <TableColumn
+              field="constructionTime"
+              :label="$t('构建耗时')"
+              show-overflow="tooltip"
+              sortable
+              :width="120"
+            >
+              <template #default="{ row }">
+                {{ row?.constructionTime || '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="products"
+              :label="$t('制品')"
+              :min-width="200"
+              show-overflow="tooltip"
+            >
+              <template #default="{ row }">
+                <HoverCopy
+                  :copy-value="row?.products"
+                  :text="row?.products"
+                />
+              </template>
+            </TableColumn>
+          </Table>
+        </div>
       </Skeleton>
     </div>
 

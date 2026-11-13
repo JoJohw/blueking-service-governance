@@ -276,7 +276,7 @@
   }
 
   :deep(.section-mode_label .bk-form-label) {
-    color: var(--bkms-neutral-2);
+    color: var(--bkms-text-body);
     font-size: 12px;
   }
 </style>

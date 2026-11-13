@@ -4,6 +4,11 @@
     "suggest": "待设计确认",
     "note": "src/pages/basic/base-info/permissionModel.vue 中的 CSS 颜色关键字，暂不自动归类"
   },
+  "c2cee5": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/App.vue 导航 hover 颜色，未知设计色"
+  },
   "182132": {
     "occ": 3,
     "suggest": "--bkms-navy-1",
@@ -248,6 +253,11 @@
     "occ": 2,
     "suggest": "--bkms-success-4",
     "note": "亮绿；最近候选 --bkms-success-4（色差 31.26 > 6，待设计确认）"
+  },
+  "9798a5": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/home/space-list.vue 中的灰色文字，暂不自动归类"
   },
   "979aa3": {
     "occ": 1,
@@ -578,5 +588,60 @@
     "occ": 1,
     "suggest": "待设计确认",
     "note": "src/pages/application unknown；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
+  },
+  "292d3314": {
+    "occ": 3,
+    "suggest": "待设计确认",
+    "note": "src/pages/application rgba(41,45,51,0.08)；阴影透明度和语义未确认，暂不自动归类"
+  },
+  "0000001f": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/application rgba(0,0,0,0.12)；阴影透明度和语义未确认，暂不自动归类"
+  },
+  "00000029": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/application rgba(0,0,0,0.16)；阴影透明度和语义未确认，暂不自动归类"
+  },
+  "00000024": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/application rgba(0,0,0,0.14)；阴影透明度和语义未确认，暂不自动归类"
+  },
+  "c1cadb4d": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/application rgba(193,202,219,0.3)；网格背景透明度和语义未确认，暂不自动归类"
+  },
+  "f87171": {
+    "occ": 2,
+    "suggest": "待设计确认",
+    "note": "src/components/type-param-select.vue:96,100 必填项标记颜色；未被颜色规范或人工确认覆盖，暂不自动归类，待设计确认"
+  },
+  "ffffff66": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/home/empty-home.vue:39 半透明白色特性卡片背景；alpha 语义未确认，暂不自动归类"
+  },
+  "1f26870d": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/home/empty-home.vue:39 特性卡片阴影；与现有 shadow token 不等价，暂不自动归类"
+  },
+  "0000000d": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/plugin/component-config/card-item.vue:21 卡片阴影；与现有 shadow token 不等价，暂不自动归类"
+  },
+  "00000014": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/pages/home/empty-home.vue:39 rgba(0,0,0,0.08) 阴影；透明度语义未确认，暂不自动归类"
+  },
+  "42c02e": {
+    "occ": 1,
+    "suggest": "待设计确认",
+    "note": "src/main.ts:82 浏览器控制台 %c 样式颜色；不在页面 CSS 变量作用域内，暂不自动归类"
   }
 }

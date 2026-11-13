@@ -133,7 +133,7 @@
         auto-resize
         class="mt-[16px] w-full helm-chart-table"
         :data="chartList"
-        :pagination="pagination"
+        :pagination="count > 0 ? pagination : undefined"
         :row-config="{
           isHover: true,
           isCurrent: true,

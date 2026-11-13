@@ -274,7 +274,7 @@
       &.is-focused {
         z-index: 9999;
         height: auto;
-        box-shadow: 0px 0px 3px 0px #a3c5fd;
+        box-shadow: 0px 0px 3px 0px var(--bkms-brand-4);
 
         textarea {
           overflow: unset;
@@ -286,11 +286,11 @@
       }
 
       &:hover {
-        border: 1px solid #a3c5fd;
-        background-color: #fafbfd;
+        border: 1px solid var(--bkms-brand-4);
+        background-color: var(--bkms-neutral-8);
 
         textarea {
-          background-color: #fafbfd;
+          background-color: var(--bkms-neutral-8);
         }
       }
 

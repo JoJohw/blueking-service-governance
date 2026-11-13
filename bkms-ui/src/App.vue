@@ -44,7 +44,7 @@
         <template v-if="!isGlobalRoute">
           <Divider
             class="h-[14px] !mx-[12px]"
-            color="#4D4F56"
+            color="var(--bkms-neutral-2)"
             direction="vertical"
             type="solid"
           />

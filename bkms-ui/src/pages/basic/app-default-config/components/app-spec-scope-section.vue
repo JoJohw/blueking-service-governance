@@ -148,7 +148,7 @@
     }
 
     :deep(.bk-checkbox.is-disabled .bk-checkbox-input) {
-      border-color: var(--bkms-neutral-4);
+      border-color: var(--bkms-line-input);
     }
 
     :deep(.bk-checkbox.is-disabled .bk-checkbox-label) {

@@ -63,7 +63,7 @@
         </Button>
         <Divider
           class="h-[10px] !mx-[8px]"
-          color="var(--bkms-neutral-5)"
+          color="var(--bkms-line-default)"
           direction="vertical"
           type="solid"
         />

@@ -17,249 +17,263 @@
 -->
 
 <template>
-  <div>
-    <Skeleton
-      :loading="loading"
-      theme="gray"
+  <div class="flex flex-col h-full overflow-hidden">
+    <div
+      ref="wrapperRef"
+      class="min-h-0 flex-1 overflow-hidden p-[16px]"
     >
-      <template #loading>
-        <FlexRow class="w-full mb-[16px]">
-          <template #left>
-            <Layout.shape :width="110" />
-          </template>
-          <template #right>
-            <Layout.shape :width="400" />
-          </template>
-        </FlexRow>
-        <Layout.table />
-      </template>
-      <!-- 北极星待重部署提示 -->
-      <PolarisPendingRedeployAlert
-        :configs="originalList"
-        :deploying-env-names="deployingEnvNames"
-        :env-list="envList"
-        :refreshing="pendingRedeployRefreshing"
-        @go-deploy="handleGoDeploy"
-        @refresh="handleRefreshPendingRedeploy"
-      />
-      <FlexRow class="mb-[16px]">
-        <template #left>
-          <Button
-            v-test="'polaris-config-add-button'"
-            theme="primary"
-            @click="handleCreatePolaris"
-          >
-            <Plus
-              :height="24"
-              :width="24"
-            />
-            {{ $t('添加北极星') }}
-          </Button>
-        </template>
-        <template #right>
-          <SearchSelect
-            v-model="searchValue"
-            class="w-[520px] bkms-bg-card relative z-[100]"
-            :data="searchSelectData"
-            :placeholder="
-              createPlaceholder({
-                type: 'searchSelect',
-                labels: ['环境类型', '可用环境'],
-              })
-            "
-            unique-select
-            value-behavior="need-key"
-          >
-          </SearchSelect>
-        </template>
-      </FlexRow>
-      <Table
-        ref="tableRef"
-        v-bkloading="{ loading: filterLoading || loading, zIndex: 8 }"
-        class="bkms-bg-card mt-[16px]"
-        :data="list"
-        :filter-config="{ remote: true }"
-        :max-height="maxHeight"
-        :pagination="pagination"
-        :row-config="{
-          isHover: true,
-          isCurrent: true,
-        }"
-        :row-height="40"
-        :virtual-y-config="{ enabled: true, gt: 0 }"
-        @filter-change="handleFilterChange"
-        @page-limit-change="handlePageLimitChange"
-        @page-value-change="handlePageValueChange"
+      <div
+        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]"
       >
-        <template #empty>
-          <TableException
-            :type="curExceptionType"
-            @clear="handleClearFilters"
-            @refresh="handleFetchList"
-          >
-          </TableException>
-        </template>
-        <TableColumn
-          field="polarisName"
-          :label="$t('服务名')"
-          min-width="220"
+        <Skeleton
+          :loading="loading"
+          theme="gray"
         >
-          <template #default="{ row }">
-            <span
-              class="inline-flex max-w-full cursor-pointer items-center bkms-text-brand"
-              @click="handleToPolarisProject(row)"
-            >
-              <template v-if="row?.polarisName">
-                <span
-                  v-bk-tooltips="row.polarisName"
-                  class="truncate"
-                >
-                  {{ row.polarisName }}
-                </span>
-                <Share class="ml-[4px] shrink-0 text-[12px]" />
+          <template #loading>
+            <FlexRow class="w-full mb-[16px]">
+              <template #left>
+                <Layout.shape :width="110" />
               </template>
-              <template v-else>--</template>
-            </span>
+              <template #right>
+                <Layout.shape :width="400" />
+              </template>
+            </FlexRow>
+            <Layout.table />
           </template>
-        </TableColumn>
-        <TableColumn
-          field="polarisNamespace"
-          :filters="polarisNamespaceFilterOptions"
-          width="200"
-        >
-          <template #header>
-            <CustomFilter
+          <div
+            ref="headerRef"
+            class="flex shrink-0 flex-col gap-[16px]"
+          >
+            <!-- 北极星待重部署提示 -->
+            <PolarisPendingRedeployAlert
+              :configs="originalList"
+              :deploying-env-names="deployingEnvNames"
+              :env-list="envList"
+              :refreshing="pendingRedeployRefreshing"
+              @go-deploy="handleGoDeploy"
+              @refresh="handleRefreshPendingRedeploy"
+            />
+            <FlexRow>
+              <template #left>
+                <Button
+                  v-test="'polaris-config-add-button'"
+                  theme="primary"
+                  @click="handleCreatePolaris"
+                >
+                  <Plus
+                    :height="24"
+                    :width="24"
+                  />
+                  {{ $t('添加北极星') }}
+                </Button>
+              </template>
+              <template #right>
+                <SearchSelect
+                  v-model="searchValue"
+                  class="w-[520px] bkms-bg-card relative z-[100]"
+                  :data="searchSelectData"
+                  :placeholder="
+                    createPlaceholder({
+                      type: 'searchSelect',
+                      labels: ['环境类型', '可用环境'],
+                    })
+                  "
+                  unique-select
+                  value-behavior="need-key"
+                >
+                </SearchSelect>
+              </template>
+            </FlexRow>
+          </div>
+          <Table
+            ref="tableRef"
+            v-bkloading="{ loading: filterLoading || loading, zIndex: 8 }"
+            class="bkms-bg-card mt-[16px]"
+            :data="list"
+            :filter-config="{ remote: true }"
+            :max-height="tableMaxHeight"
+            :pagination="tablePagination"
+            :row-config="{
+              isHover: true,
+              isCurrent: true,
+            }"
+            :row-height="40"
+            :virtual-y-config="{ enabled: true, gt: 0 }"
+            @filter-change="handleFilterChange"
+            @page-limit-change="handlePageLimitChange"
+            @page-value-change="handlePageValueChange"
+          >
+            <template #empty>
+              <TableException
+                :type="curExceptionType"
+                @clear="handleClearFilters"
+                @refresh="handleFetchList"
+              >
+              </TableException>
+            </template>
+            <TableColumn
+              field="polarisName"
+              :label="$t('服务名')"
+              min-width="220"
+            >
+              <template #default="{ row }">
+                <span
+                  class="inline-flex max-w-full cursor-pointer items-center bkms-text-brand"
+                  @click="handleToPolarisProject(row)"
+                >
+                  <template v-if="row?.polarisName">
+                    <span
+                      v-bk-tooltips="row.polarisName"
+                      class="truncate"
+                    >
+                      {{ row.polarisName }}
+                    </span>
+                    <Share class="ml-[4px] shrink-0 text-[12px]" />
+                  </template>
+                  <template v-else>--</template>
+                </span>
+              </template>
+            </TableColumn>
+            <TableColumn
               field="polarisNamespace"
               :filters="polarisNamespaceFilterOptions"
-              :label="$t('环境类型')"
-              :table-ref="tableRef"
-            />
-          </template>
-          <template #default="{ row }">
-            <span>
-              {{ row.polarisNamespace }}
-            </span>
-          </template>
-        </TableColumn>
-        <TableColumn
-          field="instanceKey"
-          :label="$t('实例名称')"
-          min-width="160"
-        >
-        </TableColumn>
-        <TableColumn
-          field="servicePort"
-          :label="$t('服务端口')"
-          width="200"
-        >
-        </TableColumn>
-        <TableColumn
-          field="scopeEnvNames"
-          :filters="scopeEnvNamesFilterOptions"
-          width="300"
-        >
-          <template #header>
-            <CustomFilter
+              width="200"
+            >
+              <template #header>
+                <CustomFilter
+                  field="polarisNamespace"
+                  :filters="polarisNamespaceFilterOptions"
+                  :label="$t('环境类型')"
+                  :table-ref="tableRef"
+                />
+              </template>
+              <template #default="{ row }">
+                <span>
+                  {{ row.polarisNamespace }}
+                </span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="instanceKey"
+              :label="$t('实例名称')"
+              min-width="160"
+            >
+            </TableColumn>
+            <TableColumn
+              field="servicePort"
+              :label="$t('服务端口')"
+              width="200"
+            >
+            </TableColumn>
+            <TableColumn
               field="scopeEnvNames"
               :filters="scopeEnvNamesFilterOptions"
-              :label="$t('可用环境')"
-              :table-ref="tableRef"
-            />
-          </template>
-          <template #default="{ row }">
-            <!-- 部署提示 -->
-            <template v-if="row.scopeEnvNames?.length">
-              <MoreTag
-                :data="row.scopeEnvNames"
-                popover-theme="popover-dark-translucent"
-              >
-                <template #default="{ item }">
-                  <PolarisEnvRedeployTag
-                    v-if="item && typeof item === 'string'"
-                    :config="row"
-                    :display-name="envNameMapping[item] || item"
-                    :env-name="item"
-                    @go-deploy="handleGoDeploy"
-                  />
+              width="300"
+            >
+              <template #header>
+                <CustomFilter
+                  field="scopeEnvNames"
+                  :filters="scopeEnvNamesFilterOptions"
+                  :label="$t('可用环境')"
+                  :table-ref="tableRef"
+                />
+              </template>
+              <template #default="{ row }">
+                <!-- 部署提示 -->
+                <template v-if="row.scopeEnvNames?.length">
+                  <MoreTag
+                    :data="row.scopeEnvNames"
+                    popover-theme="popover-dark-translucent"
+                  >
+                    <template #default="{ item }">
+                      <PolarisEnvRedeployTag
+                        v-if="item && typeof item === 'string'"
+                        :config="row"
+                        :display-name="envNameMapping[item] || item"
+                        :env-name="item"
+                        @go-deploy="handleGoDeploy"
+                      />
+                    </template>
+                    <template #more-content="{ items }">
+                      <PolarisEnvRedeployMoreTip
+                        :config="row"
+                        :env-list="envList"
+                        :env-names="getValidEnvNames(items)"
+                        @go-deploy="handleGoDeploy"
+                      />
+                    </template>
+                  </MoreTag>
                 </template>
-                <template #more-content="{ items }">
-                  <PolarisEnvRedeployMoreTip
-                    :config="row"
-                    :env-list="envList"
-                    :env-names="getValidEnvNames(items)"
-                    @go-deploy="handleGoDeploy"
+                <span v-else> -- </span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="enableHealthCheck"
+              :label="$t('健康检查')"
+              width="200"
+            >
+              <template #default="{ row }">
+                <div class="flex items-center">
+                  <ColorIcon
+                    class="mr-[4px]"
+                    :icon="row.enableHealthCheck ? 'normal' : 'status-unknown'"
                   />
-                </template>
-              </MoreTag>
-            </template>
-            <span v-else> -- </span>
-          </template>
-        </TableColumn>
-        <TableColumn
-          field="enableHealthCheck"
-          :label="$t('健康检查')"
-          width="200"
-        >
-          <template #default="{ row }">
-            <div class="flex items-center">
-              <ColorIcon
-                class="mr-[4px]"
-                :icon="row.enableHealthCheck ? 'normal' : 'status-unknown'"
-              />
-              {{ row.enableHealthCheck ? $t('已开启') : $t('未启用') }}
-            </div>
-          </template>
-        </TableColumn>
-        <TableColumn
-          fixed="right"
-          :label="$t('操作')"
-          :show-overflow="false"
-          :width="300"
-        >
-          <template #default="{ row }">
-            <span class="inline-flex items-center">
-              <Button
-                text
-                theme="primary"
-                @click.stop="handleShowAssociatedEnvs(row)"
-              >
-                {{ $t('关联环境') }}
-              </Button>
-              <Tag
-                class="ml-[6px]"
-                :theme="getAssociatedEnvNames(row)?.length ? 'info' : 'default'"
-              >
-                {{ getAssociatedEnvNames(row)?.length }}
-              </Tag>
-            </span>
-            <Button
-              class="ml-[16px]"
-              text
-              theme="primary"
-              @click.stop="handleShowCertificate(row)"
+                  {{ row.enableHealthCheck ? $t('已开启') : $t('未启用') }}
+                </div>
+              </template>
+            </TableColumn>
+            <TableColumn
+              fixed="right"
+              :label="$t('操作')"
+              :show-overflow="false"
+              :width="300"
             >
-              {{ $t('查看凭证') }}
-            </Button>
-            <Button
-              v-test="{ id: `polaris-config-edit-${row.name}` }"
-              class="mx-[16px]"
-              text
-              theme="primary"
-              @click.stop="handleEdit(row)"
-            >
-              {{ $t('编辑') }}
-            </Button>
-            <Button
-              text
-              theme="primary"
-              @click.stop="handleDelete(row)"
-            >
-              {{ $t('删除') }}
-            </Button>
-          </template>
-        </TableColumn>
-      </Table>
-    </Skeleton>
+              <template #default="{ row }">
+                <span class="inline-flex items-center">
+                  <Button
+                    text
+                    theme="primary"
+                    @click.stop="handleShowAssociatedEnvs(row)"
+                  >
+                    {{ $t('关联环境') }}
+                  </Button>
+                  <Tag
+                    class="ml-[6px]"
+                    :theme="getAssociatedEnvNames(row)?.length ? 'info' : 'default'"
+                  >
+                    {{ getAssociatedEnvNames(row)?.length }}
+                  </Tag>
+                </span>
+                <Button
+                  class="ml-[16px]"
+                  text
+                  theme="primary"
+                  @click.stop="handleShowCertificate(row)"
+                >
+                  {{ $t('查看凭证') }}
+                </Button>
+                <Button
+                  v-test="{ id: `polaris-config-edit-${row.name}` }"
+                  class="mx-[16px]"
+                  text
+                  theme="primary"
+                  @click.stop="handleEdit(row)"
+                >
+                  {{ $t('编辑') }}
+                </Button>
+                <Button
+                  text
+                  theme="primary"
+                  @click.stop="handleDelete(row)"
+                >
+                  {{ $t('删除') }}
+                </Button>
+              </template>
+            </TableColumn>
+          </Table>
+        </Skeleton>
+      </div>
+    </div>
 
     <!-- 创建/编辑北极星侧栏 -->
     <EditPolaris
@@ -307,12 +321,12 @@
   import MoreTag from '~/components/more-tag.vue';
   import Layout from '~/components/skeleton/skeleton-layout';
   import SvgIcon from '~/components/svg-icon.vue';
+  import { useElementHeight } from '~/composables/use-element-height';
   import useEnvManager, { envTypeMap, envTypeTagClassMap } from '~/composables/use-env-manager';
   import { useErrorHandler } from '~/composables/use-error-handler';
   import useSearchFilter from '~/composables/use-search-filter';
   import { useSearchPlaceholder } from '~/composables/use-search-placeholder';
   import useTableEmpty from '~/composables/use-table-empty';
-  import useDynamicsHeight from '~/composables/use-table-height';
   import { useAppDetail } from '~/stores/app-detail';
   import { useDeployEnvStore } from '~/stores/deploy-env';
   import { useSpaceStore } from '~/stores/space';
@@ -361,7 +375,6 @@
   const { handleError } = useErrorHandler();
 
   const { envList, envNameMapping, getAppEnvList, generateEnvNameMapping } = useEnvManager();
-  const { maxHeight } = useDynamicsHeight(106, ['.header-right', '.container-header']);
   const list = ref<PolarisConfigOutputObj[]>([]);
   const originalList = ref<PolarisConfigOutputObj[]>([]); // 保存原始数据
 
@@ -391,6 +404,7 @@
     limit: 10,
     current: 1,
   });
+  const tablePagination = computed(() => (pagination.value.count > 0 ? pagination.value : undefined));
   const isShowEditPolaris = ref(false);
   const isShowViewCertificate = ref(false);
   const isShowAssociatedEnvs = ref(false);
@@ -398,6 +412,17 @@
   const associatedEnvConfig = ref<PolarisConfigOutputObj>();
   const certificateConfig = ref<PolarisConfigOutputObj>(); // 查看凭证时的配置
   const loading = ref(true);
+  /** 可用高度 = 外层容器高度 - 外层与白卡片上下内边距。 */
+  const wrapperRef = ref<HTMLElement>();
+  const { height: wrapperHeight } = useElementHeight(wrapperRef);
+  const availableHeight = computed(() => Math.max(wrapperHeight.value - 64, 0));
+  /** 表格最大高度 = 可用高度 - 操作区高度 - 操作区与表格间距。 */
+  const headerRef = ref<HTMLElement>();
+  const { height: headerHeight } = useElementHeight(headerRef, {
+    defaultHeight: 48,
+    watchSource: loading,
+  });
+  const tableMaxHeight = computed(() => Math.max(availableHeight.value - headerHeight.value - 16, 0));
   const filterLoading = ref(false);
   const pendingRedeployRefreshing = ref(false);
   const deployingEnvNames = ref<string[]>([]);
@@ -824,8 +849,7 @@
           h(
             'span',
             {
-              class:
-                'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-bkms-neutral-6',
+              class: 'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-bkms-neutral-6',
             },
             '1',
           ),
@@ -835,8 +859,7 @@
           h(
             'span',
             {
-              class:
-                'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-bkms-neutral-6',
+              class: 'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-bkms-neutral-6',
             },
             '2',
           ),
@@ -894,8 +917,7 @@
       h(
         'div',
         {
-          class:
-            'flex h-[32px] items-center bg-bkms-neutral-6 px-[16px] text-[14px] bkms-text-title',
+          class: 'flex h-[32px] items-center bg-bkms-neutral-6 px-[16px] text-[14px] bkms-text-title',
         },
         [t('需要重新部署的 {0} 个环境', [envs.length])],
       ),

@@ -40,7 +40,7 @@
 
       <!-- 筛选工具栏：包含镜像 Tag 筛选和部署环境过滤选项 -->
       <div
-        class="flex h-[40px] items-center justify-between bkms-bg-card px-[16px] border-t border-l border-r border-[#e8eaec]"
+        class="flex h-[40px] items-center justify-between bkms-bg-card px-[16px] border-t border-l border-r border-bkms-line-default"
       >
         <!-- 左侧筛选控件 -->
         <div class="flex items-center gap-[16px]">

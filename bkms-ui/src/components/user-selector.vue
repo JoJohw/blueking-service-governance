@@ -126,7 +126,7 @@
     right: 6px;
     z-index: 9999;
     transform: translateY(-50%);
-    color: var(--bkms-neutral-4);
+    color: var(--bkms-text-disabled);
     opacity: 0;
     cursor: pointer;
     transition: opacity 0.2s ease;
@@ -137,6 +137,6 @@
   }
 
   .user-selector-clear-btn:hover {
-    color: var(--bkms-neutral-3);
+    color: var(--bkms-text-secondary);
   }
 </style>

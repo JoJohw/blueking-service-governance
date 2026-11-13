@@ -1281,16 +1281,16 @@
 
   .env-instance-table:first-child {
     .env-header {
-      border-top: 1px solid #e8eaec;
+      border-top: 1px solid var(--bkms-line-default);
     }
   }
   .env-header {
-    border: 1px solid #e8eaec;
+    border: 1px solid var(--bkms-line-default);
     border-top: none;
     border-bottom: none;
 
     &.collapsed {
-      border-bottom: 1px solid #e8eaec;
+      border-bottom: 1px solid var(--bkms-line-default);
     }
 
     &:hover {

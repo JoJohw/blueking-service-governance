@@ -17,171 +17,180 @@
 -->
 
 <template>
-  <div class="h-full px-[24px] py-[20px]">
-    <Skeleton
-      :loading="isLoading"
-      theme="gray"
+  <div class="flex flex-col h-full overflow-hidden">
+    <div
+      ref="wrapperRef"
+      class="min-h-0 flex-1 overflow-hidden p-[16px]"
     >
-      <template #loading>
-        <div class="flex mb-[16px]">
-          <Layout.shape
-            class="mr-[16px]"
-            :width="300"
-          />
-          <Layout.shape :width="400" />
-        </div>
-        <Layout.table />
-      </template>
-      <FlexRow
-        average
-        class="mb-[16px]"
-        lclass="flex"
+      <div
+        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]"
       >
-        <template #left>
-          <DatePicker
-            v-model="dateRange"
-            class="w-[300px] mr-[16px]"
-            :placeholder="$t('请选择操作时间范围')"
-            type="daterange"
-            @change="handleListRecord"
-          />
-          <SearchSelect
-            v-model="searchValue"
-            class="w-[520px] bkms-bg-card relative z-[100]"
-            :data="searchSelectData"
-            :placeholder="
-              createPlaceholder({
-                type: 'searchSelect',
-                labels: ['操作人', '操作类型', '操作结果'],
-              })
-            "
-            unique-select
-            value-behavior="need-key"
-          >
-          </SearchSelect>
-        </template>
-      </FlexRow>
-      <Loading
-        :loading="isLoading"
-        z-index="8"
-      >
-        <Table
-          :data="list"
-          :filter-config="{ remote: true }"
-          :max-height="maxHeight"
-          :pagination="pagination"
-          :row-config="{
-            isHover: true,
-            isCurrent: true,
-          }"
-          :row-height="40"
-          :virtual-y-config="{ enabled: true, gt: 0 }"
-          @filter-change="handleFilterChange"
-          @page-limit-change="handlePageLimitChange"
-          @page-value-change="handlePageValueChange"
+        <Skeleton
+          :loading="isLoading"
+          theme="gray"
         >
-          <template #empty>
-            <TableException
-              :type="curExceptionType"
-              @clear="
-                () => {
-                  searchValue = [];
-                  dateRange = ['', ''];
-                }
-              "
-              @refresh="handleListRecord"
-            />
+          <template #loading>
+            <div class="flex mb-[16px]">
+              <Layout.shape
+                class="mr-[16px]"
+                :width="300"
+              />
+              <Layout.shape :width="400" />
+            </div>
+            <Layout.table />
           </template>
-          <TableColumn
-            field="resourceType"
-            :filters="filterOptions.resourceType"
-            label="资源类型"
-            width="150"
+          <div
+            ref="headerRef"
+            class="mb-[16px] shrink-0"
           >
-            <template #default="{ row }">
-              <span>{{ row.resourceTypeDisplayName }}</span>
+            <FlexRow
+              average
+              lclass="flex"
+            >
+              <template #left>
+                <DatePicker
+                  v-model="dateRange"
+                  class="w-[300px] mr-[16px]"
+                  :placeholder="$t('请选择操作时间范围')"
+                  type="daterange"
+                  @change="handleListRecord"
+                />
+                <SearchSelect
+                  v-model="searchValue"
+                  class="w-[520px] bkms-bg-card relative z-[100]"
+                  :data="searchSelectData"
+                  :placeholder="
+                    createPlaceholder({
+                      type: 'searchSelect',
+                      labels: ['操作人', '操作类型', '操作结果'],
+                    })
+                  "
+                  unique-select
+                  value-behavior="need-key"
+                >
+                </SearchSelect>
+              </template>
+            </FlexRow>
+          </div>
+          <Table
+            v-bkloading="{ loading: isLoading, zIndex: 8 }"
+            :data="list"
+            :filter-config="{ remote: true }"
+            :max-height="tableMaxHeight"
+            :pagination="pagination.count > 0 ? pagination : undefined"
+            :row-config="{
+              isHover: true,
+              isCurrent: true,
+            }"
+            :row-height="40"
+            :virtual-y-config="{ enabled: true, gt: 0 }"
+            @filter-change="handleFilterChange"
+            @page-limit-change="handlePageLimitChange"
+            @page-value-change="handlePageValueChange"
+          >
+            <template #empty>
+              <TableException
+                :type="curExceptionType"
+                @clear="
+                  () => {
+                    searchValue = [];
+                    dateRange = ['', ''];
+                  }
+                "
+                @refresh="handleListRecord"
+              />
             </template>
-          </TableColumn>
-          <TableColumn
-            field="operationType"
-            :filters="filterOptions.operationType"
-            :label="$t('操作类型')"
-            width="120"
-          >
-            <template #default="{ row }">
-              <span>
-                {{ row.operationTypeDisplayName }}
-              </span>
-            </template>
-          </TableColumn>
-          <TableColumn
-            field="attributeDisplayName"
-            :label="$t('资源属性')"
-            width="150"
-          >
-            <template #default="{ row }">
-              {{ row.attributeDisplayName || '--' }}
-            </template>
-          </TableColumn>
-          <TableColumn
-            field="resourceID"
-            :label="$t('资源 ID')"
-            min-width="150"
-          >
-          </TableColumn>
-          <TableColumn
-            field="accessType"
-            :label="$t('环境')"
-            width="150"
-          >
-            <template #default="{ row }">
-              {{ envNameMapping[row.group?.envName || ''] || row.group?.envName || '--' }}
-            </template>
-          </TableColumn>
-          <TableColumn
-            field="result"
-            :filters="filterOptions.result"
-            :label="$t('操作结果')"
-            width="120"
-          >
-            <template #default="{ row }">
-              <span>{{ getResultDisplayName(row.result) }}</span>
-            </template>
-          </TableColumn>
-          <TableColumn
-            field="username"
-            :label="$t('操作人')"
-            width="150"
-          >
-          </TableColumn>
-          <TableColumn
-            field="createdAt"
-            :label="$t('操作时间')"
-            width="200"
-          >
-            <template #default="{ row }">
-              {{ row.createdAt ? formatTimeByTimezone(row.createdAt) : '' }}
-            </template>
-          </TableColumn>
-          <TableColumn
-            fixed="right"
-            :label="$t('操作')"
-            :show-overflow="false"
-            :width="150"
-          >
-            <template #default="{ row }">
-              <Button
-                text
-                theme="primary"
-                @click.stop="handleShowLog(row)"
-              >
-                {{ $t('查看详情') }}
-              </Button>
-            </template>
-          </TableColumn>
-        </Table>
-      </Loading>
-    </Skeleton>
+            <TableColumn
+              field="resourceType"
+              :filters="filterOptions.resourceType"
+              label="资源类型"
+              width="150"
+            >
+              <template #default="{ row }">
+                <span>{{ row.resourceTypeDisplayName }}</span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="operationType"
+              :filters="filterOptions.operationType"
+              :label="$t('操作类型')"
+              width="120"
+            >
+              <template #default="{ row }">
+                <span>
+                  {{ row.operationTypeDisplayName }}
+                </span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="attributeDisplayName"
+              :label="$t('资源属性')"
+              width="150"
+            >
+              <template #default="{ row }">
+                {{ row.attributeDisplayName || '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="resourceID"
+              :label="$t('资源 ID')"
+              min-width="150"
+            >
+            </TableColumn>
+            <TableColumn
+              field="accessType"
+              :label="$t('环境')"
+              width="150"
+            >
+              <template #default="{ row }">
+                {{ envNameMapping[row.group?.envName || ''] || row.group?.envName || '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="result"
+              :filters="filterOptions.result"
+              :label="$t('操作结果')"
+              width="120"
+            >
+              <template #default="{ row }">
+                <span>{{ getResultDisplayName(row.result) }}</span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              field="username"
+              :label="$t('操作人')"
+              width="150"
+            >
+            </TableColumn>
+            <TableColumn
+              field="createdAt"
+              :label="$t('操作时间')"
+              width="200"
+            >
+              <template #default="{ row }">
+                {{ row.createdAt ? formatTimeByTimezone(row.createdAt) : '' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              fixed="right"
+              :label="$t('操作')"
+              :show-overflow="false"
+              :width="150"
+            >
+              <template #default="{ row }">
+                <Button
+                  text
+                  theme="primary"
+                  @click.stop="handleShowLog(row)"
+                >
+                  {{ $t('查看详情') }}
+                </Button>
+              </template>
+            </TableColumn>
+          </Table>
+        </Skeleton>
+      </div>
+    </div>
     <OperationDetailSideslider
       v-model:is-show="isShow"
       :env-name-mapping="envNameMapping"
@@ -194,7 +203,7 @@
   import { computed, ComputedRef, ref, watch } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
-  import { Button, DatePicker, Loading, SearchSelect } from 'bkui-vue';
+  import { Button, DatePicker, SearchSelect } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import {
     ListOperationRecordsRequest,
@@ -204,11 +213,11 @@
   import { OperationAuditService } from '~/api/modules/v1';
   import { formatTimeByTimezone, mapKeys } from '~/common/util';
   import Layout from '~/components/skeleton/skeleton-layout';
+  import { useElementHeight } from '~/composables/use-element-height';
   import useEnvManager from '~/composables/use-env-manager';
   import useSearchFilter from '~/composables/use-search-filter';
   import { useSearchPlaceholder } from '~/composables/use-search-placeholder';
   import useTableEmpty from '~/composables/use-table-empty';
-  import useDynamicsHeight from '~/composables/use-table-height';
   import { useAppDetail } from '~/stores/app-detail';
   import { useSpaceStore } from '~/stores/space';
 
@@ -223,11 +232,19 @@
   const { envNameMapping, generateEnvNameMapping, getAppEnvList } = useEnvManager();
   const spaceStore = useSpaceStore();
   const appDetailStore = useAppDetail();
-  const { maxHeight } = useDynamicsHeight(96, ['.header-right', '.container-header']);
 
   const operationFilters = ref<OperationRecordFilterOptionsOutputObj>();
   // 部署列表
   const isLoading = ref(false);
+  const wrapperRef = ref<HTMLElement>();
+  const { height: wrapperHeight } = useElementHeight(wrapperRef);
+  const availableHeight = computed(() => Math.max(wrapperHeight.value - 64, 0));
+  const headerRef = ref<HTMLElement>();
+  const { height: headerHeight } = useElementHeight(headerRef, {
+    watchSource: isLoading,
+    defaultHeight: 40,
+  });
+  const tableMaxHeight = computed(() => Math.max(availableHeight.value - headerHeight.value - 16, 0));
   const list = ref<OperationRecordOutputObj[]>([]);
   const pagination = ref({
     count: 0,
