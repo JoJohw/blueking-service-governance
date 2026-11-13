@@ -37,7 +37,7 @@
             width="100%"
           />
         </div>
-        <div class="rounded-[2px] bkms-bg-card p-[16px]">
+        <div class="rounded-[6px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <div class="mb-[16px] flex justify-end"><Layout.shape :width="560" /></div>
           <Layout.table />
         </div>
@@ -62,9 +62,7 @@
               <span
                 :class="[
                   'ml-[4px] h-[16px] rounded-[8px] px-[6px] leading-[16px]',
-                  option.value === globalTypeFilter
-                    ? 'bkms-bg-active bkms-text-brand'
-                    : 'bkms-bg-card',
+                  option.value === globalTypeFilter ? 'bkms-bg-active bkms-text-brand' : 'bkms-bg-card',
                 ]"
               >
                 {{ option.count }}
@@ -109,10 +107,8 @@
           v-for="stat in stats"
           :key="stat.key"
           :class="[
-            'flex min-w-0 cursor-pointer items-center justify-between gap-[12px] rounded-[2px] bkms-bg-card px-[16px] py-[12px] text-left shadow-[0_2px_4px_0_var(--bkms-shadow-card)] hover:shadow-[0_2px_8px_0_#1919291f]',
-            activeStat === stat.key
-              ? '!bkms-bg-active outline outline-[1px] outline-bkms-brand-2'
-              : '',
+            'flex min-w-0 cursor-pointer items-center justify-between gap-[12px] rounded-[6px] bkms-bg-card px-[16px] py-[12px] text-left shadow-[0_2px_4px_0_var(--bkms-shadow-card)] hover:shadow-[0_2px_8px_0_#1919291f]',
+            activeStat === stat.key ? '!bkms-bg-active outline outline-[1px] outline-bkms-brand-2' : '',
           ]"
           type="button"
           @click="handleStatClick(stat.key)"
@@ -144,7 +140,9 @@
       </div>
 
       <!-- 表格容器占满剩余高度，仅表格内容滚动，顶部筛选与分页保持可见。 -->
-      <div class="flex min-h-0 flex-1 flex-col rounded-[2px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+      <div
+        class="flex min-h-0 flex-1 flex-col rounded-[6px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+      >
         <div class="mb-[16px] flex shrink-0 justify-end">
           <SearchSelect
             v-model="searchValue"

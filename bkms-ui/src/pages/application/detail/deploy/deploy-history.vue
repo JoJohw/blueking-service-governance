@@ -17,149 +17,158 @@
 -->
 
 <template>
-  <div class="flex items-center justify-between gap-[12px] mb-[16px]">
-    <div :id="DEPLOY_ENV_SELECT_SLOT_ID"></div>
-    <SearchSelect
-      v-model="searchValue"
-      class="min-w-[560px] bkms-bg-card relative z-[100]"
-      :data="searchData"
-      :placeholder="
-        createPlaceholder({
-          type: 'searchSelect',
-          labels: ['镜像 Tag', '操作人'],
-        })
-      "
-      unique-select
-      value-behavior="need-key"
-    />
-  </div>
-  <Skeleton
-    :full-height="false"
-    :loading="isLoading"
-  >
-    <template #loading>
-      <Layout.table />
-    </template>
-    <div class="bkms-bg-card">
-      <!-- 表格 -->
-      <Table
-        :data="tableData"
-        :pagination="pagination"
-        @page-limit-change="pageSizeChange"
-        @page-value-change="pageChange"
+  <div class="flex flex-col h-full overflow-hidden">
+    <div
+      ref="wrapperRef"
+      class="min-h-0 flex-1 overflow-hidden p-[16px]"
+    >
+      <div
+        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]"
       >
-        <template #empty>
-          <TableException
-            :type="tableData.length === 0 && searchValue.length === 0 ? 'empty' : 'search'"
-            @clear="handleClearSearch"
+        <div
+          ref="headerRef"
+          class="flex items-center justify-between gap-[12px] mb-[16px] shrink-0"
+        >
+          <div :id="DEPLOY_ENV_SELECT_SLOT_ID"></div>
+          <SearchSelect
+            v-model="searchValue"
+            class="min-w-[560px] bkms-bg-card relative z-[100]"
+            :data="searchData"
+            :placeholder="
+              createPlaceholder({
+                type: 'searchSelect',
+                labels: ['镜像 Tag', '操作人'],
+              })
+            "
+            unique-select
+            value-behavior="need-key"
           />
-        </template>
-        <TableColumn
-          :label="$t('镜像 Tag')"
-          min-width="150"
-          show-overflow="tooltip"
+        </div>
+        <Skeleton
+          :full-height="false"
+          :loading="isLoading"
         >
-          <template #default="{ row }">
-            {{ row.imageTag || '--' }}
+          <template #loading>
+            <Layout.table />
           </template>
-        </TableColumn>
-        <TableColumn
-          :label="$t('镜像来源')"
-          min-width="140"
-          show-overflow="tooltip"
-        >
-          <template #default="{ row }">
-            <span
-              class="rounded-[2px] px-[8px] py-[2px] text-[12px]"
-              :class="
-                isSourceBuild(row)
-                  ? 'bkms-bg-active bkms-text-brand'
-                  : 'bg-bkms-neutral-6 bkms-text-body'
-              "
+          <!-- 表格 -->
+          <Table
+            :data="tableData"
+            :max-height="tableMaxHeight"
+            :pagination="Number(pagination.count) > 0 ? pagination : undefined"
+            @page-limit-change="pageSizeChange"
+            @page-value-change="pageChange"
+          >
+            <template #empty>
+              <TableException
+                :type="tableData.length === 0 && searchValue.length === 0 ? 'empty' : 'search'"
+                @clear="handleClearSearch"
+              />
+            </template>
+            <TableColumn
+              :label="$t('镜像 Tag')"
+              min-width="150"
+              show-overflow="tooltip"
             >
-              {{ isSourceBuild(row) ? $t('源码构建') : $t('已构建镜像') }}
-            </span>
-          </template>
-        </TableColumn>
-        <TableColumn
-          :label="$t('代码版本')"
-          min-width="140"
-          show-overflow="tooltip"
-        >
-          <template #default="{ row }">
-            {{ row.revision || row.branch || '--' }}
-          </template>
-        </TableColumn>
-        <TableColumn
-          :label="$t('Commit ID')"
-          min-width="140"
-        >
-          <template #default="{ row }">
-            <!-- 展示前 8 位，hover 看完整 ID 并可复制 -->
-            <HoverCopy
-              :copy-value="row.commitID"
-              :text="row.commitID ? row.commitID.slice(0, 8) : ''"
-              :tooltip="row.commitID"
-            />
-          </template>
-        </TableColumn>
-        <TableColumn
-          :label="$t('实例数')"
-          :width="100"
-        >
-          <template #default="{ row }">
-            {{ row.replicas ?? '--' }}
-          </template>
-        </TableColumn>
-        <TableColumn
-          :label="$t('部署状态')"
-          min-width="120"
-        >
-          <template #default="{ row }">
-            <StatusIcon
-              class="line-height-[22px]"
-              :message="row.status !== APP_DEPLOY_STATUS.DEPLOYED ? row.message : ''"
-              :pending="row.status === APP_DEPLOY_STATUS.DEPLOYING || row.status === APP_DEPLOY_STATUS.UNINSTALLING"
-              :size="12"
-              :status="row.status"
-              :status-color-map="deployStatusColorMap"
-              :status-text-map="deployStatusTextMap"
-            />
-          </template>
-        </TableColumn>
-        <TableColumn
-          :label="$t('操作人')"
-          :min-width="120"
-        >
-          <template #default="{ row }">
-            {{ row.operator || '--' }}
-          </template>
-        </TableColumn>
-        <TableColumn
-          :label="$t('操作时间')"
-          min-width="150"
-        >
-          <template #default="{ row }">
-            {{ row.createdAt ? formatDateString(row.createdAt) : '--' }}
-          </template>
-        </TableColumn>
-        <TableColumn
-          :label="$t('操作')"
-          width="180"
-        >
-          <template #default="{ row }">
-            <Button
-              text
-              theme="primary"
-              @click.stop="handleShowResourceSnapshots(row)"
+              <template #default="{ row }">
+                {{ row.imageTag || '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('镜像来源')"
+              min-width="140"
+              show-overflow="tooltip"
             >
-              {{ $t('查看详情') }}
-            </Button>
-          </template>
-        </TableColumn>
-      </Table>
+              <template #default="{ row }">
+                <span
+                  class="rounded-[2px] px-[8px] py-[2px] text-[12px]"
+                  :class="isSourceBuild(row) ? 'bkms-bg-active bkms-text-brand' : 'bg-bkms-neutral-6 bkms-text-body'"
+                >
+                  {{ isSourceBuild(row) ? $t('源码构建') : $t('已构建镜像') }}
+                </span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('代码版本')"
+              min-width="140"
+              show-overflow="tooltip"
+            >
+              <template #default="{ row }">
+                {{ row.revision || row.branch || '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('Commit ID')"
+              min-width="140"
+            >
+              <template #default="{ row }">
+                <!-- 展示前 8 位，hover 看完整 ID 并可复制 -->
+                <HoverCopy
+                  :copy-value="row.commitID"
+                  :text="row.commitID ? row.commitID.slice(0, 8) : ''"
+                  :tooltip="row.commitID"
+                />
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('实例数')"
+              :width="100"
+            >
+              <template #default="{ row }">
+                {{ row.replicas ?? '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('部署状态')"
+              min-width="120"
+            >
+              <template #default="{ row }">
+                <StatusIcon
+                  class="line-height-[22px]"
+                  :message="row.status !== APP_DEPLOY_STATUS.DEPLOYED ? row.message : ''"
+                  :pending="row.status === APP_DEPLOY_STATUS.DEPLOYING || row.status === APP_DEPLOY_STATUS.UNINSTALLING"
+                  :size="12"
+                  :status="row.status"
+                  :status-color-map="deployStatusColorMap"
+                  :status-text-map="deployStatusTextMap"
+                />
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('操作人')"
+              :min-width="120"
+            >
+              <template #default="{ row }">
+                {{ row.operator || '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('操作时间')"
+              min-width="150"
+            >
+              <template #default="{ row }">
+                {{ row.createdAt ? formatDateString(row.createdAt) : '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('操作')"
+              width="180"
+            >
+              <template #default="{ row }">
+                <Button
+                  text
+                  theme="primary"
+                  @click.stop="handleShowResourceSnapshots(row)"
+                >
+                  {{ $t('查看详情') }}
+                </Button>
+              </template>
+            </TableColumn>
+          </Table>
+        </Skeleton>
+      </div>
     </div>
-  </Skeleton>
+  </div>
 
   <ResourceSnapshotSideslider
     v-model:is-show="showResourceSnapshots"
@@ -180,6 +189,7 @@
   import StatusIcon from '~/components/status-icon.vue';
   import TableException from '~/components/table-exception.vue';
   import { useDeployStatusMap } from '~/composables/use-deploy-status';
+  import { useElementHeight } from '~/composables/use-element-height';
   import usePageConf from '~/composables/use-page';
   import { useSearchPlaceholder } from '~/composables/use-search-placeholder';
   import useTime from '~/composables/use-time';
@@ -201,6 +211,15 @@
   const tableData = ref<AppModelDeployRecordOutputObj[]>([]);
   const isLoading = ref(false);
   const count = ref(0);
+  const wrapperRef = ref<HTMLElement>();
+  const { height: wrapperHeight } = useElementHeight(wrapperRef);
+  const availableHeight = computed(() => Math.max(wrapperHeight.value - 64, 0));
+  const headerRef = ref<HTMLElement>();
+  const { height: headerHeight } = useElementHeight(headerRef, {
+    watchSource: isLoading,
+    defaultHeight: 40,
+  });
+  const tableMaxHeight = computed(() => Math.max(availableHeight.value - headerHeight.value - 16, 0));
   const showResourceSnapshots = ref(false);
   const selectedDeployID = ref('');
 

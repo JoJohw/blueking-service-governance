@@ -17,115 +17,130 @@
 -->
 
 <template>
-  <div class="flex items-center justify-between gap-[12px] mb-[16px]">
-    <div :id="DEPLOY_ENV_SELECT_SLOT_ID"></div>
-    <div class="flex items-center gap-[12px]">
-      <DatePicker
-        v-model="dateRange"
-        class="w-[300px]"
-        clearable
-        :placeholder="$t('请选择操作时间范围')"
-        type="daterange"
-        @change="handleDateChange"
-      />
-      <SearchSelect
-        v-model="searchValue"
-        class="min-w-[360px] bkms-bg-card relative z-[100]"
-        :data="searchData"
-        :placeholder="
-          createPlaceholder({
-            type: 'searchSelect',
-            labels: ['事件级别'],
-          })
-        "
-        unique-select
-        value-behavior="need-key"
-      />
+  <div class="flex flex-col h-full overflow-hidden">
+    <div
+      ref="wrapperRef"
+      class="min-h-0 flex-1 overflow-hidden p-[16px]"
+    >
+      <div
+        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]"
+      >
+        <div
+          ref="headerRef"
+          class="flex items-center justify-between gap-[12px] mb-[16px] shrink-0"
+        >
+          <div :id="DEPLOY_ENV_SELECT_SLOT_ID"></div>
+          <div class="flex items-center gap-[12px]">
+            <DatePicker
+              v-model="dateRange"
+              class="w-[300px]"
+              clearable
+              :placeholder="$t('请选择操作时间范围')"
+              type="daterange"
+              @change="handleDateChange"
+            />
+            <SearchSelect
+              v-model="searchValue"
+              class="min-w-[360px] bkms-bg-card relative z-[100]"
+              :data="searchData"
+              :placeholder="
+                createPlaceholder({
+                  type: 'searchSelect',
+                  labels: ['事件级别'],
+                })
+              "
+              unique-select
+              value-behavior="need-key"
+            />
+          </div>
+        </div>
+        <Skeleton
+          :full-height="false"
+          :loading="isLoading"
+        >
+          <template #loading>
+            <Layout.table />
+          </template>
+          <Table
+            v-bkloading="{ loading: isLoading, zIndex: 8 }"
+            :data="tableData"
+            :max-height="tableMaxHeight"
+            :pagination="Number(pagination.count) > 0 ? pagination : undefined"
+            @page-limit-change="pageSizeChange"
+            @page-value-change="pageChange"
+          >
+            <template #empty>
+              <TableException
+                :type="tableData.length === 0 && searchValue.length === 0 ? 'empty' : 'search'"
+                @clear="handleClearSearch"
+              />
+            </template>
+            <TableColumn
+              :label="$t('时间')"
+              :width="150"
+            >
+              <template #default="{ row }">
+                {{ row.createdAt ? formatDateString(row.createdAt) : '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('组件')"
+              show-overflow="tooltip"
+              :width="180"
+            >
+              <template #default="{ row }">
+                {{ row.componentName || '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('类型')"
+              show-overflow="tooltip"
+              :width="150"
+            >
+              <template #default="{ row }">
+                {{ row.type || '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('资源类型')"
+              :width="120"
+            >
+              <template #default="{ row }">
+                {{ row.resourceKind || '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('资源名称')"
+              show-overflow="tooltip"
+              :width="150"
+            >
+              <template #default="{ row }">
+                {{ row.resourcesName || '--' }}
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('事件级别')"
+              :width="100"
+            >
+              <template #default="{ row }">
+                <span :class="eventLevelClass(row.level)">
+                  {{ row.level || '--' }}
+                </span>
+              </template>
+            </TableColumn>
+            <TableColumn
+              :label="$t('事件内容')"
+              show-overflow="tooltip"
+            >
+              <template #default="{ row }">
+                {{ row.content || '--' }}
+              </template>
+            </TableColumn>
+          </Table>
+        </Skeleton>
+      </div>
     </div>
   </div>
-  <Skeleton
-    :full-height="false"
-    :loading="isLoading"
-  >
-    <template #loading>
-      <Layout.table />
-    </template>
-    <Table
-      v-bkloading="{ loading: isLoading, zIndex: 8 }"
-      :data="tableData"
-      :pagination="pagination"
-      @page-limit-change="pageSizeChange"
-      @page-value-change="pageChange"
-    >
-      <template #empty>
-        <TableException
-          :type="tableData.length === 0 && searchValue.length === 0 ? 'empty' : 'search'"
-          @clear="handleClearSearch"
-        />
-      </template>
-      <TableColumn
-        :label="$t('时间')"
-        :width="150"
-      >
-        <template #default="{ row }">
-          {{ row.createdAt ? formatDateString(row.createdAt) : '--' }}
-        </template>
-      </TableColumn>
-      <TableColumn
-        :label="$t('组件')"
-        show-overflow="tooltip"
-        :width="180"
-      >
-        <template #default="{ row }">
-          {{ row.componentName || '--' }}
-        </template>
-      </TableColumn>
-      <TableColumn
-        :label="$t('类型')"
-        show-overflow="tooltip"
-        :width="150"
-      >
-        <template #default="{ row }">
-          {{ row.type || '--' }}
-        </template>
-      </TableColumn>
-      <TableColumn
-        :label="$t('资源类型')"
-        :width="120"
-      >
-        <template #default="{ row }">
-          {{ row.resourceKind || '--' }}
-        </template>
-      </TableColumn>
-      <TableColumn
-        :label="$t('资源名称')"
-        show-overflow="tooltip"
-        :width="150"
-      >
-        <template #default="{ row }">
-          {{ row.resourcesName || '--' }}
-        </template>
-      </TableColumn>
-      <TableColumn
-        :label="$t('事件级别')"
-        :width="100"
-      >
-        <template #default="{ row }">
-          <span :class="eventLevelClass(row.level)">
-            {{ row.level || '--' }}
-          </span>
-        </template>
-      </TableColumn>
-      <TableColumn
-        :label="$t('事件内容')"
-        show-overflow="tooltip"
-      >
-        <template #default="{ row }">
-          {{ row.content || '--' }}
-        </template>
-      </TableColumn>
-    </Table>
-  </Skeleton>
 </template>
 
 <script lang="ts" setup>
@@ -139,6 +154,7 @@
   import Layout from '~/components/skeleton/skeleton-layout';
   import Skeleton from '~/components/skeleton/skeleton.vue';
   import TableException from '~/components/table-exception.vue';
+  import { useElementHeight } from '~/composables/use-element-height';
   import usePageConf from '~/composables/use-page';
   import { useSearchPlaceholder } from '~/composables/use-search-placeholder';
   import useTime from '~/composables/use-time';
@@ -158,6 +174,16 @@
   const tableData = ref<EventEntryOutputObj[]>([]);
   const isLoading = ref(false);
   const count = ref(0);
+
+  const wrapperRef = ref<HTMLElement>();
+  const { height: wrapperHeight } = useElementHeight(wrapperRef);
+  const availableHeight = computed(() => Math.max(wrapperHeight.value - 64, 0));
+  const headerRef = ref<HTMLElement>();
+  const { height: headerHeight } = useElementHeight(headerRef, {
+    watchSource: isLoading,
+    defaultHeight: 40,
+  });
+  const tableMaxHeight = computed(() => Math.max(availableHeight.value - headerHeight.value - 16, 0));
 
   const searchData = [
     {

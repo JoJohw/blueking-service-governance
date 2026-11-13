@@ -53,7 +53,7 @@
           </div>
         </template>
         <template #right>
-          <div class="flex items-center gap-[12px] justify-end">
+          <div class="flex items-center gap-[8px] justify-end">
             <SearchSelect
               v-model="searchValue"
               class="w-[520px] bkms-bg-card relative z-[100]"
@@ -69,28 +69,11 @@
             >
             </SearchSelect>
             <!-- 排序 -->
-            <div class="flex items-center">
-              <Select
-                v-model="curSortOption"
-                class="w-[136px] bkms-bg-card"
-                :clearable="false"
-              >
-                <Select.Option
-                  v-for="(item, index) in sortOptions"
-                  :id="item.value"
-                  :key="index"
-                  :name="item.label"
-                />
-              </Select>
-              <Button
-                :key="`${curSortOption}-${sortOrder}`"
-                v-bk-tooltips="sortTip"
-                class="!min-w-[32px] !px-[8px] !ml-[-1px] bkms-text-brand"
-                @click="toggleSortOrder"
-              >
-                <i :class="['bkms-icon', sortOrder === 'asc' ? 'bkms-icon-shengxu' : 'bkms-icon-jiangxu']" />
-              </Button>
-            </div>
+            <SortDropdown
+              v-model="curSortOption"
+              v-model:order="sortOrder"
+              :options="sortOptions"
+            />
             <Radio.Group
               v-model="appTableMode"
               type="capsule"
@@ -333,7 +316,7 @@
   import { computed, onBeforeMount, ref, watch } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
-  import { Button, Popover, Radio, SearchSelect, Select, Tag } from 'bkui-vue';
+  import { Button, Popover, Radio, SearchSelect, Tag } from 'bkui-vue';
   import { Plus } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
@@ -343,6 +326,7 @@
   import CustomFilter from '~/components/custom-filter.vue';
   import MoreTag from '~/components/more-tag.vue';
   import Layout from '~/components/skeleton/skeleton-layout';
+  import SortDropdown from '~/components/sort-dropdown.vue';
   import { getAppDisplayKind, getAppDisplayLabel } from '~/composables/app-type';
   import { useDeployStatusMap } from '~/composables/use-deploy-status';
   import { useElementHeight } from '~/composables/use-element-height';
@@ -360,6 +344,7 @@
 
   import type { ISearchItem, ISearchValue } from 'bkui-vue/lib/search-select/utils';
   import type { AppDeployedEnvOutputObj, AppInfoOutputObj } from '~/@types/v1/app';
+  import type { ISortOption, SortOrder } from '~/components/sort-dropdown.vue';
   import type { AppType } from '~/composables/app-type';
 
   type AppSortField = 'createdAt' | 'lastOperatedAt' | 'name';
@@ -389,19 +374,15 @@
   const appList = ref<AppInfoOutputObj[]>([]);
 
   const curSortOption = ref<AppSortField>('lastOperatedAt');
-  const sortOrder = ref<'asc' | 'desc'>('asc');
-  const sortOptions: { label: string; value: AppSortField }[] = [
-    { label: t('应用名称'), value: 'name' },
-    { label: t('操作时间'), value: 'lastOperatedAt' },
-    { label: t('创建时间'), value: 'createdAt' },
+  const sortOrder = ref<SortOrder>('desc');
+  const sortOptions: ISortOption<AppSortField>[] = [
+    { label: t('应用名称'), value: 'name', ascName: 'A → Z', descName: 'Z → A' },
+    { label: t('操作时间'), value: 'lastOperatedAt', ascName: t('升序'), descName: t('降序') },
+    { label: t('创建时间'), value: 'createdAt', ascName: t('升序'), descName: t('降序') },
   ];
   const appNameCollator = new Intl.Collator('zh-CN', { sensitivity: 'base' });
   const compareAppID = (left: AppInfoOutputObj, right: AppInfoOutputObj) =>
     appNameCollator.compare(left.id || '', right.id || '');
-  const sortTip = computed(() => {
-    if (curSortOption.value === 'name') return sortOrder.value === 'asc' ? 'A-Z' : 'Z-A';
-    return sortOrder.value === 'asc' ? t('最新') : t('最早');
-  });
 
   // 使用持久化分页hooks - 自动使用当前路由路径作为存储key
   const { usePagination } = usePersistentStorage();
@@ -515,9 +496,8 @@
     const data = [...tableDataMatchSearch.value];
 
     if (field !== 'name') {
-      // 时间字段的升序交互表示最近时间优先，与时间戳的自然排序方向相反
-      const dateSortOrder = sortOrder.value === 'asc' ? 'desc' : 'asc';
-      return sortByDate(data, item => item[field], dateSortOrder, compareAppID);
+      // 时间字段：asc = 最早优先，desc = 最新优先，与 sortByDate 自然方向一致
+      return sortByDate(data, item => item[field], sortOrder.value, compareAppID);
     }
 
     const direction = sortOrder.value === 'asc' ? 1 : -1;
@@ -673,10 +653,6 @@
         type: row?.type || '',
       },
     });
-  }
-
-  function toggleSortOrder() {
-    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
   }
 
   watch(searchValue, () => {

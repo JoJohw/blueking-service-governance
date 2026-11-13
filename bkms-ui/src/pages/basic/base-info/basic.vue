@@ -273,7 +273,7 @@
 
     <div class="w-[clac(100% - 80px)] bkms-bg-card p-[24px] mt-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
       <BkmsContent :title="$t('成员管理')">
-        <div class="pt-[16px] px-[40px]">
+        <div class="pt-[16px]">
           <FlexRow
             average
             lclass="flex items-center"

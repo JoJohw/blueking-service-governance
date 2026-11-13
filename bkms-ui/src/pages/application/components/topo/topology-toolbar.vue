@@ -18,12 +18,12 @@
 
 <template>
   <div
-    class="flex items-center px-[4px] h-[32px] bg-[#565E7A] rounded-[4px] shadow-[0_4px_12px_0_rgba(41,45,51,0.08)] z-10 select-none"
+    class="flex items-center px-[4px] h-[32px] bg-[#565E7A] rounded-[6px] shadow-[0_4px_12px_0_rgba(41,45,51,0.08)] z-10 select-none"
   >
     <!-- 1:1 -->
     <span
       v-bk-tooltips="$t('恢复100%')"
-      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]"
+      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[4px] hover:bg-[#41475C]"
       @click="zoomToOriginal"
     >
       <i class="bkms-icon bkms-icon-reset-1_1 text-bkms-neutral-7 text-[16px]" />
@@ -39,7 +39,7 @@
     <!-- 缩小 -->
     <span
       v-bk-tooltips="$t('缩小')"
-      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]"
+      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[4px] hover:bg-[#41475C]"
       @click="zoomOut"
     >
       <i class="bkms-icon bkms-icon-jianhao text-bkms-neutral-7 text-[16px]" />
@@ -51,7 +51,7 @@
     <!-- 放大 -->
     <span
       v-bk-tooltips="$t('放大')"
-      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-[#41475C]"
+      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[4px] hover:bg-[#41475C]"
       @click="zoomIn"
     >
       <i class="bkms-icon bkms-icon-jiahao text-bkms-neutral-7 text-[16px]" />
@@ -78,7 +78,7 @@
     </span>
 
     <div
-      class="custom-minimap !absolute top-[40px] left-0 rounded border-none overflow-hidden bg-bkms-neutral-6 shadow-[0_2px_10px_0_rgba(0,0,0,0.12)]"
+      class="custom-minimap !absolute top-[40px] left-0 rounded-[6px] border-none overflow-hidden bg-bkms-neutral-6 shadow-[0_2px_10px_0_rgba(0,0,0,0.12)]"
       :style="{ display: showMinimap ? 'block' : 'none' }"
     ></div>
   </div>
