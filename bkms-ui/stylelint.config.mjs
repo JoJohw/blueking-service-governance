@@ -18,29 +18,44 @@
 
 import stylelintConfig from '@blueking/bkui-lint/stylelint.mjs';
 
-// 主题覆写层：bkui-theme/ 由生成器产出（选择器/属性形态逐字复刻 bkui 产物），
-// patches/ 为手写业务补丁（同样复刻 vxe/bkui 等外部产物的选择器形态）。
-// （bkui 自身不符合本项目规约：BEM -- 修饰类名、单冒号伪元素、属性顺序等），
-// 这些"形态类"规则在复刻件上不适用——选择器一旦按本项目规约改写就不再匹配产物，破坏覆写
-const patchesOverride = {
-  overrides: [
-    {
-      files: [
-        'src/styles/theme/patches/bkui-theme/**/*.css',
-        'src/styles/theme/patches/bkui-theme-literal/**/*.css',
-        'src/styles/theme/patches/bkms/**/*.css',
-      ],
-      rules: {
-        'no-descending-specificity': null,
-        'selector-class-pattern': null,
-        'selector-pseudo-element-colon-notation': null,
-        'selector-attribute-quotes': null,
-        'order/properties-order': null,
-      },
-    },
-  ],
+// 消费层禁止色值字面量，暂为 warning，存量清完后升 error。半透明用 color-mix（uno.config 规则 4）
+const consumerRules = {
+  'color-no-hex': [true, { severity: 'warning' }],
+  'function-disallowed-list': [['rgb', 'rgba', 'hsl', 'hsla'], { severity: 'warning' }],
 };
 
-export default Array.isArray(stylelintConfig)
-  ? [...stylelintConfig, patchesOverride]
-  : { ...stylelintConfig, overrides: [...(stylelintConfig.overrides ?? []), patchesOverride.overrides[0]] };
+// 主题定义层：tokens / 生成覆写 / 补丁里的色值是定义与复刻产物，不适用
+const themeDefinitionOverride = {
+  files: ['src/styles/theme/**/*.css'],
+  rules: {
+    'color-no-hex': null,
+    'function-disallowed-list': null,
+  },
+};
+
+// 复刻 bkui/vxe 产物形态，形态类规则（BEM、伪元素冒号、属性顺序）在复刻件上不适用。
+// 写成数组而不是 { overrides: [...] }，后续加第二条 patch 直接 push，不用改下面的展开方式。
+const patchesOverrides = [
+  {
+    files: ['src/styles/theme/patches/bkui-theme/**/*.css', 'src/styles/theme/patches/bkms/**/*.css'],
+    rules: {
+      'no-descending-specificity': null,
+      'selector-class-pattern': null,
+      'selector-pseudo-element-colon-notation': null,
+      'selector-attribute-quotes': null,
+      'order/properties-order': null,
+    },
+  },
+];
+
+// 预设只导出对象形态（已确认非数组）。数组配置不支持顶层 files 键，那套"看起来兼容"的分支已删除；
+// 上游若改导出形态，这里显式抛错，避免报出来的是难以理解的 unknown key "0"。
+if (Array.isArray(stylelintConfig)) {
+  throw new TypeError('[stylelint] 预设导出形态已变为数组：请先合并为对象配置再导出（数组配置不支持顶层 files）');
+}
+
+export default {
+  ...stylelintConfig,
+  rules: { ...stylelintConfig.rules, ...consumerRules },
+  overrides: [...(stylelintConfig.overrides ?? []), themeDefinitionOverride, ...patchesOverrides],
+};

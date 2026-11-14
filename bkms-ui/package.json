@@ -1,6 +1,9 @@
 {
   "private": true,
   "packageManager": "pnpm@10.33.4",
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24"
+  },
   "scripts": {
     "build": "node --max-old-space-size=8192 node_modules/vite/bin/vite.js build",
     "dev": "vite --mode development",
@@ -10,12 +13,14 @@
     "server": "http-server ./dist -p 5000",
     "test:unit": "vitest",
     "test:ci": "vitest run --reporter=verbose",
+    "test:scripts": "vitest run --config scripts/test/vitest.config.mts",
     "typecheck": "vue-tsc --noEmit --incremental",
     "typecheck:staged": "node scripts/typecheck-staged.mjs",
     "up": "taze major -I",
     "sizecheck": "npx vite-bundle-visualizer",
     "lint": "eslint . --ext .js,.ts,.vue",
     "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
+    "theme:report": "node scripts/theme-lint/report.mjs",
     "format": "prettier --write .",
     "stylelint": "stylelint \"src/**/*.{css,scss,vue}\"",
     "stylelint:fix": "stylelint \"src/**/*.{css,scss,vue}\" --fix",
@@ -58,6 +63,7 @@
   },
   "devDependencies": {
     "@blueking/bkui-lint": "0.1.8",
+    "@eslint/css": "^2.0.1",
     "@intlify/unplugin-vue-i18n": "^4.0.0",
     "@testing-library/jest-dom": "^6.10.0",
     "@testing-library/user-event": "^14.6.7",
@@ -69,6 +75,7 @@
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitejs/plugin-vue-jsx": "^4.1.2",
     "@vue/test-utils": "^2.4.6",
+    "eslint": "^9.39.1",
     "http-server": "^14.1.1",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
@@ -78,6 +85,7 @@
     "prettier": "^3.9.6",
     "protobufjs": "^7.5.8",
     "rollup": "^4.60.4",
+    "stylelint": "^16.25.0",
     "taze": "^0.13.8",
     "typescript": "^5.4.5",
     "unocss": "^66.5.4",

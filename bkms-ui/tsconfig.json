@@ -32,6 +32,7 @@
   "exclude": ["dist", "node_modules", "cypress"],
   "include": [
     "./node_modules/bkui-vue/lib/volar.components.d.ts",
+    "./uno.config.ts",
     "./src/**/*.js",
     "./src/**/*.ts",
     "./src/**/*.tsx",

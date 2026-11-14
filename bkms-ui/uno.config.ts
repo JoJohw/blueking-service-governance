@@ -16,10 +16,6 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import {
   defineConfig,
   presetAttributify,
@@ -28,6 +24,10 @@ import {
   transformerDirectives,
   transformerVariantGroup,
 } from 'unocss';
+
+// 令牌解析是唯一真源，eslint 主题规则（scripts/theme-lint/plugin.mjs）复用同一份，
+// 保证「注册了哪些类」只有一处定义
+import { parseScaleColors, parseSemanticShortcuts } from './scripts/theme-lint/map.mjs';
 
 /*
  * ## bkms 令牌注册
@@ -43,69 +43,25 @@ import {
  *
  * ### 规则
  *
- * 1. 唯一强制项：不写色值字面量（stylelint `color-no-hex` + codemod 管辖）。
+ * 1. class 内只能用注册类，禁止 `text-[var(--bkms-*)]` 任意值（eslint `theme/prefer-uno-class`，例外见规则 5）。
  * 2. semantic.css 已定义的变量优先使用 `bkms-text-*` / `bkms-bg-*` / `bkms-line-*` shortcut；未定义的色阶使用 `text-bkms-*` / `bg-bkms-*` / `border-bkms-*`。
  * 3. 方向边框必须保留工具类方向：`border-t-[#...]` 只能转成 `border-t-bkms-*`，不能压平为 `bkms-line-*`；后者会生成通用 `border-color`。
  * 4. 半透明：纯 var() token 不支持 `/50` alpha 修饰符，用 `color-mix(in srgb, var(--bkms-brand-2) 25%, transparent)`。
+ * 5. `--bkms-shadow-*` 未注册为 uno 类（值不以数字结尾），`shadow-[…var(--bkms-shadow-card)]` 是唯一合法例外。
  */
-/**
- * 解析令牌目录。不能用 import.meta.url 单独定位：uno 的配置加载器（unconfig）会把本文件
- * 打包到临时目录再执行，此时 import.meta.url 指向临时位置，相对路径会解析失败导致整个
- * 令牌注册静默丢失（dev 下 uno 回退默认配置）。因此 cwd 优先、import.meta.url 兜底，
- * 以 colors.css 实际存在为准。
+/*
+ * 令牌解析（parseScaleColors / parseSemanticShortcuts）在 scripts/theme-lint/map.mjs：
+ * eslint 主题规则需要同一份反查表，抽出共享避免两处 regex 漂移。
+ *
+ * 注册形态注意：色阶必须扁平注册（key = 'bkms-brand-6' 整体）——unocss 按 '-' 切段逐层查 theme，
+ * 嵌套 { bkms: { 'brand-6' } } 会被拆成 bkms/brand/6 三段而查不到（实测验证）。
  */
-function resolveThemeDir() {
-  const here = path.dirname(fileURLToPath(import.meta.url));
-  const candidates = [
-    path.resolve(process.cwd(), 'src/styles/theme/tokens'),
-    path.resolve(here, 'src/styles/theme/tokens'),
-  ];
-  for (const dir of candidates) {
-    if (fs.existsSync(path.join(dir, 'colors.css'))) return dir;
-  }
-  throw new Error(`[uno] 令牌目录未找到，已尝试：${candidates.join(' , ')}`);
-}
-const THEME_DIR = resolveThemeDir();
-
-// 色阶：colors.css → theme.colors，类名形如 text-bkms-brand-2 / bg-bkms-cyan-6
-// 注意必须扁平注册（key = 'bkms-brand-6' 整体）：unocss 按 '-' 切段逐层查 theme，
-// 嵌套结构 { bkms: { 'brand-6' } } 会把 bkms-brand-6 拆成 bkms/brand/6 三段而查不到（实测验证）
-function parseScaleColors() {
-  const tokens: Record<string, string> = {};
-  const SCALE_RE = /--bkms-([a-z-]+)-(\d+)\s*:/g;
-  for (const m of fs.readFileSync(path.join(THEME_DIR, 'colors.css'), 'utf8').matchAll(SCALE_RE)) {
-    const [, family, step] = m;
-    tokens[`bkms-${family}-${step}`] = `var(--bkms-${family}-${step})`;
-  }
-  return tokens;
-}
-
-// 语义变量：semantic.css → bkms-* shortcuts。line 是通用边框色，映射为 UnoCSS 的 border 工具类；方向边框使用 parseScaleColors。
-function parseSemanticShortcuts() {
-  const SEMANTIC_UTILITY_PREFIX: Record<string, string> = { text: 'text', line: 'border', bg: 'bg' };
-  const SEMANTIC_RE = /--bkms-(text|line|bg)-([a-z-]+)\s*:/g;
-  const shortcuts: Array<[string, string]> = [];
-  for (const m of fs.readFileSync(path.join(THEME_DIR, 'semantic.css'), 'utf8').matchAll(SEMANTIC_RE)) {
-    const [, group, name] = m;
-    const utilityPrefix = SEMANTIC_UTILITY_PREFIX[group];
-    shortcuts.push([`bkms-${group}-${name}`, `${utilityPrefix}-[var(--bkms-${group}-${name})]`]);
-  }
-  return shortcuts;
-}
 
 export default defineConfig({
   theme: {
     colors: parseScaleColors(),
   },
   shortcuts: [
-    [
-      'btn',
-      'px-4 py-1 rounded inline-block bg-teal-700 text-white cursor-pointer !outline-none hover:bg-teal-800 disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50',
-    ],
-    [
-      'icon-btn',
-      'inline-block cursor-pointer select-none opacity-75 transition duration-200 ease-in-out hover:opacity-100 hover:text-teal-600',
-    ],
     ['env-tag-development', '!border-none !bg-bkms-brand-6 !text-bkms-brand-2'],
     ['env-tag-test', '!border-none !bg-bkms-cyan-6 !text-bkms-cyan-2'],
     ['env-tag-staging', '!border-none !bg-bkms-warning-6 !text-bkms-warning-1'],
