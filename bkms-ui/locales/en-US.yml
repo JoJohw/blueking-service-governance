@@ -956,6 +956,8 @@ Request为最小值，Limit为最大值: Request is the minimum value, Limit is 
 泳道名称格式不正确: The format of the lane name is incorrect
 预留: Reserve
 限制: Limits
+升序: Ascending
+降序: Descending
 组件可用环境: Component Available Environment
 所有环境: All Environments
 组件管理: Component Management

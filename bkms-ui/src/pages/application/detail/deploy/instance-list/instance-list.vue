@@ -17,76 +17,78 @@
 -->
 
 <template>
-  <Skeleton
-    :full-height="false"
-    :loading="isLoading || !isFederationResolved"
-    :once="false"
-  >
-    <template #loading>
-      <div class="flex items-center justify-between mb-[12px]">
-        <div class="flex items-center gap-[8px]">
-          <Layout.shape />
-          <Layout.shape />
-          <Layout.shape />
-        </div>
-        <Layout.shape :width="348" />
-      </div>
-      <Layout.table />
-    </template>
-    <div class="flex items-center justify-between mb-[12px]">
-      <InstanceBatchToolbar
-        :can-adjust-weight="canAdjustWeight"
-        :can-gray-deploy="canGrayDeploy"
-        :disable-admin-command="isCrossPageSelection"
-        :disable-delete="isCrossPageSelection"
-        :disable-gray="isFederationEnv"
-        :gray-disabled-tip="isFederationEnv ? $t('联邦集群不支持灰度操作') : ''"
-        :is-all-instances-selected="isAllInstancesSelected"
-        :selected-count="selectedCount"
-        show-remove-deploy-shortcut
-        @admin-command="instanceActions.openAdminCommand"
-        @delete="instanceActions.openDelete"
-        @gray="handleShowGrayUpgrade()"
-        @monitor="instanceActions.openMonitor()"
-        @remove-deploy="emit('remove-deploy')"
-        @weight="instanceActions.openSelectedWeight"
-      />
-      <SearchSelect
-        v-model="searchValue"
-        class="min-w-[560px] bkms-bg-card relative z-[100]"
-        :data="searchData"
-        :placeholder="
-          createPlaceholder({
-            type: 'searchSelect',
-            labels: ['实例', 'Pod IP', 'Node IP', '镜像 Tag', '实例状态', '就绪状态', '北极星状态'],
-          })
-        "
-        unique-select
-        value-behavior="need-key"
-      >
-      </SearchSelect>
-    </div>
-    <InstanceTable
-      ref="instanceTableRef"
-      :data="tableDataMatchSearch"
-      :env-name="trpcDeployStore.curEnvItem?.name || ''"
-      :filter-options="filterOptions"
-      :is-federation="isFederationEnv"
-      mode="single"
-      show-filter
-      @filter-change="handleFilterChange"
-      @row-action="handleRowAction"
+  <div class="flex flex-col">
+    <Skeleton
+      :full-height="false"
+      :loading="isLoading || !isFederationResolved"
+      :once="false"
     >
-      <template #empty>
-        <TableException
-          :type="curExceptionType"
-          @clear="handleClearFilters"
-          @refresh="handleListReleaseInstances"
-        >
-        </TableException>
+      <template #loading>
+        <div class="flex items-center justify-between mb-[12px]">
+          <div class="flex items-center gap-[8px]">
+            <Layout.shape />
+            <Layout.shape />
+            <Layout.shape />
+          </div>
+          <Layout.shape :width="348" />
+        </div>
+        <Layout.table />
       </template>
-    </InstanceTable>
-  </Skeleton>
+      <div class="flex items-center justify-between mb-[12px]">
+        <InstanceBatchToolbar
+          :can-adjust-weight="canAdjustWeight"
+          :can-gray-deploy="canGrayDeploy"
+          :disable-admin-command="isCrossPageSelection"
+          :disable-delete="isCrossPageSelection"
+          :disable-gray="isFederationEnv"
+          :gray-disabled-tip="isFederationEnv ? $t('联邦集群不支持灰度操作') : ''"
+          :is-all-instances-selected="isAllInstancesSelected"
+          :selected-count="selectedCount"
+          show-remove-deploy-shortcut
+          @admin-command="instanceActions.openAdminCommand"
+          @delete="instanceActions.openDelete"
+          @gray="handleShowGrayUpgrade()"
+          @monitor="instanceActions.openMonitor()"
+          @remove-deploy="emit('remove-deploy')"
+          @weight="instanceActions.openSelectedWeight"
+        />
+        <SearchSelect
+          v-model="searchValue"
+          class="min-w-[560px] bkms-bg-card relative z-[100]"
+          :data="searchData"
+          :placeholder="
+            createPlaceholder({
+              type: 'searchSelect',
+              labels: ['实例', 'Pod IP', 'Node IP', '镜像 Tag', '实例状态', '就绪状态', '北极星状态'],
+            })
+          "
+          unique-select
+          value-behavior="need-key"
+        >
+        </SearchSelect>
+      </div>
+      <InstanceTable
+        ref="instanceTableRef"
+        :data="tableDataMatchSearch"
+        :env-name="trpcDeployStore.curEnvItem?.name || ''"
+        :filter-options="filterOptions"
+        :is-federation="isFederationEnv"
+        mode="single"
+        show-filter
+        @filter-change="handleFilterChange"
+        @row-action="handleRowAction"
+      >
+        <template #empty>
+          <TableException
+            :type="curExceptionType"
+            @clear="handleClearFilters"
+            @refresh="handleListReleaseInstances"
+          >
+          </TableException>
+        </template>
+      </InstanceTable>
+    </Skeleton>
+  </div>
 
   <InstanceActionsHost
     ref="actionsHostRef"

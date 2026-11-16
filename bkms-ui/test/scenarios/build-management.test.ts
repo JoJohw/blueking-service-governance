@@ -5,17 +5,23 @@
  *   镜像仓库来源禁用执行构建 / 代码仓库来源可执行构建 / 点击后弹出执行配置 → V = 3
  *
  * 说明：构建历史为列表（vxe），本场景聚焦「构建入口」的判定与弹层；
- * RepoRefSelect 为重型子件（依赖代码仓库接口），stub 为标记元素。
+ * CodeRevisionField 为重型子件，使用与宿主 wiring 对齐的契约 stub；FlexRow 仅保留 left 插槽。
  */
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/vue';
 import { createPinia } from 'pinia';
+import { defineComponent, h } from 'vue';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { i18nGlobalMocks } from '../helpers/mock-i18n';
 import { installVxeShims } from '../helpers/mock-table';
 
 // 页面含 vxe 构建历史表格，需先装垫片（同 S14/S9）
+vi.mock('@blueking/table', async () => {
+  const { tableMockFactory } = await import('../helpers/mock-table');
+  return tableMockFactory();
+});
+
 beforeAll(() => {
   installVxeShims();
 });
@@ -51,12 +57,6 @@ vi.mock('~/stores/app-detail', () => ({
     updateAppID: vi.fn(),
   }),
 }));
-// 代码仓库选择器：依赖外部仓库接口，stub 为标记元素
-vi.mock('~/components/repo-ref-select.vue', async () => {
-  const { defineComponent } = await import('vue');
-  return { default: defineComponent({ name: 'RepoRefSelectStub', template: '<div>repo-ref-select</div>' }) };
-});
-
 beforeEach(() => {
   vi.clearAllMocks();
   harness.sourceType = 'imageRegistry';
@@ -65,7 +65,31 @@ beforeEach(() => {
 async function renderPage() {
   const { default: BuildManagement } = await import('~/pages/application/detail/app-build/build-management.vue');
   return render(BuildManagement as never, {
-    global: { plugins: [createPinia()], mocks: i18nGlobalMocks } as never,
+    global: {
+      plugins: [createPinia()],
+      mocks: i18nGlobalMocks,
+      stubs: {
+        CodeRevisionField: defineComponent({
+          name: 'CodeRevisionFieldStub',
+          setup(_, { expose }) {
+            expose({
+              containsTarget: () => false,
+              dismissIfOutside: () => undefined,
+              hidePopover: () => undefined,
+              prepare: (preferred = '') => preferred,
+              reset: () => undefined,
+            });
+            return () => h('div', { 'data-testid': 'code-revision-field' });
+          },
+        }),
+        FlexRow: defineComponent({
+          name: 'FlexRowStub',
+          setup(_, { slots }) {
+            return () => h('div', slots.left?.());
+          },
+        }),
+      },
+    } as never,
   });
 }
 

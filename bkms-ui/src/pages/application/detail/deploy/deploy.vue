@@ -194,10 +194,13 @@
       <div
         v-else
         :class="[
-          'flex-1 min-h-0 px-[24px] pb-[20px]',
-          isTopBarVisible ? '' : 'pt-[20px]',
-          // 部署总览：操作栏固定，仅表格区域滚动
-          activeTab === 'overview' ? 'flex flex-col overflow-hidden' : 'overflow-auto',
+          'flex-1 min-h-0',
+          activeTab === 'event' || activeTab === 'history' ? '' : 'px-[24px] pb-[20px]',
+          isTopBarVisible ? '' : activeTab === 'event' || activeTab === 'history' ? '' : 'pt-[20px]',
+          // 部署总览、事件和部署历史：内容区域固定，表格内部滚动；其他页面整体滚动
+          activeTab === 'overview' || activeTab === 'event' || activeTab === 'history'
+            ? 'flex flex-col overflow-hidden'
+            : 'overflow-auto',
         ]"
       >
         <DeployOverview
@@ -211,10 +214,10 @@
           @view-instances="handleViewEnvInstances"
         />
         <template v-else-if="activeTab === 'instance'">
-          <!-- 构建状态提示 -->
+          <!-- 构建状态提示（白卡片外） -->
           <Alert
             v-if="isBuildAlertVisible"
-            class="mb-[24px]"
+            class="mb-[16px] shrink-0"
             :closable="buildAlertInfo!.closable"
             :theme="buildAlertInfo!.theme"
           >
@@ -242,9 +245,7 @@
                 height="14px"
                 width="14px"
               />
-              <span class="bkms-text-body text-[12px] font-bold ml-[8px]">{{
-                buildAlertInfo!.statusText
-              }}</span>
+              <span class="bkms-text-body text-[12px] font-bold ml-[8px]">{{ buildAlertInfo!.statusText }}</span>
             </template>
             <template #default>
               <div class="flex px-[24px] gap-[36px] text-[12px] h-[18px] leading-[18px]">
@@ -262,63 +263,65 @@
               </div>
             </template>
           </Alert>
-          <template v-if="isMultiEnvMode || isDeployStatusVisible">
-            <!-- 单环境 -->
-            <InstanceList
-              v-if="!isMultiEnvMode"
-              :key="curEnv"
-              :has-deploy-record="instanceListHasDeployRecord"
-              @remove-deploy="handleRemoveDeploy"
-            />
-            <!-- 多环境 -->
-            <MultiEnvInstanceTable
-              v-else
-              :requestable-env-names="requestableMultiEnvNames"
-              @remove-deploy="handleRemoveDeploy"
-            />
-          </template>
-          <!-- 未部署状态 -->
-          <Skeleton
-            v-else
-            :full-height="false"
-            :loading="initLoading"
-          >
-            <template #loading>
-              <div class="flex items-center justify-between mb-[12px]">
-                <div class="flex items-center gap-[8px]">
-                  <Layout.shape />
-                  <Layout.shape />
-                </div>
-                <Layout.shape :width="348" />
-              </div>
-              <Layout.table />
+          <div class="rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]">
+            <template v-if="isMultiEnvMode || isDeployStatusVisible">
+              <!-- 单环境 -->
+              <InstanceList
+                v-if="!isMultiEnvMode"
+                :key="curEnv"
+                :has-deploy-record="instanceListHasDeployRecord"
+                @remove-deploy="handleRemoveDeploy"
+              />
+              <!-- 多环境 -->
+              <MultiEnvInstanceTable
+                v-else
+                :requestable-env-names="requestableMultiEnvNames"
+                @remove-deploy="handleRemoveDeploy"
+              />
             </template>
-            <Exception
-              v-if="!initLoading"
-              class="large-exception"
-              scene="part"
-              type="empty"
+            <!-- 未部署状态 -->
+            <Skeleton
+              v-else
+              :full-height="false"
+              :loading="initLoading"
             >
-              <template #type>
-                <img src="/empty.svg" />
-              </template>
-              <template #description>
-                <div class="bkms-text-body text-[14px] leading-[22px]">
-                  {{ $t('该环境尚未部署应用') }}
+              <template #loading>
+                <div class="flex items-center justify-between mb-[12px]">
+                  <div class="flex items-center gap-[8px]">
+                    <Layout.shape />
+                    <Layout.shape />
+                  </div>
+                  <Layout.shape :width="348" />
                 </div>
+                <Layout.table />
               </template>
-              <Button
-                v-bk-tooltips="{ content: currentEnvDeployDisabledReason, disabled: !currentEnvDeployDisabledReason }"
-                class="mt-[8px]"
-                :disabled="!curEnv || !!currentEnvDeployDisabledReason"
-                :loading="precheckLoading"
-                theme="primary"
-                @click="handleShowQuicklyDeploy"
+              <Exception
+                v-if="!initLoading"
+                class="large-exception"
+                scene="part"
+                type="empty"
               >
-                {{ $t('立即部署') }}
-              </Button>
-            </Exception>
-          </Skeleton>
+                <template #type>
+                  <img src="/empty.svg" />
+                </template>
+                <template #description>
+                  <div class="bkms-text-body text-[14px] leading-[22px]">
+                    {{ $t('该环境尚未部署应用') }}
+                  </div>
+                </template>
+                <Button
+                  v-bk-tooltips="{ content: currentEnvDeployDisabledReason, disabled: !currentEnvDeployDisabledReason }"
+                  class="mt-[8px]"
+                  :disabled="!curEnv || !!currentEnvDeployDisabledReason"
+                  :loading="precheckLoading"
+                  theme="primary"
+                  @click="handleShowQuicklyDeploy"
+                >
+                  {{ $t('立即部署') }}
+                </Button>
+              </Exception>
+            </Skeleton>
+          </div>
         </template>
         <DeployEvent v-else-if="activeTab === 'event'" />
         <DeployHistory v-else-if="activeTab === 'history'" />

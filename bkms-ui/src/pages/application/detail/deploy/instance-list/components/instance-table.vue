@@ -29,10 +29,7 @@
       @click="toggleCollapse"
     >
       <RightShape
-        :class="[
-          'bkms-text-secondary text-[14px] transition-transform duration-200',
-          { 'rotate-90': !isCollapsed },
-        ]"
+        :class="['bkms-text-secondary text-[14px] transition-transform duration-200', { 'rotate-90': !isCollapsed }]"
       />
       <span class="font-medium bkms-text-title">{{ envDisplayName }}</span>
       <Tag
@@ -994,16 +991,20 @@
     envName: () => props.envName,
   });
 
-  const displayPagination = computed(() => ({
-    current: paginationInternal.value.current,
-    count: displayTotal.value,
-    limit: paginationInternal.value.limit,
-    remote: true,
-    limitList: [10, 20, 50, 100],
-    showLimit: true,
-    showTotalCount: true,
-    align: 'right' as const,
-  }));
+  const displayPagination = computed(() =>
+    displayTotal.value > 0
+      ? {
+          current: paginationInternal.value.current,
+          count: displayTotal.value,
+          limit: paginationInternal.value.limit,
+          remote: true,
+          limitList: [10, 20, 50, 100],
+          showLimit: true,
+          showTotalCount: true,
+          align: 'right' as const,
+        }
+      : undefined,
+  );
 
   // 空状态处理
   const emptyFilters = ref([]);

@@ -19,14 +19,24 @@
 import { defineComponent, h } from 'vue';
 
 const Empty = defineComponent({ name: 'BkuiStub', template: '<span><slot /></span>' });
-const Popover = defineComponent({
-  name: 'PopoverStub',
-  setup(_, { slots }) {
-    return () => h('div', { 'data-testid': 'popover' }, [slots.default?.(), slots.content?.()]);
+const Button = defineComponent({
+  name: 'ButtonStub',
+  inheritAttrs: false,
+  setup(_, { attrs, slots }) {
+    return () => h('button', attrs, slots.default?.());
   },
 });
-
-export const Button = Empty;
+const Popover = defineComponent({
+  name: 'PopoverStub',
+  props: {
+    isShow: { type: Boolean, default: true },
+  },
+  setup(props, { slots }) {
+    return () =>
+      h('div', { 'data-testid': 'popover' }, [slots.default?.(), props.isShow ? slots.content?.() : null]);
+  },
+});
+export { Button };
 export const Checkbox = Empty;
 export const Dropdown = Object.assign(Empty, {
   DropdownMenu: Empty,
@@ -35,4 +45,6 @@ export const Dropdown = Object.assign(Empty, {
 export { Popover };
 export const Tag = Empty;
 export const Input = Empty;
+export const Form = Object.assign(Empty, { FormItem: Empty });
+export const Radio = Object.assign(Empty, { Group: Empty });
 export const Select = Object.assign(Empty, { Group: Empty, Option: Empty });

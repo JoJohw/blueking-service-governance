@@ -17,268 +17,275 @@
 -->
 
 <template>
-  <Skeleton
-    :loading="loading"
-    theme="gray"
+  <div
+    ref="containerRef"
+    class="h-full min-h-0 p-[16px]"
   >
-    <template #loading>
-      <div class="h-full px-[24px] py-[20px]">
-        <Layout.shape width="100%" />
-        <FlexRow
-          average
-          class="my-[16px]"
-        >
-          <template #left>
-            <Layout.shape :width="110" />
-          </template>
-        </FlexRow>
-        <Layout.table />
-      </div>
-    </template>
-    <div class="h-full px-[24px] py-[20px]">
-      <Alert
-        class="mb-[12px]"
-        theme="info"
-        >{{ $t('通过组件可以灵活修改应用的 Kubernetes 资源配置，如调整参数、添加网络策略等。') }}</Alert
+    <div class="max-h-full overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]">
+      <Skeleton
+        :loading="loading"
+        theme="gray"
       >
-      <FlexRow>
-        <template #left>
-          <Button
-            theme="primary"
-            @click="handleShowSlider"
-          >
-            <Plus
-              class="mr-[4px]"
-              :height="24"
-              :width="24"
-            />
-            {{ $t('添加组件实例') }}
-          </Button>
-        </template>
-        <template #right>
-          <SearchSelect
-            v-model="searchValue"
-            class="w-[520px] bkms-bg-card relative z-[100]"
-            :data="searchSelectData"
-            :placeholder="
-              createPlaceholder({
-                type: 'searchSelect',
-                labels: ['实例名称', '组件', '可用环境', '来源'],
-              })
-            "
-            unique-select
-            value-behavior="need-key"
-          >
-          </SearchSelect>
-        </template>
-      </FlexRow>
-      <div
-        ref="componentTableContentRef"
-        class="!h-[calc(100%-48px-33px-16px)] flex flex-col gap-[16px] mt-[16px]"
-      >
-        <Table
-          ref="componentTableRef"
-          :data="tableDataMatchSearch"
-          :max-height="componentTableContentHeight"
-          :pagination="pagination"
-          :row-config="{
-            isHover: true,
-            isCurrent: true,
-          }"
-          :show-overflow="false"
-          @checkbox-all="handleCheckboxAll"
-          @checkbox-change="handleCheckboxChange"
-          @filter-change="filterChangeEvent"
-          @page-limit-change="pageSizeChange"
-          @page-value-change="pageChange"
-        >
-          <template #empty>
-            <TableException
-              :type="curExceptionType"
-              @clear="handleClearFilters"
-              @refresh="handleFetchList"
+        <template #loading>
+          <div>
+            <Layout.shape width="100%" />
+            <FlexRow
+              average
+              class="my-[16px]"
             >
-            </TableException>
-          </template>
+              <template #left>
+                <Layout.shape :width="110" />
+              </template>
+            </FlexRow>
+            <Layout.table />
+          </div>
+        </template>
+        <div
+          ref="headerRef"
+          class="shrink-0"
+        >
+          <Alert
+            class="mb-[12px]"
+            theme="info"
+            >{{ $t('通过组件可以灵活修改应用的 Kubernetes 资源配置，如调整参数、添加网络策略等。') }}</Alert
+          >
+          <FlexRow>
+            <template #left>
+              <Button
+                theme="primary"
+                @click="handleShowSlider"
+              >
+                <Plus
+                  class="mr-[4px]"
+                  :height="24"
+                  :width="24"
+                />
+                {{ $t('添加组件实例') }}
+              </Button>
+            </template>
+            <template #right>
+              <SearchSelect
+                v-model="searchValue"
+                class="w-[520px] bkms-bg-card relative z-[100]"
+                :data="searchSelectData"
+                :placeholder="
+                  createPlaceholder({
+                    type: 'searchSelect',
+                    labels: ['实例名称', '组件', '可用环境', '来源'],
+                  })
+                "
+                unique-select
+                value-behavior="need-key"
+              >
+              </SearchSelect>
+            </template>
+          </FlexRow>
+        </div>
+        <div class="mt-[16px]">
+          <Table
+            ref="componentTableRef"
+            :data="tableDataMatchSearch"
+            :max-height="tableMaxHeight"
+            :pagination="Number(pagination.count) > 0 ? pagination : undefined"
+            :row-config="{
+              isHover: true,
+              isCurrent: true,
+            }"
+            :show-overflow="false"
+            @checkbox-all="handleCheckboxAll"
+            @checkbox-change="handleCheckboxChange"
+            @filter-change="filterChangeEvent"
+            @page-limit-change="pageSizeChange"
+            @page-value-change="pageChange"
+          >
+            <template #empty>
+              <TableException
+                :type="curExceptionType"
+                @clear="handleClearFilters"
+                @refresh="handleFetchList"
+              >
+              </TableException>
+            </template>
 
-          <!-- <TableColumn
+            <!-- <TableColumn
             fixed="left"
             type="checkbox"
             width="50"
           /> -->
 
-          <TableColumn
-            field="name"
-            fixed="left"
-            label="实例名称"
-            min-width="150"
-          >
-            <template #default="{ row }">
-              {{ row.name || '--' }}
-            </template>
-          </TableColumn>
+            <TableColumn
+              field="name"
+              fixed="left"
+              label="实例名称"
+              min-width="150"
+            >
+              <template #default="{ row }">
+                {{ row.name || '--' }}
+              </template>
+            </TableColumn>
 
-          <TableColumn
-            field="type"
-            filter-multiple
-            :filters="filterOptions.type"
-            :label="$t('组件')"
-            min-width="150"
-          >
-            <template #header>
-              <CustomFilter
-                field="type"
-                :filters="filterOptions.type"
-                :label="$t('组件')"
-                :table-ref="componentTableRef"
-              />
-            </template>
-            <template #default="{ row }">
-              {{ row.type || '--' }}
-            </template>
-          </TableColumn>
+            <TableColumn
+              field="type"
+              filter-multiple
+              :filters="filterOptions.type"
+              :label="$t('组件')"
+              min-width="150"
+            >
+              <template #header>
+                <CustomFilter
+                  field="type"
+                  :filters="filterOptions.type"
+                  :label="$t('组件')"
+                  :table-ref="componentTableRef"
+                />
+              </template>
+              <template #default="{ row }">
+                {{ row.type || '--' }}
+              </template>
+            </TableColumn>
 
-          <TableColumn
-            field="properties"
-            label="配置内容"
-            min-width="250"
-          >
-            <template #default="{ row }">
-              <div
-                v-if="Object.keys(row.properties || {})?.length"
-                v-bk-tooltips="{
-                  content: propertiesToText(row.properties),
-                  disabled: Object.keys(row.properties || {}).length < 4,
-                  placement: 'left',
-                  delay: 500,
-                }"
-                class="flex flex-col gap-[2px]"
-              >
-                <span
-                  v-for="key in Object.keys(row.properties || {}).slice(0, 3)"
-                  :key="key"
-                  class="text-[12px] bkms-text-body truncate"
+            <TableColumn
+              field="properties"
+              label="配置内容"
+              min-width="250"
+            >
+              <template #default="{ row }">
+                <div
+                  v-if="Object.keys(row.properties || {})?.length"
+                  v-bk-tooltips="{
+                    content: propertiesToText(row.properties),
+                    disabled: Object.keys(row.properties || {}).length < 4,
+                    placement: 'left',
+                    delay: 500,
+                  }"
+                  class="flex flex-col gap-[2px]"
                 >
-                  {{ `${key}: ${formatPropertyValue(row.properties[key])}` }}
-                </span>
-                <span
-                  v-if="Object.keys(row.properties || {})?.length > 3"
-                  class="text-[12px] bkms-text-secondary"
-                >
-                  ...
-                </span>
-              </div>
-              <span v-else>--</span>
-            </template>
-          </TableColumn>
+                  <span
+                    v-for="key in Object.keys(row.properties || {}).slice(0, 3)"
+                    :key="key"
+                    class="text-[12px] bkms-text-body truncate"
+                  >
+                    {{ `${key}: ${formatPropertyValue(row.properties[key])}` }}
+                  </span>
+                  <span
+                    v-if="Object.keys(row.properties || {})?.length > 3"
+                    class="text-[12px] bkms-text-secondary"
+                  >
+                    ...
+                  </span>
+                </div>
+                <span v-else>--</span>
+              </template>
+            </TableColumn>
 
-          <TableColumn
-            field="scopeEnvNames"
-            :filters="filterOptions.scopeEnvNames"
-            :label="$t('可用环境')"
-            min-width="180"
-          >
-            <template #header>
-              <CustomFilter
-                field="scopeEnvNames"
-                :filters="filterOptions.scopeEnvNames"
-                :label="$t('可用环境')"
-                :table-ref="componentTableRef"
-              />
-            </template>
-            <template #default="{ row }">
-              <Tag
-                v-if="row.scopeType === 'global'"
-                class="pointer-events-none"
-                theme="danger"
-                >{{ $t('所有环境') }}</Tag
-              >
-              <div
-                v-else-if="row.scopeEnvNames?.length"
-                class="flex items-center gap-[4px] flex-wrap"
-              >
+            <TableColumn
+              field="scopeEnvNames"
+              :filters="filterOptions.scopeEnvNames"
+              :label="$t('可用环境')"
+              min-width="180"
+            >
+              <template #header>
+                <CustomFilter
+                  field="scopeEnvNames"
+                  :filters="filterOptions.scopeEnvNames"
+                  :label="$t('可用环境')"
+                  :table-ref="componentTableRef"
+                />
+              </template>
+              <template #default="{ row }">
                 <Tag
-                  v-for="(env, index) in row.scopeEnvNames?.slice(0, 2)"
-                  :key="index"
+                  v-if="row.scopeType === 'global'"
                   class="pointer-events-none"
+                  theme="danger"
+                  >{{ $t('所有环境') }}</Tag
                 >
-                  {{ env }}
-                </Tag>
-                <Popover theme="light">
-                  <Tag v-if="row.scopeEnvNames?.length > 2"> +{{ row.scopeEnvNames?.length - 2 }} </Tag>
-                  <template #content>
-                    <Tag
-                      v-for="(env, index) in row.scopeEnvNames?.slice(2)"
-                      :key="index"
-                      class="mr-[4px]"
-                    >
-                      {{ env }}
-                    </Tag>
-                  </template>
-                </Popover>
-              </div>
-              <span v-else>--</span>
-            </template>
-          </TableColumn>
+                <div
+                  v-else-if="row.scopeEnvNames?.length"
+                  class="flex items-center gap-[4px] flex-wrap"
+                >
+                  <Tag
+                    v-for="(env, index) in row.scopeEnvNames?.slice(0, 2)"
+                    :key="index"
+                    class="pointer-events-none"
+                  >
+                    {{ env }}
+                  </Tag>
+                  <Popover theme="light">
+                    <Tag v-if="row.scopeEnvNames?.length > 2"> +{{ row.scopeEnvNames?.length - 2 }} </Tag>
+                    <template #content>
+                      <Tag
+                        v-for="(env, index) in row.scopeEnvNames?.slice(2)"
+                        :key="index"
+                        class="mr-[4px]"
+                      >
+                        {{ env }}
+                      </Tag>
+                    </template>
+                  </Popover>
+                </div>
+                <span v-else>--</span>
+              </template>
+            </TableColumn>
 
-          <TableColumn
-            field="source"
-            filter-multiple
-            :filters="filterOptions.source"
-            :label="$t('来源')"
-            min-width="150"
-          >
-            <template #default="{ row }">
-              {{ row.refWorkspaceCompName ? $t('引用空间组件实例') : $t('自定义') }}
-            </template>
-          </TableColumn>
+            <TableColumn
+              field="source"
+              filter-multiple
+              :filters="filterOptions.source"
+              :label="$t('来源')"
+              min-width="150"
+            >
+              <template #default="{ row }">
+                {{ row.refWorkspaceCompName ? $t('引用空间组件实例') : $t('自定义') }}
+              </template>
+            </TableColumn>
 
-          <!-- 操作列 -->
-          <TableColumn
-            fixed="right"
-            :label="$t('操作')"
-            min-width="120"
-          >
-            <template #default="{ row }">
-              <div class="flex items-center gap-[12px]">
-                <Button
-                  v-bk-tooltips="{
-                    content: $t('引用创建的实例不支持编辑'),
-                    disabled: !row.refWorkspaceCompName,
-                  }"
-                  :disabled="!!row.refWorkspaceCompName"
-                  text
-                  theme="primary"
-                  @click="handleEdit(row)"
-                >
-                  {{ $t('编辑') }}
-                </Button>
-                <Button
-                  v-bk-tooltips="{
-                    content: $t('引用创建的实例不支持克隆'),
-                    disabled: !row.refWorkspaceCompName,
-                  }"
-                  :disabled="!!row.refWorkspaceCompName"
-                  text
-                  theme="primary"
-                  @click="handleClone(row)"
-                >
-                  {{ $t('克隆') }}
-                </Button>
-                <Button
-                  text
-                  theme="primary"
-                  @click="handleDelete(row)"
-                >
-                  {{ $t('删除') }}
-                </Button>
-              </div>
-            </template>
-          </TableColumn>
-        </Table>
-      </div>
+            <!-- 操作列 -->
+            <TableColumn
+              fixed="right"
+              :label="$t('操作')"
+              min-width="120"
+            >
+              <template #default="{ row }">
+                <div class="flex items-center gap-[12px]">
+                  <Button
+                    v-bk-tooltips="{
+                      content: $t('引用创建的实例不支持编辑'),
+                      disabled: !row.refWorkspaceCompName,
+                    }"
+                    :disabled="!!row.refWorkspaceCompName"
+                    text
+                    theme="primary"
+                    @click="handleEdit(row)"
+                  >
+                    {{ $t('编辑') }}
+                  </Button>
+                  <Button
+                    v-bk-tooltips="{
+                      content: $t('引用创建的实例不支持克隆'),
+                      disabled: !row.refWorkspaceCompName,
+                    }"
+                    :disabled="!!row.refWorkspaceCompName"
+                    text
+                    theme="primary"
+                    @click="handleClone(row)"
+                  >
+                    {{ $t('克隆') }}
+                  </Button>
+                  <Button
+                    text
+                    theme="primary"
+                    @click="handleDelete(row)"
+                  >
+                    {{ $t('删除') }}
+                  </Button>
+                </div>
+              </template>
+            </TableColumn>
+          </Table>
+        </div>
+      </Skeleton>
     </div>
-  </Skeleton>
+  </div>
   <ComponentsSideSlider
     v-model="isShow"
     :btn-loading="updating"
@@ -334,7 +341,19 @@
   const editIndex = ref<number>(-1); // 当前更新索引
   const componentType = ref<ComponentType | undefined>('Deploy');
 
-  const componentTableContentRef = ref<HTMLElement>();
+  const containerRef = ref<HTMLElement>();
+  const { height: containerHeight } = useElementHeight(containerRef, {
+    watchSource: loading,
+    defaultHeight: 600,
+  });
+  const headerRef = ref<HTMLElement>();
+  const { height: headerHeight } = useElementHeight(headerRef, {
+    watchSource: loading,
+    defaultHeight: 77,
+  });
+  /** 外层 p-[16px] 与白卡片 p-[16px] 各扣除上下内边距 */
+  const availableHeight = computed(() => Math.max(containerHeight.value - 64, 0));
+  const tableMaxHeight = computed(() => Math.max(availableHeight.value - headerHeight.value - 16, 0));
   const componentTableRef = ref();
   const componentTypeOptions = computed<ITableFilterItem[]>(() => {
     const typeSet = new Set<string>();
@@ -422,12 +441,6 @@
     },
     count,
   );
-
-  // 使用 useElementHeight hook 获取表格容器高度
-  const { height: componentTableContentHeight } = useElementHeight(componentTableContentRef, {
-    watchSource: loading,
-    defaultHeight: 600,
-  });
 
   /**
    * 关闭 Slider
@@ -606,8 +619,7 @@
       h(
         'div',
         {
-          class:
-            'max-h-[160px] overflow-auto border-1 border-t-transparent bkms-line-light rounded-[2px]',
+          class: 'max-h-[160px] overflow-auto border-1 border-t-transparent bkms-line-light rounded-[2px]',
         },
         [...instances],
       ),
