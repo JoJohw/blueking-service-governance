@@ -76,6 +76,15 @@ pnpm test:scripts            # 本目录的单测
 
 `eslint.probe` 决定哪些语言触发 ESLint 校验（含 `.css`，让 `theme/no-hardcoded-color` 在样式文件里也生效）；`stylelint.validate` 决定哪些语言触发 Stylelint，`vue` 必须显式列出（扩展默认只校验 `css`/`postcss`）。配置到位后保存即有提示，灯泡里可一键替换。
 
+## 常见问题与解决方案
+
+编辑器里看不到 `theme/*` 规则的提示，按顺序排查：
+
+1. **确认装了 ESLint 和 Stylelint 两个扩展**。没装 Stylelint 时 `.vscode/settings.json` 里的 `stylelint.validate` 会被标「未知的配置设置」Hint——这就是缺扩展的信号，不是配置写错
+2. **确认 `.vscode/settings.json` 有内容**。新 clone 后该文件应随仓库存在；如果缺失，从上文补回
+3. **`pnpm install` 后重启 ESLint 服务或重启编辑器**（命令面板 → `ESLint: Restart ESLint Server`）。自定义插件 `plugin.mjs` 是随依赖安装后才可解析的本地文件，装完依赖不重启服务，扩展仍用旧缓存，规则不生效
+4. 以上都没问题仍不报：命令行跑 `pnpm lint` 验证规则本身是否命中——命令行报、编辑器不报，就是扩展侧问题（回到第 3 步）
+
 ## 已知边界
 
 - `hsl()` 只报不导：没做 HSL→RGB 转换，报出来后不给候选，需人工查令牌（`rgb()/rgba()` 已归一成 hex）
