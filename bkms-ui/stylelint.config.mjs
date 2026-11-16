@@ -33,6 +33,14 @@ const themeDefinitionOverride = {
   },
 };
 
+// palette 骨架层：shell.css 是工具自身 chrome 的固定色快照，同属定义层
+const paletteShellOverride = {
+  files: ['dev/palette/src/shell.css'],
+  rules: {
+    'color-no-hex': null,
+  },
+};
+
 // 复刻 bkui/vxe 产物形态，形态类规则（BEM、伪元素冒号、属性顺序）在复刻件上不适用。
 // 写成数组而不是 { overrides: [...] }，后续加第二条 patch 直接 push，不用改下面的展开方式。
 const patchesOverrides = [
@@ -57,5 +65,5 @@ if (Array.isArray(stylelintConfig)) {
 export default {
   ...stylelintConfig,
   rules: { ...stylelintConfig.rules, ...consumerRules },
-  overrides: [...(stylelintConfig.overrides ?? []), themeDefinitionOverride, ...patchesOverrides],
+  overrides: [...(stylelintConfig.overrides ?? []), themeDefinitionOverride, paletteShellOverride, ...patchesOverrides],
 };

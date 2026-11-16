@@ -133,4 +133,13 @@ export default [
       'theme/no-foreign-var': 'off',
     },
   },
+  // palette 是独立 dev 工具：骨架用自有 --pal-* 固定变量（shell.css 定义），
+  // 展示色块用 var(--bkms-*) 读取真源；两者都不是消费层的令牌漂移
+  {
+    files: ['dev/palette/**/*.{vue,ts,css}'],
+    rules: {
+      'theme/no-hardcoded-color': 'off',
+      'theme/no-foreign-var': 'off',
+    },
+  },
 ];
