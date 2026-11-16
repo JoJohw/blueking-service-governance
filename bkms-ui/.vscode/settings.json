@@ -1,0 +1,4 @@
+{
+  "stylelint.validate": ["css", "postcss", "scss", "sass", "less", "vue"],
+  "eslint.probe": ["javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "css"]
+}
