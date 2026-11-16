@@ -20,6 +20,7 @@
     "sizecheck": "npx vite-bundle-visualizer",
     "lint": "eslint . --ext .js,.ts,.vue",
     "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
+    "theme:designer": "vite --config dev/palette/vite.config.ts",
     "theme:report": "node scripts/theme-lint/report.mjs",
     "format": "prettier --write .",
     "stylelint": "stylelint \"src/**/*.{css,scss,vue}\"",

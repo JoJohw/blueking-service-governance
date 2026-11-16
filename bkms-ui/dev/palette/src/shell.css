@@ -1,0 +1,25 @@
+/*
+ * palette 骨架色：工具自身的 chrome（面板/文字/边框/按钮/阴影）。
+ * 固定快照，刻意不从 colors.css 派生——工具是审视色板的尺子，不能跟着色板伸缩。
+ * 色块与语义预览的展示色仍用 var(--bkms-*)，那是被审视的对象，必须跟随真源。
+ */
+:root {
+  --pal-text-title: #111214;
+  --pal-text-body: #4A5973;
+  --pal-text-muted: #C1CDE5;
+  --pal-text-inverse: #FFF;
+  --pal-bg-card: #FFF;
+  --pal-bg-head: #FBFCFE;
+  --pal-bg-hover: #F0F4FA;
+  --pal-bg-active: #E5EDFF;
+  --pal-bg-subtle: #F7F9FD;
+  --pal-bg-brand-soft: #F0F4FF;
+  --pal-line: #E9EDF5;
+  --pal-line-strong: #3B6EF5;
+  --pal-brand: #3B6EF5;
+  --pal-brand-deep: #274ECF;
+  --pal-success: #2CAF5E;
+  --pal-warning: #F59500;
+  --pal-shadow-popover: #00000029;
+  --pal-shadow-dialog: #0003;
+}
