@@ -18,6 +18,7 @@
 
 <template>
   <ResizeLayout
+    :border="false"
     class="collapsible-aside-layout"
     collapsible
     :initial-divide="initialDivide"
@@ -103,11 +104,10 @@
 
 <style lang="postcss" scoped>
   .collapsible-aside-layout {
-    border: none;
-
     & > :deep(.bk-resize-layout-aside) {
       min-height: 0;
     }
+
     & > :deep(.bk-resize-layout-main) {
       min-height: 0;
       overflow-y: auto;

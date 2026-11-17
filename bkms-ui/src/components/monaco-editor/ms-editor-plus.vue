@@ -25,7 +25,8 @@
     <ResizeLayout
       ref="resizeLayoutRef"
       :auto-minimize="true"
-      class="h-full w-full border-none"
+      :border="false"
+      class="h-full w-full"
       :collapsible="true"
       :disabled="!editorErr.length"
       :initial-divide="rememberedHeight"

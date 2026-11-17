@@ -66,6 +66,7 @@
     <ResizeLayout
       v-show="editMode === 'yaml'"
       :auto-minimize="true"
+      :border="false"
       class="!h-[500px] w-full"
       :collapsible="true"
       :disabled="!editorError.length"

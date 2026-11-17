@@ -38,13 +38,15 @@
     >
       <div class="flex">
         <div
-          class="flex items-center justify-center w-[16px] h-[64px] bkms-bg-title border-0 cursor-pointer"
+          class="flex items-center justify-center w-[16px] h-[64px] bkms-bg-title border-0 cursor-pointer hover:bg-bkms-brand-2"
           :style="collapsed ? buttonStyle.expand : buttonStyle.collapse"
           @click="toggle"
         >
           <component
             :is="collapsed ? expandIcon : collapseIcon"
-            class="text-[16px] bkms-text-body"
+            class="bkms-text-inverse"
+            :height="26"
+            :width="26"
           />
         </div>
       </div>
