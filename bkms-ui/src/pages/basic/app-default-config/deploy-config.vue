@@ -237,7 +237,7 @@
     font-size: 14px;
     background-color: var(--bkms-bg-card);
     border: 1px dashed var(--bkms-line-input);
-    border-radius: 2px;
+    border-radius: var(--bkms-radius-card);
     box-shadow: 0 2px 4px 0 var(--bkms-shadow-card);
     cursor: pointer;
 

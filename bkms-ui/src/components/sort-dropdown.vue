@@ -98,7 +98,7 @@
   >
     <template #default>
       <section
-        class="bkms-sort-trigger inline-flex items-center justify-between h-[32px] min-w-[160px] pl-[12px] pr-[8px] bkms-bg-card border border-solid border-bkms-neutral-4 rounded-[6px] text-[12px] text-bkms-neutral-2 whitespace-nowrap cursor-pointer hover:border-bkms-neutral-3"
+        class="bkms-sort-trigger inline-flex items-center justify-between h-[32px] min-w-[160px] pl-[12px] pr-[8px] bkms-bg-card border border-solid border-bkms-neutral-4 rounded-control text-[12px] text-bkms-neutral-2 whitespace-nowrap cursor-pointer hover:border-bkms-neutral-3"
         :class="{ 'is-open': isOpen }"
       >
         <span class="inline-flex items-center min-w-0">

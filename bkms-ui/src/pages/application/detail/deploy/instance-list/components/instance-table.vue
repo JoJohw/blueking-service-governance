@@ -1208,7 +1208,7 @@
     font-size: 16px;
     color: var(--bkms-neutral-3);
     cursor: pointer;
-    border-radius: 2px;
+    border-radius: var(--bkms-radius-control);
 
     &:hover {
       color: var(--bkms-brand-2);

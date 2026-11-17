@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-[6px] flex min-h-0 flex-col gap-[16px]">
+  <div class="rounded-card flex min-h-0 flex-col gap-[16px]">
     <!-- 头部区域：Alert + 工具栏 -->
     <div
       ref="headerRef"

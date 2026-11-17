@@ -22,7 +22,7 @@
     class="h-full min-h-0 p-[16px]"
   >
     <div
-      class="max-h-full overflow-hidden rounded-[6px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+      class="max-h-full overflow-hidden rounded-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
     >
       <Skeleton
         :loading="loading"
@@ -636,7 +636,7 @@
 <style lang="less" scoped>
   .info-title :deep(.bkms-content-title) {
     background-color: var(--bkms-neutral-6);
-    border-radius: 2px;
+    border-radius: var(--bkms-radius-card);
   }
 
   @media (max-width: 1440px) {

@@ -39,7 +39,7 @@
         :style="nodeStyle"
       >
         <div
-          class="flex items-center justify-center size-[32px] rounded-[6px] shrink-0 mr-[8px]"
+          class="flex items-center justify-center size-[32px] rounded-control shrink-0 mr-[8px]"
           :style="{
             background: statusConfig.iconBgColor,
             color: statusConfig.color,

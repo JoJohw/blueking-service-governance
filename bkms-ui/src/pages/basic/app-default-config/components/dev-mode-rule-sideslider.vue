@@ -272,7 +272,7 @@
     font-weight: 700;
     line-height: 22px;
     background-color: var(--bkms-bg-page);
-    border-radius: 2px;
+    border-radius: var(--bkms-radius-card);
   }
 
   :deep(.section-mode_label .bk-form-label) {

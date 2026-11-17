@@ -98,7 +98,7 @@
               v-show="filteredTreeData.length !== 0"
               :class="[
                 'border-b-[1px] border-b-bkms-neutral-6',
-                'mx-[16px] flex items-center justify-between px-[8px] h-[36px] rounded-[6px] cursor-pointer',
+                'mx-[16px] flex items-center justify-between px-[8px] h-[36px] rounded-control cursor-pointer',
                 selectedTreeNode === 'all' ? 'bkms-bg-active bkms-text-brand' : 'bkms-text-body',
                 { 'hover:bg-bkms-neutral-6': selectedTreeNode !== 'all' },
               ]"
@@ -110,7 +110,7 @@
               </div>
               <span
                 :class="[
-                  'text-[12px] px-[8px] rounded-[6px]',
+                  'text-[12px] px-[8px] rounded-tag',
                   selectedTreeNode === 'all'
                     ? 'bg-bkms-brand-2 bkms-text-inverse'
                     : 'bkms-text-secondary bg-bkms-neutral-6',
@@ -123,7 +123,7 @@
                 v-for="item in filteredTreeData"
                 :key="item.id"
                 :class="[
-                  'flex items-center justify-between min-h-[36px] px-[8px] py-[4px] rounded-[6px] cursor-pointer',
+                  'flex items-center justify-between min-h-[36px] px-[8px] py-[4px] rounded-control cursor-pointer',
                   selectedTreeNode === item.id ? 'bkms-bg-active bkms-text-brand' : 'bkms-text-body',
                   { 'hover:bg-bkms-neutral-6': selectedTreeNode !== item.id },
                 ]"
@@ -149,7 +149,7 @@
                 </div>
                 <span
                   :class="[
-                    'text-[12px] px-[8px] rounded-[6px] shrink-0',
+                    'text-[12px] px-[8px] rounded-tag shrink-0',
                     selectedTreeNode === item.id
                       ? 'bg-bkms-brand-2 bkms-text-inverse'
                       : 'bkms-text-secondary bg-bkms-neutral-6',

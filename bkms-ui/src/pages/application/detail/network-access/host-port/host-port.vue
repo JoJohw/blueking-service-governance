@@ -620,7 +620,7 @@
     display: flex;
     overflow: hidden;
     border: 1px solid var(--host-port-border);
-    border-radius: 2px;
+    border-radius: var(--bkms-radius-card);
   }
 
   .host-port-scope {
@@ -660,7 +660,7 @@
     line-height: 22px;
     white-space: nowrap;
     background: var(--bkms-neutral-6);
-    border-radius: 2px;
+    border-radius: var(--bkms-radius-tag);
   }
 
   .host-port-env-tag--edit {

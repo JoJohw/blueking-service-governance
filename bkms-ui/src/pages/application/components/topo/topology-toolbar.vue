@@ -18,7 +18,7 @@
 
 <template>
   <div
-    class="flex items-center px-[4px] h-[32px] bg-bkms-neutral-2 rounded-[6px] shadow-[0_4px_12px_0_var(--bkms-shadow-float)] z-10 select-none"
+    class="flex items-center px-[4px] h-[32px] bg-bkms-neutral-2 rounded-control shadow-[0_4px_12px_0_var(--bkms-shadow-float)] z-10 select-none"
   >
     <!-- 1:1 -->
     <span
@@ -78,7 +78,7 @@
     </span>
 
     <div
-      class="custom-minimap !absolute top-[40px] left-0 rounded-[6px] border-none overflow-hidden bg-bkms-neutral-6 shadow-[0_2px_10px_0_var(--bkms-shadow-float)]"
+      class="custom-minimap !absolute top-[40px] left-0 rounded-card border-none overflow-hidden bg-bkms-neutral-6 shadow-[0_2px_10px_0_var(--bkms-shadow-float)]"
       :style="{ display: showMinimap ? 'block' : 'none' }"
     ></div>
   </div>

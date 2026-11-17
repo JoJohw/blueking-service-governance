@@ -468,7 +468,7 @@
   .c-env-select-v2-popover {
     padding: 0 8px 8px !important;
     border: none;
-    border-radius: 2px !important;
+    border-radius: var(--bkms-radius-overlay) !important;
     box-shadow: 0 2px 4px 0 var(--bkms-shadow-card) !important;
 
     .env-list-scroll {

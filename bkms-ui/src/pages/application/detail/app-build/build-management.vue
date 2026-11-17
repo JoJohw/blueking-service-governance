@@ -47,7 +47,7 @@
           <Layout.shape :width="400" />
           <Layout.table class="mt-[10px]" />
         </template>
-        <div class="overflow-hidden rounded-[6px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+        <div class="overflow-hidden rounded-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <FlexRow>
             <template #left>
               <div class="flex">
