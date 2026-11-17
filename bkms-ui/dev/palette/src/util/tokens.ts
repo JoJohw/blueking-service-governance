@@ -1,7 +1,9 @@
-import colorsRaw from '../../../../src/styles/theme/tokens/colors.css?raw';
-import semanticRaw from '../../../../src/styles/theme/tokens/semantic.css?raw';
+import colorRaw from '../../../../src/styles/theme/tokens/color.css?raw';
+import radiusRaw from '../../../../src/styles/theme/tokens/radius.css?raw';
 
-export type TokenKind = 'color' | 'shadow';
+export type TokenKind = 'color' | 'shadow' | 'radius';
+/** 令牌层：色阶原子 / 语义引用。由 token 文件里的 @layer 标记决定，不再靠文件名区分 */
+export type TokenLayer = 'scale' | 'semantic';
 
 export interface Token {
   group: string;
@@ -17,6 +19,7 @@ export interface Group {
   /** 分组名（@group 的值，直接作为展示标题） */
   label: string;
   note: string;
+  layer: TokenLayer;
   tokens: Token[];
 }
 
@@ -54,6 +57,7 @@ function splitDirectives(raw: string): { tags: Directive[]; text: string } {
  * 解析 CSS，注释约定（CSS 不识别 @tag，本工具自行解析）：
  * - 组标记块：\/**
  *     @group keep             分组名，开组（同时也是展示标题）
+ *     @layer scale            所属层：scale（色阶原子）| semantic（语义引用），必填
  *     @note 描述文字           分组描述，可多行续写（@description 同义）
  *   *\/
  * - 闭组标识：\/* @endgroup *\/
@@ -61,6 +65,12 @@ function splitDirectives(raw: string): { tags: Directive[]; text: string } {
  * - 分组只认 @group：普通单行注释一律当备注，不会隐式建组
  * - 容错：组外声明归入「未分组」；声明同行尾注释挂到该 token 的 note；非 @tag 多行块注释兜底为组描述
  */
+/** @layer 是色阶区/语义区的唯一依据：缺失或拼错会让该组无处归位，直接报错而不是静默丢组 */
+function toLayer(label: string, raw: string): TokenLayer {
+  if (raw === 'scale' || raw === 'semantic') return raw;
+  throw new Error(`[palette] 分组「${label}」的 @layer 必须是 scale 或 semantic，当前为：${raw || '(缺失)'}`);
+}
+
 function parse(css: string, prefix: string): ParsedCss {
   const tokens: Token[] = [];
   const groups: Group[] = [];
@@ -68,15 +78,16 @@ function parse(css: string, prefix: string): ParsedCss {
   let note = '';
   let lastToken: Token | null = null;
 
-  const addGroup = (name: string, groupNote: string): Group => {
-    group = { id: `${prefix}-${groups.length + 1}`, label: name, note: groupNote, tokens: [] };
+  const addGroup = (name: string, groupNote: string, layer: TokenLayer): Group => {
+    group = { id: `${prefix}-${groups.length + 1}`, label: name, note: groupNote, layer, tokens: [] };
     groups.push(group);
     note = '';
     lastToken = null;
     return group;
   };
 
-  const ensureGroup = (): Group => group ?? addGroup('未分组', '未在 @group 标记内，按源码顺序兜底归组');
+  // 组外散落的声明没有 @layer 可读，归语义层展示
+  const ensureGroup = (): Group => group ?? addGroup('未分组', '未在 @group 标记内，按源码顺序兜底归组', 'semantic');
 
   function handleComment(raw: string, jsdoc: boolean, trailing: boolean): void {
     const { tags, text } = splitDirectives(raw);
@@ -106,7 +117,7 @@ function parse(css: string, prefix: string): ParsedCss {
     }
     const name = tag('group').trim();
     if (name) {
-      addGroup(name, tag('note') || tag('description'));
+      addGroup(name, tag('note') || tag('description'), toLayer(name, tag('layer').trim()));
       return;
     }
     if (!group) return;
@@ -125,7 +136,7 @@ function parse(css: string, prefix: string): ParsedCss {
       note,
       ref: /^var\((--[\w-]+)\)$/.exec(value)?.[1] ?? '',
       group: current.label,
-      kind: name.includes('shadow') ? 'shadow' : 'color',
+      kind: name.includes('shadow') ? 'shadow' : name.startsWith('--bkms-radius-') ? 'radius' : 'color',
     };
     tokens.push(token);
     current.tokens.push(token);
@@ -168,10 +179,10 @@ function parse(css: string, prefix: string): ParsedCss {
   return { tokens, groups: groups.filter(group => group.tokens.length > 0) };
 }
 
-const colors = parse(colorsRaw, 'ramp');
-const semantics = parse(semanticRaw, 'sem');
+const colorFile = parse(colorRaw, 'ramp');
+const radiusFile = parse(radiusRaw, 'rad');
 
-const colorMap = new Map(colors.tokens.map(token => [token.name, token.value]));
+const colorMap = new Map(colorFile.tokens.map(token => [token.name, token.value]));
 
 /** 解开 var() 链拿到色值；非纯 var()（如 color-mix）原样交给浏览器解析，用 seen 防循环引用 */
 export function resolved(value: string, seen = new Set<string>()): string {
@@ -194,10 +205,13 @@ const sortTokens = (tokens: Token[]): Token[] => {
   });
 };
 
-/** 色阶组：colors.css 的分组，组内按数字正序（1 最深在前） */
-export const rampGroups: Group[] = colors.groups
-  .filter(group => group.tokens.every(token => token.kind === 'color'))
+/** 色阶组：@layer scale 的分组，组内按数字正序（1 最深在前） */
+export const rampGroups: Group[] = colorFile.groups
+  .filter(group => group.layer === 'scale')
   .map(group => ({ ...group, tokens: sortTokens(group.tokens) }));
 
-/** 语义层：semantic.css —— 语义 token 引用色阶，主题换色时自动联动；阴影组按场景命名，值即完整效果 */
-export const allSemanticGroups: Group[] = semantics.groups;
+/** 语义层：@layer semantic 的分组——语义 token 引用色阶，主题换色时自动联动；阴影组按场景命名，值即完整效果 */
+export const allSemanticGroups: Group[] = colorFile.groups.filter(group => group.layer === 'semantic');
+
+/** 圆角维度：两个分组（档位 / 圆角语义），语义档只 var() 引用档位，故 resolved() 解析不出色值，由预览组件直接按长度渲染 */
+export const radiusGroups: Group[] = radiusFile.groups;

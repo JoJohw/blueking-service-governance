@@ -29,6 +29,7 @@
  *   --bkms-bg-{name}        → shortcut bkms-bg-{name}
  *   --bkms-line-{name}      → shortcut bkms-line-{name}（方向边框除外，用色阶类保留方向）
  *   --bkms-shadow-*         → 未注册（值不是数字结尾），class 内 var() 属例外，放行
+ *   --bkms-radius-{语义}     → theme.borderRadius，类名 rounded-{语义}（档位 --bkms-radius-<px> 不注册）
  *   ring-offset-*           → 未注册（uno 无色环颜色类），只报不修，避免压平成 ring-*
  */
 import fs from 'node:fs';
@@ -71,6 +72,36 @@ export function normalizeHex(input) {
   if (full.length === 6) return `#${full}`;
   if (full.length === 8) return full.endsWith('ff') ? `#${full.slice(0, 6)}` : `#${full}`;
   return null;
+}
+
+/**
+ * 圆角档位类：radius.css 的档位区 → rounded-bkms-<px>，仅供迁移过渡期使用。
+ * key 必须带 bkms- 前缀：裸数字会被 uno 内置 spacing 刻度抢走（rounded-6 = 1.5rem）。
+ * 新代码禁用档位类——直接写档位会绕过语义，改语义档时管不到这些地方。
+ */
+export function parseRadiusScaleTokens() {
+  const tokens = {};
+  for (const block of readTokenFile('radius.css').match(/@layer scale[\s\S]*?@endgroup/g) || []) {
+    for (const m of block.matchAll(/--bkms-radius-([0-9]+)\s*:/g)) {
+      tokens[`bkms-${m[1]}`] = `var(--bkms-radius-${m[1]})`;
+    }
+  }
+  return tokens;
+}
+
+/**
+ * 圆角语义变量：radius.css 的语义区 → theme.borderRadius，类名形如 rounded-card / rounded-t-field。
+ * 只取 @layer semantic 组：档位（--bkms-radius-6 这类名字即像素值的）不注册，
+ * 业务与覆写层只该消费语义档，注册会诱导 rounded-6 这种写法。
+ */
+export function parseRadiusTokens() {
+  const tokens = {};
+  for (const block of readTokenFile('radius.css').match(/@layer semantic[\s\S]*?@endgroup/g) || []) {
+    for (const m of block.matchAll(/--bkms-radius-([a-z0-9-]+)\s*:/g)) {
+      tokens[m[1]] = `var(--bkms-radius-${m[1]})`;
+    }
+  }
+  return tokens;
 }
 
 /** 色阶 + keep 令牌：color.css → theme.colors，类名形如 text-bkms-brand-2 / bg-bkms-keep-ffb848。

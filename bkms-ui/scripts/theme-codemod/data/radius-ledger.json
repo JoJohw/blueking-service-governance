@@ -1,0 +1,251 @@
+{
+  "tokenSource": "src/styles/theme/tokens/radius.css",
+  "entries": [
+    {
+      "file": "src/styles/main.css",
+      "line": 43,
+      "before": "border-radius: 4px;",
+      "after": "border-radius: var(--bkms-radius-scroll);"
+    },
+    {
+      "file": "src/styles/overrides.css",
+      "line": 23,
+      "before": "border-radius: 8px;",
+      "after": "border-radius: var(--bkms-radius-menu);"
+    },
+    {
+      "file": "src/styles/app.css",
+      "line": 17,
+      "before": "border-radius: 6px;",
+      "after": "border-radius: var(--bkms-radius-control);"
+    },
+    {
+      "file": "src/styles/app.css",
+      "line": 43,
+      "before": "border-radius: 6px;",
+      "after": "border-radius: 999px;"
+    },
+    {
+      "file": "src/pages/application/detail/network-access/host-port/host-port.vue",
+      "line": 623,
+      "before": "border-radius: 2px;",
+      "after": "border-radius: var(--bkms-radius-card);"
+    },
+    {
+      "file": "src/pages/application/detail/network-access/host-port/host-port.vue",
+      "line": 663,
+      "before": "border-radius: 2px;",
+      "after": "border-radius: var(--bkms-radius-tag);"
+    },
+    {
+      "file": "src/components/env-select-panel/env-select-panel.vue",
+      "line": 1148,
+      "before": "border-radius: 2px !important;",
+      "after": "border-radius: var(--bkms-radius-overlay) !important;"
+    },
+    {
+      "file": "src/pages/application/detail/app-config/env-perspective-select.vue",
+      "line": 471,
+      "before": "border-radius: 2px !important;",
+      "after": "border-radius: var(--bkms-radius-overlay) !important;"
+    },
+    {
+      "file": "src/pages/env/components/env-detail-selector.vue",
+      "line": 279,
+      "before": "border-radius: 2px !important;",
+      "after": "border-radius: var(--bkms-radius-overlay) !important;"
+    },
+    {
+      "file": "src/pages/application/detail/deploy/instance-list/components/instance-table.vue",
+      "line": 1211,
+      "before": "border-radius: 2px;",
+      "after": "border-radius: var(--bkms-radius-control);"
+    },
+    {
+      "file": "src/pages/application/detail/modules-config.vue",
+      "line": 639,
+      "before": "border-radius: 2px;",
+      "after": "border-radius: var(--bkms-radius-card);"
+    },
+    {
+      "file": "src/pages/basic/app-default-config/components/dev-mode-rule-sideslider.vue",
+      "line": 275,
+      "before": "border-radius: 2px;",
+      "after": "border-radius: var(--bkms-radius-card);"
+    },
+    {
+      "file": "src/pages/basic/app-default-config/components/resources-rule-sideslider.vue",
+      "line": 437,
+      "before": "border-radius: 2px;",
+      "after": "border-radius: var(--bkms-radius-card);"
+    },
+    {
+      "file": "src/pages/basic/app-default-config/deploy-config.vue",
+      "line": 240,
+      "before": "border-radius: 2px;",
+      "after": "border-radius: var(--bkms-radius-card);"
+    },
+    {
+      "file": "src/components/sort-dropdown.vue",
+      "line": 101,
+      "before": "rounded-[6px]",
+      "after": "rounded-control"
+    },
+    {
+      "file": "src/pages/application/components/topo/edge-tooltip.vue",
+      "line": 27,
+      "before": "rounded-[6px]",
+      "after": "rounded-overlay"
+    },
+    {
+      "file": "src/pages/application/components/topo/resource-topology.vue",
+      "line": 21,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/components/topo/topology-node.vue",
+      "line": 42,
+      "before": "rounded-[6px]",
+      "after": "rounded-control"
+    },
+    {
+      "file": "src/pages/application/components/topo/topology-toolbar.vue",
+      "line": 21,
+      "before": "rounded-[6px]",
+      "after": "rounded-control"
+    },
+    {
+      "file": "src/pages/application/components/topo/topology-toolbar.vue",
+      "line": 81,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/alert-record/alert-group.vue",
+      "line": 2,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/alert-record/alert-record-list.vue",
+      "line": 2,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/alert-record/alert-strategy.vue",
+      "line": 2,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/alert-record/index.vue",
+      "line": 15,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/app-build/build-management.vue",
+      "line": 50,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/artifact/index.vue",
+      "line": 32,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/artifact/index.vue",
+      "line": 44,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/deploy/deploy-event.vue",
+      "line": 26,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/deploy/deploy-history.vue",
+      "line": 26,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/deploy/deploy.vue",
+      "line": 266,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/deploy/overview/deploy-overview.vue",
+      "line": 40,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/deploy/overview/deploy-overview.vue",
+      "line": 110,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/deploy/overview/deploy-overview.vue",
+      "line": 144,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/modules-config.vue",
+      "line": 25,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/operation-history/index.vue",
+      "line": 26,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/application/detail/polaris/polaris.vue",
+      "line": 26,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/basic/operation-history/index.vue",
+      "line": 26,
+      "before": "rounded-[6px]",
+      "after": "rounded-card"
+    },
+    {
+      "file": "src/pages/plugin/component-config/component-list.vue",
+      "line": 101,
+      "before": "rounded-[6px]",
+      "after": "rounded-control"
+    },
+    {
+      "file": "src/pages/plugin/component-config/component-list.vue",
+      "line": 113,
+      "before": "rounded-[6px]",
+      "after": "rounded-tag"
+    },
+    {
+      "file": "src/pages/plugin/component-config/component-list.vue",
+      "line": 126,
+      "before": "rounded-[6px]",
+      "after": "rounded-control"
+    },
+    {
+      "file": "src/pages/plugin/component-config/component-list.vue",
+      "line": 152,
+      "before": "rounded-[6px]",
+      "after": "rounded-tag"
+    }
+  ]
+}

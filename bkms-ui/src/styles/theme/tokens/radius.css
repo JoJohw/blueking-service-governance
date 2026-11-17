@@ -1,0 +1,55 @@
+/*
+ * BKMS 圆角令牌：全库唯一允许出现圆角长度字面量的文件。
+ * 档位名即像素值（--bkms-radius-6 = 6px）：加档直接加新数字，不占量级名、不撞名、不用重排。
+ * 语义层按组件场景命名，只允许引用档位；同值不代表同源（control/card/overlay 现都是 6px）。
+ * 形状语义不进令牌：50%、100%、rounded-full、胶囊（20px+）属于形状而非圆角档位。
+ * 消费方：patches/bkui-theme/variables.css（bkui 变量桥接）、src/styles/overrides.css（写死值覆写）。
+ */
+:root {
+  /**
+   * @group 档位
+   * @layer scale
+   * @note 名字即像素值，新增档位直接加 --bkms-radius-<px>；只被语义层引用
+   */
+  --bkms-radius-3: 3px;
+  --bkms-radius-4: 4px;
+  --bkms-radius-6: 6px;
+  --bkms-radius-8: 8px;
+
+  /* @endgroup */
+
+  /**
+   * @group 圆角语义
+   * @layer semantic
+   * @note 按组件场景命名：field/tag/checkbox 小构件、control/card/overlay 容器级、tab/menu 独立讨论项
+   */
+
+  /** 输入域：input / textarea / search-select */
+  --bkms-radius-field: var(--bkms-radius-3);
+
+  /** 标签：bk-tag / select 内小标签 / tag-input 项 */
+  --bkms-radius-tag: var(--bkms-radius-3);
+
+  /** 勾选框：bk-checkbox 方框（含半选态内块） */
+  --bkms-radius-checkbox: var(--bkms-radius-3);
+
+  /** 滚动条：全局 thumb */
+  --bkms-radius-scroll: var(--bkms-radius-4);
+
+  /** 可点控件：按钮 / 选择器 / 级联 / 取色 / 日期输入 / 分页 / 穿梭 / 折叠头 / 开关 / 上传项 */
+  --bkms-radius-control: var(--bkms-radius-6);
+
+  /** 容器：bk-card / alert / 上传触发区 / 业务面板 / 分组标题条 */
+  --bkms-radius-card: var(--bkms-radius-6);
+
+  /** 弹层：popover / dropdown / modal / 日期面板 / message / notify */
+  --bkms-radius-overlay: var(--bkms-radius-6);
+
+  /** tab：卡片式 tab 头 / 方块数字 tab */
+  --bkms-radius-tab: var(--bkms-radius-6);
+
+  /** 菜单项：侧边导航 */
+  --bkms-radius-menu: var(--bkms-radius-8);
+
+  /* @endgroup */
+}

@@ -5,36 +5,73 @@
   >
     <aside class="palette-aside">
       <header class="palette-head">
-        <h1>BKMS 主题色板</h1>
-        <p>源自 <code>colors.css</code> / <code>semantic.css</code>。点色块复制 <code>var()</code>。</p>
+        <h1>{{ viewMode === 'color' ? 'BKMS 主题色板' : 'BKMS 圆角令牌' }}</h1>
+        <p v-if="viewMode === 'color'">源自 <code>color.css</code>。点色块复制 <code>var()</code>。</p>
+        <p v-else>源自 <code>radius.css</code>。点卡片复制 <code>var()</code>。</p>
       </header>
 
+      <nav class="view-tabs">
+        <button
+          v-for="tab in viewTabs"
+          :key="tab.value"
+          :class="{ 'is-active': viewMode === tab.value }"
+          type="button"
+          @click="switchView(tab.value)"
+        >
+          {{ tab.label }}
+        </button>
+      </nav>
+
       <nav class="palette-nav">
-        <p class="nav-label">色阶</p>
-        <a
-          v-for="group in rampGroups"
-          :key="`nav-${group.id}`"
-          :class="{ 'is-active': activeId === group.id }"
-          href="javascript:void(0)"
-          @click="scrollTo(group.id)"
-        >
-          {{ group.label }}
-        </a>
-        <p class="nav-label">语义层</p>
-        <a
-          v-for="group in allSemanticGroups"
-          :key="`nav-sem-${group.id}`"
-          :class="{ 'is-active': activeId === group.id }"
-          href="javascript:void(0)"
-          @click="scrollTo(group.id)"
-        >
-          {{ group.label }}
-        </a>
+        <template v-if="viewMode === 'color'">
+          <p class="nav-label">色阶</p>
+          <a
+            v-for="group in rampGroups"
+            :key="`nav-${group.id}`"
+            :class="{ 'is-active': activeId === group.id }"
+            href="javascript:void(0)"
+            @click="scrollTo(group.id)"
+          >
+            {{ group.label }}
+          </a>
+          <p class="nav-label">语义层</p>
+          <a
+            v-for="group in allSemanticGroups"
+            :key="`nav-sem-${group.id}`"
+            :class="{ 'is-active': activeId === group.id }"
+            href="javascript:void(0)"
+            @click="scrollTo(group.id)"
+          >
+            {{ group.label }}
+          </a>
+        </template>
+        <template v-else>
+          <p class="nav-label">档位</p>
+          <a
+            v-for="group in radiusScaleGroups"
+            :key="`nav-rad-${group.id}`"
+            :class="{ 'is-active': activeId === group.id }"
+            href="javascript:void(0)"
+            @click="scrollTo(group.id)"
+          >
+            {{ group.label }}
+          </a>
+          <p class="nav-label">语义</p>
+          <a
+            v-for="group in radiusSemanticGroups"
+            :key="`nav-rad-sem-${group.id}`"
+            :class="{ 'is-active': activeId === group.id }"
+            href="javascript:void(0)"
+            @click="scrollTo(group.id)"
+          >
+            {{ group.label }}
+          </a>
+        </template>
       </nav>
     </aside>
 
     <div
-      v-if="!isFocus"
+      v-if="!isFocus && viewMode === 'color'"
       class="search-bar"
     >
       <span class="search-icon">⌕</span>
@@ -62,7 +99,7 @@
       class="palette-main"
     >
       <div
-        v-if="isSearching"
+        v-if="isSearching && viewMode === 'color'"
         class="search-results"
       >
         <template v-if="searchHits.length">
@@ -104,7 +141,7 @@
       </div>
 
       <TransitionGroup
-        v-else
+        v-else-if="viewMode === 'color'"
         class="section-list"
         name="section"
         tag="div"
@@ -145,6 +182,47 @@
 
         <SectionPanel
           v-for="group in visibleSemanticGroups"
+          :id="group.id"
+          :key="group.id"
+          :count="group.tokens.length"
+          :focus="isFocus"
+          :note="group.note"
+          :title="group.label"
+        >
+          <template #tools>
+            <button
+              class="focus-toggle"
+              type="button"
+              @click="toggleFocus(group.id)"
+            >
+              {{ focusId === group.id ? '退出专注' : '专注模式' }}
+            </button>
+          </template>
+          <TransitionGroup
+            class="ramp"
+            :class="{ 'ramp-grid': isFocus }"
+            name="card"
+            tag="div"
+          >
+            <TokenCell
+              v-for="token in group.tokens"
+              :key="token.name"
+              :token="token"
+              variant="semantic"
+              @copy="copy"
+            />
+          </TransitionGroup>
+        </SectionPanel>
+      </TransitionGroup>
+
+      <TransitionGroup
+        v-else
+        class="section-list"
+        name="section"
+        tag="div"
+      >
+        <SectionPanel
+          v-for="group in visibleRadiusGroups"
           :id="group.id"
           :key="group.id"
           :count="group.tokens.length"
@@ -225,13 +303,21 @@
   import SectionPanel from './components/SectionPanel.vue';
   import TokenCell from './components/TokenCell.vue';
   import { registerSearchGroups, searchTokens } from './util/search';
-  import { allSemanticGroups, rampGroups } from './util/tokens';
+  import { allSemanticGroups, radiusGroups, rampGroups } from './util/tokens';
   import { useDrag } from './util/useDrag';
 
   registerSearchGroups([
     ...rampGroups.map(group => ({ ...group, kind: 'ramp' as const })),
     ...allSemanticGroups.map(group => ({ ...group, kind: 'semantic' as const })),
   ]);
+
+  const viewTabs = [
+    { label: '颜色', value: 'color' as const },
+    { label: '圆角', value: 'radius' as const },
+  ];
+  const viewMode = ref<'color' | 'radius'>('color');
+  const radiusScaleGroups = computed(() => radiusGroups.filter(group => group.layer === 'scale'));
+  const radiusSemanticGroups = computed(() => radiusGroups.filter(group => group.layer === 'semantic'));
 
   const copied = ref('');
   const advisorOpen = ref(false);
@@ -285,8 +371,8 @@
 
   const activeId = ref('');
   const mainRef = ref<HTMLElement | null>(null);
-  const allGroups = [...rampGroups, ...allSemanticGroups];
-  const sectionIds = allGroups.map(group => group.id);
+  const allGroups = computed(() => (viewMode.value === 'color' ? [...rampGroups, ...allSemanticGroups] : radiusGroups));
+  const sectionIds = computed(() => allGroups.value.map(group => group.id));
   let clickLockId = '';
 
   const focusId = ref<null | string>(null);
@@ -298,19 +384,39 @@
   const visibleSemanticGroups = computed(() =>
     focusId.value ? allSemanticGroups.filter(group => group.id === focusId.value) : allSemanticGroups,
   );
+  const visibleRadiusGroups = computed(() =>
+    focusId.value ? radiusGroups.filter(group => group.id === focusId.value) : radiusGroups,
+  );
 
+  /** ?focus= 链接可跨视图打开，命中圆角分组时切到圆角视图 */
   function readFocus(): void {
     const label = new URLSearchParams(window.location.search).get('focus');
     if (!label) return;
-    const group = allGroups.find(item => item.label === label);
-    if (group) focusId.value = group.id;
+    const group = [...rampGroups, ...allSemanticGroups, ...radiusGroups].find(item => item.label === label);
+    if (!group) return;
+    if (radiusGroups.includes(group)) viewMode.value = 'radius';
+    focusId.value = group.id;
+  }
+
+  function switchView(mode: 'color' | 'radius'): void {
+    if (viewMode.value === mode) return;
+    viewMode.value = mode;
+    searchQuery.value = '';
+    focusId.value = null;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('focus');
+    window.history.replaceState(null, '', url);
+    nextTick(() => {
+      if (mainRef.value) mainRef.value.scrollTop = 0;
+      activeId.value = computeActive();
+    });
   }
 
   function toggleFocus(id: string): void {
     searchQuery.value = '';
     if (!isFocus.value) scrollBeforeFocus = mainRef.value?.scrollTop ?? 0;
     focusId.value = focusId.value === id ? null : id;
-    const group = allGroups.find(item => item.id === focusId.value);
+    const group = allGroups.value.find(item => item.id === focusId.value);
     const url = new URL(window.location.href);
     if (group) url.searchParams.set('focus', group.label);
     else url.searchParams.delete('focus');
@@ -328,12 +434,12 @@
     const container = mainRef.value;
     if (!container) return '';
     if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
-      return sectionIds[sectionIds.length - 1];
+      return sectionIds.value[sectionIds.value.length - 1];
     }
     const containerTop = container.getBoundingClientRect().top;
-    let best = sectionIds[0];
+    let best = sectionIds.value[0];
     let bestDist = Infinity;
-    for (const id of sectionIds) {
+    for (const id of sectionIds.value) {
       const el = document.getElementById(id);
       if (!el) continue;
       const dist = Math.abs(el.getBoundingClientRect().top - containerTop);
@@ -601,6 +707,40 @@
     margin: 0;
     line-height: 1.5;
     color: var(--pal-text-body);
+  }
+
+  .view-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    margin-top: 16px;
+    background: var(--pal-bg-subtle);
+    border: 1px solid var(--pal-line);
+    border-radius: 999px;
+  }
+
+  .view-tabs button {
+    flex: 1;
+    padding: 5px 0;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pal-text-body);
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+  }
+
+  .view-tabs button:hover {
+    color: var(--pal-text-title);
+  }
+
+  .view-tabs button.is-active {
+    color: var(--pal-brand);
+    background: var(--pal-bg-card);
+    box-shadow: 0 1px 3px var(--pal-shadow-popover);
   }
 
   .advisor-fab {

@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import './shell.css';
-import '../../../src/styles/theme/tokens/colors.css';
-import '../../../src/styles/theme/tokens/semantic.css';
+import '../../../src/styles/theme/tokens/color.css';
+import '../../../src/styles/theme/tokens/radius.css';
 
 createApp(App).mount('#app');

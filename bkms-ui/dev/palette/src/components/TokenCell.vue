@@ -16,8 +16,11 @@
       >
         <span class="cell-ref-label">引用</span>
         <code>{{ token.ref }}</code>
-        <code class="cell-ref-hex">
-          <span class="cell-hex-tag">{{ resolved(token.value) }}</span>
+        <code
+          v-if="refValue"
+          class="cell-ref-hex"
+        >
+          <span class="cell-hex-tag">{{ refValue }}</span>
         </code>
       </span>
       <span
@@ -45,6 +48,12 @@
   const emit = defineEmits<{ copy: [text: string] }>();
 
   const preview = computed(() => previewFor(props.token));
+
+  /** var() 链解析不到色值时（圆角等长度令牌）不展示重复的引用名 */
+  const refValue = computed(() => {
+    const value = resolved(props.token.value);
+    return value.startsWith('var(') ? '' : value;
+  });
 </script>
 
 <style scoped>
