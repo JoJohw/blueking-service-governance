@@ -11,7 +11,7 @@
 
 ## Step 0 前置准备（已执行）
 
-已落地：`scripts/theme-codemod/`（`mapping.json` / `keep.json` / `pending-design.json`、`codemod.mjs`、`extract-root-vars.mjs`、reports）、`src/styles/theme/` 结构（tokens/colors + tokens/semantic + variables.css 桥接聚合 + patches/bkui-theme + patches/bkms + themes + index.css）。
+已落地：`scripts/theme-codemod/`（`mapping.json` / `keep.json` / `pending-design.json`、`codemod.mjs`、`extract-root-vars.mjs`、reports）、`src/styles/theme/` 结构（tokens/colors + tokens/semantic + variables.css 桥接聚合 + patches/bkui-theme + themes + index.css；手写补丁独立在 `src/styles/overrides.css`）。
 
 > 2026-11-17 变更：Step 5 存量替换完成，`mapping.json` / `pending-design.json` / `color-diff-backup.json`、`codemod.mjs`、`resolve-pending.mjs` 退役；映射改为**单源自举**——`gen-overrides.mjs` 重跑前从 `patches/bkui-theme/*.css` 的「令牌 + 行尾原值注释」提取 hex→token，不再有第二份 JSON。`data/` 仅保留 `keep.json`。
 
@@ -51,7 +51,7 @@
    - 抽取：prop 非 `--` 开头且 value 含 hex（先小写化）的 declaration，按"选择器 + prop"聚合。
    - 过滤：索引命中 → `var(--bkms-*)`；keep/令牌值命中 → 原值保留；其余按原值占位进 `reports/gen-summary.md` 待拍板清单。
    - 输出：选择器加 `.bkms-themed ` 前缀、逐字复刻原选择器（含伪类/组合器），值写 `var(--bkms-*)`；渐变/阴影**整值重拼**；8 位 hex 用 color-mix；**原值保留为行尾注释**。
-   - 分域：按 bkui 组件前缀写入 `patches/bkui-theme/` 对应文件（button / form / table / dialog / alert-message / pagination / …，每组件一文件，文件内分区注释），`index.css` 同步 @import（bkms 手写补丁段由生成器扫描 `patches/bkms/` 追加）。
+   - 分域：按 bkui 组件前缀写入 `patches/bkui-theme/` 对应文件（button / form / table / dialog / alert-message / pagination / …，每组件一文件，文件内分区注释），`index.css` 同步 @import（手写补丁在 `src/styles/overrides.css`，不参与本清单）。
 2. **stylelint 配置**：`patches/` 目录豁免 `no-descending-specificity`。
 3. **人工审查生成草稿**：重点核伪类复刻、组合选择器、渐变整值重拼；patches 内禁止裸 hex（原值只准在注释）。
 4. **退役编译替换**：删 `vite.config.mts` 的 postcss import 与 `css.postcss` 配置；删 `scripts/theme-codemod/postcss-theme-replace.mjs`。
@@ -70,7 +70,7 @@
 
 ## Step 3 存量 patch 审计（口径微调）
 
-19 条规则三分类：动机被 bridge 替代 → 删；布局/尺寸规则 → 迁入**全局无包裹段**（`patches/bkms/` 手写文件，无 `.bkms-themed` 前缀——作用于 body/html 自身或需全局生效）；涉色规则（1 处 rgba 气泡）→ 变量化后入全局段。结论表附 PR。**未走查完不删任何一条。**（注：`patches/bkms/feedback.css` 与 `table.css` 为原手写补丁，已恢复保留。）
+19 条规则三分类：动机被 bridge 替代 → 删；布局/尺寸规则 → 迁入**全局无包裹段**（无 `.bkms-themed` 前缀——作用于 body/html 自身或需全局生效）；涉色规则（1 处 rgba 气泡）→ 变量化后入全局段。结论表附 PR。**未走查完不删任何一条。**（注：原 `patches/bkms/feedback.css` 与 `table.css` 为原手写补丁，2026-11-17 起与 `src/styles/bkms.css` 一并迁入 `src/styles/overrides.css`。）
 
 ## Step 4 全局层替换（同前版）
 

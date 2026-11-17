@@ -1,0 +1,163 @@
+/*
+ * 应用自有样式 —— 本项目模板里写的 class（导航项 / 场景语义类 / 通用工具类）。
+ * 加载点：main.css 内 @import（位于 uno.css 之前），模板上的工具类可以覆盖本文件。
+ * 改组件库渲染出的 DOM（选择器里出现 bk- / vxe- / monaco- 等类名）请去 overrides.css。
+ */
+
+/* ────────────── 导航 ────────────── */
+
+/* 顶部导航链接：对齐 design-visual（默认 / hover 药丸 / 选中底部渐变指示条） */
+.bkms-nav-item {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 8px;
+  margin-right: 16px;
+  color: var(--bkms-navy-4);
+  border-radius: var(--bkms-radius-control);
+
+  &:hover {
+    color: var(--bkms-text-inverse);
+    background-color: var(--bkms-navy-2);
+  }
+
+  &.bkms-active-nav {
+    position: relative;
+    color: var(--bkms-text-inverse);
+
+    &::after {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 24px;
+      height: 4px;
+      content: '';
+      background: linear-gradient(
+        155deg,
+        var(--bkms-nav-indicator-1) 0%,
+        var(--bkms-nav-indicator-2) 51%,
+        var(--bkms-nav-indicator-3) 100%
+      );
+
+      /* 胶囊形状：高仅 4px，圆角被高度钳制，与圆角档位无关 */
+      border-radius: 999px;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+/* ────────────── 场景语义类 ────────────── */
+
+/* 筛选条底色（design-visual 规范 var(--bkms-neutral-5)），形态留在模板 unocss */
+.bkms-filter-bar {
+  background-color: var(--bkms-neutral-5);
+}
+
+/* ────────────── 通用工具类 ────────────── */
+
+.bkms-cursor-element {
+  width: 12px;
+  height: 16px;
+  background: url("/lock.svg");
+}
+
+.ellipsis {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1;
+  word-break: break-all;
+  white-space: nowrap;
+  -webkit-box-orient: vertical;
+}
+
+/* 迁自 bk-patch.css：业务通用工具类（非组件库补丁） */
+.content-hover {
+  .content-item {
+    display: none !important;
+  }
+}
+
+.content-hover:hover {
+  .content-item {
+    display: block !important;
+  }
+}
+
+.scrollbar-stable {
+  scrollbar-gutter: stable;
+}
+
+.bfc::before,
+.bfc::after {
+  clear: both;
+  display: block;
+  visibility: hidden;
+  overflow: hidden;
+  content: '';
+}
+
+.bkms-full-screen {
+  position: fixed !important;
+  inset: 0;
+  z-index: 9999;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.bkms-dropdown-item {
+  display: block;
+  height: 32px;
+  padding: 0 16px;
+  font-size: 12px;
+  line-height: 32px;
+  color: var(--bkms-text-body);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover:not(.disabled) {
+    color: var(--bkms-text-brand);
+    background-color: var(--bkms-bg-hover);
+  }
+
+  &.disabled {
+    color: var(--bkms-text-disabled);
+    cursor: not-allowed;
+  }
+
+  &.active {
+    color: var(--bkms-text-brand);
+    background-color: var(--bkms-bg-active);
+  }
+}
+
+.bkms-underline {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-style: dashed;
+  text-underline-offset: 6px;
+}
+
+/* 存量类名（非 kebab），模板里动态绑定，改名需同步改消费方 */
+
+/* stylelint-disable-next-line selector-class-pattern */
+.row--current {
+  background-color: var(--bkms-bg-active) !important;
+}
+
+.bkms-skeleton {
+  background-position: 100% 50%;
+  background-size: 400% 100%;
+  animation: console-skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes console-skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
+}

@@ -45,7 +45,7 @@ const paletteShellOverride = {
 // 写成数组而不是 { overrides: [...] }，后续加第二条 patch 直接 push，不用改下面的展开方式。
 const patchesOverrides = [
   {
-    files: ['src/styles/theme/patches/bkui-theme/**/*.css', 'src/styles/theme/patches/bkms/**/*.css'],
+    files: ['src/styles/theme/patches/bkui-theme/**/*.css', 'src/styles/overrides.css'],
     rules: {
       'no-descending-specificity': null,
       'selector-class-pattern': null,

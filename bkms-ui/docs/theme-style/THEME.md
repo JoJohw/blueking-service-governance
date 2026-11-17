@@ -45,8 +45,8 @@ tokens/
 └── semantic.css       语义层               --bkms-text-body…… 引用色阶
 patches/*/variables.css   桥接层               组件库 :root 变量重指向 --bkms-*（按域拆分：bkui-theme/ + bkms/，bkui.ts 加载）
 patches/
-├── bkui-theme/        class 覆写层 ★主角   组件库写死 hex 的选择器级覆盖（549 处的归属地，生成器管理）
-└── bkms/              手写业务补丁         feedback/table 等手工维护，生成器不触碰
+└── bkui-theme/        class 覆写层 ★主角   组件库写死 hex 的选择器级覆盖（549 处的归属地，生成器管理）
+src/styles/overrides.css  手写覆写层        组件库形态/尺寸补丁（menu/navigation/vxe/monaco 等），生成器不触碰
 themes/             主题扩展位           [data-theme] 第二主题时启用
 ```
 
@@ -71,7 +71,7 @@ src/styles/theme/
 │   │   ├── form.css
 │   │   ├── dialog.css
 │   │   └── …
-│   └── bkms/           # 手写业务补丁（feedback / table / variables，生成器不触碰）
+│   └── bkms/           # 仅保留 variables.css 变量桥接位（CSS 补丁已迁至 src/styles/overrides.css）
 ├── themes/             # 本期留空
 └── index.css           # 统一 @import（生成器重写）
 ```
@@ -84,7 +84,7 @@ src/styles/theme/
 
 ## 五、覆写层组织规约
 
-**作用域类**：`patches/bkui-theme/` 所有覆写选择器加 `.bkms-themed ` 前缀（`.bkms-themed .bk-input { … }`）， specificity (0,2,0) > 库内 (0,1,0)，**全程不用 !important**。挂载在 `body` 上而非 app 根：Modal/Select 下拉/Message 等 teleport 到 body 的弹层天然在作用域内，无需额外补救。挂载点定案为 `main.ts` 启动时运行时添加（本项目 app.mount 在异步回调之后，时序安全）。`body`/`html` 自身样式与历史临时修正放**全局无包裹段**（`patches/bkms/` 手写文件，无前缀）。
+**作用域类**：`patches/bkui-theme/` 所有覆写选择器加 `.bkms-themed ` 前缀（`.bkms-themed .bk-input { … }`）， specificity (0,2,0) > 库内 (0,1,0)，**全程不用 !important**。挂载在 `body` 上而非 app 根：Modal/Select 下拉/Message 等 teleport 到 body 的弹层天然在作用域内，无需额外补救。挂载点定案为 `main.ts` 启动时运行时添加（本项目 app.mount 在异步回调之后，时序安全）。`body`/`html` 自身样式与历史临时修正放**全局无包裹段**（`src/styles/overrides.css`，无前缀）。
 
 **值策略（占位制，2026-11-06 定案）**：覆写结构先行、不等设计全部拍板——设计已确认值直接写 `var(--bkms-*)`；待确认值先用组件库**原色值占位**并打 `pending` 标记（拍板后换 token 即可，结构零返工）；keep 值不生成。
 
@@ -98,10 +98,10 @@ src/styles/theme/
 
 ## 六、质量基建
 
-- **stylelint**：`patches/bkui-theme/` 与 `patches/bkms/` 豁免**形态类规则**（`no-descending-specificity`、`selector-class-pattern`、`selector-pseudo-element-colon-notation`、`selector-attribute-quotes`、`order/properties-order`）——覆写逐字复刻 bkui/vxe 产物形态，按本项目规约改写选择器会破坏匹配；`color-no-hex` 全局启用仍待存量清完（排最后），覆写内原值只准进注释。
+- **stylelint**：`patches/bkui-theme/` 与 `src/styles/overrides.css` 豁免**形态类规则**（`no-descending-specificity`、`selector-class-pattern`、`selector-pseudo-element-colon-notation`、`selector-attribute-quotes`、`order/properties-order`）——覆写逐字复刻 bkui/vxe 产物形态，按本项目规约改写选择器会破坏匹配；`color-no-hex` 全局启用仍待存量清完（排最后），覆写内原值只准进注释。
 - **漂移自检（必要基建，非可选）**：`check-overrides.mjs` 校验 `patches/bkui-theme/` 每条选择器仍存在于 bkui dist css 且原 hex 仍在，失效即报警，库升级后必跑。注意实现细节：覆写文件首条规则的 prelude 混有文件头注释，解析时需先剥注释再判定。
 - **工具链 scripts**（直接 node 执行，不占 package.json）：`stats-usage.mjs`（组件使用统计）→ `gen-overrides.mjs`（生成覆写）→ `check-overrides.mjs`（漂移自检），数据基线为 `reports/usage.json` + `data/keep.json`（2026-11-17 起 `mapping.json` / `pending-design.json` / `color-diff-backup.json` 与 `codemod.mjs`、`resolve-pending.mjs` 退役）。
-- **生成器（单源）**：`gen-overrides.mjs` 从 bkui dist css 抽取"prop 非 `--` 开头且 value 含 hex"的 declaration，按选择器+prop 聚合；**映射真源是既往产物**——重跑前先扫 `patches/bkui-theme/*.css` 里「令牌 var + 行尾原值注释」成对记录建 hex→token 索引，未收录的值按原值占位并进 `reports/gen-summary.md` 待拍板清单。拍板方式：直接改产物里的值与原值注释，重跑即继承（尾注释同时喂漂移自检，删了等于丢映射）。按组件域写入 `patches/bkui-theme/`，人工只审不写；每次重跑 `rmSync` 整个 `bkui-theme/` 重建，但**绝不触碰 `patches/bkms/`**（手写补丁目录，index.css 的 bkms 段由生成器扫描追加 import）。
+- **生成器（单源）**：`gen-overrides.mjs` 从 bkui dist css 抽取"prop 非 `--` 开头且 value 含 hex"的 declaration，按选择器+prop 聚合；**映射真源是既往产物**——重跑前先扫 `patches/bkui-theme/*.css` 里「令牌 var + 行尾原值注释」成对记录建 hex→token 索引，未收录的值按原值占位并进 `reports/gen-summary.md` 待拍板清单。拍板方式：直接改产物里的值与原值注释，重跑即继承（尾注释同时喂漂移自检，删了等于丢映射）。按组件域写入 `patches/bkui-theme/`，人工只审不写；每次重跑 `rmSync` 整个 `bkui-theme/` 重建，但**绝不触碰 `src/styles/overrides.css`**（手写覆写层，不参与生成器重跑）。
 - **纪律**：进 `patches/` 前先试 bridge（变量定义值都能走 bridge）；patches 内禁止裸 hex。
 
 ## 七、映射表的可执行性

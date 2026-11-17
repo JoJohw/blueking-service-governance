@@ -16,34 +16,31 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
+/* 全局基础层：只放 HTML 根元素与浏览器级默认值。
+ * 应用自有 class → app.css；组件库覆写 → overrides.css。 */
+
 @import '@/fonts/style.css';
-@import './bkms.css';
+@import './app.css';
 
 html,
 body,
 #app {
   height: 100%;
-  margin: 0;
   padding: 0;
-  font-family: -apple-system, Helvetica Neue, Helvetica, Arial, PingFang SC, Microsoft YaHei, SimSun, sans-serif;
+  margin: 0;
+  font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", SimSun, sans-serif;
   font-size: 12px;
 }
 
-/* 滚动条有两个尺寸，在下拉框，穿梭框等小场景内，尺寸为 6px */
-.bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-dropdown::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-/* 而在弹窗，抽屉或页面等大场景内，尺寸为 8px */
+/* 弹窗、抽屉或页面等大场景用 8px；下拉框、穿梭框等小场景为 6px，见 overrides.css */
 ::-webkit-scrollbar {
-  height: 8px;
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
   background-color: var(--bkms-neutral-5);
-  border-radius: 4px;
+  border-radius: var(--bkms-radius-scroll);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -58,173 +55,7 @@ body,
   background-color: var(--bkms-neutral-6);
 }
 
-/* vxe表格滚动条样式 */
-/* .bk-vxe-table .vxe-table--scroll-x-handle::-webkit-scrollbar, .bk-vxe-table .vxe-table--scroll-y-handle::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-.bk-vxe-table .vxe-table .vxe-table--render-wrapper .vxe-table--scroll-y-virtual {
-  width: 8px;
-}
-.bk-vxe-table .vxe-table .vxe-table--render-wrapper .vxe-table--scroll-x-virtual {
-  height: 8px;
-} */
-
-.bkms-cursor-element {
-  background: url("/lock.svg");
-  height: 16px;
-  width: 12px;
-}
-
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-all;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-}
-
-/* 迁自 bk-patch.css：业务通用工具类（非组件库补丁） */
-.content-hover {
-  .content-item {
-    display: none !important;
-  }
-}
-
-.content-hover:hover {
-  .content-item {
-    display: block !important;
-  }
-}
-
-.scrollbar-stable {
-  scrollbar-gutter: stable;
-}
-
-.bfc::before,
-.bfc::after {
-  display: block;
-  clear: both;
-  content: '';
-  visibility: hidden;
-  overflow: hidden;
-}
-
-.bkms-full-screen {
-  position: fixed !important;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 100% !important;
-  width: 100% !important;
-  z-index: 9999;
-}
-
-.bkms-dropdown-item {
-  display: block;
-  height: 32px;
-  line-height: 32px;
-  padding: 0 16px;
-  color: var(--bkms-text-body);
-  font-size: 12px;
-  text-decoration: none;
-  white-space: nowrap;
-  cursor: pointer;
-
-  &:hover:not(.disabled) {
-    background-color: var(--bkms-bg-hover);
-    color: var(--bkms-text-brand);
-  }
-
-  &.disabled {
-    color: var(--bkms-text-disabled);
-    cursor: not-allowed;
-  }
-
-  &.active {
-    background-color: var(--bkms-bg-active);
-    color: var(--bkms-text-brand);
-  }
-}
-
-.bkms-underline {
-  text-decoration-line: underline;
-  text-underline-offset: 6px;
-  text-decoration-style: dashed;
-  text-decoration-thickness: 1px;
-}
-
-.row--current {
-  background-color: var(--bkms-bg-active) !important;
-}
-
-.bkms-skeleton {
-  background-size: 400% 100%;
-  background-position: 100% 50%;
-  animation: console-skeleton-loading 1.4s ease infinite;
-}
-
-@keyframes console-skeleton-loading {
-  0% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0 50%;
-  }
-}
-
-/* vxe-table 可排序表头样式 */
-.vxe-header--column.is--sortable {
-  cursor: pointer;
-}
-
-/**
- * 适用与搭配custom-filter组件，隐藏VxeTable的filter
- */
-.vxe-cell--title:has(.bkms-custom-filter-title)~.vxe-cell--filter {
-  display: none;
-}
-
-.leave-confirm-box-index {
-  .bk-modal-mask,
-  .bk-modal-wrapper {
-    z-index: 9999 !important;
-  }
-}
-
-/* 解决 monaco-editor 不可编辑提示错位问题 */
-.monaco-editor-overlaymessage {
-  z-index: 9999;
-
-  .message {
-    padding: 2px 4px;
-    color: var(--bkms-navy-5);
-    background-color: #252526;
-    border: 1px solid #007acc;
-    border-radius: 3px;
-  }
-
-  .anchor {
-    position: absolute;
-    left: 2px;
-    z-index: 1000;
-    width: 0 !important;
-    height: 0 !important;
-    border-color: transparent;
-    border-style: solid;
-    border-width: 8px;
-  }
-
-  .anchor.below {
-    border-top-color: #007acc;
-  }
-}
-
-/* 解决某些浏览器的readonly输入框会出现编辑光标问题 */
+/* 解决某些浏览器的 readonly 输入框会出现编辑光标问题 */
 input[readonly] {
   caret-color: transparent;
 }

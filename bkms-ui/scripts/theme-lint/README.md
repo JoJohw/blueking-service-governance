@@ -16,8 +16,8 @@
 
 `src/styles/theme/tokens/` 下两个文件：
 
-- `colors.css` —— 原子色阶（`--bkms-brand-2`、`--bkms-neutral-10` …），全库唯一允许出现色值字面量的地方
-- `semantic.css` —— 语义层（`--bkms-text-title`、`--bkms-bg-card` …），只 `var()` 引用色阶
+- `color.css` —— 颜色维度（一个维度一个文件）：`@layer scale` 区是原子色阶（`--bkms-brand-2`、`--bkms-neutral-10` …），全库唯一允许出现色值字面量的地方；`@layer semantic` 区是语义层（`--bkms-text-title`、`--bkms-bg-card` …），只 `var()` 引用色阶
+- `radius.css` —— 圆角维度：档位（名字即像素值 `--bkms-radius-3/4/6`）+ 语义档（field/tag/checkbox/scroll/control/card/overlay）
 
 **新增令牌不需要改任何代码**：`map.mjs` 在模块加载时扫描这两个文件，`uno.config.ts` 据此注册类、eslint 据此给建议。色阶会自动生成 `text-` / `bg-` / `border-` 等全部颜色工具类，语义层自动生成 `bkms-text-*` / `bkms-bg-*` / `bkms-line-*` 快捷类（见 `uno.config.ts` 顶部注释的消费矩阵）。
 

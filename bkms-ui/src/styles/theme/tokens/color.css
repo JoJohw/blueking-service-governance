@@ -1,0 +1,312 @@
+/*
+ * BKMS 颜色维度：色阶原子 + 颜色语义 + 阴影，一个维度一个文件。
+ * 两组用 layer 标记区分：scale 是色阶区（全库唯一允许色值字面量），semantic 只 var() 引用色阶，
+ * 唯一例外是阴影组——值即完整效果色、无法由色阶派生。该标记同时是 palette 区分
+ * 色阶组与语义组的唯一依据，漏标会让 palette 直接报错。
+ * 真源：bkms-color-spec.md（不进 git，真源位置见 scripts/theme-codemod/rules.md）。
+ * 色阶与语义一律挂 :root；[data-theme] 覆盖位预留。
+ * 分组标记：@group 开组（值即展示标题）、@layer 标层、@note 分组描述、@endgroup 闭组（见 dev/palette/README.md）。
+ */
+:root {
+  /**
+   * @group brand
+   * @layer scale
+   * @note 品牌主色，7 最浅 → 1 最深；按钮、链接、选中态
+   */
+  --bkms-brand-7: #F0F4FF;
+  --bkms-brand-6: #E5EDFF;
+  --bkms-brand-5: #C7D8FF;
+  --bkms-brand-4: #99B9FF;
+  --bkms-brand-3: #6691FF;
+  --bkms-brand-2: #3B6EF5;
+  --bkms-brand-1: #274ECF;
+
+  /* @endgroup */
+
+  /**
+   * @group neutral
+   * @layer scale
+   * @note 中性色，10 最浅 → 1 最深；文字、背景、边框与分割线
+   */
+  --bkms-neutral-10: #FFF;
+  --bkms-neutral-9: #FBFCFE;
+  --bkms-neutral-8: #F7F9FD;
+  --bkms-neutral-7: #F0F4FA;
+  --bkms-neutral-6: #E9EDF5;
+  --bkms-neutral-5: #E4E9F2;
+  --bkms-neutral-4: #C1CDE5;
+  --bkms-neutral-3: #8F9FBD;
+  --bkms-neutral-2: #4A5973;
+  --bkms-neutral-1: #111214;
+
+  /* @endgroup */
+
+  /**
+   * @group success
+   * @layer scale
+   * @note 成功、运行中状态，7 最浅 → 1 最深
+   */
+  --bkms-success-7: #EBFAF0;
+  --bkms-success-6: #DAF6E5;
+  --bkms-success-5: #CBF0DA;
+  --bkms-success-4: #A1E3BA;
+  --bkms-success-3: #65C389;
+  --bkms-success-2: #2CAF5E;
+  --bkms-success-1: #299E56;
+
+  /* @endgroup */
+
+  /**
+   * @group warning
+   * @layer scale
+   * @note 警告、待处理状态，7 最浅 → 1 最深
+   */
+  --bkms-warning-7: #FDF4E8;
+  --bkms-warning-6: #FDEED8;
+  --bkms-warning-5: #FCE5C0;
+  --bkms-warning-4: #F9D090;
+  --bkms-warning-3: #F8B64F;
+  --bkms-warning-2: #F59500;
+  --bkms-warning-1: #E38B02;
+
+  /* @endgroup */
+
+  /**
+   * @group danger
+   * @layer scale
+   * @note 危险、失败状态，7 最浅 → 1 最深
+   */
+  --bkms-danger-7: #FFF0F0;
+  --bkms-danger-6: #FFEBEB;
+  --bkms-danger-5: #FDD;
+  --bkms-danger-4: #F8B4B4;
+  --bkms-danger-3: #FF5656;
+  --bkms-danger-2: #EA3636;
+  --bkms-danger-1: #E71818;
+
+  /* @endgroup */
+
+  /**
+   * @group purple
+   * @layer scale
+   * @note 辅助色阶，7 最浅 → 1 最深
+   */
+  --bkms-purple-7: #F5EEFC;
+  --bkms-purple-6: #EDDFFB;
+  --bkms-purple-5: #E3CEF8;
+  --bkms-purple-4: #C9A5EE;
+  --bkms-purple-3: #A160E1;
+  --bkms-purple-2: #7D25D4;
+  --bkms-purple-1: #7322C3;
+
+  /* @endgroup */
+
+  /**
+   * @group cyan
+   * @layer scale
+   * @note 辅助色阶，7 最浅 → 1 最深
+   */
+  --bkms-cyan-7: #EEFBFC;
+  --bkms-cyan-6: #DFFAFB;
+  --bkms-cyan-5: #CEF6F8;
+  --bkms-cyan-4: #A5EAEE;
+  --bkms-cyan-3: #3ED2DA;
+  --bkms-cyan-2: #1FAAB2;
+  --bkms-cyan-1: #1C9AA0;
+
+  /* @endgroup */
+
+  /**
+   * @group navy
+   * @layer scale
+   * @note 深色系，5 最浅 → 1 最深；深色背景与深色文字
+   */
+  --bkms-navy-5: #C4C6CC;
+  --bkms-navy-4: #96A2B9;
+  --bkms-navy-3: #384A6B;
+  --bkms-navy-2: #31394F;
+  --bkms-navy-1: #0C1323;
+
+  /* @endgroup */
+
+  /**
+   * @group nav-indicator
+   * @layer scale
+   * @note 侧边导航选中/指示条的三色
+   */
+  --bkms-nav-indicator-1: #4ABDFB;
+  --bkms-nav-indicator-2: #425BFB;
+  --bkms-nav-indicator-3: #4551FB;
+
+  /* @endgroup */
+
+  /**
+   * @group keep
+   * @layer scale
+   * @note spec 不替换色，原值收编成 token，名字即色值，不参与设计映射
+   */
+
+  /** bkui warning 旧黄、构建记录 UNKNOWN 标签 */
+  --bkms-keep-ffb848: #FFB848;
+
+  /** 图表 palette 橙 */
+  --bkms-keep-ef6317: #EF6317;
+
+  /** 运维历史状态 tag 深绿底 */
+  --bkms-keep-144628: #144628;
+
+  /** iconcool 图标（HelmCharts）深蓝 */
+  --bkms-keep-0f1689: #0F1689;
+
+  /** iconcool 图标默认灰 */
+  --bkms-keep-737987: #737987;
+  --bkms-keep-7a8193: #7A8193;
+
+  /** Helm 编排文件列表的 BSCP 标签深棕底 */
+  --bkms-keep-6d5b42: #6D5B42;
+
+  /** 版本号规则 VN 标签、构建命令参数名的棕红字 */
+  --bkms-keep-ad7a6b: #AD7A6B;
+
+  /* @endgroup */
+
+  /**
+   * @group 文字
+   * @layer semantic
+   * @note 标题、正文、辅助字等文字用色，引用 neutral/brand 色阶
+   */
+
+  /** 标题、表头字 */
+  --bkms-text-title: var(--bkms-neutral-1);
+
+  /** 正文、表单标签 */
+  --bkms-text-body: var(--bkms-neutral-2);
+
+  /** 辅助字、图标、关闭 */
+  --bkms-text-secondary: var(--bkms-neutral-3);
+
+  /** 禁用字、占位 */
+  --bkms-text-disabled: var(--bkms-neutral-4);
+
+  /** 链接、选中字 */
+  --bkms-text-brand: var(--bkms-brand-2);
+
+  /** 主按钮字、顶栏选中字 */
+  --bkms-text-inverse: var(--bkms-neutral-10);
+
+  /* @endgroup */
+
+  /**
+   * @group 线条
+   * @layer semantic
+   * @note 分割线、边框、描边，引用 neutral/brand/danger 色阶
+   */
+
+  /** Dialog 顶线、分页顶线 */
+  --bkms-line-light: var(--bkms-neutral-6);
+
+  /** 表格行线、侧栏边线 */
+  --bkms-line-default: var(--bkms-neutral-5);
+
+  /** 输入框边、按钮边、虚线 */
+  --bkms-line-input: var(--bkms-neutral-4);
+
+  /** 输入悬停边 */
+  --bkms-line-hover: var(--bkms-neutral-3);
+
+  /** 输入激活边、主色描边 */
+  --bkms-line-active: var(--bkms-brand-2);
+
+  /** 警示边、校验 */
+  --bkms-line-danger: var(--bkms-danger-2);
+
+  /* @endgroup */
+
+  /**
+   * @group 背景
+   * @layer semantic
+   * @note 页面、卡片、悬停与状态底，引用 neutral/brand/success/warning/danger 色阶
+   */
+
+  /** 内容区底 */
+  --bkms-bg-page: var(--bkms-neutral-7);
+
+  /** 行悬停、菜单悬停 */
+  --bkms-bg-hover: var(--bkms-neutral-7);
+
+  /** 斑马纹、输入禁用底 */
+  --bkms-bg-subtle: var(--bkms-neutral-8);
+
+  /** 表头、Dialog 底栏 */
+  --bkms-bg-head: var(--bkms-neutral-9);
+
+  /** 标题条、筛选条 */
+  --bkms-bg-title: var(--bkms-neutral-5);
+
+  /** 主按钮禁用底 */
+  --bkms-bg-disabled: var(--bkms-neutral-5);
+
+  /** 白卡片 */
+  --bkms-bg-card: var(--bkms-neutral-10);
+
+  /** 选中底、Alert 信息底 */
+  --bkms-bg-active: var(--bkms-brand-6);
+
+  /** 选中悬停 */
+  --bkms-bg-active-hover: var(--bkms-brand-5);
+
+  /** Message 信息底 */
+  --bkms-bg-brand-soft: var(--bkms-brand-7);
+
+  /** Alert 成功底 */
+  --bkms-bg-success: var(--bkms-success-6);
+
+  /** Message 成功底 */
+  --bkms-bg-success-soft: var(--bkms-success-7);
+
+  /** Alert 警告底 */
+  --bkms-bg-warning: var(--bkms-warning-6);
+
+  /** Message 警告底 */
+  --bkms-bg-warning-soft: var(--bkms-warning-7);
+
+  /** Alert 危险底 */
+  --bkms-bg-danger: var(--bkms-danger-6);
+
+  /** Message 危险底 */
+  --bkms-bg-danger-soft: var(--bkms-danger-7);
+
+  /* @endgroup */
+
+  /**
+   * @group 阴影
+   * @layer semantic
+   * @note 按场景命名的效果值：完整值直接写 8 位带 alpha 色（阴影无法由色阶派生），随暗色主题整体覆盖
+   */
+
+  /** 白卡片 */
+  --bkms-shadow-card: #1919290D;
+
+  /** 卡片悬停、筛选条 */
+  --bkms-shadow-hover: #0000001A;
+
+  /** 画布浮层、工具条、节点卡片 */
+  --bkms-shadow-float: #292D3314;
+
+  /** 内容头 */
+  --bkms-shadow-header: #0000000A;
+
+  /** 气泡、下拉 */
+  --bkms-shadow-popover: #00000029;
+
+  /** Dialog */
+  --bkms-shadow-dialog: #0003;
+
+  /** 输入框、搜索框内阴影 */
+  --bkms-shadow-inset: #CCCCCC4D;
+
+  /** 主按钮。禁用和按钮组不加；用 color-mix 等价 spec 的 #3B6EF540，随主题换色 */
+  --bkms-shadow-button: color-mix(in srgb, var(--bkms-brand-2) 25%, transparent);
+
+  /* @endgroup */
+}

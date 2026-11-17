@@ -21,7 +21,7 @@
  *
  * 值策略（单源：既往产物即映射真源）：
  *   - 现有 patches 里「令牌 var + 行尾原值注释」的成对记录 → 复用同一 token（自举，不再有 mapping.json 副本）
- *   - keep 双源命中（keep.json / colors.css token 值，本就不变）→ 不生成
+ *   - keep 双源命中（keep.json / color.css token 值，本就不变）→ 不生成
  *   - 未收录 → 组件库原色值占位，行尾 pending 标记，进 gen-summary 清单
  *   - 渐变/阴影函数内含任一未确认 hex → 整条声明占位（不做局部替换）
  *
@@ -32,7 +32,7 @@
  *
  * 产出：
  *   - src/styles/theme/patches/bkui-theme/<kebab>.css（bkui 组件覆写，按组件族每组件一文件，含变量版段+字面量段；
- *     手写业务补丁在 patches/bkms/，生成器不触碰）
+ *     手写业务补丁在 src/styles/overrides.css，生成器不触碰）
  *   - reports/gen-summary.md（生成摘要 + 未归属规则 + 未收录 hex 待确认清单）
  *
  * 用法：node scripts/theme-codemod/scripts/gen-overrides.mjs
@@ -61,8 +61,8 @@ const usage = readJson('../reports/usage.json');
 const KEEP = readJson('../data/keep.json');
 
 // 令牌定义值索引：8 位源 hex 若与令牌值完全一致，直接 var() 引用（令牌自带 alpha 时 color-mix 会二次衰减）。
-// 两个令牌文件都读：阴影令牌在 semantic.css，漏读会让 8 位精确命中失效
-const colorsText = ['colors.css', 'semantic.css']
+// 色阶、语义、阴影同在 color.css，漏读会让 8 位精确命中失效
+const colorsText = ['color.css']
   .map(name => fs.readFileSync(path.join(ROOT, 'src/styles/theme/tokens', name), 'utf8'))
   .join('\n');
 const TOKEN_HEX = new Map();
@@ -106,7 +106,7 @@ if (fs.existsSync(PATCHES_DIR)) {
 /** keep 判定双源开关，可独立启停（keep.json 退役时关 keepJson 位） */
 const KEEP_SOURCES = { keepJson: true, tokenValue: true };
 
-/** colors.css 令牌值反查集（3 位写法先展开，8 位阴影值不参与） */
+/** color.css 令牌值反查集（3 位写法先展开，8 位阴影值不参与） */
 const TOKEN_VALUE_SET = new Set();
 for (const h of TOKEN_HEX.values()) {
   let hex6 = h.slice(1);
@@ -486,7 +486,7 @@ writeDomainIndex(
   perComponent.map(p => `${p.kebab}.css`),
   ['/* bkui 覆写清单 — 由 gen-overrides.mjs 生成，重跑整体覆盖；variables.css 为手工桥接，不在此列 */'],
 );
-// patches/bkms/index.css 为手工维护（feedback/table 清单），生成器不触碰
+// 手写覆写在 src/styles/overrides.css，不参与生成器重跑
 
 // ---------- 4. 生成摘要 + 台账 ----------
 fs.mkdirSync(REPORTS, { recursive: true });

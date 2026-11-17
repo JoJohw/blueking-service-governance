@@ -37,7 +37,7 @@ import { fileURLToPath } from 'node:url';
 
 /**
  * 不能用 import.meta.url 单独定位：uno 的配置加载器（unconfig）会把配置打包到临时目录再执行，
- * 此时 import.meta.url 指向临时位置。cwd 优先、本文件位置兜底，以 colors.css 存在为准。
+ * 此时 import.meta.url 指向临时位置。cwd 优先、本文件位置兜底，以 color.css 存在为准。
  * 本文件在 scripts/theme-lint/ 下，兜底路径需要上溯两级到仓库子项目根，才能拼出 src/...。
  */
 function resolveThemeDir() {
@@ -47,7 +47,7 @@ function resolveThemeDir() {
     path.resolve(here, '../../src/styles/theme/tokens'),
   ];
   for (const dir of candidates) {
-    if (fs.existsSync(path.join(dir, 'colors.css'))) return dir;
+    if (fs.existsSync(path.join(dir, 'color.css'))) return dir;
   }
   throw new Error(`[theme] 令牌目录未找到，已尝试：${candidates.join(' , ')}`);
 }
@@ -73,11 +73,12 @@ export function normalizeHex(input) {
   return null;
 }
 
-/** 色阶 + keep 令牌：colors.css → theme.colors，类名形如 text-bkms-brand-2 / bg-bkms-keep-ffb848。
- * step 兼容 6 位 hex（keep 族命名即色值），hex 替代排在 \d+ 之后防全数字 hex 走错分支 */
+/** 色阶 + keep 令牌：color.css → theme.colors，类名形如 text-bkms-brand-2 / bg-bkms-keep-ffb848。
+ * step 兼容 6 位 hex（keep 族命名即色值），hex 替代排在 \d+ 之后防全数字 hex 走错分支。
+ * 语义与阴影变量结尾不是数字/hex，不会被这条正则捕获 */
 export function parseScaleColors() {
   const tokens = {};
-  for (const m of readTokenFile('colors.css').matchAll(/--bkms-([a-z-]+)-(\d+|[0-9a-f]{6})\s*:/g)) {
+  for (const m of readTokenFile('color.css').matchAll(/--bkms-([a-z-]+)-(\d+|[0-9a-f]{6})\s*:/g)) {
     const [, family, step] = m;
     tokens[`bkms-${family}-${step}`] = `var(--bkms-${family}-${step})`;
   }
@@ -85,13 +86,13 @@ export function parseScaleColors() {
 }
 
 /**
- * 语义变量：semantic.css → shortcuts，line 映射为 border 工具类
+ * 语义变量：color.css 的语义区 → shortcuts，line 映射为 border 工具类
  * @returns {[string, string][]} 元组而非 string[][]，uno 的 UserShortcuts 只接受元组形态
  */
 export function parseSemanticShortcuts() {
   const prefixByGroup = { text: 'text', line: 'border', bg: 'bg' };
   const shortcuts = [];
-  for (const m of readTokenFile('semantic.css').matchAll(/--bkms-(text|line|bg)-([a-z-]+)\s*:/g)) {
+  for (const m of readTokenFile('color.css').matchAll(/--bkms-(text|line|bg)-([a-z-]+)\s*:/g)) {
     const [, group, name] = m;
     shortcuts.push([`bkms-${group}-${name}`, `${prefixByGroup[group]}-[var(--bkms-${group}-${name})]`]);
   }
@@ -130,7 +131,7 @@ function parseRgb(input) {
 }
 
 const decls = new Map();
-for (const file of ['colors.css', 'semantic.css']) {
+for (const file of ['color.css']) {
   for (const m of readTokenFile(file).matchAll(/(--bkms-[\w-]+)\s*:\s*([^;{}]+)/g)) {
     decls.set(m[1], m[2].trim());
   }

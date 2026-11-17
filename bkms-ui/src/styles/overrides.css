@@ -1,0 +1,205 @@
+/*
+ * 第三方覆写层 —— 只改组件库渲染出的 DOM（选择器里出现 bk- / vxe- / monaco- 等类名）。
+ * 加载点：main.ts 末尾（晚于 uno.css 与 theme/index.css），手写覆写最后说话。
+ * 本应用自有 class（.bkms-* 等模板里写的类）一律进 app.css，不要写在这里。
+ * 颜色归 tokens / 变量桥接，本文件只写形态与尺寸；刻意保留的原色值见各条注释。
+ */
+
+/* ══════════ bkui：导航壳层 ══════════ */
+
+/* bk-navigation 主内容区去掉默认内边距，间距由页面级容器自行控制 */
+.bk-navigation-wrapper .navigation-container .container-content {
+  padding: 0 !important;
+}
+
+/* ══════════ bkui：左侧菜单 ══════════ */
+
+/* 对齐 design-visual（圆角留边、hover/选中渐变底、选中图标渐变字） */
+.bkms-themed .bk-menu {
+  /* width:auto 抵消 bk-menu 内部的 width:100%，否则 margin 0 8px 会让圆角块向右溢出菜单 */
+  .bk-menu-item {
+    width: auto;
+    margin: 0 8px;
+    border-radius: var(--bkms-radius-menu);
+
+    &:hover {
+      background-image: linear-gradient(
+        155deg,
+        var(--bkms-neutral-7) 0%,
+        var(--bkms-neutral-6) 51%,
+        var(--bkms-neutral-5) 100%
+      );
+    }
+
+    &.is-active {
+      background-image: linear-gradient(
+        155deg,
+        var(--bkms-brand-7) 0%,
+        var(--bkms-brand-6) 51%,
+        var(--bkms-brand-5) 100%
+      );
+
+      .item-icon i {
+        color: transparent;
+        background-image: linear-gradient(180deg, var(--bkms-brand-3) 0%, var(--bkms-brand-1) 100%);
+        background-clip: text;
+      }
+    }
+  }
+
+  /* 菜单分组标题：对齐图标列。bkui 默认 18px 是按整宽菜单项（无留边）算的，
+     上面给菜单项加了 8px 圆角留边，图标列随之右移，标题需同步补 8px 才能保持与图标列的相对位置 */
+  .bk-menu-group .group-name {
+    margin: 0 18px 0 26px;
+  }
+}
+
+/* ══════════ bkui：message / exception / popover ══════════ */
+
+.bk-message-content.multi .overview .tools .tool.fix.fixed {
+  /* 组件库的 fixed 被 unocss 的 fixed 覆盖了 */
+  position: static;
+}
+
+.normal-exception {
+  .bk-exception-img {
+    width: 220px !important;
+    height: 100px !important;
+  }
+}
+
+.large-exception {
+  .bk-exception-img {
+    width: 440px !important;
+    height: 200px !important;
+  }
+
+  .bk-exception-description {
+    margin-top: 11px;
+  }
+}
+
+.bk-popper {
+  border: none;
+}
+
+/* 半透明深色气泡：刻意视觉，spec 无对应 token，rgba 原值保留 */
+.popover-dark-translucent {
+  background: rgb(0 0 0 / 80%) !important;
+}
+
+.no-padding-popover {
+  padding: 0 !important;
+}
+
+.bk-popover.bk-pop2-content.no-border-popover,
+.bk-popover.bk-pop2-content.no-border-popover .bk-pop2-arrow {
+  border: none !important;
+}
+
+/* ══════════ bkui：form 控件（tab / button / textarea / search-select）══════════ */
+
+.bk-tab-content {
+  padding: 18px 24px !important;
+}
+
+.bk-button:not(.is-text, .bk-button-small) {
+  min-width: 88px;
+}
+
+.bk-textarea {
+  min-height: 50px;
+}
+
+/* SearchSelect 选中项过多时容器空间不足不换行 */
+.bk-search-select-container .search-container-input {
+  min-width: fit-content;
+}
+
+/* ══════════ bkui：dialog / modal ══════════ */
+
+.leave-confirm-box-index {
+  .bk-modal-mask,
+  .bk-modal-wrapper {
+    z-index: 9999 !important;
+  }
+}
+
+/* ══════════ vxe / bk-table ══════════ */
+
+.vxe-table--render-default {
+  --vxe-ui-table-row-height-default: 42px;
+  --vxe-ui-table-header-background-color: var(--bkms-bg-head);
+
+  /* 表格最后一行斑马纹背景残留清除（vxe 按行绘制背景图） */
+
+  .vxe-table--body .vxe-body--row:nth-last-child(1) {
+    .vxe-body--column {
+      background-size: 100% 0;
+    }
+  }
+}
+
+.vxe-table--tooltip-wrapper {
+  z-index: 3000 !important;
+}
+
+.vxe-table--filter-wrapper {
+  min-width: unset !important;
+
+  .vxe-checkbox--label {
+    padding-left: 0;
+  }
+
+  .vxe-table--filter-body {
+    max-height: 280px !important;
+  }
+}
+
+/* vxe-table 可排序表头样式 */
+
+.vxe-header--column.is--sortable {
+  cursor: pointer;
+}
+
+/* 适用与搭配 custom-filter 组件，隐藏 vxe-table 的 filter */
+
+.vxe-cell--title:has(.bkms-custom-filter-title)~.vxe-cell--filter {
+  display: none;
+}
+
+/* ══════════ 浮层与编辑器 ══════════ */
+
+/* 下拉框、穿梭框等小场景滚动条为 6px（弹窗/抽屉/页面等大场景 8px，见 main.css 全局段） */
+.bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-dropdown::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* 解决 monaco-editor 不可编辑提示错位问题；配色与圆角均为 vscode 编辑器自身值，不令牌化 */
+.monaco-editor-overlaymessage {
+  z-index: 9999;
+
+  .message {
+    padding: 2px 4px;
+    color: var(--bkms-navy-5);
+    background-color: #252526;
+    border: 1px solid #007acc;
+    border-radius: 3px;
+  }
+
+  .anchor {
+    position: absolute;
+    left: 2px;
+    z-index: 1000;
+    width: 0 !important;
+    height: 0 !important;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 8px;
+  }
+
+  .anchor.below {
+    border-top-color: #007acc;
+  }
+}

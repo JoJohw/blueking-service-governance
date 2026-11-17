@@ -743,7 +743,7 @@ describe('令牌目录定位', () => {
   it('cwd 不在 bkms-ui 时仍能加载 map.mjs，且解析到同一份令牌', () => {
     const mapUrl = new URL('../theme-lint/map.mjs', import.meta.url).href;
     // 不只断言"能加载"：还要校验解析出的色阶数与当前进程一致，
-    // 否则兜底指错但恰好某个目录存在 colors.css 时仍会绿。
+    // 否则兜底指错但恰好某个目录存在 color.css 时仍会绿。
     const script = `const m = await import(${JSON.stringify(mapUrl)});process.stdout.write(String(Object.keys(m.parseScaleColors()).length))`;
     const stdout = execFileSync(process.execPath, ['--input-type=module', '-e', script], {
       cwd: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..'),

@@ -54,19 +54,20 @@ npx vite build --config dev/palette/vite.config.ts
 
 ## 数据来源与口径
 
-- 色阶来自 `src/styles/theme/tokens/colors.css`，语义层来自同目录的 `semantic.css`，由 `src/util/tokens.ts` 解析。语义 token 通过 `var()` 引用色阶，工具会递归解析到最终色值。
+- 颜色令牌全部来自 `src/styles/theme/tokens/color.css`，由 `src/util/tokens.ts` 解析；色阶区与语义区按组标记里的 `@layer scale` / `@layer semantic` 区分。语义 token 通过 `var()` 引用色阶，工具会递归解析到最终色值。
 - CSS 本身不支持 JSDoc，`@tag` 是工具自定义、解析器自行识别的注释约定（浏览器忽略）。分组用显式起止标识符标记，描述显示在分组标题下：
 
   ```css
   /**
    * @group keep            分组名，开组（必填，值即展示标题）
+   * @layer scale           所属层，必填：scale（色阶区）| semantic（语义区）
    * @note 原值收编成 token   分组描述，可多行续写（@description 同义）
    */
   --bkms-keep-ffb848: #FFB848;
   /* @endgroup */          闭组标识，之后到下一个 @group 之前的声明归入「未分组」
   ```
 
-- `/** 用途 */` 仍是单条 token 的说明（原有格式）。兼容与容错：旧格式 `/* 组名（组描述） */` 继续按分组解析（semantic.css 仍用）；声明同行尾注释 `--x: #fff; /* 用途 */` 挂到该 token；非 @tag 多行块注释兜底为组描述；未知 @tag 忽略不报错。
+- `/** 用途 */` 仍是单条 token 的说明（原有格式）。兼容与容错：旧格式 `/* 组名（组描述） */` 继续按分组解析；声明同行尾注释 `--x: #fff; /* 用途 */` 挂到该 token；非 @tag 多行块注释兜底为组描述；未知 @tag 忽略不报错。
 - 色差使用 CIEDE2000（ΔE00）。色值建议的贴近阈值为 **6**；颜色搜索的容错阈值为 **3**。
 - 工具自身的界面配色定义在 `src/shell.css`，是一组固定值，不随主题 token 变化；色块与预览展示的颜色仍取自 token 真源。
 

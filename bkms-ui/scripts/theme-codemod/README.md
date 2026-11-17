@@ -21,7 +21,7 @@ theme-codemod/
 
 | 层 | 真源 | 说明 |
 | --- | --- | --- |
-| 令牌值 | `src/styles/theme/tokens/colors.css`、`semantic.css` | 所有 `--bkms-*` 的唯一定义处 |
+| 令牌值 | `src/styles/theme/tokens/color.css` | 所有 `--bkms-*` 色值的唯一定义处（`@layer scale` / `@layer semantic` 两个区） |
 | 历史映射事实 | `src/styles/theme/patches/bkui-theme/*.css` | 令牌 + 原值注释成对出现，生成器自读自建索引 |
 | 保留色黑名单 | `data/keep.json` | 刻意保留原色、不替换的黑名单 |
 
@@ -45,8 +45,8 @@ stats-usage（组件白名单基线） → gen-overrides（生成覆写） → �
 
 ## 纪律
 
-- `patches/bkui-theme/`（每组件文件含变量版段+字面量段）由生成器管理，**重跑整体覆盖**；`patches/bkms/` 为手写业务补丁，生成器只读取并追加进 `index.css` import 清单，**绝不写入**。
+- `patches/bkui-theme/`（每组件文件含变量版段+字面量段）由生成器管理，**重跑整体覆盖**；手写覆写在 `src/styles/overrides.css`，生成器既不读取也不写入。
 - 字面量版存在的原因：dev 下 bkui 组件入口（`lib/<comp>/index.js`）按需加载 `.less`（字面量色），部分选择器比变量版更具体（如 `.bk-button.bk-button-primary`），同 specificity 下后加载的 less 会赢——字面量覆写复刻 less 的选择器并加 `.bkms-themed` 前缀（+1 specificity）压制。
 - 覆写文件内禁止裸 hex，原值只准进行尾注释（供 review 与漂移自检比对）；尾注释同时是下一轮生成的映射来源，删了等于丢映射。
 - 设计拍板流程：改 `patches/bkui-theme/` 的值与原值注释 → 重跑 `gen-overrides.mjs` → `check-overrides.mjs` 自检。
-- `--bkms-*` 色阶只在 `tokens/colors.css` 定义，业务代码禁止新写 hex（stylelint `color-no-hex` 落地后自动管控）。
+- `--bkms-*` 色阶只在 `tokens/color.css` 定义，业务代码禁止新写 hex（stylelint `color-no-hex` 落地后自动管控）。
