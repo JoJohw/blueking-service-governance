@@ -10,8 +10,10 @@
     ; (function () {
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
       const setting = localStorage.getItem('vueuse-color-scheme') || 'auto'
-      if (setting === 'dark' || (prefersDark && setting !== 'light'))
-        document.documentElement.classList.toggle('dark', true)
+      const isDark = setting === 'dark' || (prefersDark && setting !== 'light')
+      if (isDark) document.documentElement.classList.toggle('dark', true)
+      /* 多主题：色值覆盖位见 src/styles/theme/themes/，按 [data-theme] 生效 */
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
     })()
   </script>
 </head>

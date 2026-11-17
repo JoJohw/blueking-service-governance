@@ -16,6 +16,10 @@
 创建应用(Gitops): Create Application(Gitops)
 创建应用(Helm): Create Application(Helm)
 退出登录: Log Out
+深色: Dark
+浅色: Light
+切换到深色主题: Switch to dark theme
+切换到浅色主题: Switch to light theme
 搜索: Search
 重置: Reset
 新增: Add

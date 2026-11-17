@@ -1,4 +1,13 @@
 /* bkui/vxe 补丁 - table 域：颜色使用语义化变量，布局/尺寸按公共默认值修正 */
+
+/*
+ * vxe 的布局底色（表体 / 追加区 / 空态）库内写死 #fff，不跟 --bkms-* 走，
+ * 深色主题下会让整块表格露出白底；此处置回语义令牌，亮色下取值不变（neutral-10）。
+ */
+:root {
+  --vxe-ui-layout-background-color: var(--bkms-bg-card);
+}
+
 .vxe-table--render-default {
   --vxe-ui-table-row-height-default: 42px;
   --vxe-ui-table-header-background-color: var(--bkms-bg-head);
