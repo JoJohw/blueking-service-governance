@@ -23,9 +23,10 @@
  * 只做报表，不做判定：规则本身在 eslint（scripts/theme-lint/plugin.mjs），
  * 这里把 theme/* 命中的问题按「规则 → 文件」聚合，用于推进存量替换进度。
  *
- * 用法：pnpm theme:report [--rule=<ruleId>]
+ * 用法：pnpm theme:report [--rule=<ruleId>] [--by=property]
  */
 import { ESLint } from 'eslint';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -37,6 +38,10 @@ const RULE_TITLE = {
 };
 
 const ruleFilter = process.argv.find(a => a.startsWith('--rule='))?.slice('--rule='.length);
+const byDimension = process.argv.find(a => a.startsWith('--by='))?.slice('--by='.length);
+if (byDimension && byDimension !== 'property') {
+  console.warn(`[theme:report] 未识别的 --by=${byDimension}，当前仅支持 property`);
+}
 // 根目录由脚本自身位置推出，不取 process.cwd()：从仓库上层或子目录跑 `pnpm theme:report` 时
 // cwd 不是 bkms-ui，eslint.config.mjs 与 src 都会解析失败 / 报出带 ../ 的路径
 const projectRoot = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
@@ -49,6 +54,7 @@ const issues = results.flatMap(r =>
     .map(m => ({
       file: path.relative(projectRoot, r.filePath),
       line: m.line,
+      column: m.column,
       rule: m.ruleId,
       messageId: m.messageId,
       message: m.message,
@@ -90,6 +96,82 @@ for (const [rule, list] of byRule) {
     console.log(`    ${file}  ×${items.length}`);
   }
   if (files.length > 5) console.log(`    … 另有 ${files.length - 5} 个文件`);
+  console.log('');
+}
+
+/**
+ * 按 CSS 属性维度聚合（--by=property，仅 no-hardcoded-color）。
+ * 规则 message 不带属性名：这里按问题所在行推断——声明行取属性名，class 行按工具类前缀反推。
+ * 只做归类展示，不影响 eslint 判定；推断不出时归「其他」。
+ */
+if (byDimension === 'property') {
+  const lineCache = new Map();
+  const lineOf = issue => {
+    if (!lineCache.has(issue.file)) {
+      lineCache.set(issue.file, fs.readFileSync(path.join(projectRoot, issue.file), 'utf8').split('\n'));
+    }
+    return lineCache.get(issue.file)[issue.line - 1] ?? '';
+  };
+  /** 工具类前缀 → 等效 CSS 属性 */
+  const PROPERTY_BY_PREFIX = {
+    bg: 'background',
+    text: 'color',
+    border: 'border',
+    divide: 'border',
+    fill: 'fill',
+    stroke: 'stroke',
+    outline: 'outline',
+    shadow: 'box-shadow',
+    ring: 'ring',
+    from: 'gradient',
+    via: 'gradient',
+    to: 'gradient',
+  };
+  /** camelCase 样式键的前缀线索，顺序即优先级 */
+  const PROPERTY_HINT = [
+    [/background|bgcolor/i, 'background'],
+    [/border/i, 'border'],
+    [/shadow/i, 'box-shadow'],
+    [/colou?r/i, 'color'],
+  ];
+  /** 任意值工具类整段（含内部 `_`），用于按 token 区间归属命中 */
+  const ARBITRARY_TOKEN_RE = /([\w-]+)-\[[^\]]*\]/g;
+  /** 声明名：`box-shadow:` / `color="` / `style="background: …"`（容器名在后，取最后一个即为真属性） */
+  const DECL_NAME_RE = /([a-zA-Z-]+)\s*(?::\s|=["'])/g;
+  const UNKNOWN = '其他（属性 / 脚本）';
+
+  const labelOfPrefix = prefix => {
+    if (prefix.startsWith('drop-shadow')) return 'filter: drop-shadow';
+    if (prefix.startsWith('ring-offset')) return 'ring-offset';
+    return PROPERTY_BY_PREFIX[prefix.split('-')[0]] ?? UNKNOWN;
+  };
+  /** 业务样式键（iconBgColor / boxShadow）归一成 CSS 属性；已是 kebab CSS 属性（background-color）时原样保留 */
+  const asProperty = name => {
+    if (!name) return UNKNOWN;
+    return PROPERTY_HINT.find(([re]) => re.test(name))?.[1] ?? name;
+  };
+
+  const propertyOf = issue => {
+    const line = lineOf(issue);
+    const cut = Math.max(0, issue.column - 1);
+    // class 行：规则按任意值 token 的起点报列号，归属命中所在 token 的前缀。
+    // 不能取「色值前最后一个 xxx-[」——rounded-[6px] / px-[4px] / h-[32px] 会抢在真正的颜色类之前命中
+    const hit = [...line.matchAll(ARBITRARY_TOKEN_RE)].find(t => cut >= t.index && cut < t.index + t[0].length);
+    if (hit) return labelOfPrefix(hit[1]);
+    // 声明 / 属性 / 内联 style：取色值之前最后一个声明名
+    return asProperty([...line.slice(0, cut).matchAll(DECL_NAME_RE)].at(-1)?.[1]);
+  };
+
+  const byProp = new Map();
+  for (const issue of issues.filter(i => i.rule === 'theme/no-hardcoded-color')) {
+    const prop = propertyOf(issue);
+    if (!byProp.has(prop)) byProp.set(prop, []);
+    byProp.get(prop).push(issue);
+  }
+  console.log('【按属性（--by=property，仅 no-hardcoded-color）】');
+  for (const [prop, list] of [...byProp].sort((a, b) => b[1].length - a[1].length)) {
+    console.log(`  ${prop.padEnd(18)} ${list.length} 处，${new Set(list.map(i => i.file)).size} 个文件`);
+  }
   console.log('');
 }
 

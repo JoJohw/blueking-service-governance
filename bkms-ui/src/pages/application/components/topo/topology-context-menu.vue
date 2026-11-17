@@ -21,7 +21,7 @@
     <div
       v-if="visible"
       ref="menuRef"
-      class="fixed min-w-[120px] bkms-bg-card rounded-[4px] shadow-[0_4px_12px_0_rgba(0,0,0,0.14)] py-[4px] z-[9999]"
+      class="fixed min-w-[120px] bkms-bg-card rounded-[4px] shadow-[0_4px_12px_0_var(--bkms-shadow-popover)] py-[4px] z-[9999]"
       :style="menuStyle"
       @contextmenu.prevent
     >

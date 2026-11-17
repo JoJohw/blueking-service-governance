@@ -44,7 +44,7 @@
     <!-- 下方主体区域骨架 -->
     <div class="flex flex-1 mt-[2px] min-h-0">
       <!-- 左侧统计面板骨架 -->
-      <div class="w-[260px] py-[12px] px-[16px] flex flex-col shadow-[0_2px_4px_0_#0000000f]">
+      <div class="w-[260px] py-[12px] px-[16px] flex flex-col shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
         <!-- 状态标题行 -->
         <div class="flex items-center justify-between h-[40px] px-[10px]">
           <Layout.shape

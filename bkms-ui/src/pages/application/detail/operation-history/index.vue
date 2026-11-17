@@ -23,7 +23,7 @@
       class="min-h-0 flex-1 overflow-hidden p-[16px]"
     >
       <div
-        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]"
+        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-[6px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
       >
         <Skeleton
           :loading="isLoading"

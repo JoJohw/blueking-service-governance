@@ -20,8 +20,9 @@ pre-*-bkcodeai
 .env.test
 tsconfig.tsbuildinfo
 
-# 主题工具链产物（theme-codemod 脚本可重建）
+# 主题工具链产物（theme-codemod / theme-lint 脚本可重建）
 scripts/theme-codemod/reports/*
+scripts/theme-lint/reports/*
 
 # lint 缓存
 .stylelintcache

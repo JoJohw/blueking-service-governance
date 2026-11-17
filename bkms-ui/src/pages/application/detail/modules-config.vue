@@ -21,7 +21,9 @@
     ref="containerRef"
     class="h-full min-h-0 p-[16px]"
   >
-    <div class="max-h-full overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]">
+    <div
+      class="max-h-full overflow-hidden rounded-[6px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+    >
       <Skeleton
         :loading="loading"
         theme="gray"

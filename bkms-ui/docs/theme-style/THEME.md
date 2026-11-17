@@ -106,7 +106,7 @@ src/styles/theme/
 
 ## 七、映射表的可执行性
 
-- 「不替换」清单 = `keep.json` 黑名单；hex 先小写化再匹配；3 位短写展开成 6 位后仅当命中 mapping 才处理；`rgba(` 人工处理。
+- 「不替换」清单 = `keep.json` 黑名单；hex 先小写化再匹配；3 位短写展开成 6 位后仅当命中 mapping 才处理；`rgba(` 人工处理；扫描与替换排除 `src/fonts/`（iconfont 平台生成物，改了会被覆盖，与 eslint ignores 对齐）。
 - 写死 hex 报告"去重种类（113）+ 出现处数（549）"两列都输出。
 - **spec 未收录色拆分**：spec 已收录 → `mapping.json`；未收录 → `pending-design.json`（附建议归类，标注待设计拍板），不臆断。基线已于 2026-11-06 按最新设计待确认清单同步（45 项），**设计同日全部拍板按建议值替换**——45 项已收编 `mapping.json`、`pending-design.json` 清空、patches 全量换 `var(--bkms-*)`。
 - **覆写内占位清零（2026-11-06）**：覆写后新暴露的 13 种清单外 hex 分三路收编完毕——① 与设计已采纳建议值重复（1890ff/253047/d8d8d8/e6e9ea/f7f7f7）；② ΔE≤6 进最近规范色（000000/babcc0）与 spec 原色邻近（333333/fea500）；③ 借鉴"设计已采纳 45 对建议值"的实证容忍度（ΔE 中位 8.39、30/45 超 6 仍被采纳）收录剩余 3 个（333c48/aaaaaa/4070cb）。**当前覆写内 pending = 0**；`reports/pending-values.md` 仅剩 30 种未收录 hex（多为未使用组件 one-dark/ColorPicker 色），留待全局无包裹段处理。

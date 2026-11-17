@@ -265,7 +265,10 @@
     [GroupStatus.Failed]: {
       icon: Warn,
       label: t('安装失败'),
-      style: { borderColor: 'var(--bkms-danger-4)', background: '#fff0f0b3' },
+      style: {
+        borderColor: 'var(--bkms-danger-4)',
+        background: 'color-mix(in srgb, var(--bkms-bg-danger-soft) 70%, transparent)',
+      },
       theme: 'danger',
     },
     [GroupStatus.NotInstalled]: {
@@ -277,13 +280,19 @@
     [GroupStatus.PartialInstalled]: {
       icon: Info,
       label: t('部分安装'),
-      style: { borderColor: '#F9D090', background: '#fdf4e8b3' },
+      style: {
+        borderColor: '#F9D090',
+        background: 'color-mix(in srgb, var(--bkms-bg-warning-soft) 70%, transparent)',
+      },
       theme: 'warning',
     },
     [GroupStatus.Ready]: {
       icon: Success,
       label: t('已就绪'),
-      style: { borderColor: 'var(--bkms-success-4)', background: '#ebfaf0b3' },
+      style: {
+        borderColor: 'var(--bkms-success-4)',
+        background: 'color-mix(in srgb, var(--bkms-bg-success-soft) 70%, transparent)',
+      },
       theme: 'success',
     },
   };

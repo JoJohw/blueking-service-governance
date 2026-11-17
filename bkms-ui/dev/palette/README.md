@@ -24,8 +24,9 @@ npx vite build --config dev/palette/vite.config.ts
 
 左侧是分组导航（色阶 / 语义层），右侧按分组展示所有 token：
 
-- **色阶**：以色块 + 原始色值展示，如 `--bkms-brand-2` → `#3B6EF5`。
-- **语义层**：除色值外，还按 token 用途给出实际预览——文字、线条、背景、阴影等，并显示它引用的色阶和解析后的 hex。
+- **色阶**：以原始色值展示，如 `--bkms-brand-2` → `#3B6EF5`。
+- **语义层**：显示 token 引用的色阶，以及解析后的 hex；阴影组也在这里——阴影是按场景命名的效果值，直接写 8 位带 alpha 色，无法由色阶派生。
+- 两侧都会出现「用途预览」（文字 / 线条 / 背景 / 阴影）：**预览形态由 token 类别决定，与挂在哪个分区无关**——没有用途语境的原子色（品牌色、中性色、keep 级）显示纯色块。
 - 点击任意卡片复制 `var(--bkms-xxx)`，顶部会弹出复制成功提示。
 
 ### 搜索
@@ -54,6 +55,18 @@ npx vite build --config dev/palette/vite.config.ts
 ## 数据来源与口径
 
 - 色阶来自 `src/styles/theme/tokens/colors.css`，语义层来自同目录的 `semantic.css`，由 `src/util/tokens.ts` 解析。语义 token 通过 `var()` 引用色阶，工具会递归解析到最终色值。
+- CSS 本身不支持 JSDoc，`@tag` 是工具自定义、解析器自行识别的注释约定（浏览器忽略）。分组用显式起止标识符标记，描述显示在分组标题下：
+
+  ```css
+  /**
+   * @group keep            分组名，开组（必填，值即展示标题）
+   * @note 原值收编成 token   分组描述，可多行续写（@description 同义）
+   */
+  --bkms-keep-ffb848: #FFB848;
+  /* @endgroup */          闭组标识，之后到下一个 @group 之前的声明归入「未分组」
+  ```
+
+- `/** 用途 */` 仍是单条 token 的说明（原有格式）。兼容与容错：旧格式 `/* 组名（组描述） */` 继续按分组解析（semantic.css 仍用）；声明同行尾注释 `--x: #fff; /* 用途 */` 挂到该 token；非 @tag 多行块注释兜底为组描述；未知 @tag 忽略不报错。
 - 色差使用 CIEDE2000（ΔE00）。色值建议的贴近阈值为 **6**；颜色搜索的容错阈值为 **3**。
 - 工具自身的界面配色定义在 `src/shell.css`，是一组固定值，不随主题 token 变化；色块与预览展示的颜色仍取自 token 真源。
 
@@ -69,10 +82,9 @@ src/
 ├─ components/
 │  ├─ SectionPanel.vue         # 分组容器与专注模式
 │  ├─ TokenCard.vue            # 卡片通用外壳与复制
-│  ├─ RampCell.vue             # 色阶卡片
-│  ├─ SemanticCell.vue         # 语义卡片
+│  ├─ TokenCell.vue            # 卡片内容：形态由 previews 规则决定，分区只定尺寸
 │  ├─ ColorAdvisor.vue         # 色值建议面板
-│  └─ previews/                # 语义 token 的实际预览（文字/线条/背景/阴影）
+│  └─ previews/                # 按 token 类别选预览组件（文字/线条/背景/阴影/色块兜底）
 └─ util/
    ├─ tokens.ts                # 解析 CSS token、递归解析 var()
    ├─ color-diff.ts            # CIEDE2000 与颜色输入归一化

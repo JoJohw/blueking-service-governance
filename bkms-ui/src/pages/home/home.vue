@@ -342,7 +342,7 @@
     'var(--bkms-success-2)',
     'var(--bkms-warning-2)',
     'var(--bkms-purple-2)',
-    '#EF6317',
+    'var(--bkms-keep-ef6317)',
     'var(--bkms-danger-2)',
   ];
 

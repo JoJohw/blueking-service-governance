@@ -76,21 +76,13 @@
               {{ block.title }} <span>{{ block.hits.length }}</span>
             </h3>
             <div class="ramp ramp-grid">
-              <template
+              <TokenCell
                 v-for="hit in block.hits"
                 :key="hit.token.name"
-              >
-                <RampCell
-                  v-if="block.key === 'ramp'"
-                  :token="hit.token"
-                  @copy="copy"
-                />
-                <SemanticCell
-                  v-else
-                  :token="hit.token"
-                  @copy="copy"
-                />
-              </template>
+                :token="hit.token"
+                :variant="block.variant"
+                @copy="copy"
+              />
             </div>
           </section>
         </template>
@@ -123,6 +115,7 @@
           :key="group.id"
           :count="group.tokens.length"
           :focus="isFocus"
+          :note="group.note"
           :title="group.label"
         >
           <template #tools>
@@ -140,10 +133,11 @@
             name="card"
             tag="div"
           >
-            <RampCell
+            <TokenCell
               v-for="token in group.tokens"
               :key="token.name"
               :token="token"
+              variant="ramp"
               @copy="copy"
             />
           </TransitionGroup>
@@ -173,10 +167,11 @@
             name="card"
             tag="div"
           >
-            <SemanticCell
+            <TokenCell
               v-for="token in group.tokens"
               :key="token.name"
               :token="token"
+              variant="semantic"
               @copy="copy"
             />
           </TransitionGroup>
@@ -227,9 +222,8 @@
   import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 
   import ColorAdvisor from './components/ColorAdvisor.vue';
-  import RampCell from './components/RampCell.vue';
   import SectionPanel from './components/SectionPanel.vue';
-  import SemanticCell from './components/SemanticCell.vue';
+  import TokenCell from './components/TokenCell.vue';
   import { registerSearchGroups, searchTokens } from './util/search';
   import { allSemanticGroups, rampGroups } from './util/tokens';
   import { useDrag } from './util/useDrag';
@@ -246,9 +240,15 @@
   const searchHits = computed(() => searchTokens(searchQuery.value));
   const searchBlocks = computed(() =>
     [
-      { key: 'ramp', title: '色阶', hits: searchHits.value.filter(hit => hit.kind === 'ramp') },
+      {
+        key: 'ramp',
+        variant: 'ramp' as const,
+        title: '色阶',
+        hits: searchHits.value.filter(hit => hit.kind === 'ramp'),
+      },
       {
         key: 'semantic',
+        variant: 'semantic' as const,
         title: '语义层',
         hits: searchHits.value.filter(hit => hit.kind === 'semantic'),
       },

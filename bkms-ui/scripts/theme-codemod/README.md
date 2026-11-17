@@ -20,7 +20,7 @@ theme-codemod/
 | `scripts/stats-usage.mjs` | 组件使用统计 → `reports/usage.json`（生成器白名单基线）+ `reports/usage-report.md` |
 | `scripts/gen-overrides.mjs` | 双源扫描 bkui dist（style.variable.css 变量版 + style.css 字面量版），生成 `patches/bkui-theme/`（每组件一文件：变量版段 + 字面量段，字面量段压制 lib/*.less 旧色）+ `index.css` + 摘要/占位台账。缺 `usage.json` 时会提示先跑 stats-usage |
 | `scripts/check-overrides.mjs` | 漂移自检：按文件内「字面量版源」段标记切分，变量版段对 style.variable.css、字面量段对 style.css 校验选择器与原 hex 仍在，失效即 exit 1。**库升级后必跑** |
-| `scripts/codemod.mjs` | — | 业务侧 hex → `var(--bkms-*)`（Step 5 用：`scan` 只报告 / `apply [dir]` 写回） |
+| `scripts/codemod.mjs` | 业务侧 hex → `var(--bkms-*)`（Step 5 用：`scan` 只报告 / `apply [dir]` 写回）；扫描与替换均排除 `src/fonts`（iconfont 平台生成物，改了会被覆盖） |
 | `scripts/extract-root-vars.mjs` | — | 一次性：提取 bkui `:root` 变量清单（Step 0 盘点用，已完成使命） |
 
 ## data/ 数据基线
@@ -29,7 +29,7 @@ theme-codemod/
 | --- | --- |
 | `mapping.json` | hex → `--bkms-*` token 映射（设计已确认值，真源 = `bkms-color-spec.md`，不进 git，本地路径 `C:\Users\Administrator\Downloads\bkms-color-spec.md`） |
 | `keep.json` | 刻意保留原色、不替换的黑名单 |
-| `pending-design.json` | 待设计确认值（当前为空；重新积累待确认色时在此登记，设计拍板后转入 mapping） |
+| `pending-design.json` | 待设计确认值（`src` 侧仍有存量；设计拍板后转入 mapping，确认项从此文件移除） |
 | `color-diff-backup.json` | 主题改造历史颜色备份：记录按实际赋值变量计算、CIEDE2000 色差不超过 6 的 hex、对应 token、色差及来源；仅用于历史追溯与审查，不作为自动替换输入。 |
 
 ## 典型工作流

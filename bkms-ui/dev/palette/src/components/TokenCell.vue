@@ -1,33 +1,33 @@
 <template>
   <TokenCard
+    :class="`token-cell token-cell-${variant}`"
     :token="token"
-    variant="semantic"
+    :variant="variant"
     @copy="text => emit('copy', text)"
   >
     <component
       :is="preview"
-      v-if="preview"
       :token="token"
     />
     <template #meta>
       <span
         v-if="token.ref"
-        class="semantic-ref"
+        class="cell-ref"
       >
-        <span class="semantic-ref-label">引用</span>
+        <span class="cell-ref-label">引用</span>
         <code>{{ token.ref }}</code>
-        <code class="semantic-ref-hex"
-          ><span class="semantic-hex-tag">{{ resolved(token.value) }}</span></code
-        >
+        <code class="cell-ref-hex">
+          <span class="cell-hex-tag">{{ resolved(token.value) }}</span>
+        </code>
       </span>
       <span
         v-else
-        class="ramp-value"
+        class="cell-value"
         >{{ token.value }}</span
       >
       <span
         v-if="token.note"
-        class="semantic-note"
+        class="cell-note"
         >{{ token.note }}</span
       >
     </template>
@@ -41,19 +41,33 @@
   import { previewFor } from './previews';
   import TokenCard from './TokenCard.vue';
 
-  const props = defineProps<{ token: Token }>();
+  const props = defineProps<{ token: Token; variant: 'ramp' | 'semantic' }>();
   const emit = defineEmits<{ copy: [text: string] }>();
 
   const preview = computed(() => previewFor(props.token));
 </script>
 
 <style scoped>
-  .ramp-value {
+  /* 分区只影响卡片尺寸与预览高度，不决定展示形态 */
+  .token-cell-ramp {
+    --preview-h: 120px;
+    --swatch-h: 100px;
+  }
+
+  .token-cell-semantic {
+    --preview-h: 170px;
+  }
+
+  .cell-value {
     font-size: 15px;
     color: var(--pal-text-body);
   }
 
-  .semantic-ref {
+  .token-cell-ramp .cell-value {
+    font-size: 13px;
+  }
+
+  .cell-ref {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -62,7 +76,7 @@
     color: var(--pal-brand);
   }
 
-  .semantic-ref-label {
+  .cell-ref-label {
     padding: 2px 8px;
     font-size: 13px;
     color: var(--pal-brand);
@@ -71,11 +85,11 @@
     border-radius: 3px;
   }
 
-  .semantic-ref-hex {
+  .cell-ref-hex {
     color: var(--pal-text-body);
   }
 
-  .semantic-hex-tag {
+  .cell-hex-tag {
     padding: 2px 8px;
     font-size: 13px;
     color: var(--pal-text-body);
@@ -84,9 +98,13 @@
     border-radius: 3px;
   }
 
-  .semantic-note {
+  .cell-note {
     font-size: 14px;
     line-height: 1.4;
     color: var(--pal-text-body);
+  }
+
+  .token-cell-ramp .cell-note {
+    font-size: 13px;
   }
 </style>

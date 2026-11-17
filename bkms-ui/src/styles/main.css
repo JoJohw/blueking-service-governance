@@ -203,7 +203,7 @@ body,
 
   .message {
     padding: 2px 4px;
-    color: #cccccc;
+    color: var(--bkms-navy-5);
     background-color: #252526;
     border: 1px solid #007acc;
     border-radius: 3px;

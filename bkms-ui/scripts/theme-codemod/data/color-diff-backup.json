@@ -1,5 +1,5 @@
 {
-  "description": "主题改造历史中按实际赋值变量计算、CIEDE2000 色差不超过 6 的颜色与对应变量备份；不作为自动替换输入。",
+  "description": "主题改造历史中按实际赋值变量计算、CIEDE2000 色差不超过 6 的颜色与对应变量备份；同一 hex 可能因场景不同对应多个语义档位，按 usage 区分；不作为自动替换输入。",
   "distanceMetric": "CIEDE2000 (CIE 2000)",
   "threshold": 6,
   "colors": [
@@ -623,6 +623,153 @@
         "history-mapping",
         "application"
       ]
+    },
+    {
+      "hex": "#0000000D",
+      "variable": "--bkms-shadow-card",
+      "distance": 0.59,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#0000000F",
+      "variable": "--bkms-shadow-card",
+      "distance": 0.84,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#1912290D",
+      "variable": "--bkms-shadow-card",
+      "distance": 0,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#1F26870D",
+      "variable": "--bkms-shadow-card",
+      "distance": 2.06,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#00000012",
+      "variable": "--bkms-shadow-float",
+      "distance": 0.63,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#292D3314",
+      "variable": "--bkms-shadow-float",
+      "distance": 0,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#00000014",
+      "variable": "--bkms-shadow-hover",
+      "distance": 1.3,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#0000001A",
+      "variable": "--bkms-shadow-hover",
+      "distance": 0,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#0000001F",
+      "variable": "--bkms-shadow-popover",
+      "distance": 2.28,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#00000024",
+      "variable": "--bkms-shadow-popover",
+      "distance": 1.15,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#1919291F",
+      "variable": "--bkms-shadow-popover",
+      "distance": 3.17,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#00000029",
+      "variable": "--bkms-shadow-popover",
+      "distance": 0,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#0000002D",
+      "variable": "--bkms-shadow-dialog",
+      "distance": 1.44,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#CCCCCC4D",
+      "variable": "--bkms-shadow-inset",
+      "distance": 0,
+      "source": "shadow-token-migration"
+    },
+    {
+      "hex": "#FFFFFF",
+      "variable": "--bkms-bg-card",
+      "distance": 0,
+      "source": "bg-token-migration"
+    },
+    {
+      "hex": "#65C389",
+      "variable": "--bkms-success-3",
+      "distance": 0,
+      "source": "bg-token-migration"
+    },
+    {
+      "hex": "#FFF0F0B3",
+      "variable": "--bkms-bg-danger-soft",
+      "distance": 0,
+      "source": "alpha-keep"
+    },
+    {
+      "hex": "#FDF4E8B3",
+      "variable": "--bkms-bg-warning-soft",
+      "distance": 0,
+      "source": "alpha-keep"
+    },
+    {
+      "hex": "#EBFAF0B3",
+      "variable": "--bkms-bg-success-soft",
+      "distance": 0,
+      "source": "alpha-keep"
+    },
+    {
+      "hex": "#FFFFFF66",
+      "variable": "--bkms-bg-card",
+      "distance": 0,
+      "source": "alpha-keep"
+    },
+    {
+      "hex": "#C1CADB4D",
+      "variable": "--bkms-neutral-4",
+      "distance": 2.62,
+      "source": "alpha-keep"
+    },
+    {
+      "hex": "#0000001F",
+      "variable": "--bkms-shadow-hover",
+      "distance": 1.1,
+      "source": "shadow-semantic",
+      "usage": "组件配置卡片 hover"
+    },
+    {
+      "hex": "#0000001F",
+      "variable": "--bkms-shadow-float",
+      "distance": 3.24,
+      "source": "shadow-semantic",
+      "usage": "拓扑小地图面板（常驻，非浮层）"
+    },
+    {
+      "hex": "#1919291F",
+      "variable": "--bkms-shadow-hover",
+      "distance": 1.16,
+      "source": "shadow-semantic",
+      "usage": "应用详情统计卡 hover"
     }
   ]
 }

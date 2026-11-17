@@ -93,7 +93,7 @@
       <div
         v-show="showDropdown"
         ref="dropdownRef"
-        class="topo-search-dropdown fixed z-[9999] bkms-bg-card rounded-[4px] shadow-[0_3px_8px_0_rgba(0,0,0,0.16)] border bkms-line-default max-h-[320px] overflow-y-auto py-[4px]"
+        class="topo-search-dropdown fixed z-[9999] bkms-bg-card rounded-[4px] shadow-[0_3px_8px_0_var(--bkms-shadow-popover)] border bkms-line-default max-h-[320px] overflow-y-auto py-[4px]"
         :style="dropdownStyle"
       >
         <!-- 有结果 -->

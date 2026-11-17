@@ -36,7 +36,7 @@
         <div
           v-for="feature in features"
           :key="feature.title"
-          class="bg-[#ffffff66] rounded-[16px] p-[24px] shadow-[0_8px_32px_0_#1f26870d] hover:shadow-[0_4px_12px_0_rgba(0,0,0,0.08)] transition-shadow duration-200"
+          class="bg-[color-mix(in_srgb,var(--bkms-bg-card)_40%,transparent)] rounded-[16px] p-[24px] shadow-[0_8px_32px_0_var(--bkms-shadow-card)] hover:shadow-[0_4px_12px_0_var(--bkms-shadow-hover)] transition-shadow duration-200"
         >
           <!-- 特性图标预留位 -->
           <div

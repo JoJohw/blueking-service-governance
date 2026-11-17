@@ -4,7 +4,7 @@ name: 主题色值修改规范
 category: engineering
 description: 设计师改 BKMS 主题颜色 token 的规范流程：定位真源、改对层级，改完用 palette 预览对比
 tags: [theme, token, color, design, bkms]
-updated_at: 2026-11-16
+updated_at: 2026-11-17
 ---
 
 <!-- 同一 skill 同时放在 .agents/skills/ 与 .codebuddy/skills/ 两处，改动请同步 -->
@@ -17,16 +17,36 @@ updated_at: 2026-11-16
 
 ## 核心原则
 
-- `src/styles/theme/tokens/colors.css` 是**唯一允许出现色值字面量**的原子层；`semantic.css` 只引用色阶，**禁止色值字面量**。
+- `src/styles/theme/tokens/colors.css` 是**唯一允许出现色值字面量**的原子层；`semantic.css` 只引用色阶，**禁止色值字面量**——唯一例外是阴影组：阴影按场景命名、值即完整 8 位效果值，无法由色阶派生。
 - 业务/组件代码只用 `--bkms-*` 语义 token，**禁止新增硬编码色值**（stylelint `color-no-hex` 管控）。
 - 改 primitive 色阶会影响所有引用它的 semantic token；动手前先说清影响面。
 
 ## 真源
 
 - 色值真源：`bkms-color-spec.md`（**不进 git**，本地在 `C:\Users\Administrator\Downloads\bkms-color-spec.md`）。要改确认过的色值，以此为准。
-- 仓库里的落地文件：`src/styles/theme/tokens/colors.css`（色阶，唯一写 hex 的地方）和 `semantic.css`（语义，只引用色阶）。
+- 仓库里的落地文件：`src/styles/theme/tokens/colors.css`（色阶，唯一写 hex 的地方）和 `semantic.css`（语义，只引用色阶；阴影组例外）。
 
 `scripts/theme-codemod/` 下的 `mapping.json`、`keep.json`、`pending-design.json`、`color-diff-backup.json` 都是**主题改造过渡期**的迁移台账，正式版本不会保留。改现有 token 值不碰它们；只有做全仓 hex→token 批量迁移时才用得到，那不是本 skill 的场景。
+
+## token 文件的注释约定
+
+分组与说明用显式标记维护（palette 解析，CSS 本身忽略）。新增 / 调整 token 时必须同步维护，否则色板丢分组或丢说明：
+
+```css
+/**
+ * @group brand                        分组名，值即色板展示标题（开组）
+ * @note 品牌主色，7 最浅 → 1 最深        分组描述，可多行续写
+ */
+
+/** 链接、选中字 */                     每条 token 上方一行「用在」，新增 token 必须写
+--bkms-text-brand: var(--bkms-brand-2);
+
+/* @endgroup */                        闭组，之后到下一个 @group 前的声明归入「未分组」
+```
+
+- 块注释与相邻声明之间留空行（stylelint `comment-empty-line-before`）。
+- `colors.css` 的 keep 组命名即色值（`--bkms-keep-ffb848`），加色时沿用该形态。
+- 改完刷新 palette，确认分组名、分组描述、token 说明都正常显示。
 
 ## 改色流程
 

@@ -1,9 +1,14 @@
 /*
- * BKMS 语义层：只引用 colors.css 的色阶，禁止出现色值字面量（不享受 stylelint 豁免）。
+ * BKMS 语义层：只引用 colors.css 的色阶，禁止出现色值字面量（不享受 stylelint 豁免）；
+ * 唯一例外是阴影组——阴影是完整效果值、无法由色阶派生，直接写 8 位带 alpha 色。
  * 每个变量的「用在」注释与 spec 语义表同步维护。
+ * 分组标记：@group 开组（值即展示标题）、@note 分组描述、@endgroup 闭组（palette 解析约定，见 dev/palette/README.md）。
  */
 :root {
-  /* 文字 */
+  /**
+   * @group 文字
+   * @note 标题、正文、辅助字等文字用色，引用 neutral/brand 色阶
+   */
 
   /** 标题、表头字 */
   --bkms-text-title: var(--bkms-neutral-1);
@@ -23,7 +28,12 @@
   /** 主按钮字、顶栏选中字 */
   --bkms-text-inverse: var(--bkms-neutral-10);
 
-  /* 线条 */
+  /* @endgroup */
+
+  /**
+   * @group 线条
+   * @note 分割线、边框、描边，引用 neutral/brand/danger 色阶
+   */
 
   /** Dialog 顶线、分页顶线 */
   --bkms-line-light: var(--bkms-neutral-6);
@@ -43,7 +53,12 @@
   /** 警示边、校验 */
   --bkms-line-danger: var(--bkms-danger-2);
 
-  /* 背景 */
+  /* @endgroup */
+
+  /**
+   * @group 背景
+   * @note 页面、卡片、悬停与状态底，引用 neutral/brand/success/warning/danger 色阶
+   */
 
   /** 内容区底 */
   --bkms-bg-page: var(--bkms-neutral-7);
@@ -92,4 +107,37 @@
 
   /** Message 危险底 */
   --bkms-bg-danger-soft: var(--bkms-danger-7);
+
+  /* @endgroup */
+
+  /**
+   * @group 阴影
+   * @note 按场景命名的效果值：完整值直接写 8 位带 alpha 色（阴影无法由色阶派生），随暗色主题整体覆盖
+   */
+
+  /** 白卡片 */
+  --bkms-shadow-card: #1919290D;
+
+  /** 卡片悬停、筛选条 */
+  --bkms-shadow-hover: #0000001A;
+
+  /** 画布浮层、工具条、节点卡片 */
+  --bkms-shadow-float: #292D3314;
+
+  /** 内容头 */
+  --bkms-shadow-header: #0000000A;
+
+  /** 气泡、下拉 */
+  --bkms-shadow-popover: #00000029;
+
+  /** Dialog */
+  --bkms-shadow-dialog: #0003;
+
+  /** 输入框、搜索框内阴影 */
+  --bkms-shadow-inset: #CCCCCC4D;
+
+  /** 主按钮。禁用和按钮组不加；用 color-mix 等价 spec 的 #3B6EF540，随主题换色 */
+  --bkms-shadow-button: color-mix(in srgb, var(--bkms-brand-2) 25%, transparent);
+
+  /* @endgroup */
 }

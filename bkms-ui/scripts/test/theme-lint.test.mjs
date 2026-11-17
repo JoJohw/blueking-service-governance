@@ -166,7 +166,8 @@ describe('map 令牌解析', () => {
     const names = Object.keys(scale);
     expect(names.length).toBeGreaterThan(0);
     for (const name of names) {
-      expect(name).toMatch(/^bkms-[a-z-]+-\d+$/);
+      // step 是数字色阶，keep 族则是 6 位 hex（名字即色值）
+      expect(name).toMatch(/^bkms-[a-z-]+-(?:\d+|[0-9a-f]{6})$/);
       expect(scale[name]).toBe(`var(--${name})`);
     }
   });
@@ -210,7 +211,7 @@ describe('map.suggest', () => {
       expect(hex).not.toBeNull();
       const cls = suggestClass(hex, 'bg');
       expect(cls).toEqual(expect.any(String));
-      expect(cls).toMatch(/^(bkms-bg-[a-z-]+|bg-bkms-[a-z-]+-\d+)$/);
+      expect(cls).toMatch(/^(bkms-bg-[a-z-]+|bg-bkms-[a-z-]+-(?:\d+|[0-9a-f]{6}))$/);
     }
   });
 

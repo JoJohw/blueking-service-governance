@@ -45,7 +45,7 @@
 }
 
 .bkms-themed .bk-link.warning:hover {
-  color: #ffb848; /* 原值保留（keep：#ffb848） */
+  color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
 }
 
 .bkms-themed .bk-link.warning.is-disabled {

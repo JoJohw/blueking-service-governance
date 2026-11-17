@@ -5,7 +5,7 @@
 .bkms-themed .bk-date-picker-dropdown {
   background-color: var(--date-picker-dropdown-bg); /* 原值保留 */
   border: 1px solid var(--disable-color); /* 原值保留 */
-  box-shadow: 0 3px 10px color-mix(in srgb, var(--bkms-neutral-1) 10%, transparent); /* 原 #0000001a */
+  box-shadow: 0 3px 10px var(--bkms-shadow-hover); /* 原 #0000001a */
 }
 
 .bkms-themed .bk-date-picker-footer-wrapper {

@@ -18,7 +18,7 @@
 
 <template>
   <div
-    class="relative rounded-[6px] bkms-bg-page bg-[radial-gradient(circle,rgba(193,202,219,0.3)_1px,transparent_1px)] bg-[length:16px_16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+    class="relative rounded-[6px] bkms-bg-page bg-[radial-gradient(circle,color-mix(in_srgb,var(--bkms-neutral-4)_30%,transparent)_1px,transparent_1px)] bg-[length:16px_16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
   >
     <div
       id="topology-graph"
@@ -425,7 +425,8 @@
                 },
                 maskStyle: {
                   background: 'transparent',
-                  boxShadow: '0 0 10000px 10000px #0000002d',
+                  // 缩略图外遮罩：借 dialog 档位（原 #0000002d 18% → 20%），避免为一处遮罩单开令牌
+                  boxShadow: '0 0 10000px 10000px var(--bkms-shadow-dialog)',
                 },
                 filter: (id: string, elementType: string) => {
                   if (elementType !== 'node') return true;

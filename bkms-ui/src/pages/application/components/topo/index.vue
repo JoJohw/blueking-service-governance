@@ -296,7 +296,7 @@
   :deep(.custom-resize-layout) {
     .bk-resize-layout-aside {
       border-right: 0;
-      box-shadow: 0 2px 4px 0 #0000000f;
+      box-shadow: 0 2px 4px 0 var(--bkms-shadow-card);
       position: relative;
       z-index: 2;
       &::after {

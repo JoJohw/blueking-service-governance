@@ -61,6 +61,7 @@
 ```bash
 pnpm theme:report            # 存量清单：按规则+文件聚合，标出可修/有候选的数量
 pnpm theme:report --rule=theme/no-hardcoded-color
+pnpm theme:report --by=property   # 额外按 CSS 属性维度聚合（shadow / border / background…），仅 no-hardcoded-color
 pnpm lint                    # 全量走 eslint（存量未清零，会红）
 pnpm test:scripts            # 本目录的单测
 ```

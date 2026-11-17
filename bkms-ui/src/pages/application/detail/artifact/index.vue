@@ -29,7 +29,7 @@
 
       <!-- 内容区域 -->
       <div class="p-[16px] flex-1 overflow-auto">
-        <div class="overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]">
+        <div class="overflow-hidden rounded-[6px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <component :is="currentTabComponent" />
         </div>
       </div>
@@ -41,7 +41,7 @@
       <TabHeader :title="$t('制品管理')" />
 
       <div class="p-[16px] flex-1 overflow-auto">
-        <div class="overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]">
+        <div class="overflow-hidden rounded-[6px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <ContainerImage />
         </div>
       </div>

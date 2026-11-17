@@ -130,8 +130,8 @@
 }
 
 .bkms-themed .bk-button.bk-button-warning:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning:hover {
-  background-color: #ffb848; /* 原值保留（keep：#ffb848） */
-  border-color: #ffb848; /* 原值保留（keep：#ffb848） */
+  background-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
+  border-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
 }
 
 .bkms-themed .bk-button.bk-button-warning:active,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning:active {
@@ -147,8 +147,8 @@
 }
 
 .bkms-themed .bk-button.bk-button-warning.is-outline:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-outline:hover {
-  background-color: #ffb848; /* 原值保留（keep：#ffb848） */
-  border-color: #ffb848; /* 原值保留（keep：#ffb848） */
+  background-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
+  border-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
   color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
@@ -165,7 +165,7 @@
 }
 
 .bkms-themed .bk-button.bk-button-warning.is-text:not(.is-disabled):hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-text:not(.is-disabled):hover {
-  color: #ffb848; /* 原值保留（keep：#ffb848） */
+  color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
 }
 
 .bkms-themed .bk-button.bk-button-warning.is-disabled,.bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-disabled {
@@ -179,8 +179,8 @@
 }
 
 .bkms-themed .bk-button.bk-button-hover-warning:hover,.bk-button-group .is-selected:not(.is-disabled).bk-button-hover-warning:hover {
-  background-color: #ffb848; /* 原值保留（keep：#ffb848） */
-  border-color: #ffb848; /* 原值保留（keep：#ffb848） */
+  background-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
+  border-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
   color: var(--bkms-neutral-10); /* 原 #fff */
 }
 

@@ -12,6 +12,7 @@ interface SearchableGroup {
   id: string;
   kind: 'ramp' | 'semantic';
   label: string;
+  note?: string;
   tokens: Token[];
 }
 
@@ -42,7 +43,8 @@ export function searchTokens(input: string): SearchHit[] {
         token.note.toLowerCase().includes(lower) ||
         token.value.toLowerCase().includes(lower) ||
         token.ref.toLowerCase().includes(lower) ||
-        group.label.toLowerCase().includes(lower)
+        group.label.toLowerCase().includes(lower) ||
+        Boolean(group.note?.toLowerCase().includes(lower))
       ) {
         hits.push(hit);
       }

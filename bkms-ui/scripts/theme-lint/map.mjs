@@ -24,6 +24,7 @@
  *
  * 消费矩阵（class 内禁止 var()，只能用注册类）：
  *   --bkms-{family}-{step}  → text-/bg-/border-/fill-/stroke-/divide-/ring-/outline-/-{dir}- + bkms-{family}-{step}
+ *   --bkms-keep-{hex6}      → 同上色阶形态，keep 族（名字即色值，如 bg-bkms-keep-ffb848）
  *   --bkms-text-{name}      → shortcut bkms-text-{name}
  *   --bkms-bg-{name}        → shortcut bkms-bg-{name}
  *   --bkms-line-{name}      → shortcut bkms-line-{name}（方向边框除外，用色阶类保留方向）
@@ -72,10 +73,11 @@ export function normalizeHex(input) {
   return null;
 }
 
-/** 色阶：colors.css → theme.colors，类名形如 text-bkms-brand-2 / bg-bkms-cyan-6 */
+/** 色阶 + keep 令牌：colors.css → theme.colors，类名形如 text-bkms-brand-2 / bg-bkms-keep-ffb848。
+ * step 兼容 6 位 hex（keep 族命名即色值），hex 替代排在 \d+ 之后防全数字 hex 走错分支 */
 export function parseScaleColors() {
   const tokens = {};
-  for (const m of readTokenFile('colors.css').matchAll(/--bkms-([a-z-]+)-(\d+)\s*:/g)) {
+  for (const m of readTokenFile('colors.css').matchAll(/--bkms-([a-z-]+)-(\d+|[0-9a-f]{6})\s*:/g)) {
     const [, family, step] = m;
     tokens[`bkms-${family}-${step}`] = `var(--bkms-${family}-${step})`;
   }
@@ -144,10 +146,10 @@ function resolveHex(name, seen = new Set()) {
   return normalizeHex(value);
 }
 
-/** 色阶令牌：[{ name, family, step, hex }] */
+/** 色阶令牌：[{ name, family, step, hex }]（step 兼容 keep 族的 6 位 hex 后缀） */
 const SCALE = [];
 for (const name of decls.keys()) {
-  const m = name.match(/^--bkms-([a-z-]+)-(\d+)$/);
+  const m = name.match(/^--bkms-([a-z-]+)-(\d+|[0-9a-f]{6})$/);
   if (!m) continue;
   const hex = resolveHex(name);
   if (hex) SCALE.push({ name, family: m[1], step: m[2], hex });

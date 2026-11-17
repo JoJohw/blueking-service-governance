@@ -24,7 +24,7 @@
 }
 
 .bkms-themed .bk-collapse-card .bk-collapse-item {
-  box-shadow: 0 0 8px #ccc; /* 原值保留（keep：#ccc） */
+  box-shadow: 0 0 8px var(--bkms-navy-5); /* 原 #ccc */
 }
 
 .bkms-themed .bk-collapse-block .bk-collapse-item .bk-collapse-header {

@@ -115,6 +115,7 @@
   "aaaaaa": "--bkms-navy-5",
   "c4c6cc": "--bkms-navy-5",
   "c0c4cc": "--bkms-navy-5",
+  "cccccc": "--bkms-navy-5",
   "c5c7d1": "--bkms-navy-5",
   "acb9d1": "--bkms-navy-5",
   "b0bdd5": "--bkms-navy-5",
@@ -227,5 +228,16 @@
   "fdf6e5": "--bkms-warning-7",
   "fff8e6": "--bkms-warning-7",
   "ffffff": "--bkms-neutral-10",
-  "26323d": "--bkms-navy-2"
+  "26323d": "--bkms-navy-2",
+
+  "65c389": "--bkms-success-3",
+  "f9d090": "--bkms-warning-4",
+  "f8b64f": "--bkms-warning-3",
+
+  "ffb848": "--bkms-keep-ffb848",
+  "ef6317": "--bkms-keep-ef6317",
+  "144628": "--bkms-keep-144628",
+  "0f1689": "--bkms-keep-0f1689",
+  "737987": "--bkms-keep-737987",
+  "7a8193": "--bkms-keep-7a8193"
 }

@@ -59,7 +59,7 @@
     </template>
 
     <div
-      class="monitor-toolbar flex-shrink-0 border-b border-b-bkms-neutral-5 bkms-bg-card px-[24px] py-[8px] shadow-[0_3px_5.5px_0_#00000012]"
+      class="monitor-toolbar flex-shrink-0 border-b border-b-bkms-neutral-5 bkms-bg-card px-[24px] py-[8px] shadow-[0_3px_5.5px_0_var(--bkms-shadow-float)]"
     >
       <div class="flex items-center gap-[16px] min-w-0">
         <!-- 实例名称 -->
@@ -277,7 +277,7 @@
       v-bkloading="{ loading: isShow && chartPlotWidth > 0 && !queryReady }"
       class="min-h-0 flex-1 overflow-auto px-[24px] pt-[24px] pb-[24px] bkms-bg-page"
     >
-      <div class="mb-[24px] bkms-bg-card h-[48px] px-[16px] py-[8px] shadow-[0_3px_5.5px_0_#00000012]">
+      <div class="mb-[24px] bkms-bg-card h-[48px] px-[16px] py-[8px] shadow-[0_3px_5.5px_0_var(--bkms-shadow-float)]">
         <Radio.Group
           v-model="metricFilter"
           type="capsule"

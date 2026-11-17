@@ -98,7 +98,7 @@
   >
     <template #default>
       <section
-        class="bkms-sort-trigger inline-flex items-center justify-between h-[32px] min-w-[160px] pl-[12px] pr-[8px] bg-[#fff] border border-solid border-[#C1CDE5] rounded-[6px] text-[12px] text-[#4A5973] whitespace-nowrap cursor-pointer hover:border-[#8F9FBD]"
+        class="bkms-sort-trigger inline-flex items-center justify-between h-[32px] min-w-[160px] pl-[12px] pr-[8px] bkms-bg-card border border-solid border-[#C1CDE5] rounded-[6px] text-[12px] text-[#4A5973] whitespace-nowrap cursor-pointer hover:border-[#8F9FBD]"
         :class="{ 'is-open': isOpen }"
       >
         <span class="inline-flex items-center min-w-0">
@@ -252,7 +252,7 @@
     background: #fff;
     border-color: #e4e9f2;
     border-radius: 6px;
-    box-shadow: 0 2px 4px #1919290d;
+    box-shadow: 0 2px 4px var(--bkms-shadow-card);
   }
 
   .bkms-sort-popover .bkms-sort-item.bk-dropdown-item {

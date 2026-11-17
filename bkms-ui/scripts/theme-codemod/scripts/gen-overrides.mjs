@@ -21,7 +21,7 @@
  *
  * 值策略（四分类）：
  *   - mapping.json 命中（设计已确认）→ var(--bkms-*)，行尾注释原值
- *   - keep.json 命中（本就不变）→ 不生成
+ *   - keep 双源命中（keep.json / colors.css token 值，本就不变）→ 不生成
  *   - pending-design.json / 未收录（未确认）→ 组件库原色值占位，行尾 `/* pending * /` 标记
  *   - 渐变/阴影函数内含任一未确认 hex → 整条声明占位（不做局部替换）
  *
@@ -61,15 +61,37 @@ const MAPPING = readJson('../data/mapping.json');
 const KEEP = readJson('../data/keep.json');
 const PENDING = readJson('../data/pending-design.json');
 
-// 令牌定义值索引：8 位源 hex 若与令牌值完全一致，直接 var() 引用（令牌自带 alpha 时 color-mix 会二次衰减）
-const colorsText = fs.readFileSync(path.join(ROOT, 'src/styles/theme/tokens/colors.css'), 'utf8');
+// 令牌定义值索引：8 位源 hex 若与令牌值完全一致，直接 var() 引用（令牌自带 alpha 时 color-mix 会二次衰减）。
+// 两个令牌文件都读：阴影令牌在 semantic.css，漏读会让 8 位精确命中失效
+const colorsText = ['colors.css', 'semantic.css']
+  .map(name => fs.readFileSync(path.join(ROOT, 'src/styles/theme/tokens', name), 'utf8'))
+  .join('\n');
 const TOKEN_HEX = new Map();
 for (const cm of colorsText.matchAll(/(--bkms-[a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{3,8})\b/g)) {
   TOKEN_HEX.set(cm[1], cm[2].toLowerCase());
 }
 
+/** 8 位源 hex → 令牌精确值索引：值完全一致直接 var() 引用（补 mapping 反查之外的值维度，避免摘掉 mapping 条目后精确场景落入 pending） */
+const TOKEN_BY_HEX8 = new Map();
+for (const [name, hex] of TOKEN_HEX) {
+  if (hex.length === 9) TOKEN_BY_HEX8.set(hex, name);
+}
+
 const PENDING_KEYS = new Set(Object.keys(PENDING));
 const KEEP_KEYS = new Set(Object.keys(KEEP));
+/** keep 判定双源开关，可独立启停（keep.json 退役时关 keepJson 位） */
+const KEEP_SOURCES = { keepJson: true, tokenValue: true };
+
+/** colors.css 令牌值反查集（3 位写法先展开，8 位阴影值不参与） */
+const TOKEN_VALUE_SET = new Set();
+for (const h of TOKEN_HEX.values()) {
+  let hex6 = h.slice(1);
+  if (hex6.length === 3) hex6 = hex6
+    .split('')
+    .map(c => c + c)
+    .join('');
+  if (hex6.length === 6) TOKEN_VALUE_SET.add(hex6);
+}
 const WHITELIST = new Set(usage.components.map(c => c.kebab));
 
 /** 台账收编：真实渲染但不在 usage 白名单的类前缀。
@@ -110,9 +132,15 @@ const HEX_TOKEN_RE = /#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b/g;
 /** 单个 hex token 的归类：token | keep | pending（含 unknown） */
 function classifyHex(hex8) {
   const base6 = hex8.slice(0, 6);
-  if (KEEP_KEYS.has(base6)) return { kind: 'keep', base6 };
+  // 8 位精确命中排在前：基色可能已另有归属（如 #cccccc4d 的基色 cccccc 是 navy-5），
+  // 但完整值已有专属令牌（--bkms-shadow-inset），应按精确值收编
+  if (hex8.length === 8 && TOKEN_BY_HEX8.has(`#${hex8}`)) {
+    return { kind: 'token', base6, token: TOKEN_BY_HEX8.get(`#${hex8}`) };
+  }
+  if (KEEP_SOURCES.keepJson && KEEP_KEYS.has(base6)) return { kind: 'keep', base6 };
   const token = MAPPING[base6];
   if (token) return { kind: 'token', base6, token };
+  if (KEEP_SOURCES.tokenValue && TOKEN_VALUE_SET.has(base6)) return { kind: 'keep', base6 };
   return { kind: 'pending', base6 };
 }
 
@@ -298,7 +326,12 @@ function scanDist(file, patchesMap, trackUnassigned) {
         for (const m of d.value.matchAll(HEX_TOKEN_RE)) {
           const h = normalizeHex(m[0]);
           const base = h.slice(0, 6);
-          if (!KEEP_KEYS.has(base) && !MAPPING[base] && !PENDING_KEYS.has(base)) {
+          if (
+            !(KEEP_SOURCES.keepJson && KEEP_KEYS.has(base))
+            && !MAPPING[base]
+            && !(KEEP_SOURCES.tokenValue && TOKEN_VALUE_SET.has(base))
+            && !PENDING_KEYS.has(base)
+          ) {
             if (!unknownHexes.has(base)) unknownHexes.set(base, new Set());
             unknownHexes.get(base).add(rule.selector);
           }

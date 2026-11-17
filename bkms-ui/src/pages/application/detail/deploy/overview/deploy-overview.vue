@@ -107,7 +107,7 @@
           v-for="stat in stats"
           :key="stat.key"
           :class="[
-            'flex min-w-0 cursor-pointer items-center justify-between gap-[12px] rounded-[6px] bkms-bg-card px-[16px] py-[12px] text-left shadow-[0_2px_4px_0_var(--bkms-shadow-card)] hover:shadow-[0_2px_8px_0_#1919291f]',
+            'flex min-w-0 cursor-pointer items-center justify-between gap-[12px] rounded-[6px] bkms-bg-card px-[16px] py-[12px] text-left shadow-[0_2px_4px_0_var(--bkms-shadow-card)] hover:shadow-[0_2px_8px_0_var(--bkms-shadow-hover)]',
             activeStat === stat.key ? '!bkms-bg-active outline outline-[1px] outline-bkms-brand-2' : '',
           ]"
           type="button"

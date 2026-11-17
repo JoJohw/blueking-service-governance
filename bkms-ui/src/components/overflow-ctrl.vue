@@ -173,12 +173,12 @@
 
     &.left {
       left: 0;
-      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 2px 0 4px var(--bkms-shadow-hover);
     }
 
     &.right {
       right: 0;
-      box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+      box-shadow: -2px 0 4px var(--bkms-shadow-hover);
     }
   }
 </style>

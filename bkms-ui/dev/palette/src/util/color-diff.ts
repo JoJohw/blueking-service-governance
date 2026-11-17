@@ -127,13 +127,32 @@ function hslToRgb(h: number, s: number, l: number): number[] {
   return table[sector].map(channel => (channel + m) * 255);
 }
 
-/** 归一化输入：hex / rgb() / rgba() / hsl() / hsla() → 大写 6 位 hex；无法识别返回 null */
+/** alpha 合成到白底：阴影只靠 alpha 区分，截断 alpha 会让色差恒为 0，
+ * 与 color-diff-backup.json 的阴影记录（按合成后的值算）保持同一口径 */
+function flattenAlpha(hex6: string, alpha: number): string {
+  if (!(alpha >= 0 && alpha < 1)) return hex6;
+  const channels = [0, 1, 2].map(index => {
+    const channel = Number.parseInt(hex6.slice(1 + index * 2, 3 + index * 2), 16);
+    return channel * alpha + 255 * (1 - alpha);
+  });
+  return toHex(channels);
+}
+
+function parseAlpha(part: string | undefined): number {
+  if (!part) return 1;
+  const value = Number.parseFloat(part);
+  if (!Number.isFinite(value)) return 1;
+  return part.endsWith('%') ? value / 100 : value;
+}
+
+/** 归一化输入：hex / rgb() / rgba() / hsl() / hsla() → 大写 6 位 hex（带 alpha 的合成到白底）；无法识别返回 null */
 export function normalizeHex(input: string): null | string {
   const value = input.trim();
   const hex = /^#?([\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/i.exec(value)?.[1];
   if (hex) {
     const full = hex.length === 3 ? hex.replace(/./g, char => char + char) : hex;
-    return `#${full.slice(0, 6).toUpperCase()}`;
+    const rgb = `#${full.slice(0, 6).toUpperCase()}`;
+    return full.length === 8 ? flattenAlpha(rgb, Number.parseInt(full.slice(6, 8), 16) / 255) : rgb;
   }
   const parts = value
     .replace(/^(rgb|rgba|hsl|hsla)\(/i, '')
@@ -148,8 +167,9 @@ export function normalizeHex(input: string): null | string {
     const s = Number.parseFloat(parts[1]);
     const l = Number.parseFloat(parts[2]);
     if (![h, s, l].every(Number.isFinite)) return null;
-    return toHex(
-      hslToRgb(h, Number.parseFloat(s) / 100, Number.parseFloat(l) / 100),
+    return flattenAlpha(
+      toHex(hslToRgb(h, Number.parseFloat(s) / 100, Number.parseFloat(l) / 100)),
+      parseAlpha(parts[3]),
     );
   }
   const channels = parts.slice(0, 3).map(part => {
@@ -157,5 +177,5 @@ export function normalizeHex(input: string): null | string {
     return Number.isFinite(num) ? Math.round(Math.min(255, Math.max(0, num))) : NaN;
   });
   if (channels.some(Number.isNaN)) return null;
-  return toHex(channels);
+  return flattenAlpha(toHex(channels), parseAlpha(parts[3]));
 }

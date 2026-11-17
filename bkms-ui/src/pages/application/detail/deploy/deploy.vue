@@ -263,7 +263,7 @@
               </div>
             </template>
           </Alert>
-          <div class="rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]">
+          <div class="rounded-[6px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
             <template v-if="isMultiEnvMode || isDeployStatusVisible">
               <!-- 单环境 -->
               <InstanceList

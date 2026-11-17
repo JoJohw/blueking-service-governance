@@ -485,7 +485,7 @@
 
       &::-webkit-scrollbar-thumb {
         background: var(--bkms-neutral-5);
-        box-shadow: inset 0 0 6px #cccccc4d;
+        box-shadow: inset 0 0 6px var(--bkms-shadow-inset);
 
         &:hover {
           background: var(--bkms-neutral-5);

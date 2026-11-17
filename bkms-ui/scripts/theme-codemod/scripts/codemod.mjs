@@ -19,7 +19,7 @@
 
 /**
  * theme codemod：业务侧 hex → var(--bkms-*)
- * 数据源：mapping.json（spec 颜色映射）/ keep.json（不替换清单）/ pending-design.json（待设计确认）
+ * 数据源：mapping.json（spec 颜色映射）/ keep 判定双源（keep.json + colors.css token 值）/ pending-design.json（待设计确认）
  *
  * 用法：
  *   node codemod.mjs bkui   扫描 bkui dist style.variable.css，输出未覆盖色清单（供 pending-design）
@@ -30,6 +30,7 @@
  * - 先小写化再匹配；仅 6 位 hex（词边界），8 位 hex（带 alpha）整体跳过
  * - 3 位短写先展开成 6 位，仅当命中 mapping 才替换，命中 keep 或未命中一律不动
  * - rgba( 不进脚本
+ * - src/fonts 不扫描不替换（iconfont 平台生成物，与 eslint ignores 对齐）
  * - 报告同时输出「色值种类数」与「出现处数」两列
  */
 import fs from 'node:fs';
@@ -40,6 +41,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../../..');
 const MAPPING = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/mapping.json'), 'utf8'));
 const KEEP = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/keep.json'), 'utf8'));
+/** keep 判定双源开关，可独立启停（keep.json 退役时关 keepJson 位） */
+const KEEP_SOURCES = { keepJson: true, tokenValue: true };
+
+/** colors.css 令牌值反查集：值命中视为 keep（3 位写法先展开，8 位阴影值不参与） */
+const TOKEN_VALUES = new Set();
+for (const m of fs
+  .readFileSync(path.join(ROOT, 'src/styles/theme/tokens/colors.css'), 'utf8')
+  .matchAll(/--bkms-[\w-]+\s*:\s*#([0-9a-fA-F]{3,8})\b/g)) {
+  let h = m[1].toLowerCase();
+  if (h.length === 3) h = h
+    .split('')
+    .map(c => c + c)
+    .join('');
+  if (h.length === 6) TOKEN_VALUES.add(h);
+}
 const PENDING_FILE = path.join(__dirname, '../data/pending-design.json');
 const PENDING = fs.existsSync(PENDING_FILE) ? JSON.parse(fs.readFileSync(PENDING_FILE, 'utf8')) : {};
 
@@ -79,7 +95,7 @@ function applyReplacements() {
 // 命中分类：mapping / keep / pending / unknown
 function classify(hex6) {
   if (MAPPING[hex6]) return 'mapping';
-  if (KEEP[hex6]) return 'keep';
+  if ((KEEP_SOURCES.keepJson && KEEP[hex6]) || (KEEP_SOURCES.tokenValue && TOKEN_VALUES.has(hex6))) return 'keep';
   if (PENDING[hex6]) return 'pending';
   return 'unknown';
 }
@@ -171,10 +187,14 @@ function sourceFiles(target = targetArg) {
   return walk(targetPath).filter(file => !TOKEN_FILES.includes(path.resolve(file)));
 }
 
+/** src/fonts 是 iconfont 平台生成物，改了会被覆盖（与 eslint.config.mjs ignores 对齐），不参与扫描替换 */
+const EXCLUDED_PATHS = new Set([path.join(ROOT, 'src/fonts')]);
+
 function walk(dir, files = []) {
   for (const name of fs.readdirSync(dir)) {
     if (name === 'node_modules' || name === 'dist' || name === '.git') continue;
     const full = path.join(dir, name);
+    if (EXCLUDED_PATHS.has(full)) continue;
     const stat = fs.statSync(full);
     if (stat.isDirectory()) walk(full, files);
     else if (EXTS.has(path.extname(name))) files.push(full);

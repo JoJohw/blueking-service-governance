@@ -47,7 +47,7 @@
           <Layout.shape :width="400" />
           <Layout.table class="mt-[10px]" />
         </template>
-        <div class="overflow-hidden rounded-[6px] bg-[#fff] p-[16px] shadow-[0_2px_4px_0_#1919290d]">
+        <div class="overflow-hidden rounded-[6px] bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <FlexRow>
             <template #left>
               <div class="flex">
@@ -399,7 +399,7 @@
     RUNNING: 'text-bkms-brand-3',
     SUCCEED: 'text-bkms-success-2',
     FAILED: 'text-bkms-danger-2',
-    UNKNOWN: 'text-[#ffb848]',
+    UNKNOWN: 'text-bkms-keep-ffb848',
   };
   const failedStatus = ['failed', 'pollingBroken'];
 

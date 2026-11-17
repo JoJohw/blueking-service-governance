@@ -33,7 +33,7 @@
     <template v-if="isIntersecting">
       <div
         :class="[
-          'relative flex items-center px-[8px] py-[4px] rounded-[10px] border border-bkms-neutral-10 shadow-[0_4px_8px_0_rgba(41,45,51,0.08)]',
+          'relative flex items-center px-[8px] py-[4px] rounded-[10px] border border-bkms-neutral-10 shadow-[0_4px_8px_0_var(--bkms-shadow-float)]',
           data.data?.kind !== 'App' ? 'topo-node cursor-pointer' : '',
         ]"
         :style="nodeStyle"
@@ -121,7 +121,7 @@
     </template>
     <div
       v-else
-      class="bkms-bg-card rounded-[10px] shadow-[0_4px_8px_0_rgba(41,45,51,0.08)]"
+      class="bkms-bg-card rounded-[10px] shadow-[0_4px_8px_0_var(--bkms-shadow-float)]"
       :style="{
         width: `${NODE_WIDTH}px`,
         height: `${NODE_HEIGHT}px`,

@@ -488,7 +488,7 @@
 
 <style scoped>
   .chart-card-item {
-    box-shadow: 0 2px 4px 0 #1912290d;
+    box-shadow: 0 2px 4px 0 var(--bkms-shadow-card);
   }
 
   /* 隐藏 ExploreChart 内部 CommonLegend（图例已迁移到右侧 Table） */
