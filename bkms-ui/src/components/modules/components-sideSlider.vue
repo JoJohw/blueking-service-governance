@@ -141,10 +141,7 @@
                       v-for="(item, index) in curComponentList"
                       :key="`${index}-${item?.name}`"
                       :active="item.name === curComponent?.name"
-                      :class="[
-                        'mt-[16px]',
-                        { 'bkms-bg-brand-soft !bkms-line-active': activeIndex === index },
-                      ]"
+                      :class="['mt-[16px]', { 'bkms-bg-brand-soft !bkms-line-active': activeIndex === index }]"
                       :data="item"
                       :disabled="disabledFn?.(item)"
                       :disabled-text="$t('应用必须且只有一个部署类组件，无法新增部署组件。')"
@@ -243,13 +240,13 @@
             </Button>
             <template v-else>
               <Input
-                class="box-content"
+                class="component-picker-input box-content"
                 disabled
                 :model-value="curComponent?.displayName || curComponent?.name || '--'"
               >
                 <template #suffix>
                   <Button
-                    class="!min-w-[60px] rounded-[0_2px_2px_0] text-[12px]"
+                    class="component-picker-reselect !min-w-[60px] text-[12px]"
                     :disabled="!!data"
                     theme="primary"
                     @click="handleReSelect"
@@ -517,7 +514,6 @@
             >{{ $t('试运行') }}</Button
           >
           <Button
-            class="ml-[8px]"
             :disabled="isTrialRunning"
             @click="handleCancel"
             >{{ $t('取消') }}</Button
@@ -536,7 +532,6 @@
             >{{ $t('提交') }}</Button
           >
           <Button
-            class="ml-[8px]"
             :disabled="btnLoading"
             @click="handleCancel"
             >{{ $t('取消') }}</Button
@@ -1210,12 +1205,24 @@
       width: 4px;
     }
   }
+
   :deep(.bk-sideslider-footer) {
-    margin-top: 0px;
+    margin-top: 0;
   }
+
   :deep(.bk-exception-part .bk-exception-img) {
     width: 320px;
     height: 160px;
+  }
+
+  /* 组件名与「重选」拼成一条：外框 6px，衔接处直角 */
+  :deep(.component-picker-input.bk-input) {
+    border-radius: 6px;
+  }
+
+  :deep(.component-picker-reselect.bk-button) {
+    height: 100%;
+    border-radius: 0 6px 6px 0 !important;
   }
 
   /** 不预留滚动条位置，避免侧栏有类似padding的效果 */

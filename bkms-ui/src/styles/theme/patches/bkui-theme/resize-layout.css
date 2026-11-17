@@ -3,23 +3,24 @@
 /* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
 
 .bkms-themed .bk-resize-layout-border {
-  border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  /* 仅覆盖颜色：宽度/样式由基础层 .bk-resize-layout-border 的 border 声明提供 */
+  border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-resize-layout-left>.bk-resize-layout-aside {
-  border-right: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  border-right-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-resize-layout-right>.bk-resize-layout-aside {
-  border-left: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  border-left-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-resize-layout-top>.bk-resize-layout-aside {
-  border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  border-bottom-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-resize-layout-bottom>.bk-resize-layout-aside {
-  border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
+  border-top-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-resize-layout>.bk-resize-layout-aside:after {

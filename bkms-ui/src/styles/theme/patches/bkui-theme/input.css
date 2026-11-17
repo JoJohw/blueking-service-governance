@@ -37,7 +37,9 @@
 }
 
 .bkms-themed .bk-input {
-  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  /* 仅覆盖颜色：宽度/样式由基础层 .bk-input 的 border 声明提供，避免以更高优先级
+     的完整 border 简写压制业务侧 border:none 的局部覆写 */
+  border-color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-input ::placeholder {
