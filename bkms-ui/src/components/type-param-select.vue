@@ -93,11 +93,11 @@
                   <div class="grid grid-cols-2 w-[442px]">
                     <span class="text-[12px]">
                       {{ $t('选项文本（用于显示）') }}
-                      <span class="text-[#f87171] text-[14px]">*</span>
+                      <span class="text-bkms-danger-3 text-[14px]">*</span>
                     </span>
                     <span class="text-[12px]">
                       {{ $t('选项值') }}
-                      <span class="text-[#f87171] text-[14px]">*</span>
+                      <span class="text-bkms-danger-3 text-[14px]">*</span>
                     </span>
                   </div>
                 </template>

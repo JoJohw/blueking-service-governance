@@ -19,7 +19,7 @@
 <template>
   <div
     v-if="pendingRedeployGroups.length"
-    class="pending-redeploy-panel mb-[16px] overflow-hidden rounded-[2px] border border-[#F9D090]"
+    class="pending-redeploy-panel mb-[16px] overflow-hidden rounded-[2px] border border-bkms-warning-4"
   >
     <div
       class="flex cursor-pointer items-center justify-between bkms-bg-warning-soft px-[16px] py-[8px]"

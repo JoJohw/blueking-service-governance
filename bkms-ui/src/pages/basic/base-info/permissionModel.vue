@@ -44,7 +44,6 @@
       </template>
     </TableColumn>
     <TableColumn
-      class-name="last:bg-[blue]"
       field="operation"
       :label="$t('操作')"
     >

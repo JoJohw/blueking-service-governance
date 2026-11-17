@@ -30,7 +30,7 @@
       />
       <Success
         v-else-if="alertTheme === 'success'"
-        fill="#65C389"
+        fill="var(--bkms-success-3)"
         height="16px"
         width="16px"
       />

@@ -21,7 +21,7 @@
     <!-- 文件列表面板 -->
     <CollapsiblePanel
       v-model:collapsed="isFileListCollapsed"
-      panel-class="box-shadow-[#191929] bkms-bg-card"
+      panel-class="box-shadow-[var(--bkms-navy-1)] bkms-bg-card"
       position="left"
       :width="260"
     >
@@ -210,7 +210,7 @@
                       width="240"
                     >
                       <Tag
-                        class="!text-bkms-brand-5 !bg-[#2759AE] ml-[4px] h-[16px] text-[10px] px-[4px]"
+                        class="!text-bkms-brand-5 !bg-bkms-brand-1 ml-[4px] h-[16px] text-[10px] px-[4px]"
                         theme="info"
                       >
                         {{ $t('覆盖层') }}
@@ -235,7 +235,7 @@
                       theme="light"
                     >
                       <Tag
-                        class="!text-bkms-warning-7 !bg-[#6D5B42] ml-[4px] h-[16px] text-[10px] px-[4px]"
+                        class="!text-bkms-warning-7 !bg-bkms-keep-6d5b42 ml-[4px] h-[16px] text-[10px] px-[4px]"
                         theme="warning"
                       >
                         BSCP

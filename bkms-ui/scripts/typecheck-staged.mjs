@@ -131,9 +131,22 @@ const createExplicitAnyEslintConfig = () => `import tsParser from '@typescript-e
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import vueParser from 'vue-eslint-parser';
 
-const explicitAnyRule = {
-  plugins: { '@typescript-eslint': tsPlugin },
+// 只声明规则名、不实现：hook 只跑 no-explicit-any，项目里的 theme disable 注释需要能被解析，
+// 未注册规则名会让 ESLint 直接报 "Definition for rule ... was not found"。
+const themeStub = {
+  rules: {
+    'no-hardcoded-color': { create: () => ({}) },
+    'no-foreign-var': { create: () => ({}) },
+    'no-default-palette': { create: () => ({}) },
+    'prefer-uno-class': { create: () => ({}) },
+  },
+};
+
+const sharedConfig = {
+  plugins: { '@typescript-eslint': tsPlugin, theme: themeStub },
   rules: { '@typescript-eslint/no-explicit-any': 'error' },
+  // 主题规则不参与本次检查，disable 注释压不到东西，不关会产出未使用指令告警
+  linterOptions: { reportUnusedDisableDirectives: 'off' },
 };
 
 export default [
@@ -143,7 +156,7 @@ export default [
       parser: tsParser,
       parserOptions: { ecmaVersion: 'latest', jsx: true, sourceType: 'module' },
     },
-    ...explicitAnyRule,
+    ...sharedConfig,
   },
   {
     files: ['**/*.vue'],
@@ -156,7 +169,7 @@ export default [
         sourceType: 'module',
       },
     },
-    ...explicitAnyRule,
+    ...sharedConfig,
   },
 ];
 `;

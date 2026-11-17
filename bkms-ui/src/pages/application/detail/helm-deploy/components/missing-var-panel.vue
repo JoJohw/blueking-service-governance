@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="rounded-[2px] border border-[#F9D090] bkms-bg-warning-soft px-[12px]">
+  <div class="rounded-[2px] border border-bkms-warning-4 bkms-bg-warning-soft px-[12px]">
     <!-- Header -->
     <div
       class="flex cursor-pointer items-center justify-between py-[8px]"
@@ -51,7 +51,7 @@
     <transition name="collapse">
       <div
         v-show="!collapsed"
-        class="border-t border-[#F9D090] py-[8px]"
+        class="border-t border-bkms-warning-4 py-[8px]"
       >
         <!-- description -->
         <slot />

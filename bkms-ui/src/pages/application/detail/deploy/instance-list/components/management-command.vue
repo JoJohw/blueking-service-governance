@@ -328,7 +328,7 @@
                   :class="[
                     'h-[32px] leading-[32px] px-[12px]',
                     'hover:bg-bkms-neutral-6 cursor-pointer',
-                    { '!bg-[#d1e8ff] bkms-text-brand': curInstance?.instanceID === item.instanceID },
+                    { '!bkms-bg-active bkms-text-brand': curInstance?.instanceID === item.instanceID },
                   ]"
                   @click="handleClickInstance(item)"
                 >

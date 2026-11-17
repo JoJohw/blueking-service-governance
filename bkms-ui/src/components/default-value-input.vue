@@ -26,7 +26,7 @@
   >
     <Input
       v-model.trim="value"
-      :class="isShowChange ? '!border-[#F8B64F]' : ''"
+      :class="isShowChange ? '!border-bkms-warning-3' : ''"
       clearable
       :placeholder="inputConfig?.placeholder"
       :style="widthStyle"
@@ -44,7 +44,7 @@
   <Input
     v-else
     v-model.trim="value"
-    :class="isShowChange ? '!border-[#F8B64F]' : ''"
+    :class="isShowChange ? '!border-bkms-warning-3' : ''"
     clearable
     :placeholder="inputConfig?.placeholder"
     :style="widthStyle"

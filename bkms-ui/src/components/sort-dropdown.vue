@@ -98,7 +98,7 @@
   >
     <template #default>
       <section
-        class="bkms-sort-trigger inline-flex items-center justify-between h-[32px] min-w-[160px] pl-[12px] pr-[8px] bkms-bg-card border border-solid border-[#C1CDE5] rounded-[6px] text-[12px] text-[#4A5973] whitespace-nowrap cursor-pointer hover:border-[#8F9FBD]"
+        class="bkms-sort-trigger inline-flex items-center justify-between h-[32px] min-w-[160px] pl-[12px] pr-[8px] bkms-bg-card border border-solid border-bkms-neutral-4 rounded-[6px] text-[12px] text-bkms-neutral-2 whitespace-nowrap cursor-pointer hover:border-bkms-neutral-3"
         :class="{ 'is-open': isOpen }"
       >
         <span class="inline-flex items-center min-w-0">
@@ -121,7 +121,7 @@
         </span>
         <svg
           aria-hidden="true"
-          class="bkms-sort-caret text-[#8F9FBD] transition-transform duration-200"
+          class="bkms-sort-caret text-bkms-neutral-3 transition-transform duration-200"
           :class="{ 'rotate-180': !isOpen }"
           viewBox="0 0 12 12"
         >
@@ -173,7 +173,7 @@
 
 <style scoped>
   .bkms-sort-trigger.is-open {
-    border-color: #3b6ef5;
+    border-color: var(--bkms-brand-2);
   }
 
   .bkms-sort-tag {
@@ -183,37 +183,37 @@
     height: 20px;
     padding: 2px 8px;
     font-size: 10px;
-    color: #4a5973;
+    color: var(--bkms-neutral-2);
     cursor: pointer;
-    background: #f7f9fd;
-    border: 1px solid #e4e9f2;
+    background: var(--bkms-neutral-8);
+    border: 1px solid var(--bkms-neutral-5);
     border-radius: 6px;
   }
 
   .bkms-sort-tag:hover {
-    background: #e4e9f2;
+    background: var(--bkms-neutral-5);
   }
 
   .bkms-sort-trigger-tag {
     padding: 0 6px;
     margin-right: 4px;
-    color: #4a5973;
-    background: #e9edf5;
+    color: var(--bkms-neutral-2);
+    background: var(--bkms-neutral-6);
     border-color: transparent;
   }
 
   .bkms-sort-trigger-tag:hover {
-    background: #e4e9f2;
+    background: var(--bkms-neutral-5);
   }
 
   .bkms-sort-tag.is-active {
-    color: #3b6ef5;
-    background: #e5edff;
+    color: var(--bkms-brand-2);
+    background: var(--bkms-brand-6);
     border-color: transparent;
   }
 
   .bkms-sort-tag.is-active:hover {
-    background: #99b9ff;
+    background: var(--bkms-brand-4);
   }
 
   .bkms-sort-caret {
@@ -226,7 +226,7 @@
     width: 12px;
     height: 12px;
     margin-right: 2px;
-    fill: #8f9fbd;
+    fill: var(--bkms-neutral-3);
     transform: rotate(90deg);
   }
 
@@ -240,7 +240,7 @@
   }
 
   .bkms-sort-tag.is-active .bkms-sort-arrow {
-    fill: #3b6ef5;
+    fill: var(--bkms-brand-2);
   }
 </style>
 
@@ -249,8 +249,8 @@
   .bkms-sort-popover.bk-dropdown-popover .bk-dropdown-menu.bkms-sort-menu {
     min-width: 230px;
     padding: 4px 0;
-    background: #fff;
-    border-color: #e4e9f2;
+    background: var(--bkms-neutral-10);
+    border-color: var(--bkms-neutral-5);
     border-radius: 6px;
     box-shadow: 0 2px 4px var(--bkms-shadow-card);
   }
@@ -264,18 +264,18 @@
     padding: 6px 8px;
     font-size: 12px;
     line-height: 20px;
-    color: #8f9fbd;
+    color: var(--bkms-neutral-3);
     background: transparent;
   }
 
   .bkms-sort-popover .bkms-sort-item.bk-dropdown-item:hover {
-    color: #4a5973;
+    color: var(--bkms-neutral-2);
     background: transparent;
   }
 
   .bkms-sort-popover .bkms-sort-item.bk-dropdown-item.is-active,
   .bkms-sort-popover .bkms-sort-item.bk-dropdown-item.is-active:hover {
-    color: #3b6ef5;
-    background: #f0f4ff;
+    color: var(--bkms-brand-2);
+    background: var(--bkms-brand-7);
   }
 </style>

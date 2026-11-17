@@ -1,6 +1,5 @@
 /**
- * CIEDE2000 色差计算，口径对齐 scripts/theme-codemod/data/color-diff-backup.json。
- * 仓库现有脚本只有数据没有实现，这里按 ISO/CIE 标准公式补齐，供色值建议工具使用。
+ * CIEDE2000 色差计算，按 ISO/CIE 标准公式实现，供色值建议工具（theme-lint / dev/palette）使用。
  */
 
 function srgbToLinear(value: number): number {
@@ -127,8 +126,7 @@ function hslToRgb(h: number, s: number, l: number): number[] {
   return table[sector].map(channel => (channel + m) * 255);
 }
 
-/** alpha 合成到白底：阴影只靠 alpha 区分，截断 alpha 会让色差恒为 0，
- * 与 color-diff-backup.json 的阴影记录（按合成后的值算）保持同一口径 */
+/** alpha 合成到白底：阴影只靠 alpha 区分，截断 alpha 会让色差恒为 0 */
 function flattenAlpha(hex6: string, alpha: number): string {
   if (!(alpha >= 0 && alpha < 1)) return hex6;
   const channels = [0, 1, 2].map(index => {

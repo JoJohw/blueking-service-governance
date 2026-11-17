@@ -17,9 +17,9 @@
 -->
 
 <template>
-  <div class="border border-[#e5e7eb] bkms-text-body">
+  <div class="border bkms-line-light bkms-text-body">
     <div
-      class="grid grid-cols-2 h-[40px] items-center border-b border-b-[#e5e7eb] bg-[#f8f8f9] bkms-text-title text-[13px]"
+      class="grid grid-cols-2 h-[40px] items-center border-b border-b-bkms-neutral-6 bkms-bg-head bkms-text-title text-[13px]"
     >
       <div class="min-w-0 px-[16px]">
         {{ $t('应用名称') }}
@@ -32,7 +32,7 @@
       <div
         v-for="app in deployedApps"
         :key="`${app.appName}-${app.appType}-${app.deployStatus}`"
-        class="grid grid-cols-2 h-[40px] items-center border-b border-b-[#e5e7eb] last:border-b-0"
+        class="grid grid-cols-2 h-[40px] items-center border-b border-b-bkms-neutral-6 last:border-b-0"
       >
         <div
           class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap px-[16px]"

@@ -43,8 +43,8 @@
           :key="row.key"
         >
           <td>{{ row.label }}</td>
-          <td class="text-[#b34747] bg-[#fff5f5]">{{ row.previous }}</td>
-          <td class="text-[#2d8a54] bg-[#f0fff4]">{{ row.current }}</td>
+          <td class="text-bkms-danger-2 bkms-bg-danger-soft">{{ row.previous }}</td>
+          <td class="text-bkms-success-1 bkms-bg-success-soft">{{ row.current }}</td>
         </tr>
       </tbody>
     </table>

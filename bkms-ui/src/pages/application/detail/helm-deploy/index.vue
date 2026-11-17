@@ -74,7 +74,7 @@
             theme="light"
           >
             <Ellipsis
-              class="transform-rotate-90 w-[24px] h-[24px] p-[3px] rounded-full cursor-pointer bkms-text-body text-[20px] hover:bg-[#e5e7eb]"
+              class="transform-rotate-90 w-[24px] h-[24px] p-[3px] rounded-full cursor-pointer bkms-text-body text-[20px] hover:bg-bkms-neutral-6"
             />
             <template #content>
               <div

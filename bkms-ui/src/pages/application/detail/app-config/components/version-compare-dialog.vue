@@ -105,7 +105,7 @@
               </div>
               <div
                 v-if="diffStats.added"
-                class="text-[#65C389]"
+                class="text-bkms-success-3"
               >
                 +{{ diffStats.added }}
               </div>

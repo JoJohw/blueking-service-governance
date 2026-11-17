@@ -190,7 +190,6 @@ body,
 }
 
 .leave-confirm-box-index {
-
   .bk-modal-mask,
   .bk-modal-wrapper {
     z-index: 9999 !important;
@@ -210,14 +209,14 @@ body,
   }
 
   .anchor {
+    position: absolute;
+    left: 2px;
+    z-index: 1000;
     width: 0 !important;
     height: 0 !important;
     border-color: transparent;
     border-style: solid;
-    z-index: 1000;
     border-width: 8px;
-    position: absolute;
-    left: 2px;
   }
 
   .anchor.below {

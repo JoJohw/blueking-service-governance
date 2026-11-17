@@ -281,7 +281,7 @@
       icon: Info,
       label: t('部分安装'),
       style: {
-        borderColor: '#F9D090',
+        borderColor: 'var(--bkms-warning-4)',
         background: 'color-mix(in srgb, var(--bkms-bg-warning-soft) 70%, transparent)',
       },
       theme: 'warning',

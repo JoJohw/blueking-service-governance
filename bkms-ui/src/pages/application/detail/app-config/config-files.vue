@@ -473,8 +473,8 @@
                                       :class="[
                                         item.divider ? 'border-r border-r-bkms-neutral-2' : '',
                                         contentView === item.value
-                                          ? '!bg-[#4d4d4d] text-bkms-navy-5'
-                                          : 'hover:bg-[#3a3a3a] hover:text-bkms-navy-5',
+                                          ? '!bg-bkms-neutral-2 text-bkms-navy-5'
+                                          : 'hover:bg-bkms-navy-2 hover:text-bkms-navy-5',
                                       ]"
                                       type="button"
                                       @click="contentView = item.value"

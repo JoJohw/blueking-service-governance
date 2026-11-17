@@ -26,16 +26,11 @@
     <FlexRow
       :class="[
         'h-[40px] px-[16px] rounded-t-sm border-b-[1px] border-b-bkms-neutral-5',
-        lightTheme ? 'bkms-bg-page' : 'bg-[#2E2E2E]',
+        lightTheme ? 'bkms-bg-page' : 'bg-bkms-neutral-1',
       ]"
     >
       <template #left>
-        <span
-          :class="[
-            'text-[14px] leading-none',
-            lightTheme ? 'bkms-text-title' : 'text-bkms-navy-5',
-          ]"
-        >
+        <span :class="['text-[14px] leading-none', lightTheme ? 'bkms-text-title' : 'text-bkms-navy-5']">
           <slot name="title">{{ title }}</slot>
         </span>
       </template>

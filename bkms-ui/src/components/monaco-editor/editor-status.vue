@@ -65,31 +65,35 @@
 </script>
 <style lang="postcss" scoped>
   .editor-status {
-    height: 100%;
-    border-left: 4px solid;
-    padding: 8px 0px 8px 16px;
-    background: #2e2e2e;
-    border-radius: 0px 0px 2px 2px;
-    display: flex;
-    align-items: flex-start;
     position: absolute;
     bottom: 0;
     left: 0;
+    display: flex;
+    align-items: flex-start;
     width: 100%;
+    height: 100%;
+    padding: 8px 0 8px 16px;
+    background: var(--bkms-neutral-1);
+    border-left: 4px solid;
+    border-radius: 0 0 2px 2px;
+
     i {
       font-size: 12px;
     }
+
     &.error {
-      border-left-color: #b34747;
+      border-left-color: var(--bkms-danger-2);
+
       i {
-        color: #b34747;
+        color: var(--bkms-danger-2);
       }
     }
+
     .message {
       margin-left: 8px;
-      color: var(--bkms-neutral-5);
-      line-height: 20px;
       font-size: 12px;
+      line-height: 20px;
+      color: var(--bkms-neutral-5);
       white-space: wrap;
     }
   }

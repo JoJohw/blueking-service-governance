@@ -86,7 +86,7 @@
   margin: 0 18px 0 26px;
 }
 
-/* 筛选条底色（design-visual 规范 #e4e9f2） */
+/* 筛选条底色（design-visual 规范 var(--bkms-neutral-5)） */
 .bkms-filter-bar {
   background-color: var(--bkms-neutral-5);
 }

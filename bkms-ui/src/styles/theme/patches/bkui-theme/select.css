@@ -1,6 +1,6 @@
 /* bkui Select 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */
 
-/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */
+/* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */
 
 .bkms-themed .bk-select.is-focus:not(.is-disabled).normal .bk-select-trigger .bk-select-tag {
   border-color: var(--primary-color); /* 原值保留 */

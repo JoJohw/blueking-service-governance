@@ -247,7 +247,7 @@
                       :icon="isPolarisHealthy(row) ? 'normal' : 'abnormal'"
                       :size="12"
                     />
-                    <span class="!border-b-[1px] !border-[#AFAFAF] !border-dashed">
+                    <span class="!border-b-[1px] !border-bkms-neutral-6 !border-dashed">
                       {{ isPolarisHealthy(row) ? 'Healthy' : 'UnHealthy' }}
                     </span>
                   </div>
@@ -1192,7 +1192,7 @@
 
 <style lang="postcss" scoped>
   :deep(.publish-nested-popover.bk-popover.bk-pop2-content .bk-pop2-arrow) {
-    background-color: #26323d !important;
+    background-color: var(--bkms-navy-2) !important;
   }
 
   .fail-reason-item :deep(> div:last-child) {

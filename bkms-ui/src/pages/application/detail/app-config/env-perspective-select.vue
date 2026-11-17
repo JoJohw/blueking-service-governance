@@ -34,7 +34,7 @@
       :class="[
         'flex items-center min-w-[280px] h-[32px] rounded-[2px] cursor-pointer overflow-hidden transition-all duration-200',
         isDarkTheme
-          ? 'h-full bg-[#4A4A4A] hover:bg-[#545454]'
+          ? 'h-full bg-bkms-navy-2 hover:bg-bkms-neutral-2'
           : 'border border-bkms-navy-5 bkms-bg-card transition-border-color hover:bkms-line-hover',
         {
           'bkms-line-active shadow-[0_0_3px_0_var(--bkms-brand-4)]': isPopoverVisible && !isDarkTheme,
@@ -77,16 +77,13 @@
         </span>
         <span
           v-else-if="isDefaultSelected"
-          :class="[
-            'text-[12px] leading-[22px]',
-            isDarkTheme ? 'text-bkms-neutral-5' : 'bkms-text-body',
-          ]"
+          :class="['text-[12px] leading-[22px]', isDarkTheme ? 'text-bkms-neutral-5' : 'bkms-text-body']"
         >
           {{ $t('默认配置') }}
         </span>
         <span
           v-else
-          :class="['text-[14px] leading-[22px]', isDarkTheme ? 'text-[#74767E]' : 'text-bkms-navy-5']"
+          :class="['text-[14px] leading-[22px]', isDarkTheme ? 'text-bkms-keep-737987' : 'text-bkms-navy-5']"
         >
           {{ $t('请选择') }}
         </span>
@@ -187,10 +184,7 @@
                 <!-- 环境状态（默认配置不显示） -->
                 <span
                   v-if="env.type !== 'default'"
-                  :class="[
-                    'text-[10px] shrink-0',
-                    isModified(env.name) ? 'text-[#F8B64F]' : 'text-bkms-navy-5',
-                  ]"
+                  :class="['text-[10px] shrink-0', isModified(env.name) ? 'text-bkms-warning-3' : 'text-bkms-navy-5']"
                 >
                   {{ isModified(env.name) ? displayStatusLabels.active : displayStatusLabels.inactive }}
                 </span>

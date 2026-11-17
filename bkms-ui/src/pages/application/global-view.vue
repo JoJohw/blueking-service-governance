@@ -86,7 +86,7 @@
             <i class="inline-block h-[14px] w-[14px] rounded-[2px] bg-bkms-danger-5"></i>{{ $t('部署失败') }}
           </span>
           <span class="inline-flex items-center gap-[6px]">
-            <i class="inline-block h-[14px] w-[14px] rounded-[2px] bg-[#d9e8ff]"></i>{{ $t('部署中') }}
+            <i class="inline-block h-[14px] w-[14px] rounded-[2px] bkms-bg-active"></i>{{ $t('部署中') }}
           </span>
         </div>
       </div>

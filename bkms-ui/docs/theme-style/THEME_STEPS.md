@@ -13,6 +13,8 @@
 
 已落地：`scripts/theme-codemod/`（`mapping.json` / `keep.json` / `pending-design.json`、`codemod.mjs`、`extract-root-vars.mjs`、reports）、`src/styles/theme/` 结构（tokens/colors + tokens/semantic + variables.css 桥接聚合 + patches/bkui-theme + patches/bkms + themes + index.css）。
 
+> 2026-11-17 变更：Step 5 存量替换完成，`mapping.json` / `pending-design.json` / `color-diff-backup.json`、`codemod.mjs`、`resolve-pending.mjs` 退役；映射改为**单源自举**——`gen-overrides.mjs` 重跑前从 `patches/bkui-theme/*.css` 的「令牌 + 行尾原值注释」提取 hex→token，不再有第二份 JSON。`data/` 仅保留 `keep.json`。
+
 **实施调整**：
 
 1. JS 内联开关语义微调：编译替换退役后，问题变为"**inline style 无法被 class 覆写覆盖**"——盘点组件库 JS 内联样式后，命中项只能走 `!important` 覆盖或 JS 改写，单独登记决策。
@@ -44,10 +46,10 @@
 
 **操作**
 
-1. **生成器 `gen-overrides.mjs`**：
-   - 输入：`node_modules/bkui-vue/dist/*.css`；数据：`mapping.json`（已确认值）+ `keep.json`。
-   - 抽取：prop 非 `--` 开头且 value 含 6 位 hex（先小写化）的 declaration，按"选择器 + prop"聚合。
-   - 过滤：仅生成 mapping 已收录**且设计已确认**的值；`pending-design.json` 内的值不生成，进"待确认清单"。
+1. **生成器 `gen-overrides.mjs`**（2026-11-17 起为单源，下条 mapping/pending 输入已退役）：
+   - 输入：`node_modules/bkui-vue/dist/*.css`；映射索引：现有 `patches/bkui-theme/*.css` 的「令牌 + 行尾原值注释」成对记录（自举）+ `data/keep.json`。
+   - 抽取：prop 非 `--` 开头且 value 含 hex（先小写化）的 declaration，按"选择器 + prop"聚合。
+   - 过滤：索引命中 → `var(--bkms-*)`；keep/令牌值命中 → 原值保留；其余按原值占位进 `reports/gen-summary.md` 待拍板清单。
    - 输出：选择器加 `.bkms-themed ` 前缀、逐字复刻原选择器（含伪类/组合器），值写 `var(--bkms-*)`；渐变/阴影**整值重拼**；8 位 hex 用 color-mix；**原值保留为行尾注释**。
    - 分域：按 bkui 组件前缀写入 `patches/bkui-theme/` 对应文件（button / form / table / dialog / alert-message / pagination / …，每组件一文件，文件内分区注释），`index.css` 同步 @import（bkms 手写补丁段由生成器扫描 `patches/bkms/` 追加）。
 2. **stylelint 配置**：`patches/` 目录豁免 `no-descending-specificity`。

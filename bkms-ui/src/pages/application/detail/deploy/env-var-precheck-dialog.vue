@@ -56,7 +56,7 @@
       <transition name="collapse">
         <div
           v-show="!resourceCollapsed"
-          class="border-t border-bkms-danger-4 bg-[#FFF5F4] px-[12px] py-[8px]"
+          class="border-t border-bkms-danger-4 bkms-bg-danger-soft px-[12px] py-[8px]"
         >
           <p class="text-[12px] leading-[20px] bkms-text-body">
             {{ $t('当前环境已绑定联邦集群。联邦集群要求 CPU、内存的 Requests 与 Limits 必须一致，否则无法部署。') }}
@@ -111,7 +111,7 @@
         <div class="flex items-center">
           <i class="bkms-icon bkms-icon-close-circle-shape text-[14px] text-bkms-danger-2" />
           <span class="mx-[8px] text-base font-bold text-bkms-danger-2">{{ $t('缺少必选集群组件') }}</span>
-          <span class="rounded-[2px] bg-[#FCD5D3] px-[8px] py-[2px] text-[12px] text-bkms-danger-2">
+          <span class="rounded-[2px] bg-bkms-danger-5 px-[8px] py-[2px] text-[12px] text-bkms-danger-2">
             <i18n-t keypath="{0} 个组件">
               <span class="pl-[2px]">{{ missingRequiredClusterAddons.length }}</span>
             </i18n-t>
@@ -126,7 +126,7 @@
       <transition name="collapse">
         <div
           v-show="!clusterAddonCollapsed"
-          class="border-t border-bkms-danger-4 bg-[#FFF5F4] px-[12px] py-[8px]"
+          class="border-t border-bkms-danger-4 bkms-bg-danger-soft px-[12px] py-[8px]"
         >
           <p class="text-[12px] leading-[20px] bkms-text-body">
             {{ $t('以下必选集群组件在目标环境所在集群中尚未安装，缺失时应用无法正常部署。') }}
@@ -159,7 +159,7 @@
     <!-- 环境变量未定义 -->
     <div
       v-if="hasUndefinedVars"
-      class="rounded-[2px] border border-[#F9D090] bkms-bg-warning-soft px-[12px]"
+      class="rounded-[2px] border border-bkms-warning-4 bkms-bg-warning-soft px-[12px]"
     >
       <div
         class="flex cursor-pointer items-center justify-between py-[8px]"
@@ -185,7 +185,7 @@
       <transition name="collapse">
         <div
           v-show="!envVarCollapsed"
-          class="border-t border-[#F9D090] py-[8px]"
+          class="border-t border-bkms-warning-4 py-[8px]"
         >
           <i18n-t
             class="text-[12px] leading-[20px] bkms-text-body"

@@ -28,7 +28,7 @@
       <span>
         <span class="bkms-custom-filter-title">{{ label }}</span>
         <i
-          class="cursor-pointer hover:text-[#606266] relative text-bkms-navy-5 top-[1px] left-[4px] vxe-filter--btn vxe-table-icon-funnel"
+          class="cursor-pointer hover:text-bkms-keep-737987 relative text-bkms-navy-5 top-[1px] left-[4px] vxe-filter--btn vxe-table-icon-funnel"
           :class="appliedFilters.length > 0 ? '!bkms-text-brand' : ''"
         ></i>
       </span>
@@ -298,49 +298,60 @@
         color: var(--bkms-text-brand);
       }
     }
+
     &:hover:not(.is-disabled) {
       background-color: unset;
     }
+
     .bk-input--text {
       background-color: unset;
+
       &:hover,
       &:focus {
         background-color: unset;
       }
     }
+
     .bk-input--suffix-icon {
       background-color: unset !important;
+
       &:hover {
         background-color: unset !important;
       }
     }
   }
+
   :deep(.bk-checkbox) {
+    display: inline-block;
+    align-self: start;
     height: 36px;
     padding: 8px 10px 8px 12px;
-    display: inline-block;
+
+    .bk-checkbox-input {
+      width: 14px;
+      height: 14px;
+      border-color: var(--bkms-line-default);
+      border-radius: 3px;
+      box-shadow: 0 0 0 1px var(--bkms-line-default);
+    }
+
     &:hover {
       background-color: var(--bkms-bg-hover);
+
       .bk-checkbox-input {
         border-color: var(--bkms-line-active);
         box-shadow: 0 0 0 1px var(--bkms-brand-3);
       }
     }
-    align-self: start;
-    .bk-checkbox-input {
-      width: 14px;
-      height: 14px;
-      border-radius: 3px;
-      border-color: var(--bkms-line-default);
-      box-shadow: 0 0 0 1px var(--bkms-line-default);
-    }
+
     .bk-checkbox-label {
       width: calc(100% - 22px);
-      white-space: nowrap;
-      text-overflow: ellipsis;
       overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
+
   :deep(.bk-checkbox.is-checked) {
     .bk-checkbox-label {
       color: var(--bkms-text-brand);

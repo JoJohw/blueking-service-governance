@@ -170,7 +170,7 @@
                 :label="$t('高级命令')"
               >
                 <ToggleCard
-                  class="bkms-bg-card rounded-[2px] border-[1px] border-[#e5e5e5]"
+                  class="bkms-bg-card rounded-[2px] border-[1px] bkms-line-light"
                   content-class="p-[16px]"
                   :model-value="false"
                   type="normal"
@@ -734,7 +734,7 @@
   }
 
   .equivalent-build-command :deep(.build-command-arg-key) {
-    color: #ad7a6b;
+    color: var(--bkms-keep-ad7a6b);
   }
 
   .equivalent-build-command :deep(.build-command-image) {

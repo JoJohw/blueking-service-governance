@@ -131,7 +131,7 @@
                   >
                     {{ row.displayName }}
                   </Button>
-                  <div class="text-[#9798A5]">{{ row.id || '--' }}</div>
+                  <div class="text-bkms-navy-4">{{ row.id || '--' }}</div>
                 </div>
               </template>
             </TableColumn>

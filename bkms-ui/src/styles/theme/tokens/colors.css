@@ -149,5 +149,11 @@
   --bkms-keep-737987: #737987;
   --bkms-keep-7a8193: #7A8193;
 
+  /** Helm 编排文件列表的 BSCP 标签深棕底 */
+  --bkms-keep-6d5b42: #6D5B42;
+
+  /** 版本号规则 VN 标签、构建命令参数名的棕红字 */
+  --bkms-keep-ad7a6b: #AD7A6B;
+
   /* @endgroup */
 }

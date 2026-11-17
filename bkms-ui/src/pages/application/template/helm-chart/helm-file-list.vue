@@ -20,7 +20,7 @@
   <div class="relative h-full flex flex-col">
     <FlexRow class="mt-[16px] px-[16px]">
       <template #left>
-        <span class="text-[#191929] font-bold text-[14px]">{{ `Values ${$t('文件列表')}` }}</span>
+        <span class="text-bkms-navy-1 font-bold text-[14px]">{{ `Values ${$t('文件列表')}` }}</span>
         <InfoLine
           v-bk-tooltips="{
             content: $t(

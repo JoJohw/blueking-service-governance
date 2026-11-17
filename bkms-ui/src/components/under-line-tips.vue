@@ -19,7 +19,7 @@
 <template>
   <span
     v-bk-tooltips="{ content: description, placement }"
-    class="!border-b-[1px] !border-[#AFAFAF] !border-dashed"
+    class="!border-b-[1px] !border-bkms-neutral-6 !border-dashed"
   >
     <slot></slot>
   </span>

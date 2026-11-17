@@ -203,13 +203,13 @@
       position: relative;
 
       .bk-resize-trigger {
-        background-color: #2e2e2e !important;
+        background-color: var(--bkms-neutral-1) !important;
 
         &::before {
           width: 4px;
           height: 5px;
           content: '';
-          background-color: #b34747;
+          background-color: var(--bkms-danger-2);
           position: absolute;
         }
 

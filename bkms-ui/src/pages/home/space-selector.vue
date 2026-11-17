@@ -61,7 +61,7 @@
               width="20px"
             />
             <Button
-              class="!text-[14px]"
+              class="!text-[12px]"
               text
             >
               {{ $t('新建') }}
@@ -74,7 +74,7 @@
           >
             <i class="bkms-icon bkms-icon-guanlikongjian-3 mr-[5px] mt-[1px]"></i>
             <Button
-              class="!text-[14px]"
+              class="!text-[12px]"
               text
               >{{ $t('空间管理') }}</Button
             >

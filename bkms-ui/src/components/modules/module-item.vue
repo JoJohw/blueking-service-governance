@@ -28,7 +28,7 @@
         <span class="font-bold">{{ data?.type || '--' }}</span>
         <span
           v-if="data?.name"
-          class="text-[#979aa3]"
+          class="text-bkms-navy-4"
         >
           ({{ data.name }})</span
         >
@@ -52,10 +52,7 @@
           @click="handleClone"
         >
           <i
-            :class="[
-              'bkms-icon bkms-icon-clone',
-              { 'bkms-text-secondary hover:bkms-text-brand': !disabledClone },
-            ]"
+            :class="['bkms-icon bkms-icon-clone', { 'bkms-text-secondary hover:bkms-text-brand': !disabledClone }]"
           ></i>
         </Button>
         <Button

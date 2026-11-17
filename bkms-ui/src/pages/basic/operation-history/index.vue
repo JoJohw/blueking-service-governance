@@ -214,7 +214,7 @@
       >
         <template #title>
           <div class="grid grid-cols-2 gap-[18px] text-[12px] text-center leading-[22px]">
-            <div class="w-[52px] h-[22px] bg-[#1E3567] rounded-[2px]">
+            <div class="w-[52px] h-[22px] bg-bkms-navy-3 rounded-[2px]">
               {{ $t('操作前') }}
             </div>
             <div class="w-[52px] h-[22px] bg-bkms-keep-144628 rounded-[2px] text-bkms-success-2">

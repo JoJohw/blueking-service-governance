@@ -19,11 +19,13 @@
 /**
  * bkui 覆写生成器：从 bkui dist css 抽取含写死 hex 的声明，按"选择器+prop"生成 class 覆写。
  *
- * 值策略（四分类）：
- *   - mapping.json 命中（设计已确认）→ var(--bkms-*)，行尾注释原值
+ * 值策略（单源：既往产物即映射真源）：
+ *   - 现有 patches 里「令牌 var + 行尾原值注释」的成对记录 → 复用同一 token（自举，不再有 mapping.json 副本）
  *   - keep 双源命中（keep.json / colors.css token 值，本就不变）→ 不生成
- *   - pending-design.json / 未收录（未确认）→ 组件库原色值占位，行尾 `/* pending * /` 标记
+ *   - 未收录 → 组件库原色值占位，行尾 pending 标记，进 gen-summary 清单
  *   - 渐变/阴影函数内含任一未确认 hex → 整条声明占位（不做局部替换）
+ *
+ * 拍板路径：直接改 patches 里的值与原值注释，重跑即继承（生成器先读旧产物建索引，再整体覆盖）。
  *
  * 范围过滤：只处理 reports/usage.json 白名单组件（.bk-<kebab> 前缀族）的规则；
  * 未归属规则不静默丢弃，进 reports/gen-summary.md 供人工收编。
@@ -31,8 +33,7 @@
  * 产出：
  *   - src/styles/theme/patches/bkui-theme/<kebab>.css（bkui 组件覆写，按组件族每组件一文件，含变量版段+字面量段；
  *     手写业务补丁在 patches/bkms/，生成器不触碰）
- *   - reports/gen-summary.md（生成摘要 + 未归属规则 + 未收录 hex）
- *   - reports/pending-values.md（占位值台账，按待确认清单分组）
+ *   - reports/gen-summary.md（生成摘要 + 未归属规则 + 未收录 hex 待确认清单）
  *
  * 用法：node scripts/theme-codemod/scripts/gen-overrides.mjs
  */
@@ -57,9 +58,7 @@ if (!fs.existsSync(USAGE_PATH)) {
   process.exit(1);
 }
 const usage = readJson('../reports/usage.json');
-const MAPPING = readJson('../data/mapping.json');
 const KEEP = readJson('../data/keep.json');
-const PENDING = readJson('../data/pending-design.json');
 
 // 令牌定义值索引：8 位源 hex 若与令牌值完全一致，直接 var() 引用（令牌自带 alpha 时 color-mix 会二次衰减）。
 // 两个令牌文件都读：阴影令牌在 semantic.css，漏读会让 8 位精确命中失效
@@ -71,14 +70,39 @@ for (const cm of colorsText.matchAll(/(--bkms-[a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{3,
   TOKEN_HEX.set(cm[1], cm[2].toLowerCase());
 }
 
-/** 8 位源 hex → 令牌精确值索引：值完全一致直接 var() 引用（补 mapping 反查之外的值维度，避免摘掉 mapping 条目后精确场景落入 pending） */
+/** 8 位源 hex → 令牌精确值索引：值完全一致直接 var() 引用（注释索引之外的值维度，避免精确场景落入占位） */
 const TOKEN_BY_HEX8 = new Map();
 for (const [name, hex] of TOKEN_HEX) {
   if (hex.length === 9) TOKEN_BY_HEX8.set(hex, name);
 }
 
-const PENDING_KEYS = new Set(Object.keys(PENDING));
 const KEEP_KEYS = new Set(Object.keys(KEEP));
+
+/**
+ * 映射索引的唯一来源：现有产物。逐条解析 `属性: 含 var 的值 + 行尾原值注释`，
+ * 值里的 var 与原值注释里的 hex 按出现顺序成对（多色渐变也能对上）。
+ * 生成器整体覆盖写之前先读一遍旧文件，人工拍板的改动因此可继承。
+ */
+const PATCH_LEDGER = new Map();
+if (fs.existsSync(PATCHES_DIR)) {
+  for (const name of fs.readdirSync(PATCHES_DIR)) {
+    if (!name.endsWith('.css')) continue;
+    const text = fs.readFileSync(path.join(PATCHES_DIR, name), 'utf8');
+    for (const line of text.split('\n')) {
+      const m = line.match(/^\s*[-\w]+\s*:\s*([^;]+);\s*\/\*\s*(.+?)\s*\*\/\s*$/);
+      if (!m) continue;
+      const vars = [...m[1].matchAll(/var\((--bkms-[\w-]+)\)/g)].map(x => x[1]);
+      const hexes = [...m[2].matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map(x => normalizeHex(x[0]));
+      if (!vars.length || vars.length !== hexes.length) continue;
+      hexes.forEach((h, i) => {
+        const token = vars[i];
+        PATCH_LEDGER.set(h, token); // 8 位精确命中
+        // 基色回归只对"颜色令牌"成立；阴影令牌自身带 alpha，回填基色会让实色（如 #ccc）被错配成带 alpha 的值
+        if (TOKEN_HEX.get(token)?.length !== 9) PATCH_LEDGER.set(h.slice(0, 6), token);
+      });
+    }
+  }
+}
 /** keep 判定双源开关，可独立启停（keep.json 退役时关 keepJson 位） */
 const KEEP_SOURCES = { keepJson: true, tokenValue: true };
 
@@ -138,7 +162,7 @@ function classifyHex(hex8) {
     return { kind: 'token', base6, token: TOKEN_BY_HEX8.get(`#${hex8}`) };
   }
   if (KEEP_SOURCES.keepJson && KEEP_KEYS.has(base6)) return { kind: 'keep', base6 };
-  const token = MAPPING[base6];
+  const token = PATCH_LEDGER.get(hex8) ?? PATCH_LEDGER.get(base6);
   if (token) return { kind: 'token', base6, token };
   if (KEEP_SOURCES.tokenValue && TOKEN_VALUE_SET.has(base6)) return { kind: 'keep', base6 };
   return { kind: 'pending', base6 };
@@ -328,9 +352,8 @@ function scanDist(file, patchesMap, trackUnassigned) {
           const base = h.slice(0, 6);
           if (
             !(KEEP_SOURCES.keepJson && KEEP_KEYS.has(base))
-            && !MAPPING[base]
+            && !PATCH_LEDGER.has(base)
             && !(KEEP_SOURCES.tokenValue && TOKEN_VALUE_SET.has(base))
-            && !PENDING_KEYS.has(base)
           ) {
             if (!unknownHexes.has(base)) unknownHexes.set(base, new Set());
             unknownHexes.get(base).add(rule.selector);
@@ -392,7 +415,7 @@ for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].
   const lines = [
     `/* bkui ${name} 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */`,
     '',
-    '/* 值策略：已确认 → var(--bkms-*)；待确认 → 原色值占位 + pending 标记（拍板后写入 mapping 重跑换 token） */',
+    '/* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */',
     '',
   ];
   let varRuleCount = 0;
@@ -476,7 +499,7 @@ const summary = [
   `- 扫描含 hex 声明：${scannedDecls}；归属组件：${perComponent.length} 个；生成覆写规则：${emittedRules} 条 / ${emittedDecls} 声明`,
   `- 字面量段（dist/style.css）：${literalRules} 条 / ${literalDecls} 声明（并入 bkui-theme/ 组件文件，${perComponent.filter(p => p.litRules > 0).length} 个组件含字面量段；未归属 ${literalUnassigned} 条不计入台账）`,
   `- 未归属规则（选择器无白名单组件前缀）：${unassigned.length} 条`,
-  `- 未收录 hex（不在 mapping/keep/pending 任一清单）：${unknownHexes.size} 种`,
+  `- 未收录 hex（既对不上既有映射、也不在 keep/令牌值）：${unknownHexes.size} 种`,
   '',
   '## 按组件产出',
   '',
@@ -502,7 +525,7 @@ if (unassigned.length > 0) {
   summary.push('');
 }
 if (unknownHexes.size > 0) {
-  summary.push('## 未收录 hex（需补录 mapping/pending/keep 后重跑）', '');
+  summary.push('## 未收录 hex（需先决定 token 或加入 keep 后重跑）', '');
   for (const [hex, sels] of [...unknownHexes.entries()].sort()) {
     summary.push(
       `- #${hex}：${[...sels]
@@ -513,56 +536,21 @@ if (unknownHexes.size > 0) {
   }
   summary.push('');
 }
-fs.writeFileSync(path.join(REPORTS, 'gen-summary.md'), summary.join('\n'));
-
-// pending 台账：按 pending-design note 的分组前缀归组
-const groups = new Map();
-for (const [hex, meta] of Object.entries(PENDING)) {
-  const group = (meta.note || '').split('｜')[0] || '未分组';
-  if (!groups.has(group)) groups.set(group, []);
-  const usedIn = perComponent.filter(p => {
-    const text = fs.readFileSync(path.join(PATCHES_DIR, `${p.kebab}.css`), 'utf8');
-    return new RegExp(`#${hex}(?![0-9a-f])`, 'i').test(text);
-  });
-  groups.get(group).push({ hex, suggest: meta.suggest, usedIn: usedIn.map(p => p.kebab) });
-}
-
-const ledger = [
-  '# 占位值台账（待设计确认）',
-  '',
-  '> 覆写文件中标记 `pending: 待设计确认` 的原色值清单。设计拍板后：确认值写入 mapping.json → 重跑 theme:gen 换 token → theme:check 自检。',
-  '',
-];
-for (const [group, items] of groups) {
-  ledger.push(`## ${group}（${items.length}）`, '');
-  ledger.push('| 色值 | 候选 token | 覆写出现于 | 状态 |', '| --- | --- | --- | --- |');
-  for (const it of items) {
-    ledger.push(
-      `| #${it.hex} | \`${it.suggest}\` | ${it.usedIn.length ? it.usedIn.map(k => `\`${k}.css\``).join('、') : '—（未生成覆写）'} | 待确认 |`,
-    );
-  }
-  ledger.push('');
-}
-if (unknownHexes.size > 0) {
-  ledger.push(`## 未收录（${unknownHexes.size}）`, '');
-  ledger.push('以下 hex 不在任何清单，本轮按原值占位；需先归入 spec/pending/keep 再重跑：', '');
-  for (const hex of [...unknownHexes.keys()].sort()) ledger.push(`- #${hex}`);
-  ledger.push('');
-}
 if (rulePending.size > 0) {
-  ledger.push(`## 覆写内占位（不在任何清单，${rulePending.size}）`, '');
-  ledger.push('以下 hex 出现在归属组件的覆写中、按原值占位；需先归入 spec/pending/keep 再重跑：', '');
+  summary.push(`## 覆写内按原值占位（待拍板，${rulePending.size} 种）`, '');
+  summary.push('以下 hex 已归属组件、但对不上既有映射也不是 keep/令牌值，本轮按原值占位；');
+  summary.push('拍板时直接改对应 patches 文件的值与原值注释，重跑即继承。', '');
   for (const [hex, sels] of [...rulePending.entries()].sort()) {
-    ledger.push(
+    summary.push(
       `- #${hex}：${[...sels]
         .slice(0, 3)
         .map(s => `\`${s}\``)
         .join('、')}${sels.size > 3 ? ` 等 ${sels.size} 处` : ''}`,
     );
   }
-  ledger.push('');
+  summary.push('');
 }
-fs.writeFileSync(path.join(REPORTS, 'pending-values.md'), ledger.join('\n'));
+fs.writeFileSync(path.join(REPORTS, 'gen-summary.md'), summary.join('\n'));
 
 console.log(
   `components: ${perComponent.length}, rules: ${emittedRules}+${literalRules}literal, decls: ${emittedDecls}+${literalDecls}literal`,

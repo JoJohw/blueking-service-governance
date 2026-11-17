@@ -18,7 +18,7 @@
 
 <template>
   <div
-    class="card-item flex p-[16px] flex-col justify-center items-start gap-[16px] flex-[1_0_0] rounded-[4px] bg-[var(--Neutral-11,#FFF)] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+    class="card-item flex p-[16px] flex-col justify-center items-start gap-[16px] flex-[1_0_0] rounded-[4px] bg-[var(--Neutral-11,var(--bkms-neutral-10))] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
   >
     <!-- 卡片头部：名称 + Tag -->
     <div class="flex flex-col gap-[6px]">

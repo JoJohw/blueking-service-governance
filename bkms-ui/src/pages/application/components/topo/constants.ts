@@ -235,7 +235,7 @@ export const STATUS_CONFIG: Record<
 > = {
   all: {
     bgColor: 'var(--bkms-bg-card)',
-    iconBgColor: 'linear-gradient(90deg, #748EC1 0%, #99B1E0 100%)',
+    iconBgColor: 'linear-gradient(90deg, var(--bkms-brand-3) 0%, var(--bkms-brand-4) 100%)',
   },
   healthy: {
     bgColor: 'var(--bkms-bg-card)',
@@ -244,25 +244,27 @@ export const STATUS_CONFIG: Record<
     miniColor: 'var(--bkms-success-6)',
   },
   warning: {
-    bgColor: 'linear-gradient(90deg, #FFF5F5 0%, var(--bkms-neutral-10) 50%, var(--bkms-bg-card) 100%)',
-    iconBgColor: 'linear-gradient(90deg, var(--bkms-warning-2) 0%, #F8B64F 100%)',
+    bgColor:
+      'linear-gradient(90deg, var(--bkms-bg-danger-soft) 0%, var(--bkms-neutral-10) 50%, var(--bkms-bg-card) 100%)',
+    iconBgColor: 'linear-gradient(90deg, var(--bkms-warning-2) 0%, var(--bkms-warning-3) 100%)',
     badgeIconColor: 'var(--bkms-warning-2)',
-    color: '#F8B64F',
+    color: 'var(--bkms-warning-3)',
     miniColor: 'var(--bkms-warning-6)',
   },
   error: {
-    bgColor: 'linear-gradient(90deg, #FFF5F5 0%, var(--bkms-neutral-10) 50%, var(--bkms-bg-card) 100%)',
-    iconBgColor: 'linear-gradient(90deg, var(--bkms-danger-2) 0%, #F07474 100%)',
+    bgColor:
+      'linear-gradient(90deg, var(--bkms-bg-danger-soft) 0%, var(--bkms-neutral-10) 50%, var(--bkms-bg-card) 100%)',
+    iconBgColor: 'linear-gradient(90deg, var(--bkms-danger-2) 0%, var(--bkms-danger-3) 100%)',
     badgeIconColor: 'var(--bkms-danger-2)',
-    color: '#F07474',
+    color: 'var(--bkms-danger-3)',
     miniColor: 'var(--bkms-danger-5)',
   },
   unknown: {
     bgColor: 'var(--bkms-bg-card)',
-    iconBgColor: 'linear-gradient(90deg, #748EC1 0%, #99B1E0 100%)',
-    badgeIconColor: '#748EC1',
-    color: '#99B1E0',
-    miniColor: '#99B1E0',
+    iconBgColor: 'linear-gradient(90deg, var(--bkms-brand-3) 0%, var(--bkms-brand-4) 100%)',
+    badgeIconColor: 'var(--bkms-brand-3)',
+    color: 'var(--bkms-brand-4)',
+    miniColor: 'var(--bkms-brand-4)',
   },
 };
 

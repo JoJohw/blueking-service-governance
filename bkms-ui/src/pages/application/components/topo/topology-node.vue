@@ -96,7 +96,7 @@
             :style="{ width: `${EDGE_LENGTH / 2}px`, height: '2px' }"
           >
             <line
-              stroke="#ABB5CC"
+              stroke="var(--bkms-navy-4)"
               stroke-width="2"
               x1="0"
               :x2="EDGE_LENGTH / 2"
@@ -112,7 +112,7 @@
             @pointerenter.stop
           >
             <i
-              class="text-[#ABB5CC] text-[18px] hover:bkms-text-brand custom-collapse"
+              class="text-bkms-navy-4 text-[18px] hover:bkms-text-brand custom-collapse"
               :class="data.data?.collapsed ? 'bkms-icon bkms-icon-plus' : 'bkms-icon bkms-icon-minus'"
             ></i>
           </span>

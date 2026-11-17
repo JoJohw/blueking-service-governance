@@ -33,13 +33,13 @@
     <template #extension>
       <button
         v-if="!isDraftOpen"
-        class="flex h-full w-full cursor-pointer items-center justify-center gap-[6px] px-[12px] text-[12px] text-[#4D4F56] hover:bg-[#F0F1F5]"
+        class="flex h-full w-full cursor-pointer items-center justify-center gap-[6px] px-[12px] text-[12px] text-bkms-neutral-2 hover:bg-bkms-neutral-6"
         type="button"
         @click="openDraft"
       >
         <i
           aria-hidden="true"
-          class="bkms-icon bkms-icon-plus-circle text-[14px] text-[#979BA5]"
+          class="bkms-icon bkms-icon-plus-circle text-[14px] text-bkms-neutral-3"
         ></i>
         {{ $t('自定义') }}
       </button>
@@ -50,14 +50,14 @@
         @keydown.stop
       >
         <div
-          class="flex h-[32px] min-w-0 flex-1 items-center rounded-[2px] border bg-white text-[12px] text-[#63656E]"
-          :class="showDraftError ? 'border-[#EA3636]' : 'border-[#C4C6CC] focus-within:border-[#3A84FF]'"
+          class="flex h-[32px] min-w-0 flex-1 items-center rounded-[2px] border bg-white text-[12px] text-bkms-neutral-2"
+          :class="showDraftError ? 'border-bkms-danger-2' : 'border-bkms-navy-5 focus-within:border-bkms-brand-2'"
         >
           <input
             ref="draftInputRef"
             :aria-invalid="showDraftError"
             :aria-label="$t('自定义')"
-            class="draft-number-input h-full min-w-0 flex-1 bg-transparent px-[10px] outline-none placeholder:text-[#C4C6CC]"
+            class="draft-number-input h-full min-w-0 flex-1 bg-transparent px-[10px] outline-none placeholder:text-bkms-navy-5"
             inputmode="decimal"
             min="0"
             :placeholder="$t('请输入')"
@@ -75,7 +75,7 @@
             v-if="showDraftError"
             v-bk-tooltips="draftError"
             :aria-label="draftError"
-            class="mr-[8px] flex shrink-0 items-center text-[16px] text-[#EA3636]"
+            class="mr-[8px] flex shrink-0 items-center text-[16px] text-bkms-danger-2"
           >
             <ExclamationCircleShape />
           </span>
@@ -83,7 +83,7 @@
             v-if="kind === 'memory'"
             ref="unitSelectRef"
             v-model="unit"
-            class="shrink-0 border-l border-[#DCDEE5]"
+            class="shrink-0 border-l border-bkms-neutral-5"
             :clearable="false"
             :popover-min-width="64"
             :popover-options="{ boundary: 'parent' }"
@@ -94,7 +94,7 @@
               <button
                 :aria-expanded="isUnitSelectOpen"
                 :aria-label="`${$t('内存单位')} ${unit}`"
-                class="flex h-[30px] w-[47px] cursor-pointer items-center justify-between pl-[8px] pr-[4px] outline-none focus-visible:bg-[#E1ECFF]"
+                class="flex h-[30px] w-[47px] cursor-pointer items-center justify-between pl-[8px] pr-[4px] outline-none focus-visible:bg-bkms-brand-6"
                 type="button"
                 @keydown.down.prevent="unit = 'Mi'"
                 @keydown.tab="unitSelectRef?.hidePopover()"
@@ -103,7 +103,7 @@
                 {{ unit }}
                 <AngleDown
                   aria-hidden="true"
-                  class="text-[#979BA5]"
+                  class="text-bkms-neutral-3"
                   :class="{ 'rotate-180': isUnitSelectOpen }"
                   :height="18"
                   :width="18"
@@ -120,7 +120,7 @@
         </div>
         <button
           :aria-label="$t('确定')"
-          class="flex h-[24px] w-[24px] shrink-0 cursor-pointer items-center justify-center text-[#2CAF5E] hover:text-[#299E56]"
+          class="flex h-[24px] w-[24px] shrink-0 cursor-pointer items-center justify-center text-bkms-success-2 hover:text-bkms-success-1"
           type="button"
           @click="confirmDraft"
         >
@@ -132,7 +132,7 @@
         </button>
         <button
           :aria-label="$t('取消')"
-          class="flex h-[24px] w-[24px] shrink-0 cursor-pointer items-center justify-center text-[#979BA5] hover:text-[#63656E]"
+          class="flex h-[24px] w-[24px] shrink-0 cursor-pointer items-center justify-center text-bkms-neutral-3 hover:text-bkms-neutral-2"
           type="button"
           @click="closeDraft"
         >

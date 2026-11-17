@@ -45,7 +45,7 @@
     border-color: var(--bkms-success-4);
   }
   .danger {
-    background-color: #fbe9e7;
+    background-color: var(--bkms-bg-danger);
     color: var(--bkms-danger-2);
     border-color: var(--bkms-line-danger);
   }

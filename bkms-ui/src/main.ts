@@ -76,8 +76,12 @@ getUser({}, { needRes: true }).then(res => {
 
 console.log(
   `%c${BK_BKMS_WELCOME} \n %c版本信息%c${BK_BKMS_VERSION}%c>> ${new Date().toString().slice(0, 16)}<<`,
+  // eslint-disable-next-line theme/no-hardcoded-color
   'color: #2DCB56',
-  'padding: 2px 5px; background: #ea3636; color: var(--bkms-text-inverse); border-radius: 3px 0 0 3px;',
-  'padding: 2px 5px; background: #42c02e; color: var(--bkms-text-inverse); border-radius: 0 3px 3px 0; font-weight: bold;',
-  'background-color: #3A84FF; color: var(--bkms-text-inverse); padding: 2px 5px; border-radius: 3px; font-weight: bold;margin-left: 16px;',
+  // eslint-disable-next-line theme/no-hardcoded-color
+  'padding: 2px 5px; background: #ea3636; color: #FFF; border-radius: 3px 0 0 3px;',
+  // eslint-disable-next-line theme/no-hardcoded-color
+  'padding: 2px 5px; background: #42c02e; color: #FFF; border-radius: 0 3px 3px 0; font-weight: bold;',
+  // eslint-disable-next-line theme/no-hardcoded-color
+  'background-color: #3A84FF; color: #FFF; padding: 2px 5px; border-radius: 3px; font-weight: bold;margin-left: 16px;',
 );
