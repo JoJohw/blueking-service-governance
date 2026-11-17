@@ -70,6 +70,7 @@
             :rules="rules"
           >
             <ToggleCard
+              class="mb-[24px]"
               :name="$t('基本信息')"
               type="normal"
             >
@@ -125,7 +126,6 @@
             </ToggleCard>
 
             <ToggleCard
-              class="mt-[10px]"
               :name="$t('北极星信息')"
               type="normal"
             >

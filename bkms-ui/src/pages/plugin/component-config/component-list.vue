@@ -98,7 +98,7 @@
               v-show="filteredTreeData.length !== 0"
               :class="[
                 'border-b-[1px] border-b-bkms-neutral-6',
-                'flex items-center justify-between px-[16px] h-[36px] cursor-pointer',
+                'mx-[16px] flex items-center justify-between px-[8px] h-[36px] rounded-[6px] cursor-pointer',
                 selectedTreeNode === 'all' ? 'bkms-bg-active bkms-text-brand' : 'bkms-text-body',
                 { 'hover:bg-bkms-neutral-6': selectedTreeNode !== 'all' },
               ]"
@@ -110,18 +110,20 @@
               </div>
               <span
                 :class="[
-                  'text-[12px] bkms-text-secondary px-[8px] rounded-[2px]',
-                  selectedTreeNode === 'all' ? 'bg-bkms-brand-2 bkms-text-inverse' : 'bkms-text-body bg-bkms-neutral-6',
+                  'text-[12px] px-[8px] rounded-[6px]',
+                  selectedTreeNode === 'all'
+                    ? 'bg-bkms-brand-2 bkms-text-inverse'
+                    : 'bkms-text-secondary bg-bkms-neutral-6',
                 ]"
                 >{{ componentList.length }}</span
               >
             </div>
-            <div class="flex-1 overflow-auto mt-[8px] mb-[16px]">
+            <div class="flex-1 overflow-auto mt-[8px] mb-[16px] px-[16px] flex flex-col gap-[4px]">
               <div
                 v-for="item in filteredTreeData"
                 :key="item.id"
                 :class="[
-                  'flex items-center justify-between min-h-[36px] px-[16px] py-[4px] cursor-pointer',
+                  'flex items-center justify-between min-h-[36px] px-[8px] py-[4px] rounded-[6px] cursor-pointer',
                   selectedTreeNode === item.id ? 'bkms-bg-active bkms-text-brand' : 'bkms-text-body',
                   { 'hover:bg-bkms-neutral-6': selectedTreeNode !== item.id },
                 ]"
@@ -147,8 +149,10 @@
                 </div>
                 <span
                   :class="[
-                    'text-[12px] bkms-text-secondary px-[8px] rounded-[2px] shrink-0',
-                    selectedTreeNode === item.id ? 'bg-bkms-brand-2 bkms-text-inverse' : 'bkms-text-body bg-bkms-neutral-6',
+                    'text-[12px] px-[8px] rounded-[6px] shrink-0',
+                    selectedTreeNode === item.id
+                      ? 'bg-bkms-brand-2 bkms-text-inverse'
+                      : 'bkms-text-secondary bg-bkms-neutral-6',
                   ]"
                   >{{ item.count }}</span
                 >
@@ -1023,11 +1027,13 @@
   :deep(.bk-resize-layout > .bk-resize-layout-aside .bk-resize-layout-aside-content) {
     display: flex;
   }
+
   :deep(.bk-resize-layout > .bk-resize-layout-main) {
     display: flex;
-    min-height: 0;
     min-width: 0;
+    min-height: 0;
   }
+
   :deep(.bk-resize-layout > .bk-resize-layout-aside) {
     transition: none !important;
   }

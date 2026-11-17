@@ -1,4 +1,9 @@
-/* bkui/vxe 补丁 - table 域：仅层级与布局/尺寸修正；颜色归 tokens/bridge/编译替换，不在此出现 */
+/* bkui/vxe 补丁 - table 域：颜色使用语义化变量，布局/尺寸按公共默认值修正 */
+.vxe-table--render-default {
+  --vxe-ui-table-row-height-default: 42px;
+  --vxe-ui-table-header-background-color: var(--bkms-bg-head);
+}
+
 .vxe-table--tooltip-wrapper {
   z-index: 3000 !important;
 }
