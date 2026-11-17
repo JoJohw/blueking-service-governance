@@ -1,6 +1,8 @@
 /* 主题层统一入口 — 每个 patches 目录只暴露一个聚合入口，本文件为静态清单（不随生成器重写）。
- * 加载点：src/main.ts。变量桥接走 src/styles/theme/variables.css（bkui.ts 加载），不在此列。 */
+ * 加载点：src/main.ts。变量桥接走 src/styles/theme/variables.css（bkui.ts 加载），不在此列。
+ * themes 段必须排在 tokens 之后：dark 等主题覆盖同名色阶，靠 html[data-theme] 的 specificity 生效，顺序仅保证可读性。 */
 @import './tokens/colors.css';
 @import './tokens/semantic.css';
+@import './themes/index.css';
 @import './patches/bkui-theme/index.css';
 @import './patches/bkms/index.css';
