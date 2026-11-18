@@ -131,6 +131,8 @@
   } from '~/pages/application/detail/deploy/monitor-chart-bridge';
   import { useAppDetail } from '~/stores/app-detail';
 
+  import { applyEchartsViz } from './echarts-viz';
+
   // 将所有 ExploreChart 加入同一 echarts group，实现跨图 tooltip 联动
   const CHART_GROUP = 'monitor-sideslider';
   echarts.connect(CHART_GROUP);
@@ -244,6 +246,7 @@
 
   const customOptions = {
     options: (opts: EChartOptionLike): EChartOptionLike => {
+      applyEchartsViz(opts);
       if (Array.isArray(opts.series)) {
         opts.series = opts.series.map((s: Record<string, unknown>) => {
           // 桥接层不再用 __CMP__ 前缀标记 series，对比项通过 isCompare 字段显式识别

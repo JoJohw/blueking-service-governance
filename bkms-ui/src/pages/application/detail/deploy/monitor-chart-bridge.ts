@@ -19,6 +19,7 @@
 import type { App } from 'vue';
 
 import { BkintegrationsBkmonitorService } from '~/api/modules/v1';
+import { readVizSeries } from '~/common/theme/viz-theme';
 import { i18n } from '~/modules/i18n';
 
 import type { MetricTimeSeries, RankInstancesRequest, TimeSeriesItem } from '~/@types/v1/bkintegrations-bkmonitor';
@@ -117,18 +118,6 @@ const activeQueries = new Map<string, string>();
 const inFlightRequests = new Map<string, Promise<MonitorChartApiResult>>();
 
 const COMPARE_INSTANCE_PREFIX = '__CMP__';
-
-// 供 echarts 绘制曲线，canvas 不解析 var()，必须是实色
-const COMPARE_PALETTE: string[] = [
-  '#EA3636',
-  '#FF9C01',
-  '#3A84FF',
-  '#2DCB56',
-  '#A855F7',
-  '#EC4899',
-  '#14B8A6',
-  '#6366F1',
-];
 
 // ─── 导出函数（按字母序） ───────────────────────────────────────
 
@@ -235,6 +224,17 @@ export function getCachedMetric(
 
 /** 按偏移量值返回色板颜色 */
 export function getColorByOffset(offset: number): string {
+  // series 是 @locked 实色；字典读取带原 hex 兜底，避免加载时快照
+  const palette = readVizSeries([
+    '#EA3636',
+    '#FF9C01',
+    '#3A84FF',
+    '#2DCB56',
+    '#A855F7',
+    '#EC4899',
+    '#14B8A6',
+    '#6366F1',
+  ]);
   const known: Record<number, number> = {
     60: 0, // 1 分钟  → 蓝
     300: 1, // 5 分钟  → 红
@@ -244,13 +244,13 @@ export function getColorByOffset(offset: number): string {
     2592000: 5, // 30 天   → 橙
     31536000: 6, // 1 年    → 紫
   };
-  if (offset in known) return COMPARE_PALETTE[known[offset]];
+  if (offset in known) return palette[known[offset]];
   const str = String(offset);
   let hash = 5381;
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) + hash + str.charCodeAt(i)) | 0;
   }
-  return COMPARE_PALETTE[Math.abs(hash) % COMPARE_PALETTE.length];
+  return palette[Math.abs(hash) % palette.length];
 }
 
 /** 选择器与汇总表共用组合键；数组编码避免仅按名称匹配或拼接分隔符产生冲突。 */

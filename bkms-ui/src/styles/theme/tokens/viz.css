@@ -1,0 +1,107 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
+
+/*
+ * 第三方库可视化主题字典：只服务 CSS var() 与 readVizVar 两路消费，不注册 uno 类。
+ * 三档：@follow 用 var(--bkms-*) 别名；@locked 保留实色；@pending 保留实色并标待补档。
+ * 约束：
+ *   1. 存在同名基础令牌时，值必须恰好是 var(--bkms-<同名>)，不得取近似值；
+ *   2. 无档位者保留 hex，配 @viz-pending 单行标记（target / deltaE00 / usage 三键齐全）；
+ *   3. 业务固定色也进字典并标 @locked，禁止在适配层另写一份。
+ * canvas 约束：解析后必须是实色；半透明由桥接层 hexToRgba 生成，不用 transparent / color-mix。
+ * 状态色只允许引用语义 token；数据分类色按判据 1 锁定，不得因同值关系改成语义色。
+ */
+:root {
+  /* line */
+
+  /* @viz-pending target=--bkms-navy-4 deltaE00=5.63 usage=拓扑边 */
+  --bkms-viz-line: #ABB5CC;
+  --bkms-viz-line-active: var(--bkms-line-active);
+  --bkms-viz-line-danger: var(--bkms-line-danger);
+
+  /* surface */
+
+  --bkms-viz-bg-page: var(--bkms-bg-page);
+  --bkms-viz-bg-card: var(--bkms-bg-card);
+  --bkms-viz-bg-active: var(--bkms-bg-active);
+  --bkms-viz-bg-subtle: var(--bkms-bg-subtle);
+
+  /* @viz-pending target=--bkms-navy-2 deltaE00=7.06 usage=minimap容器底 */
+  --bkms-viz-surface-canvas: #242A35;
+
+  /* @viz-pending target=--bkms-shadow-dialog deltaE00=1.44 usage=minimap遮罩 */
+  --bkms-viz-mask: #0000002d;
+
+  /* status */
+
+  --bkms-viz-status-healthy: var(--bkms-bg-success);
+  --bkms-viz-status-warning: var(--bkms-bg-warning);
+
+  /* @viz-pending target=--bkms-danger-5 deltaE00=0.22 usage=状态块error */
+  --bkms-viz-status-error: #FEDDDD;
+
+  /* @viz-pending target=--bkms-brand-4 deltaE00=4.44 usage=状态块unknown */
+  --bkms-viz-status-unknown: #99B1E0;
+
+  /* text */
+
+  --bkms-viz-text-title: var(--bkms-text-title);
+  --bkms-viz-text-body: var(--bkms-text-body);
+  --bkms-viz-text-secondary: var(--bkms-text-secondary);
+  --bkms-viz-text-disabled: var(--bkms-text-disabled);
+  --bkms-viz-text-inverse: var(--bkms-text-inverse);
+  --bkms-viz-text-brand: var(--bkms-text-brand);
+
+  /* chart */
+
+  --bkms-viz-axis-line: var(--bkms-line-default);
+  --bkms-viz-split-line: var(--bkms-line-light);
+  --bkms-viz-tooltip-surface: var(--bkms-bg-card);
+  --bkms-viz-tooltip-border: var(--bkms-line-input);
+  --bkms-viz-legend-text: var(--bkms-text-secondary);
+
+  /* state */
+
+  --bkms-viz-selection: var(--bkms-warning-2);
+
+  /* series：判据 1（同类不同项需可区分），换主色不跟随 */
+
+  /* @viz-locked reason=数据分类色 theme=light-dark-pair */
+  --bkms-viz-series-1: #EA3636;
+
+  /* @viz-locked reason=数据分类色 theme=light-dark-pair */
+  --bkms-viz-series-2: #FF9C01;
+
+  /* @viz-locked reason=数据分类色 theme=light-dark-pair */
+  --bkms-viz-series-3: #3A84FF;
+
+  /* @viz-locked reason=数据分类色 theme=light-dark-pair */
+  --bkms-viz-series-4: #2DCB56;
+
+  /* @viz-locked reason=数据分类色 theme=light-dark-pair */
+  --bkms-viz-series-5: #A855F7;
+
+  /* @viz-locked reason=数据分类色 theme=light-dark-pair */
+  --bkms-viz-series-6: #EC4899;
+
+  /* @viz-locked reason=数据分类色 theme=light-dark-pair */
+  --bkms-viz-series-7: #14B8A6;
+
+  /* @viz-locked reason=数据分类色 theme=light-dark-pair */
+  --bkms-viz-series-8: #6366F1;
+}

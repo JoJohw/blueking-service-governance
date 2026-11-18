@@ -68,10 +68,10 @@
     NODE_HEIGHT,
     NODE_WIDTH,
     normalizeStatus,
-    STATUS_CONFIG,
   } from './constants';
   import { registerCustomExtensions } from './custom-edge';
   import EdgeTooltip from './edge-tooltip.vue';
+  import { getTopoViz } from './topo-theme';
   import TopologyContextMenu from './topology-context-menu.vue';
   import TopoNodeComponent from './topology-node.vue';
   import TopologyToolbar from './topology-toolbar.vue';
@@ -151,6 +151,7 @@
   });
 
   let extensionsRegistered = false;
+  let topoViz = getTopoViz();
   // 节点数量超过 MINIMAP_NODE_MAX 时，禁用 minimap（性能考虑）
   const minimapDisabled = computed(() => props.nodes.length > MINIMAP_NODE_MAX);
 
@@ -357,6 +358,7 @@
     if (!graphContainerRef.value) return;
 
     registerExtensions();
+    topoViz = getTopoViz();
 
     const graph = new Graph({
       container: graphContainerRef.value,
@@ -386,6 +388,7 @@
       edge: {
         type: (data: EdgeData) => (data.data?.isPrimary ? 'primary-edge' : 'auxiliary-edge'),
         style: {
+          stroke: topoViz.edgeStroke,
           router: {
             type: 'orth',
           },
@@ -421,12 +424,12 @@
                 // 缩略图挂载到toolbar中的custom-minimap上
                 container: document.querySelector('.custom-minimap'),
                 containerStyle: {
-                  background: '#242A35',
+                  background: topoViz.minimapBackground,
                 },
                 maskStyle: {
                   background: 'transparent',
-                  // G6 配置项里的色值统一用字面量，避免 var() 被误用到 canvas 渲染路径
-                  boxShadow: '0 0 10000px 10000px #0000002d',
+                  // G6 配置项里的色值统一用实色，避免 var() 被误用到 canvas 渲染路径
+                  boxShadow: `0 0 10000px 10000px ${topoViz.minimapMask}`,
                 },
                 filter: (id: string, elementType: string) => {
                   if (elementType !== 'node') return true;
@@ -437,7 +440,7 @@
                   if (elementType === 'node') {
                     const nodeData = graphInstance.value?.getNodeData(id);
                     const status = (nodeData?.data as unknown as TopoNodeData)?.nodeStatus ?? 'unknown';
-                    const fill = STATUS_CONFIG[status]?.miniColor || '#99B1E0';
+                    const fill = topoViz.statusColors[status];
 
                     const group = new Group();
 
@@ -449,7 +452,7 @@
                           y: 0,
                           width: NODE_WIDTH,
                           height: NODE_HEIGHT,
-                          fill: '#FFFFFF',
+                          fill: topoViz.nodePlate,
                           radius: 10,
                         },
                       }),

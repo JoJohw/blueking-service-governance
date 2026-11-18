@@ -190,7 +190,6 @@ class AuxiliaryEdge extends Polyline {
   protected getKeyStyle(attributes: Required<PolylineStyleProps>) {
     return {
       ...super.getKeyStyle(attributes),
-      stroke: '#ABB5CC',
       lineWidth: 2,
       lineDash: [3, 3],
     };
@@ -321,7 +320,6 @@ class PrimaryEdge extends Polyline {
     return {
       ...super.getKeyStyle(attributes),
       lineWidth: PrimaryEdge.lineWidth,
-      stroke: '#ABB5CC',
     };
   }
 

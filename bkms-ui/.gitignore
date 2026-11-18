@@ -27,3 +27,8 @@ scripts/theme-lint/reports/*
 # lint 缓存
 .stylelintcache
 .eslintcache
+
+# 仓库根 .gitignore 的 *vendor* 会命中目录名与文件名，以下三项需入库（只放行这些路径）
+!src/styles/theme/patches/vendor/
+!src/styles/theme/patches/vendor/**
+!scripts/theme-check-vendor.mjs

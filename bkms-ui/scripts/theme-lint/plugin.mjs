@@ -31,6 +31,8 @@
 import colorRules from './rules/color.mjs';
 import radiusRules from './rules/radius.mjs';
 
+export { THEME_VAR_PREFIXES } from './var-prefix.mjs';
+
 export default {
   meta: { name: 'theme' },
   rules: {

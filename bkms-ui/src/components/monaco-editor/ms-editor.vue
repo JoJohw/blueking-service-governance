@@ -92,6 +92,8 @@
   import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker.js?worker';
   import { copyText, validateYAML } from '~/common/util';
 
+  import { registerBkmsMonacoTheme, resolveMonacoTheme } from './monaco-theme';
+
   import type { IMonacoEditorErrorMarkerItem } from '~/common/util';
 
   const props = defineProps({
@@ -262,11 +264,12 @@
     }
     destroyMonaco();
 
+    registerBkmsMonacoTheme();
     initAutoCompletion();
     const opt: monaco.editor.IStandaloneEditorConstructionOptions = {
       value: props.modelValue,
       language: props.lang,
-      theme: props.theme,
+      theme: resolveMonacoTheme(props.theme),
       minimap: {
         enabled: false,
       },
@@ -480,6 +483,14 @@
     () => props.options,
     val => {
       editor?.updateOptions(val);
+    },
+  );
+
+  watch(
+    () => props.theme,
+    val => {
+      registerBkmsMonacoTheme();
+      monaco.editor.setTheme(resolveMonacoTheme(val));
     },
   );
 

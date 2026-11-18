@@ -47,6 +47,49 @@ if (byDimension && byDimension !== 'property') {
 // 根目录由脚本自身位置推出，不取 process.cwd()：从仓库上层或子目录跑 `pnpm theme:report` 时
 // cwd 不是 bkms-ui，eslint.config.mjs 与 src 都会解析失败 / 报出带 ../ 的路径
 const projectRoot = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
+
+/**
+ * viz 字典待补档清单：只认机器可读的 @viz-(pending|locked) 单行标记；
+ * 字典实色是定义，不进 eslint issues，也不计入业务 hex 债务。
+ */
+const VIZ_MARKER_RE = /\/\*\s*@viz-(pending|locked)\s+([^*]*?)\s*\*\//g;
+const PENDING_KEYS = ['target', 'deltaE00', 'usage'];
+
+function collectVizMarkers() {
+  const file = path.join(projectRoot, 'src/styles/theme/tokens/viz.css');
+  if (!fs.existsSync(file)) return { pending: [], locked: [], defects: [] };
+  const source = fs.readFileSync(file, 'utf8');
+  const pending = [];
+  const locked = [];
+  const defects = [];
+  for (const marker of source.matchAll(VIZ_MARKER_RE)) {
+    const attrs = Object.fromEntries([...marker[2].matchAll(/(\w+)=([^\s]+)/g)].map(m => [m[1], m[2]]));
+    const decl = source.slice(marker.index + marker[0].length).match(/(--bkms-viz-[\w-]+)\s*:\s*([^;]+);/);
+    const name = decl?.[1] ?? '(未关联声明)';
+    const value = decl?.[2].trim() ?? '';
+    if (marker[1] === 'locked') {
+      locked.push({ name, value, attrs });
+      continue;
+    }
+    const missing = PENDING_KEYS.filter(key => !attrs[key]);
+    if (missing.length) defects.push(`${name}：缺少 ${missing.join(' / ')}`);
+    pending.push({ name, value, attrs });
+  }
+  return { pending, locked, defects };
+}
+
+const viz = collectVizMarkers();
+console.log(`\n【viz 字典】待补档 ${viz.pending.length} 项，锁定 ${viz.locked.length} 项（不计入业务 hex 债务）`);
+for (const item of viz.pending) {
+  const { target = '-', deltaE00 = '-', usage = '-' } = item.attrs;
+  console.log(
+    `  ${item.name.padEnd(32)} ${item.value.padEnd(12)} target=${target} deltaE00=${deltaE00} usage=${usage}`,
+  );
+}
+if (viz.defects.length) {
+  console.error(`✗ @viz-pending 三键校验失败：\n  ${viz.defects.join('\n  ')}`);
+}
+
 const eslint = new ESLint({ cwd: projectRoot });
 const results = await eslint.lintFiles([path.join(projectRoot, 'src')]);
 
@@ -67,7 +110,7 @@ const issues = results.flatMap(r =>
 
 if (!issues.length) {
   console.log('✓ theme:report：src 下无主题令牌漂移');
-  process.exit(0);
+  process.exit(viz.defects.length ? 1 : 0);
 }
 
 const byRule = new Map();
@@ -185,3 +228,5 @@ const top = [
   ).values(),
 ].slice(0, 3);
 if (top.length) console.log(`提示：${top.join(' / ')}\n`);
+
+if (viz.defects.length) process.exitCode = 1;

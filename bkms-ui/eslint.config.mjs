@@ -139,6 +139,19 @@ export default [
       'theme/prefer-radius-class': 'off',
     },
   },
+  // canvas 消费必须落实色：这些文件里的 hex 是配置数据与字典兜底值，不是样式字面量
+  {
+    files: [
+      'src/pages/application/components/topo/**',
+      'src/pages/application/detail/deploy/monitor-chart-bridge.ts',
+      'src/pages/application/detail/deploy/echarts-viz.ts',
+      'src/components/monaco-editor/monaco-theme.ts',
+      'src/common/theme/viz-theme.ts',
+    ],
+    rules: {
+      'theme/no-hardcoded-color': 'off',
+    },
+  },
   // palette 是独立 dev 工具：骨架用自有 --pal-* 固定变量（shell.css 定义），
   // 展示色块用 var(--bkms-*) 读取真源；两者都不是消费层的令牌漂移
   {

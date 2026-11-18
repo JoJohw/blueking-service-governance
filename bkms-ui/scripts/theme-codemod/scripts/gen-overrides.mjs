@@ -400,6 +400,28 @@ cleanGeneratedDir(PATCHES_DIR);
 const LITERAL_SECTION_MARKER =
   '/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */';
 
+// 与 eslint.config.mjs 的 LICENSE_HEADER 保持一致；产物每次重跑都整体覆盖，头必须由生成器写
+const LICENSE_LINES = `/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
+`
+  .trimEnd()
+  .split('\n');
+
 let emittedRules = 0;
 let emittedDecls = 0;
 let literalRules = 0;
@@ -413,6 +435,8 @@ for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].
   const varBucket = patches.get(kebab);
   const litBucket = literalPatches.get(kebab);
   const lines = [
+    ...LICENSE_LINES,
+    '',
     `/* bkui ${name} 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */`,
     '',
     '/* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */',
@@ -484,7 +508,12 @@ function writeDomainIndex(dir, files, header) {
 writeDomainIndex(
   PATCHES_DIR,
   perComponent.map(p => `${p.kebab}.css`),
-  ['/* bkui 覆写清单 — 由 gen-overrides.mjs 生成，重跑整体覆盖；variables.css 为手工桥接，不在此列 */'],
+  [
+    ...LICENSE_LINES,
+    '',
+    '/* bkui 覆写清单 — 由 gen-overrides.mjs 生成，重跑整体覆盖；variables.css 为手工桥接，不在此列 */',
+    '',
+  ],
 );
 // 手写覆写在 src/styles/overrides.css，不参与生成器重跑
 

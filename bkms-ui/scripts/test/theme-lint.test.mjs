@@ -55,7 +55,7 @@ import {
   suggestShadowVar,
   suggestVar,
 } from '../theme-lint/map.mjs';
-import themePlugin from '../theme-lint/plugin.mjs';
+import themePlugin, { THEME_VAR_PREFIXES } from '../theme-lint/plugin.mjs';
 
 const RULES = {
   'theme/no-hardcoded-color': 'error',
@@ -199,6 +199,16 @@ describe('map 令牌解析', () => {
     expect(hexOfVar('--bkms-not-exist')).toBeNull();
     expect(hexOfVar('--foo')).toBeNull();
     expect(hexOfVar('--bkms-shadow-button')).toBeNull(); // color-mix 无法归一为单值
+  });
+
+  it('viz 字典只进 resolveHex，不进建议池', () => {
+    expect(isThemeVar('--bkms-viz-line')).toBe(true);
+    expect(THEME_VAR_PREFIXES).toContain('--bkms-viz-');
+    expect(hexOfVar('--bkms-viz-bg-card')).toBe('#ffffff');
+    expect(hexOfVar('--bkms-viz-series-3')).toBe('#3a84ff');
+    for (const value of ['#ffffff', '#3a84ff', '#abb5cc']) {
+      expect(nearestVars(value, {}, 3).some(v => v.includes('viz-'))).toBe(false);
+    }
   });
 
   it('isThemeVar / isShadowVar 区分令牌族', () => {

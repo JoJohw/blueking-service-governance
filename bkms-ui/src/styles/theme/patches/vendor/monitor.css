@@ -1,0 +1,64 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
+
+/*
+ * monitor-vue3-components：只覆写图例 / tooltip / 图表菜单 / 空态等 DOM 可视面；
+ * 曲线与坐标轴结构色由 deploy/echarts-viz.ts 注入画布配置。
+ */
+.bkms-themed .common-legend {
+  color: var(--bkms-text-secondary);
+}
+
+.bkms-themed .common-legend-item {
+  color: var(--bkms-text-body);
+}
+
+.bkms-themed .monitor-chart-tooltips,
+.bkms-themed .common-chart-tooltips-wrap {
+  color: var(--bkms-text-body);
+  background-color: var(--bkms-bg-card);
+  border-color: var(--bkms-line-input);
+}
+
+.bkms-themed .tooltips-header {
+  color: var(--bkms-text-title);
+  background-color: var(--bkms-bg-page);
+  border-bottom-color: var(--bkms-line-light);
+}
+
+.bkms-themed .chart-menu {
+  background-color: var(--bkms-bg-card);
+  border-color: var(--bkms-line-input);
+}
+
+.bkms-themed .chart-menu-item {
+  color: var(--bkms-text-body);
+}
+
+.bkms-themed .chart-menu-item:hover {
+  color: var(--bkms-line-active);
+  background-color: var(--bkms-bg-page);
+}
+
+.bkms-themed .empty-status-container .empty-text {
+  color: var(--bkms-text-secondary);
+}
+
+.bkms-themed .title-wrapper .chart-title {
+  color: var(--bkms-text-title);
+}

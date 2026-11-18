@@ -1,4 +1,22 @@
 /*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
+
+/*
  * 第三方覆写层 —— 只改组件库渲染出的 DOM（选择器里出现 bk- / vxe- / monaco- 等类名）。
  * 加载点：main.ts 末尾（晚于 uno.css 与 theme/index.css），手写覆写最后说话。
  * 本应用自有 class（.bkms-* 等模板里写的类）一律进 app.css，不要写在这里。
@@ -129,7 +147,6 @@
 
 .vxe-table--render-default {
   --vxe-ui-table-row-height-default: 42px;
-  --vxe-ui-table-header-background-color: var(--bkms-bg-head);
 
   /* 表格最后一行斑马纹背景残留清除（vxe 按行绘制背景图） */
 

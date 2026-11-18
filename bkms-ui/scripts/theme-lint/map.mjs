@@ -36,6 +36,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { THEME_VAR_PREFIXES } from './var-prefix.mjs';
+
 /**
  * 不能用 import.meta.url 单独定位：uno 的配置加载器（unconfig）会把配置打包到临时目录再执行，
  * 此时 import.meta.url 指向临时位置。cwd 优先、本文件位置兜底，以 color.css 存在为准。
@@ -204,9 +206,22 @@ for (const file of ['color.css']) {
   }
 }
 
+/**
+ * viz 字典只参与 var() 链解析，不进 SCALE / SEMANTIC / 建议候选：
+ * --bkms-viz-series-3 这类数字结尾的名字会被色阶正则当成 family=viz-series 收进建议池。
+ */
+const vizDecls = new Map();
+const vizFile = path.join(THEME_TOKENS_DIR, 'viz.css');
+if (fs.existsSync(vizFile)) {
+  const source = fs.readFileSync(vizFile, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of source.matchAll(/(--bkms-[\w-]+)\s*:\s*([^;{}]+)/g)) {
+    vizDecls.set(m[1], m[2].trim());
+  }
+}
+
 /** var() 引用链解析到 hex；遇到多值（color-mix 等）返回 null */
 function resolveHex(name, seen = new Set()) {
-  const value = decls.get(name);
+  const value = decls.get(name) ?? vizDecls.get(name);
   if (!value || seen.has(name)) return null;
   seen.add(name);
   const ref = value.match(/^var\(\s*(--[\w-]+)\s*\)$/);
@@ -273,7 +288,8 @@ export const COLOR_KINDS = [
 /** 语义组与工具类的对应：border 方向存在时不可压平为 bkms-line-* */
 const SEMANTIC_GROUP_BY_KIND = { text: 'text', bg: 'bg', border: 'line' };
 
-export const isThemeVar = name => typeof name === 'string' && name.startsWith('--bkms-');
+export const isThemeVar = name =>
+  typeof name === 'string' && THEME_VAR_PREFIXES.some(prefix => name.startsWith(prefix));
 export const isShadowVar = name => SHADOW_TOKENS.includes(name);
 
 export function hexOfVar(name) {
