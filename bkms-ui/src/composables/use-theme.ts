@@ -55,7 +55,7 @@ function readSetting(): ColorSchemeSetting {
 /** 模块级单例：多处 useTheme() 共享同一份当前主题 */
 const currentTheme = ref<BkmsTheme>('light');
 
-/** 应用主题：写 data-theme 驱动 themes/ 下的色阶覆盖，并同步 .dark class（沿用原有约定） */
+/** 应用主题：写 data-theme 驱动 themes/ 下的色阶覆盖，并同步 .dark class（沿用原有约定，供第三方库/工具类使用） */
 export function applyTheme(theme: BkmsTheme) {
   currentTheme.value = theme;
   document.documentElement.setAttribute('data-theme', theme);

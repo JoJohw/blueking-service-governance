@@ -74,13 +74,6 @@
             </span>
           </template>
           <template #right>
-            <span
-              class="bkms-theme-toggle mr-[16px]"
-              :title="isDark ? t('切换到浅色主题') : t('切换到深色主题')"
-              @click="toggleTheme"
-            >
-              {{ isDark ? t('浅色') : t('深色') }}
-            </span>
             <bk-popover
               :arrow="false"
               ext-cls="!px-0 !py-[4px]"
@@ -133,7 +126,7 @@
   import ApplyPerm from '~/components/apply-perm.vue';
   import { useEventBus } from '~/composables/use-event-bus';
   import usePlatform from '~/composables/use-platform';
-  import { useTheme } from '~/composables/use-theme';
+  // import { useTheme } from '~/composables/use-theme';
   import { useUserStore } from '~/stores/user';
 
   import { getNavList } from './composables/use-menu';
@@ -150,8 +143,8 @@
 
   const { t } = useI18n();
 
-  // 多主题：顶栏切换入口（试验期放在用户菜单左侧，主题值只控 html[data-theme]）
-  const { isDark, toggleTheme } = useTheme();
+  // 多主题：顶栏切换入口已移除，切换逻辑暂不启用
+  // const { isDark, toggleTheme } = useTheme();
 
   // 路由信息
   const route = useRoute();
@@ -281,23 +274,5 @@
 <style lang="postcss" scoped>
   :deep(.bk-navigation-title) {
     flex: 0 0 360px;
-  }
-
-  /* 顶栏主题切换：顶栏是深色壳层，文字继承 nav 的 navy-4，hover 底与 nav 药丸一致 */
-  .bkms-theme-toggle {
-    display: inline-flex;
-    align-items: center;
-    height: 22px;
-    padding: 0 8px;
-    font-size: 12px;
-    line-height: 1;
-    cursor: pointer;
-    user-select: none;
-    border-radius: 2px;
-    transition: background-color 0.2s;
-  }
-
-  .bkms-theme-toggle:hover {
-    background-color: var(--bkms-navy-2);
   }
 </style>
