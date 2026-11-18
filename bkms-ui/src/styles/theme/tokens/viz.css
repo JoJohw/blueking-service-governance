@@ -17,69 +17,59 @@
  */
 
 /*
- * 第三方库可视化主题字典：只服务 CSS var() 与 readVizVar 两路消费，不注册 uno 类。
- * 三档：@follow 用 var(--bkms-*) 别名；@locked 保留实色；@pending 保留实色并标待补档。
- * 约束：
- *   1. 存在同名基础令牌时，值必须恰好是 var(--bkms-<同名>)，不得取近似值；
- *   2. 无档位者保留 hex，配 @viz-pending 单行标记（target / deltaE00 / usage 三键齐全）；
- *   3. 业务固定色也进字典并标 @locked，禁止在适配层另写一份。
+ * 可视化主题字典（viz 域）：拓扑图 / 图表 / Monaco / 语法高亮共用的独立色板。
+ * 只服务 CSS var() 与 readVizVar 两路消费，不注册 uno 类。
+ *
+ * 独立性：viz 域不从 --bkms-* 派生。UI 换品牌色、换明暗主题都不应带动图表——
+ * 图表的取色由可视化自身场景决定（数据分类、轴与网格、浮层、编辑器语义色）。
+ * 需要跟随主题时，在 [data-theme='dark'] 下给出 viz 自己的第二档，不回头引用 UI 令牌。
+ *
+ * 档位：
+ *   - 默认（light）：图表基础色板，字面无派生；
+ *   - @viz-locked：数据分类色，任何主题下都不漂移。
  * canvas 约束：解析后必须是实色；半透明由桥接层 hexToRgba 生成，不用 transparent / color-mix。
- * 状态色只允许引用语义 token；数据分类色按判据 1 锁定，不得因同值关系改成语义色。
+ * 业务已定的图表色（series 等）一律进本字典并标 @viz-locked，禁止在适配层另写一份。
  */
+
 :root {
   /* line */
-
-  /* @viz-pending target=--bkms-navy-4 deltaE00=5.63 usage=拓扑边 */
   --bkms-viz-line: #ABB5CC;
-  --bkms-viz-line-active: var(--bkms-line-active);
-  --bkms-viz-line-danger: var(--bkms-line-danger);
+  --bkms-viz-line-active: #3B6EF5;
+  --bkms-viz-line-danger: #EA3636;
 
   /* surface */
-
-  --bkms-viz-bg-page: var(--bkms-bg-page);
-  --bkms-viz-bg-card: var(--bkms-bg-card);
-  --bkms-viz-bg-active: var(--bkms-bg-active);
-  --bkms-viz-bg-subtle: var(--bkms-bg-subtle);
-
-  /* @viz-pending target=--bkms-navy-2 deltaE00=7.06 usage=minimap容器底 */
+  --bkms-viz-bg-page: #F0F4FA;
+  --bkms-viz-bg-card: #FFF;
+  --bkms-viz-bg-active: #E5EDFF;
+  --bkms-viz-bg-subtle: #F7F9FD;
   --bkms-viz-surface-canvas: #242A35;
+  --bkms-viz-mask: #0000002D;
 
-  /* @viz-pending target=--bkms-shadow-dialog deltaE00=1.44 usage=minimap遮罩 */
-  --bkms-viz-mask: #0000002d;
-
-  /* status */
-
-  --bkms-viz-status-healthy: var(--bkms-bg-success);
-  --bkms-viz-status-warning: var(--bkms-bg-warning);
-
-  /* @viz-pending target=--bkms-danger-5 deltaE00=0.22 usage=状态块error */
+  /* status：minimap 状态块只画实色，故与节点卡的语义色分开维护 */
+  --bkms-viz-status-healthy: #DAF6E5;
+  --bkms-viz-status-warning: #FDEED8;
   --bkms-viz-status-error: #FEDDDD;
-
-  /* @viz-pending target=--bkms-brand-4 deltaE00=4.44 usage=状态块unknown */
   --bkms-viz-status-unknown: #99B1E0;
 
   /* text */
-
-  --bkms-viz-text-title: var(--bkms-text-title);
-  --bkms-viz-text-body: var(--bkms-text-body);
-  --bkms-viz-text-secondary: var(--bkms-text-secondary);
-  --bkms-viz-text-disabled: var(--bkms-text-disabled);
-  --bkms-viz-text-inverse: var(--bkms-text-inverse);
-  --bkms-viz-text-brand: var(--bkms-text-brand);
+  --bkms-viz-text-title: #111214;
+  --bkms-viz-text-body: #4A5973;
+  --bkms-viz-text-secondary: #8F9FBD;
+  --bkms-viz-text-disabled: #C1CDE5;
+  --bkms-viz-text-inverse: #FFF;
+  --bkms-viz-text-brand: #3B6EF5;
 
   /* chart */
-
-  --bkms-viz-axis-line: var(--bkms-line-default);
-  --bkms-viz-split-line: var(--bkms-line-light);
-  --bkms-viz-tooltip-surface: var(--bkms-bg-card);
-  --bkms-viz-tooltip-border: var(--bkms-line-input);
-  --bkms-viz-legend-text: var(--bkms-text-secondary);
+  --bkms-viz-axis-line: #E4E9F2;
+  --bkms-viz-split-line: #E9EDF5;
+  --bkms-viz-tooltip-surface: #FFF;
+  --bkms-viz-tooltip-border: #C1CDE5;
+  --bkms-viz-legend-text: #8F9FBD;
 
   /* state */
+  --bkms-viz-selection: #F59500;
 
-  --bkms-viz-selection: var(--bkms-warning-2);
-
-  /* series：判据 1（同类不同项需可区分），换主色不跟随 */
+  /* series：数据分类色（同类不同项需可区分），换主题不跟随 */
 
   /* @viz-locked reason=数据分类色 theme=light-dark-pair */
   --bkms-viz-series-1: #EA3636;

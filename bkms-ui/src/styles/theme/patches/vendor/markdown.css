@@ -17,39 +17,40 @@
  */
 
 /*
- * github-markdown-css：正文 / 标题 / 引用块 / 表格边框 / 代码块底走字典；
+ * github-markdown-css：正文 / 标题 / 引用块 / 表格边框 / 代码块底。
+ * 正文属内容域，跟随 UI 主题，直读 --bkms-*；不借道 viz 字典（可视化域的独立色板）。
  * .hljs-* 与 .pl-* 语法 token 是 @locked，不在本文件覆盖。
  */
 
 /* stylelint-disable custom-property-pattern -- 变量名由 github-markdown-css 定义，必须同名重指向 */
 .bkms-themed .markdown-body {
-  --fgColor-default: var(--bkms-viz-text-body);
-  --fgColor-muted: var(--bkms-viz-text-secondary);
-  --fgColor-accent: var(--bkms-viz-text-brand);
-  --bgColor-default: var(--bkms-viz-bg-card);
-  --bgColor-muted: var(--bkms-viz-bg-subtle);
-  --bgColor-neutral-muted: var(--bkms-viz-bg-subtle);
-  --borderColor-default: var(--bkms-viz-split-line);
-  --borderColor-muted: var(--bkms-viz-split-line);
+  --fgColor-default: var(--bkms-text-body);
+  --fgColor-muted: var(--bkms-text-secondary);
+  --fgColor-accent: var(--bkms-text-brand);
+  --bgColor-default: var(--bkms-bg-card);
+  --bgColor-muted: var(--bkms-bg-subtle);
+  --bgColor-neutral-muted: var(--bkms-bg-subtle);
+  --borderColor-default: var(--bkms-line-light);
+  --borderColor-muted: var(--bkms-line-light);
 }
 
 /* stylelint-enable custom-property-pattern */
 
 .bkms-themed .markdown-body h1,
 .bkms-themed .markdown-body h2 {
-  border-bottom-color: var(--bkms-viz-split-line);
+  border-bottom-color: var(--bkms-line-light);
 }
 
 .bkms-themed .markdown-body blockquote {
-  color: var(--bkms-viz-text-secondary);
-  border-left-color: var(--bkms-viz-tooltip-border);
+  color: var(--bkms-text-secondary);
+  border-left-color: var(--bkms-line-input);
 }
 
 .bkms-themed .markdown-body table th,
 .bkms-themed .markdown-body table td {
-  border-color: var(--bkms-viz-split-line);
+  border-color: var(--bkms-line-light);
 }
 
 .bkms-themed .markdown-body table tr:nth-child(2n) {
-  background-color: var(--bkms-viz-bg-subtle);
+  background-color: var(--bkms-bg-subtle);
 }

@@ -119,8 +119,3 @@ export function mixHex(from: string, to: string, ratio: number): string {
     )
     .join('')}`;
 }
-
-/** halo 是品牌色的 alpha 派生值，字典里不落值 */
-export function vizHalo(alpha = 0.2): string {
-  return hexToRgba(readVizVar('--bkms-brand-2', '#3B6EF5'), alpha);
-}

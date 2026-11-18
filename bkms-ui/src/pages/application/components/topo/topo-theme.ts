@@ -18,16 +18,24 @@
 
 import { invalidateVizCache, readVizVar } from '~/common/theme/viz-theme';
 
-import { STATUS_CONFIG } from './constants';
-
 import type { NodeStatus } from './types';
 
 const STATUS_VARS: Record<NodeStatus, string> = {
-  all: '--bkms-viz-bg-card',
+  // minimap 只画实色状态块，all 沿用 unknown 的底色，勿指向 bg-card（与底板同色会消失）
+  all: '--bkms-viz-status-unknown',
   error: '--bkms-viz-status-error',
   healthy: '--bkms-viz-status-healthy',
   unknown: '--bkms-viz-status-unknown',
   warning: '--bkms-viz-status-warning',
+};
+
+/** viz 变量取不到实色时的兜底，与 viz.css 未落值前的字面色一致 */
+const STATUS_FALLBACK: Record<NodeStatus, string> = {
+  all: '#99B1E0',
+  error: '#FEDDDD',
+  healthy: '#DAF6E5',
+  unknown: '#99B1E0',
+  warning: '#FDEED8',
 };
 
 export interface TopoViz {
@@ -39,8 +47,7 @@ export interface TopoViz {
   statusColors: Record<NodeStatus, string>;
 }
 
-const statusColor = (status: NodeStatus): string =>
-  readVizVar(STATUS_VARS[status], STATUS_CONFIG[status].miniColor ?? '#99B1E0');
+const statusColor = (status: NodeStatus): string => readVizVar(STATUS_VARS[status], STATUS_FALLBACK[status]);
 
 export function getTopoViz(): TopoViz {
   const statusColors: Record<NodeStatus, string> = {

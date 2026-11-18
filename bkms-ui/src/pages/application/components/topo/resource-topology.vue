@@ -440,7 +440,7 @@
                   if (elementType === 'node') {
                     const nodeData = graphInstance.value?.getNodeData(id);
                     const status = (nodeData?.data as unknown as TopoNodeData)?.nodeStatus ?? 'unknown';
-                    const fill = topoViz.statusColors[status];
+                    const fill = topoViz.statusColors[status] ?? topoViz.statusColors.unknown;
 
                     const group = new Group();
 
