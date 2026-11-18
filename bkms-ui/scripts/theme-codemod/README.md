@@ -1,15 +1,14 @@
 # theme-codemod — 主题色工具集
 
 支撑 bkms-ui 主题色体系（`--bkms-*` 令牌 + bkui class 覆写层）的生成与自检。
-方案与分层模型见 `docs/theme-style/THEME.md`，操作步骤见 `docs/theme-style/THEME_STEPS.md`。
+方案与分层模型见 `docs/theme-style/THEME.md`（第九节为操作步骤），第三方库可视化主题见 `docs/theme-style/THIRD-PARTY-THEME.md`。
 
 ## 目录结构
 
 ```
 theme-codemod/
 ├── scripts/    # 可执行脚本（npm 入口见下表）
-├── data/       # 仅存 keep 黑名单（保留色的唯一人工清单）
-├── docs/       # 说明文档（rules.md 规约、bridge-notes.md bridge 生成备注）
+├── data/       # 圆角台账（radius-ledger.json）
 └── reports/    # 运行产出台账（脚本输出，可随时重生成；designer-review 为拍板记录）
 ```
 
@@ -23,7 +22,6 @@ theme-codemod/
 | --- | --- | --- |
 | 令牌值 | `src/styles/theme/tokens/color.css` | 所有 `--bkms-*` 色值的唯一定义处（`@layer scale` / `@layer semantic` 两个区） |
 | 历史映射事实 | `src/styles/theme/patches/bkui-theme/*.css` | 令牌 + 原值注释成对出现，生成器自读自建索引 |
-| 保留色黑名单 | `data/keep.json` | 刻意保留原色、不替换的黑名单 |
 
 ## 脚本入口（直接 node 执行，不占 package.json）
 

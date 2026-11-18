@@ -35,30 +35,32 @@ const VENDOR_DIR = path.join(projectRoot, 'src/styles/theme/patches/vendor');
 const VXE_CSS = 'node_modules/@blueking/table/vue3/vue3.css';
 const VIZ_CSS = 'src/styles/theme/tokens/viz.css';
 
-/** 覆写文件 → 所属库 CSS，新增覆写文件必须在这里登记 */
+/** 覆写文件（相对 patches/vendor/ 的路径）→ 所属库 CSS，新增覆写文件必须在这里登记 */
 const LIB_CSS = {
-  'date-picker.css': 'node_modules/@blueking/date-picker/vue3/vue3.css',
-  'ediatable.css': 'node_modules/@blueking/ediatable/vue3/vue3.css',
+  '@blueking/bk-table.css': VXE_CSS,
+  '@blueking/date-picker.css': 'node_modules/@blueking/date-picker/vue3/vue3.css',
+  '@blueking/ediatable.css': 'node_modules/@blueking/ediatable/vue3/vue3.css',
+  '@blueking/monitor.css': 'node_modules/@blueking/monitor-vue3-components/index.css',
+  '@blueking/notice.css': 'node_modules/@blueking/notice-component/dist/style.css',
+  '@blueking/task-log.css': 'node_modules/@blueking/task-log/vue3/vue3.css',
+  '@blueking/user-selector.css': 'node_modules/@blueking/bk-user-selector/vue3/vue3.css',
+  '@blueking/vxe.css': VXE_CSS,
   'highlight.css': 'node_modules/highlight.js/styles/github.css',
   'markdown.css': 'node_modules/github-markdown-css/github-markdown.css',
-  'monitor.css': 'node_modules/@blueking/monitor-vue3-components/index.css',
-  'notice.css': 'node_modules/@blueking/notice-component/dist/style.css',
-  'task-log.css': 'node_modules/@blueking/task-log/vue3/vue3.css',
-  'user-selector.css': 'node_modules/@blueking/bk-user-selector/vue3/vue3.css',
-  'vxe.css': VXE_CSS,
 };
 
 /** 只盯各库最关键的可视面类名，避免把状态类改动误报成漂移 */
 const KEY_SELECTORS = {
-  'date-picker.css': ['.date-panel', '.date-grid-item'],
-  'ediatable.css': ['.bk-ediatable', '.bk-ediatable-head-column'],
+  '@blueking/bk-table.css': ['.bk-vxe-table', '.bk-vxe-table-setting-column-btn'],
+  '@blueking/date-picker.css': ['.panel-wrapper', '.date-panel', '.common-date-list .list-item'],
+  '@blueking/ediatable.css': ['.bk-ediatable', '.bk-ediatable-head-column'],
+  '@blueking/monitor.css': ['.common-legend', '.monitor-chart-tooltips', '.chart-menu'],
+  '@blueking/notice.css': ['.bk-notice-component-alert'],
+  '@blueking/task-log.css': ['.log-item', '.bk-popper'],
+  '@blueking/user-selector.css': ['.bk-user-selector', '.user-option'],
+  '@blueking/vxe.css': ['.vxe-table--render-default'],
   'highlight.css': ['.hljs'],
   'markdown.css': ['.markdown-body'],
-  'monitor.css': ['.common-legend', '.monitor-chart-tooltips', '.chart-menu'],
-  'notice.css': ['.bk-notice-component-alert'],
-  'task-log.css': ['.log-item', '.bk-popper'],
-  'user-selector.css': ['.bk-user-selector', '.user-option'],
-  'vxe.css': ['.vxe-table--render-default'],
 };
 
 const readMaybe = file => {
@@ -80,7 +82,20 @@ const vizSource = readMaybe(VIZ_CSS);
 if (!vxeSource) problems.push(`依赖缺失：${VXE_CSS}`);
 if (!vizSource) problems.push(`字典缺失：${VIZ_CSS}`);
 
-const files = fs.readdirSync(VENDOR_DIR).filter(file => file.endsWith('.css') && file !== 'index.css');
+/** 递归收集覆写文件（跳过各级 index.css），键统一成 posix 相对路径，如 @blueking/date-picker.css */
+function collectOverrideFiles(dir, base = dir) {
+  const out = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...collectOverrideFiles(full, base));
+    else if (entry.name.endsWith('.css') && entry.name !== 'index.css') {
+      out.push(path.relative(base, full).split(path.sep).join('/'));
+    }
+  }
+  return out.sort();
+}
+
+const files = collectOverrideFiles(VENDOR_DIR);
 
 for (const file of files) {
   const source = fs.readFileSync(path.join(VENDOR_DIR, file), 'utf8');
@@ -112,7 +127,7 @@ for (const file of files) {
 if (problems.length) {
   console.error(`✗ theme:check-vendor：${problems.length} 处漂移`);
   for (const item of problems) console.error(`  - ${item}`);
-  console.error('\n第三方包升级后请重跑本命令；缺失的变量名/选择器需同步改 patches/vendor/*.css');
+  console.error('\n第三方包升级后请重跑本命令；缺失的变量名/选择器需同步改 patches/vendor/ 下对应覆写文件');
   process.exit(1);
 }
 

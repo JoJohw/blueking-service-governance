@@ -116,7 +116,9 @@ for (const tag of tagUse.keys()) {
 const components = [];
 for (const name of [...allNames].sort()) {
   const kebab = CLASS_ALIAS[name] ?? pascalToKebab(name);
-  const files = new Set([...(importUse.get(name) ?? []), ...(tagUse.get(`bk-${pascalToKebab(name)}`) ?? [])]);
+  // 模板标签按导出名推 kebab（InfoBox 渲染 <bk-info-box>），与 css 类前缀 kebab 可能不同
+  const tagKey = `bk-${pascalToKebab(name)}`;
+  const files = new Set([...(importUse.get(name) ?? []), ...(tagUse.get(tagKey) ?? [])]);
   const cssFound = hasClassPrefix(kebab);
   components.push({
     name,
@@ -124,7 +126,7 @@ for (const name of [...allNames].sort()) {
     cssPrefix: `.bk-${kebab}`,
     cssFound,
     importCount: importUse.get(name)?.size ?? 0,
-    tagCount: tagUse.get(`bk-${kebab}`)?.size ?? 0,
+    tagCount: tagUse.get(tagKey)?.size ?? 0,
     fileCount: files.size,
     files: [...files].map(rel),
   });

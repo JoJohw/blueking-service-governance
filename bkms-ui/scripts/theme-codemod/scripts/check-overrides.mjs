@@ -30,6 +30,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { collectBlocks, splitSelectorList } from './lib/css-blocks.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../../..');
 const DIST_FILE = path.join(ROOT, 'node_modules/bkui-vue/dist/style.variable.css');
@@ -47,39 +49,23 @@ function buildDistIndex(file) {
   for (const r of rules) {
     // 3 位短写展开成 6 位，与覆写侧注释/值中的归一化 hex 对齐
     const body = r.body.toLowerCase().replace(/#([0-9a-f]{3})(?![0-9a-f])/g, '#$1$1');
-    if (!index.has(r.selector)) index.set(r.selector, []);
-    index.get(r.selector).push(body);
+    // 与 unscopeSelector 同源：只按外层逗号切分，括号内逗号与空格原样保留
+    const key = splitSelectorList(r.selector)
+      .map(s => s.trim())
+      .join(',');
+    if (!index.has(key)) index.set(key, []);
+    index.get(key).push(body);
   }
   return index;
 }
 
-/** 与 gen-overrides 相同的块解析（@media 展开、keyframes 跳过） */
-function collectBlocks(text, media, out) {
-  let pos = 0;
-  while (pos < text.length) {
-    const open = text.indexOf('{', pos);
-    if (open === -1) break;
-    const prelude = text.slice(pos, open).trim();
-    let depth = 1;
-    let j = open + 1;
-    while (j < text.length && depth > 0) {
-      const ch = text[j];
-      if (ch === '{') depth++;
-      else if (ch === '}') depth--;
-      j++;
-    }
-    const body = text.slice(open + 1, j - 1);
-    pos = j;
-    if (prelude.startsWith('@')) {
-      const at = prelude.slice(1).split(/[\s(]/)[0].toLowerCase();
-      if (at === 'media' || at === 'supports' || at === 'layer') {
-        collectBlocks(body, at === 'media' ? prelude.replace(/\s+/g, ' ') : media, out);
-      }
-      continue;
-    }
-    out.push({ selector: prelude.replace(/\s+/g, ' '), body, media });
-  }
+/** 多选择器逐个剥作用域：生成侧是每个选择器各带一个前缀，不能只剥首个 */
+function unscopeSelector(selector) {
+  return splitSelectorList(selector)
+    .map(s => s.replace(SCOPE, '').trim())
+    .join(',');
 }
+
 const distIndex = buildDistIndex(DIST_FILE);
 const literalDistIndex = buildDistIndex(LITERAL_DIST_FILE);
 
@@ -100,7 +86,7 @@ function checkRules(rules, index, file, label) {
       .trim();
     if (!selector.startsWith(SCOPE)) continue; // 全局无包裹段不在本脚本职责内
     checked++;
-    const originSelector = selector.slice(SCOPE.length).trim();
+    const originSelector = unscopeSelector(selector);
     const bodies = index.get(originSelector);
     if (!bodies) {
       failures.push({ file: label + file, selector: rule.selector, reason: '选择器已不在 bkui 产物中（库升级漂移）' });
