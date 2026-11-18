@@ -114,15 +114,20 @@
   box-shadow: 0 0 0 1px var(--bkms-brand-4) inset; /* 原 #a3c5fd */
 }
 
-.bkms-themed .bk-date-picker-cells-cell-prev-month em,.bk-date-picker-cells-cell-next-month em {
+.bkms-themed .bk-date-picker-cells-cell-prev-month em,
+.bkms-themed .bk-date-picker-cells-cell-next-month em {
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
-.bkms-themed span.bk-date-picker-cells-cell-week-label,span.bk-date-picker-cells-cell-week-label:hover,span.bk-date-picker-cells-cell-disabled,span.bk-date-picker-cells-cell-disabled:hover {
+.bkms-themed span.bk-date-picker-cells-cell-week-label,
+.bkms-themed span.bk-date-picker-cells-cell-week-label:hover,
+.bkms-themed span.bk-date-picker-cells-cell-disabled,
+.bkms-themed span.bk-date-picker-cells-cell-disabled:hover {
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
-.bkms-themed span.bk-date-picker-cells-cell-disabled,span.bk-date-picker-cells-cell-disabled:hover {
+.bkms-themed span.bk-date-picker-cells-cell-disabled,
+.bkms-themed span.bk-date-picker-cells-cell-disabled:hover {
   background-color: var(--bkms-neutral-6); /* 原 #f0f1f5 */
 }
 
@@ -136,8 +141,9 @@
   border: 0; /* 原值保留 */
 }
 
-.bkms-themed .bk-date-picker-cells-cell-selected em,.bk-date-picker-cells-cell-selected:hover em {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+.bkms-themed .bk-date-picker-cells-cell-selected em,
+.bkms-themed .bk-date-picker-cells-cell-selected:hover em {
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background-color: var(--bkms-brand-2); /* 原 #3a84ff */
   box-shadow: 0 0 0 1px var(--bkms-brand-2) inset; /* 原 #3a84ff */
 }
@@ -151,7 +157,8 @@
   background: var(--bkms-neutral-10); /* 原 #fff */
 }
 
-.bkms-themed .bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em,.bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em:hover {
+.bkms-themed .bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em,
+.bkms-themed .bk-date-picker-cells-cell-today.bk-date-picker-cells-cell-selected em:hover {
   box-shadow: 0 0 0 1px var(--bkms-brand-2) inset; /* 原 #3a84ff */
 }
 
@@ -184,7 +191,8 @@
   box-shadow: none; /* 原值保留 */
 }
 
-.bkms-themed .bk-date-picker-rel .bk-date-picker-editor.only-bottom-border[disabled],.bk-date-picker-rel .bk-date-picker-editor.only-bottom-border.readonly {
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor.only-bottom-border[disabled],
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor.only-bottom-border.readonly {
   border-color: transparent transparent var(--bkms-neutral-5) transparent; /* 原 #dcdee5 */
 }
 
@@ -219,4 +227,3 @@
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
   background-color: transparent; /* 原值保留 */
 }
-

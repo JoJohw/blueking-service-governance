@@ -39,7 +39,7 @@
 }
 
 .bkms-themed .bk-sideslider-close {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background-color: var(--primary-color); /* 原值保留 */
 }
 
@@ -56,4 +56,3 @@
 .bkms-themed .bk-sideslider-resize-trigger:hover:after {
   color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
-

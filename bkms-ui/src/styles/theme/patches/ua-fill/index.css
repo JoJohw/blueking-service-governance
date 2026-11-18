@@ -16,31 +16,5 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-/* bk-user-selector：下拉底 / 边框 / hover / 标签 / 禁用 */
-.bkms-themed .dropdown-content {
-  background-color: var(--bkms-bg-card);
-  border-color: var(--bkms-line-input);
-}
-
-.bkms-themed .dropdown-content .no-data {
-  color: var(--bkms-text-disabled);
-}
-
-.bkms-themed .user-option:hover,
-.bkms-themed .user-option.is-highlighted {
-  background-color: var(--bkms-bg-subtle);
-}
-
-.bkms-themed .me-tag {
-  color: var(--bkms-text-brand);
-  background-color: var(--bkms-bg-active);
-}
-
-.bkms-themed .bk-user-selector .tags-container {
-  background-color: var(--bkms-bg-card);
-  border-color: var(--bkms-line-input);
-}
-
-.bkms-themed .bk-user-selector.is-disabled {
-  background-color: var(--bkms-bg-subtle);
-}
+/* UA 默认底色兜底层 — 手写，不参与 gen-overrides 重跑（生成器只重写 patches/bkui-theme/） */
+@import './form-control.css';

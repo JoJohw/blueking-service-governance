@@ -16,30 +16,23 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-/* ediatable：单元格边框 / 表头 / hover / 禁用 / 校验错误 */
-.bkms-themed .bk-ediatable {
-  color: var(--bkms-text-body);
-  border-color: var(--bkms-line-light);
-}
-
-.bkms-themed .bk-ediatable-head-column {
-  color: var(--bkms-text-title);
-  background-color: var(--bkms-bg-card);
-}
-
-.bkms-themed .bk-ediatable .th-cell {
-  border-color: var(--bkms-line-light);
-}
-
-.bkms-themed .bk-ediatable .bk-ediatable-input:hover {
-  border-color: var(--bkms-line-active);
-}
-
-.bkms-themed .bk-ediatable .is-error {
-  border-color: var(--bkms-line-danger);
-}
-
-.bkms-themed .bk-ediatable .is-disabled {
-  color: var(--bkms-text-disabled);
-  background-color: var(--bkms-bg-subtle);
+/*
+ * UA 对 input/textarea/select 声明了 background-color: field（浅色恒为白），作者未画底时就会露白。
+ * 这里用 inherit 让底色透出所在容器（wrapper 有底就用 wrapper 的，没有就继续往上传）。
+ * 整串选择器包进一个 :where()，specificity 归零（.bkms-themed 与 [type] 属性一并清零），
+ * 任何作者声明（bkui 单类、uno bg-*、业务选择器）都能盖过，只兜住无人声明底色的裸控件。
+ */
+:where(
+  .bkms-themed input:not([type]),
+  .bkms-themed input[type='text'],
+  .bkms-themed input[type='password'],
+  .bkms-themed input[type='search'],
+  .bkms-themed input[type='email'],
+  .bkms-themed input[type='number'],
+  .bkms-themed input[type='tel'],
+  .bkms-themed input[type='url'],
+  .bkms-themed textarea,
+  .bkms-themed select
+) {
+  background-color: inherit;
 }

@@ -48,10 +48,12 @@ const patchesOverrides = [
     files: [
       'src/styles/theme/patches/bkui-theme/**/*.css',
       'src/styles/theme/patches/vendor/**/*.css',
+      'src/styles/theme/patches/ua-fill/**/*.css',
       'src/styles/overrides.css',
     ],
     rules: {
       'no-descending-specificity': null,
+      'no-duplicate-selectors': null,
       'selector-class-pattern': null,
       'selector-pseudo-element-colon-notation': null,
       'selector-attribute-quotes': null,

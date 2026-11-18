@@ -21,23 +21,27 @@
 /* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */
 
 .bkms-themed .bk-resize-layout-border {
-  /* 仅覆盖颜色：宽度/样式由基础层 .bk-resize-layout-border 的 border 声明提供 */
+  /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-resize-layout-left>.bk-resize-layout-aside {
+  /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */
   border-right-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-resize-layout-right>.bk-resize-layout-aside {
+  /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */
   border-left-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-resize-layout-top>.bk-resize-layout-aside {
+  /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */
   border-bottom-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-resize-layout-bottom>.bk-resize-layout-aside {
+  /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */
   border-top-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
@@ -47,20 +51,21 @@
   box-shadow: 0 4px 0 0 currentcolor,0 8px 0 0 currentcolor,0 -4px 0 0 currentcolor,0 -8px 0 0 currentcolor; /* 原值保留 */
 }
 
-.bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-proxy.left,.bk-resize-layout>.bk-resize-layout-aside .bk-resize-proxy.right {
+.bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-proxy.left,
+.bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-proxy.right {
   border-left: 2px solid var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
-.bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-proxy.top,.bk-resize-layout>.bk-resize-layout-aside .bk-resize-proxy.bottom {
+.bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-proxy.top,
+.bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-proxy.bottom {
   border-top: 2px solid var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
 .bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-collapse {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-resize-layout>.bk-resize-layout-aside .bk-resize-collapse:hover {
   background: var(--bkms-brand-2); /* 原 #3a84ff */
 }
-

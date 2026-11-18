@@ -103,7 +103,7 @@
 }
 
 .bkms-themed .bk-tag.bk-tag-filled {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background-color: var(--bkms-neutral-3); /* 原 #979ba5 */
 }
 
@@ -116,12 +116,11 @@
 }
 
 .bkms-themed .bk-tag.bk-tag-check {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background: var(--primary-color); /* 原值保留 */
 }
 
 .bkms-themed .bk-tag.bk-tag-check:hover {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background: var(--primary-color); /* 原值保留 */
 }
-

@@ -41,48 +41,58 @@
   border: 2px solid var(--bkms-success-5); /* 原 #d8d8d8 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-blue:before,.bk-timeline .bk-timeline-blue .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-blue:before,
+.bkms-themed .bk-timeline .bk-timeline-blue .bk-timeline-icon {
   color: var(--bkms-brand-2); /* 原 #3a84ff */
   border: 2px solid var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-blue.bk-timeline-filled:before,.bk-timeline .bk-timeline-blue.bk-timeline-filled .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-blue.bk-timeline-filled:before,
+.bkms-themed .bk-timeline .bk-timeline-blue.bk-timeline-filled .bk-timeline-icon {
   background: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-red:before,.bk-timeline .bk-timeline-red .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-red:before,
+.bkms-themed .bk-timeline .bk-timeline-red .bk-timeline-icon {
   color: var(--bkms-danger-2); /* 原 #ea3636 */
   border: 2px solid var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-red.bk-timeline-filled:before,.bk-timeline .bk-timeline-red.bk-timeline-filled .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-red.bk-timeline-filled:before,
+.bkms-themed .bk-timeline .bk-timeline-red.bk-timeline-filled .bk-timeline-icon {
   background: var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-green:before,.bk-timeline .bk-timeline-green .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-green:before,
+.bkms-themed .bk-timeline .bk-timeline-green .bk-timeline-icon {
   color: var(--bkms-success-2); /* 原 #2dcb56 */
   border: 2px solid var(--bkms-success-2); /* 原 #2dcb56 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-green.bk-timeline-filled:before,.bk-timeline .bk-timeline-green.bk-timeline-filled .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-green.bk-timeline-filled:before,
+.bkms-themed .bk-timeline .bk-timeline-green.bk-timeline-filled .bk-timeline-icon {
   background: var(--bkms-success-2); /* 原 #2dcb56 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-yellow:before,.bk-timeline .bk-timeline-yellow .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-yellow:before,
+.bkms-themed .bk-timeline .bk-timeline-yellow .bk-timeline-icon {
   color: var(--bkms-warning-2); /* 原 #ff9c01 */
   border: 2px solid var(--bkms-warning-2); /* 原 #ff9c01 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-yellow.bk-timeline-filled:before,.bk-timeline .bk-timeline-yellow.bk-timeline-filled .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-yellow.bk-timeline-filled:before,
+.bkms-themed .bk-timeline .bk-timeline-yellow.bk-timeline-filled .bk-timeline-icon {
   background: var(--bkms-warning-2); /* 原 #ff9c01 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-gray:before,.bk-timeline .bk-timeline-gray .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-gray:before,
+.bkms-themed .bk-timeline .bk-timeline-gray .bk-timeline-icon {
   color: var(--bkms-neutral-2); /* 原 #63656e */
   border: 2px solid var(--bkms-neutral-2); /* 原 #63656e */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-gray.bk-timeline-filled:before,.bk-timeline .bk-timeline-gray.bk-timeline-filled .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-gray.bk-timeline-filled:before,
+.bkms-themed .bk-timeline .bk-timeline-gray.bk-timeline-filled .bk-timeline-icon {
   background: var(--bkms-neutral-2); /* 原 #63656e */
 }
 
@@ -92,12 +102,14 @@
   border-left: 1px solid var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-primary:before,.bk-timeline .bk-timeline-primary .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-primary:before,
+.bkms-themed .bk-timeline .bk-timeline-primary .bk-timeline-icon {
   color: var(--bkms-brand-2); /* 原 #3a84ff */
   border: 2px solid var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-primary.bk-timeline-filled:before,.bk-timeline .bk-timeline-primary.bk-timeline-filled .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-primary.bk-timeline-filled:before,
+.bkms-themed .bk-timeline .bk-timeline-primary.bk-timeline-filled .bk-timeline-icon {
   background: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
@@ -105,12 +117,14 @@
   border-left: 1px solid var(--bkms-warning-2); /* 原 #ff9c01 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-warning:before,.bk-timeline .bk-timeline-warning .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-warning:before,
+.bkms-themed .bk-timeline .bk-timeline-warning .bk-timeline-icon {
   color: var(--bkms-warning-2); /* 原 #ff9c01 */
   border: 2px solid var(--bkms-warning-2); /* 原 #ff9c01 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-warning.bk-timeline-filled:before,.bk-timeline .bk-timeline-warning.bk-timeline-filled .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-warning.bk-timeline-filled:before,
+.bkms-themed .bk-timeline .bk-timeline-warning.bk-timeline-filled .bk-timeline-icon {
   background: var(--bkms-warning-2); /* 原 #ff9c01 */
 }
 
@@ -118,12 +132,14 @@
   border-left: 1px solid var(--bkms-success-2); /* 原 #2dcb56 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-success:before,.bk-timeline .bk-timeline-success .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-success:before,
+.bkms-themed .bk-timeline .bk-timeline-success .bk-timeline-icon {
   color: var(--bkms-success-2); /* 原 #2dcb56 */
   border: 2px solid var(--bkms-success-2); /* 原 #2dcb56 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-success.bk-timeline-filled:before,.bk-timeline .bk-timeline-success.bk-timeline-filled .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-success.bk-timeline-filled:before,
+.bkms-themed .bk-timeline .bk-timeline-success.bk-timeline-filled .bk-timeline-icon {
   background: var(--bkms-success-2); /* 原 #2dcb56 */
 }
 
@@ -131,24 +147,27 @@
   border-left: 1px solid var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-danger:before,.bk-timeline .bk-timeline-danger .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-danger:before,
+.bkms-themed .bk-timeline .bk-timeline-danger .bk-timeline-icon {
   color: var(--bkms-danger-2); /* 原 #ea3636 */
   border: 2px solid var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
-.bkms-themed .bk-timeline .bk-timeline-danger.bk-timeline-filled:before,.bk-timeline .bk-timeline-danger.bk-timeline-filled .bk-timeline-icon {
+.bkms-themed .bk-timeline .bk-timeline-danger.bk-timeline-filled:before,
+.bkms-themed .bk-timeline .bk-timeline-danger.bk-timeline-filled .bk-timeline-icon {
   background: var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
-.bkms-themed .bk-timeline-dashed .bk-step .bk-step-title:after,.bk-timeline-dashed .bk-step .bk-step-indicator:after {
+.bkms-themed .bk-timeline-dashed .bk-step .bk-step-title:after,
+.bkms-themed .bk-timeline-dashed .bk-step .bk-step-indicator:after {
   background-image: linear-gradient(to right,var(--bkms-navy-5) 50%,transparent 0%); /* 原 #c4c6cc */
 }
 
-.bkms-themed .bk-timeline-solid .bk-step .bk-step-title:after,.bk-timeline-solid .bk-step .bk-step-indicator:after {
+.bkms-themed .bk-timeline-solid .bk-step .bk-step-title:after,
+.bkms-themed .bk-timeline-solid .bk-step .bk-step-indicator:after {
   background-color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-timeline-vertical .bk-step:after {
   background-image: linear-gradient(var(--bkms-navy-5) 50%,transparent 0%); /* 原 #c4c6cc */
 }
-

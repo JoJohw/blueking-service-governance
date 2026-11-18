@@ -20,16 +20,21 @@
 
 /* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */
 
-.bkms-themed .bk-tab--left .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,.bk-tab--right .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,.bk-tab--left .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic,.bk-tab--right .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
+.bkms-themed .bk-tab--left .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,
+.bkms-themed .bk-tab--right .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,
+.bkms-themed .bk-tab--left .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic,
+.bkms-themed .bk-tab--right .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
   background-color: var(--bkms-brand-4); /* 原 #a3c5fd */
   color: var(--white-color); /* 原值保留 */
 }
 
-.bkms-themed .bk-tab--card-tab .bk-tab-header,.bk-tab--vertical-tab .bk-tab-header {
+.bkms-themed .bk-tab--card-tab .bk-tab-header,
+.bkms-themed .bk-tab--vertical-tab .bk-tab-header {
   background: var(--bkms-neutral-6); /* 原 #f0f1f5 */
 }
 
-.bkms-themed .bk-tab--card-tab .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,.bk-tab--card-tab .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
+.bkms-themed .bk-tab--card-tab .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,
+.bkms-themed .bk-tab--card-tab .bk-tab-header .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
   background-color: var(--bkms-brand-4); /* 原 #a3c5fd */
   color: var(--white-color); /* 原值保留 */
 }
@@ -38,11 +43,13 @@
   background: var(--bkms-neutral-8); /* 原 #fafbfd */
 }
 
-.bkms-themed .bk-tab-header-next,.bk-tab-header-prev {
+.bkms-themed .bk-tab-header-next,
+.bkms-themed .bk-tab-header-prev {
   background: var(--bkms-neutral-10); /* 原 #fff */
 }
 
-.bkms-themed .bk-tab--card-tab .bk-tab-header-item:not(:first-of-type):before,.bk-tab--card-tab .bk-tab-header-item:last-of-type:after {
+.bkms-themed .bk-tab--card-tab .bk-tab-header-item:not(:first-of-type):before,
+.bkms-themed .bk-tab--card-tab .bk-tab-header-item:last-of-type:after {
   background: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
@@ -50,12 +57,14 @@
   background: var(--bkms-neutral-6); /* 原 #eaebf0 */
 }
 
-.bkms-themed .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-square,.bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
+.bkms-themed .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-square,
+.bkms-themed .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
   background-color: var(--bkms-neutral-6); /* 原 #f0f1f5 */
   color: var(--gray-color); /* 原值保留 */
 }
 
-.bkms-themed .bk-tab--card-tab .bk-tab-header--active,.bk-tab--vertical-tab .bk-tab-header--active {
+.bkms-themed .bk-tab--card-tab .bk-tab-header--active,
+.bkms-themed .bk-tab--vertical-tab .bk-tab-header--active {
   background: var(--bkms-neutral-10); /* 原 #fff */
 }
 
@@ -67,7 +76,8 @@
   background-color: var(--bkms-brand-6); /* 原 #e1ecff */
 }
 
-.bkms-themed .bk-tab-header--disabled,.bk-tab-header--disabled:hover {
+.bkms-themed .bk-tab-header--disabled,
+.bkms-themed .bk-tab-header--disabled:hover {
   color: var(--bkms-navy-5); /* 原 #aaa */
 }
 
@@ -99,7 +109,8 @@
   color: var(--bkms-neutral-2); /* 原 #63656e */
 }
 
-.bkms-themed .bk-tab--card .bk-tab-header,.bk-tab--vertical-card .bk-tab-header {
+.bkms-themed .bk-tab--card .bk-tab-header,
+.bkms-themed .bk-tab--vertical-card .bk-tab-header {
   border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
@@ -111,15 +122,20 @@
   border-bottom: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
-.bkms-themed .bk-tab--card .bk-tab-header-nav,.bk-tab--border-card .bk-tab-header-nav,.bk-tab--vertical-card .bk-tab-header-nav {
+.bkms-themed .bk-tab--card .bk-tab-header-nav,
+.bkms-themed .bk-tab--border-card .bk-tab-header-nav,
+.bkms-themed .bk-tab--vertical-card .bk-tab-header-nav {
   border-left: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
-.bkms-themed .bk-tab--card .bk-tab-header-item,.bk-tab--vertical-card .bk-tab-header-item {
+.bkms-themed .bk-tab--card .bk-tab-header-item,
+.bkms-themed .bk-tab--vertical-card .bk-tab-header-item {
   border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
-.bkms-themed .bk-tab--card .bk-tab-header-item,.bk-tab--border-card .bk-tab-header-item,.bk-tab--vertical-card .bk-tab-header-item {
+.bkms-themed .bk-tab--card .bk-tab-header-item,
+.bkms-themed .bk-tab--border-card .bk-tab-header-item,
+.bkms-themed .bk-tab--vertical-card .bk-tab-header-item {
   border-right: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
@@ -127,7 +143,8 @@
   color: var(--bkms-neutral-2); /* 原 #63656e */
 }
 
-.bkms-themed .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-default,.bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-bracket {
+.bkms-themed .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-default,
+.bkms-themed .bk-tab-header-item .bk-tab-header--has-num-right .bk-tab-header--has-num-bracket {
   color: var(--bkms-neutral-2); /* 原 #63656e */
 }
 
@@ -143,12 +160,16 @@
   color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
-.bkms-themed .bk-tab--card .bk-tab-header--active,.bk-tab--border-card .bk-tab-header--active,.bk-tab--vertical-card .bk-tab-header--active {
+.bkms-themed .bk-tab--card .bk-tab-header--active,
+.bkms-themed .bk-tab--border-card .bk-tab-header--active,
+.bkms-themed .bk-tab--vertical-card .bk-tab-header--active {
   background: var(--bkms-neutral-10); /* 原 #fff */
   border-bottom-color: var(--bkms-neutral-10); /* 原 #fff */
 }
 
-.bkms-themed .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-bracket,.bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,.bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
+.bkms-themed .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-bracket,
+.bkms-themed .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-square,
+.bkms-themed .bk-tab-header--active .bk-tab-header--has-num-right .bk-tab-header--has-num-elliptic {
   color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
@@ -160,7 +181,7 @@
   background: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
-.bkms-themed .bk-tab--border-card .bk-tab-content,.bk-tab--vertical-card .bk-tab-content {
+.bkms-themed .bk-tab--border-card .bk-tab-content,
+.bkms-themed .bk-tab--vertical-card .bk-tab-content {
   border: solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
-

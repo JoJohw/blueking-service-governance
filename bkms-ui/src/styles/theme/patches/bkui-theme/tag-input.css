@@ -20,7 +20,12 @@
 
 /* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */
 
-.bkms-themed .bk-form-item.is-error .bk-input,.bk-form-item.is-error .bk-textarea,.bk-form-item.is-error .bk-cascader,.bk-form-item.is-error .bk-date-picker-editor,.bk-form-item.is-error .bk-select-tag,.bk-form-item.is-error .bk-tag-input {
+.bkms-themed .bk-form-item.is-error .bk-input,
+.bkms-themed .bk-form-item.is-error .bk-textarea,
+.bkms-themed .bk-form-item.is-error .bk-cascader,
+.bkms-themed .bk-form-item.is-error .bk-date-picker-editor,
+.bkms-themed .bk-form-item.is-error .bk-select-tag,
+.bkms-themed .bk-form-item.is-error .bk-tag-input {
   border-color: var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
@@ -133,4 +138,3 @@
 .bkms-themed .bk-tag-input-popover-content .bk-selector-list .bk-selector-list-item .highlight-text {
   color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
-

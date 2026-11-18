@@ -50,13 +50,17 @@
 
 /* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
 
-.bkms-themed .bk-textarea.is-disabled .bk-input--prefix-area,.bk-textarea.is-readonly .bk-input--prefix-area,.bk-textarea.is-disabled .bk-input--suffix-area,.bk-textarea.is-readonly .bk-input--suffix-area,.bk-textarea.is-disabled .bk-input--suffix-icon,.bk-textarea.is-readonly .bk-input--suffix-icon {
+.bkms-themed .bk-textarea.is-disabled .bk-input--prefix-area,
+.bkms-themed .bk-textarea.is-readonly .bk-input--prefix-area,
+.bkms-themed .bk-textarea.is-disabled .bk-input--suffix-area,
+.bkms-themed .bk-textarea.is-readonly .bk-input--suffix-area,
+.bkms-themed .bk-textarea.is-disabled .bk-input--suffix-icon,
+.bkms-themed .bk-textarea.is-readonly .bk-input--suffix-icon {
   background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
 }
 
 .bkms-themed .bk-input {
-  /* 仅覆盖颜色：宽度/样式由基础层 .bk-input 的 border 声明提供，避免以更高优先级
-     的完整 border 简写压制业务侧 border:none 的局部覆写 */
+  /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */
   border-color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
@@ -64,16 +68,25 @@
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
-.bkms-themed .bk-input.is-disabled,.bk-input.is-readonly {
+.bkms-themed .bk-input.is-disabled,
+.bkms-themed .bk-input.is-readonly {
   background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
-.bkms-themed .bk-input.is-disabled .bk-input--prefix-area,.bk-input.is-readonly .bk-input--prefix-area,.bk-input.is-disabled .bk-input--suffix-area,.bk-input.is-readonly .bk-input--suffix-area,.bk-input.is-disabled .bk-input--suffix-icon,.bk-input.is-readonly .bk-input--suffix-icon {
+.bkms-themed .bk-input.is-disabled .bk-input--prefix-area,
+.bkms-themed .bk-input.is-readonly .bk-input--prefix-area,
+.bkms-themed .bk-input.is-disabled .bk-input--suffix-area,
+.bkms-themed .bk-input.is-readonly .bk-input--suffix-area,
+.bkms-themed .bk-input.is-disabled .bk-input--suffix-icon,
+.bkms-themed .bk-input.is-readonly .bk-input--suffix-icon {
   background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
 }
 
-.bkms-themed .bk-input.is-disabled input,.bk-input.is-readonly input,.bk-input.is-disabled textarea,.bk-input.is-readonly textarea {
+.bkms-themed .bk-input.is-disabled input,
+.bkms-themed .bk-input.is-readonly input,
+.bkms-themed .bk-input.is-disabled textarea,
+.bkms-themed .bk-input.is-readonly textarea {
   background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
 }
 
@@ -94,7 +107,8 @@
   box-shadow: none; /* 原值保留 */
 }
 
-.bkms-themed .bk-input.is-simplicity:hover:not(.is-disabled) .bk-input--text,.bk-input.is-simplicity:hover:not(.is-disabled) .bk-input--suffix-icon {
+.bkms-themed .bk-input.is-simplicity:hover:not(.is-disabled) .bk-input--text,
+.bkms-themed .bk-input.is-simplicity:hover:not(.is-disabled) .bk-input--suffix-icon {
   background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
 }
 
@@ -123,11 +137,13 @@
   box-shadow: none; /* 原值保留 */
 }
 
-.bkms-themed .bk-input.is-focused:not(.is-readonly).is-simplicity .bk-input--text,.bk-input.is-focused:not(.is-readonly).is-simplicity .bk-input--suffix-icon {
+.bkms-themed .bk-input.is-focused:not(.is-readonly).is-simplicity .bk-input--text,
+.bkms-themed .bk-input.is-focused:not(.is-readonly).is-simplicity .bk-input--suffix-icon {
   background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
 }
 
-.bkms-themed .bk-input--prefix-area,.bk-input--suffix-area {
+.bkms-themed .bk-input--prefix-area,
+.bkms-themed .bk-input--suffix-area {
   color: var(--bkms-neutral-2); /* 原 #63656e */
   background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
   border-right: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
@@ -167,11 +183,12 @@
   background-color: var(--bkms-neutral-6); /* 原 #eaebf0 */
 }
 
-.bkms-themed .bk-cascader.is-simplicity:hover:not(.is-disabled) .bk-input--text,.bk-cascader.is-simplicity:hover:not(.is-disabled) .bk-input--suffix-icon {
+.bkms-themed .bk-cascader.is-simplicity:hover:not(.is-disabled) .bk-input--text,
+.bkms-themed .bk-cascader.is-simplicity:hover:not(.is-disabled) .bk-input--suffix-icon {
   background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
 }
 
-.bkms-themed .bk-cascader.is-focus.is-simplicity.is-simplicity .bk-input--text,.bk-cascader.is-focus.is-simplicity.is-simplicity .bk-input--suffix-icon {
+.bkms-themed .bk-cascader.is-focus.is-simplicity.is-simplicity .bk-input--text,
+.bkms-themed .bk-cascader.is-focus.is-simplicity.is-simplicity .bk-input--suffix-icon {
   background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
 }
-

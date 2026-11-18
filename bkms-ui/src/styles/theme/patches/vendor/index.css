@@ -17,16 +17,9 @@
  */
 
 /*
- * 第三方库覆写聚合入口：手写颜色令牌化，与生成器产物 patches/bkui-theme/ 平级。
+ * 第三方库覆写聚合入口。按库归属分目录：@blueking/* 的包统一放 @blueking/ 下，其余第三方库与本文件平级。
  * 加载点 src/styles/theme/index.css，晚于 bkui-theme 与各库 CSS；每条规则带 .bkms-themed 前缀。
- * 同名 --vxe-ui-* 只在 vxe.css 定义一处，overrides.css 只留尺寸与结构。
  */
-@import './vxe.css';
-@import './monitor.css';
-@import './date-picker.css';
-@import './task-log.css';
-@import './ediatable.css';
-@import './user-selector.css';
-@import './notice.css';
+@import './@blueking/index.css';
 @import './markdown.css';
 @import './highlight.css';

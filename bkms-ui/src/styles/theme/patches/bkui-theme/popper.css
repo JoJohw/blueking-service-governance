@@ -21,8 +21,8 @@
 /* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */
 
 .bkms-themed .bk-popper {
-  color: var(--bkms-neutral-10); /* 原 #fff */
-  background: var(--bkms-neutral-1); /* 原 #333 */
+  color: var(--bkms-text-inverse); /* 原 #fff */
+  background: var(--bkms-navy-1); /* 原 #333 */
   border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
@@ -51,4 +51,3 @@
   border-left: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
   border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
-

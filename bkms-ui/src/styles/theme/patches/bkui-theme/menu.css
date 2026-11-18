@@ -48,11 +48,11 @@
 }
 
 .bkms-themed .bk-menu-submenu:hover {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
 }
 
 .bkms-themed .bk-menu-submenu .submenu-header.is-collapse {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background: linear-gradient(90deg,var(--bkms-brand-2),var(--bkms-brand-2)); /* 原 #3f87ff #3a84ff */
 }
 
@@ -61,7 +61,7 @@
 }
 
 .bkms-themed .bk-menu-item.is-active {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background: linear-gradient(90deg,var(--bkms-brand-2),var(--bkms-brand-2)); /* 原 #3f87ff #3a84ff */
 }
 
@@ -82,4 +82,3 @@
 .bkms-themed .bk-menu-group .group-name {
   color: var(--bkms-neutral-2); /* 原 #6e788b */
 }
-

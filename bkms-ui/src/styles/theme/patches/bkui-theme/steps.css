@@ -54,26 +54,34 @@
   color: var(--bkms-neutral-3); /* 原 #979ba5 */
 }
 
-.bkms-themed .bk-steps-primary .bk-step.current .bk-step-number,.bk-steps-primary .bk-step.current .bk-step-icon,.bk-steps-primary .bk-step.current .bk-step-text {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+.bkms-themed .bk-steps-primary .bk-step.current .bk-step-number,
+.bkms-themed .bk-steps-primary .bk-step.current .bk-step-icon,
+.bkms-themed .bk-steps-primary .bk-step.current .bk-step-text {
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background-color: var(--primary-color); /* 原值保留 */
   border-color: var(--primary-color); /* 原值保留 */
 }
 
-.bkms-themed .bk-steps-warning .bk-step.current .bk-step-number,.bk-steps-warning .bk-step.current .bk-step-icon,.bk-steps-warning .bk-step.current .bk-step-text {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+.bkms-themed .bk-steps-warning .bk-step.current .bk-step-number,
+.bkms-themed .bk-steps-warning .bk-step.current .bk-step-icon,
+.bkms-themed .bk-steps-warning .bk-step.current .bk-step-text {
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background-color: var(--warning-color); /* 原值保留 */
   border-color: var(--warning-color); /* 原值保留 */
 }
 
-.bkms-themed .bk-steps-success .bk-step.current .bk-step-number,.bk-steps-success .bk-step.current .bk-step-icon,.bk-steps-success .bk-step.current .bk-step-text {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+.bkms-themed .bk-steps-success .bk-step.current .bk-step-number,
+.bkms-themed .bk-steps-success .bk-step.current .bk-step-icon,
+.bkms-themed .bk-steps-success .bk-step.current .bk-step-text {
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background-color: var(--success-color); /* 原值保留 */
   border-color: var(--success-color); /* 原值保留 */
 }
 
-.bkms-themed .bk-steps-danger .bk-step.current .bk-step-number,.bk-steps-danger .bk-step.current .bk-step-icon,.bk-steps-danger .bk-step.current .bk-step-text {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+.bkms-themed .bk-steps-danger .bk-step.current .bk-step-number,
+.bkms-themed .bk-steps-danger .bk-step.current .bk-step-icon,
+.bkms-themed .bk-steps-danger .bk-step.current .bk-step-text {
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background-color: var(--danger-color); /* 原值保留 */
   border-color: var(--danger-color); /* 原值保留 */
 }
@@ -84,11 +92,15 @@
   color: var(--bkms-neutral-2); /* 原 #63656e */
 }
 
-.bkms-themed .bk-steps .bk-step.done:has(+.current.is-error) .bk-step-title:after,.bk-steps .bk-step.done:has(+.current.bk-step-error) .bk-step-title:after,.bk-steps .bk-step.done:has(+.current.is-error) .bk-step-indicator:after,.bk-steps .bk-step.done:has(+.current.bk-step-error) .bk-step-indicator:after {
+.bkms-themed .bk-steps .bk-step.done:has(+.current.is-error) .bk-step-title:after,
+.bkms-themed .bk-steps .bk-step.done:has(+.current.bk-step-error) .bk-step-title:after,
+.bkms-themed .bk-steps .bk-step.done:has(+.current.is-error) .bk-step-indicator:after,
+.bkms-themed .bk-steps .bk-step.done:has(+.current.bk-step-error) .bk-step-indicator:after {
   background-image: linear-gradient(to right,var(--bkms-danger-2) 50%,transparent 0%); /* 原 #ea3636 */
 }
 
-.bkms-themed .bk-steps .bk-step.current .bk-step-title,.bk-steps .bk-step.current .bk-step-description {
+.bkms-themed .bk-steps .bk-step.current .bk-step-title,
+.bkms-themed .bk-steps .bk-step.current .bk-step-description {
   color: var(--bkms-neutral-2); /* 原 #63656e */
 }
 
@@ -97,7 +109,8 @@
   border-color: var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
-.bkms-themed .bk-steps .bk-step.current.bk-step-error .bk-step-title,.bk-steps .bk-step.current.bk-step-error .bk-step-description {
+.bkms-themed .bk-steps .bk-step.current.bk-step-error .bk-step-title,
+.bkms-themed .bk-steps .bk-step.current.bk-step-error .bk-step-description {
   color: var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
@@ -110,12 +123,15 @@
   color: var(--bkms-danger-2)!important; /* 原 #ea3636 */
 }
 
-.bkms-themed .bk-steps-primary .bk-step.done .bk-step-number,.bk-steps-primary .bk-step.done .bk-step-icon,.bk-steps-primary .bk-step.done .bk-step-text {
+.bkms-themed .bk-steps-primary .bk-step.done .bk-step-number,
+.bkms-themed .bk-steps-primary .bk-step.done .bk-step-icon,
+.bkms-themed .bk-steps-primary .bk-step.done .bk-step-text {
   color: var(--bkms-brand-2); /* 原 #3a84ff */
   border-color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
-.bkms-themed .bk-steps-primary .bk-step.done .bk-step-title:after,.bk-steps-primary .bk-step.done .bk-step-indicator:after {
+.bkms-themed .bk-steps-primary .bk-step.done .bk-step-title:after,
+.bkms-themed .bk-steps-primary .bk-step.done .bk-step-indicator:after {
   background-image: linear-gradient(to right,var(--bkms-brand-2) 50%,transparent 0%); /* 原 #3a84ff */
 }
 
@@ -123,12 +139,15 @@
   background-image: linear-gradient(var(--bkms-brand-2) 50%,transparent 0%); /* 原 #3a84ff */
 }
 
-.bkms-themed .bk-steps-warning .bk-step.done .bk-step-number,.bk-steps-warning .bk-step.done .bk-step-icon,.bk-steps-warning .bk-step.done .bk-step-text {
+.bkms-themed .bk-steps-warning .bk-step.done .bk-step-number,
+.bkms-themed .bk-steps-warning .bk-step.done .bk-step-icon,
+.bkms-themed .bk-steps-warning .bk-step.done .bk-step-text {
   color: var(--bkms-warning-2); /* 原 #ff9c01 */
   border-color: var(--bkms-warning-2); /* 原 #ff9c01 */
 }
 
-.bkms-themed .bk-steps-warning .bk-step.done .bk-step-title:after,.bk-steps-warning .bk-step.done .bk-step-indicator:after {
+.bkms-themed .bk-steps-warning .bk-step.done .bk-step-title:after,
+.bkms-themed .bk-steps-warning .bk-step.done .bk-step-indicator:after {
   background-image: linear-gradient(to right,var(--bkms-warning-2) 50%,transparent 0%); /* 原 #ff9c01 */
 }
 
@@ -136,12 +155,15 @@
   background-image: linear-gradient(var(--bkms-warning-2) 50%,transparent 0%); /* 原 #ff9c01 */
 }
 
-.bkms-themed .bk-steps-success .bk-step.done .bk-step-number,.bk-steps-success .bk-step.done .bk-step-icon,.bk-steps-success .bk-step.done .bk-step-text {
+.bkms-themed .bk-steps-success .bk-step.done .bk-step-number,
+.bkms-themed .bk-steps-success .bk-step.done .bk-step-icon,
+.bkms-themed .bk-steps-success .bk-step.done .bk-step-text {
   color: var(--bkms-success-2); /* 原 #2dcb56 */
   border-color: var(--bkms-success-2); /* 原 #2dcb56 */
 }
 
-.bkms-themed .bk-steps-success .bk-step.done .bk-step-title:after,.bk-steps-success .bk-step.done .bk-step-indicator:after {
+.bkms-themed .bk-steps-success .bk-step.done .bk-step-title:after,
+.bkms-themed .bk-steps-success .bk-step.done .bk-step-indicator:after {
   background-image: linear-gradient(to right,var(--bkms-success-2) 50%,transparent 0%); /* 原 #2dcb56 */
 }
 
@@ -149,12 +171,15 @@
   background-image: linear-gradient(var(--bkms-success-2) 50%,transparent 0%); /* 原 #2dcb56 */
 }
 
-.bkms-themed .bk-steps-danger .bk-step.done .bk-step-number,.bk-steps-danger .bk-step.done .bk-step-icon,.bk-steps-danger .bk-step.done .bk-step-text {
+.bkms-themed .bk-steps-danger .bk-step.done .bk-step-number,
+.bkms-themed .bk-steps-danger .bk-step.done .bk-step-icon,
+.bkms-themed .bk-steps-danger .bk-step.done .bk-step-text {
   color: var(--bkms-danger-2); /* 原 #ea3636 */
   border-color: var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
-.bkms-themed .bk-steps-danger .bk-step.done .bk-step-title:after,.bk-steps-danger .bk-step.done .bk-step-indicator:after {
+.bkms-themed .bk-steps-danger .bk-step.done .bk-step-title:after,
+.bkms-themed .bk-steps-danger .bk-step.done .bk-step-indicator:after {
   background-image: linear-gradient(to right,var(--bkms-danger-2) 50%,transparent 0%); /* 原 #ea3636 */
 }
 
@@ -162,11 +187,13 @@
   background-image: linear-gradient(var(--bkms-danger-2) 50%,transparent 0%); /* 原 #ea3636 */
 }
 
-.bkms-themed .bk-steps-dashed .bk-step .bk-step-title:after,.bk-steps-dashed .bk-step .bk-step-indicator:after {
+.bkms-themed .bk-steps-dashed .bk-step .bk-step-title:after,
+.bkms-themed .bk-steps-dashed .bk-step .bk-step-indicator:after {
   background-image: linear-gradient(to right,var(--bkms-navy-5) 50%,transparent 0%); /* 原 #c4c6cc */
 }
 
-.bkms-themed .bk-steps-solid .bk-step .bk-step-title:after,.bk-steps-solid .bk-step .bk-step-indicator:after {
+.bkms-themed .bk-steps-solid .bk-step .bk-step-title:after,
+.bkms-themed .bk-steps-solid .bk-step .bk-step-indicator:after {
   background-color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
@@ -174,7 +201,7 @@
   background-image: linear-gradient(var(--bkms-navy-5) 50%,transparent 0%); /* 原 #c4c6cc */
 }
 
-.bkms-themed .bk-steps-vertical .bk-step.done:has(+.current.is-error):after,.bk-steps-vertical .bk-step.done:has(+.current.bk-step-error):after {
+.bkms-themed .bk-steps-vertical .bk-step.done:has(+.current.is-error):after,
+.bkms-themed .bk-steps-vertical .bk-step.done:has(+.current.bk-step-error):after {
   background-image: linear-gradient(var(--bkms-danger-2) 50%,transparent 0%); /* 原 #ea3636 */
 }
-

@@ -21,7 +21,7 @@
 /* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */
 
 .bkms-themed .bk-upload-trigger__picture-actions {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background: color-mix(in srgb, var(--bkms-neutral-1) 45%, transparent); /* 原 #00000073 */
 }
 
@@ -34,7 +34,8 @@
   border-color: var(--bkms-danger-3); /* 原 #ff5656 */
 }
 
-.bkms-themed .bk-upload-trigger--disabled.bk-upload-trigger--draggable,.bk-upload-trigger--disabled.bk-upload-trigger--picture {
+.bkms-themed .bk-upload-trigger--disabled.bk-upload-trigger--draggable,
+.bkms-themed .bk-upload-trigger--disabled.bk-upload-trigger--picture {
   background-color: var(--bkms-neutral-10); /* 原 #fff */
   border-color: var(--disable-color); /* 原值保留 */
 }
@@ -66,7 +67,7 @@
 }
 
 .bkms-themed .bk-upload-list__picture-item-actions {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
   background: color-mix(in srgb, var(--bkms-neutral-1) 45%, transparent); /* 原 #00000073 */
 }
 
@@ -114,7 +115,12 @@
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
-.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__draggable-inner,.bk-upload-trigger--disabled .bk-upload-trigger__draggable-icon,.bk-upload-trigger--disabled .bk-upload-trigger__draggable-upload-link,.bk-upload-trigger--disabled .bk-upload-trigger__picture-inner,.bk-upload-trigger--disabled .bk-upload-trigger__picture-icon,.bk-upload-trigger--disabled .bk-upload-trigger__picture-upload-link {
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__draggable-inner,
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__draggable-icon,
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__draggable-upload-link,
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__picture-inner,
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__picture-icon,
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__picture-upload-link {
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
@@ -122,7 +128,8 @@
   border-color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
-.bkms-themed .bk-upload-trigger:not(.bk-upload-trigger--disabled):hover .bk-upload-trigger__picture-icon,.bk-upload-trigger:not(.bk-upload-trigger--disabled):hover .bk-upload-trigger__draggable-icon {
+.bkms-themed .bk-upload-trigger:not(.bk-upload-trigger--disabled):hover .bk-upload-trigger__picture-icon,
+.bkms-themed .bk-upload-trigger:not(.bk-upload-trigger--disabled):hover .bk-upload-trigger__draggable-icon {
   color: var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
@@ -157,4 +164,3 @@
 .bkms-themed .bk-upload-list__item--success .bk-upload-list__item-message {
   color: var(--bkms-success-2); /* 原 #2dcb56 */
 }
-

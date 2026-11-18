@@ -46,6 +46,6 @@
 .bkms-themed .bk-dialog-footer {
   background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
 
-  /* 仅覆盖颜色：宽度/样式由基础层 .bk-dialog-footer 的 border-top 声明提供 */
+  /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */
   border-top-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }

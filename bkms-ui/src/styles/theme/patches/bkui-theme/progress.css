@@ -25,7 +25,7 @@
 }
 
 .bkms-themed .bk-progress .inner-text {
-  color: var(--bkms-neutral-10); /* 原 #fff */
+  color: var(--bkms-text-inverse); /* 原 #fff */
 }
 
 /* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
@@ -45,4 +45,3 @@
 .bkms-themed .bk-progress .progress-inner.bk-danger {
   background: var(--bkms-danger-2); /* 原 #ea3636 */
 }
-

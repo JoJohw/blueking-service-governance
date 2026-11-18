@@ -40,12 +40,16 @@
   color: var(--bkms-navy-5); /* 原 #c4c6cc */
 }
 
-.bkms-themed .bk-textarea.is-disabled,.bk-textarea.is-readonly {
+.bkms-themed .bk-textarea.is-disabled,
+.bkms-themed .bk-textarea.is-readonly {
   background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
-.bkms-themed .bk-textarea.is-disabled input,.bk-textarea.is-readonly input,.bk-textarea.is-disabled textarea,.bk-textarea.is-readonly textarea {
+.bkms-themed .bk-textarea.is-disabled input,
+.bkms-themed .bk-textarea.is-readonly input,
+.bkms-themed .bk-textarea.is-disabled textarea,
+.bkms-themed .bk-textarea.is-readonly textarea {
   background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
 }
 
@@ -66,4 +70,3 @@
 .bkms-themed .bk-textarea--suffix-icon {
   color: var(--bkms-neutral-3); /* 原 #979ba5 */
 }
-

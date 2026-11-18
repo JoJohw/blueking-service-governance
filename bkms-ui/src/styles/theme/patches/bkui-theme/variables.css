@@ -18,9 +18,20 @@
 
 /*
  * bkui 域变量桥接：重声明 style.variable.css :root 同名变量指向 --bkms-* 令牌。
- * 加载点在 src/modules/bkui.ts（紧随 style.variable.css），不随生成器重建；
- * 未重声明项及原因见 scripts/theme-codemod/docs/bridge-notes.md。
+ * 加载点在 src/modules/bkui.ts（紧随 style.variable.css），不随生成器重建。
  * 语义映射口径（THEME 写死）：white→neutral-10、whitesmoke→neutral-8、gray→neutral-3、light-gray→neutral-4。
+ *
+ * 未重声明的三类（style.variable.css :root 共 128 个）：
+ *   1. 值引用其他 bkui 变量，随桥接级联联动：--border-style-color、--input-disabled-border、--input-color、
+ *      --input-border-color、--input-height-base、--input-icon-size、--message-color、
+ *      --search-select-focus-border-color、--search-select-font-color、--search-select-placeholder-color、
+ *      --search-select-message-color、--search-select-menu-border-color。
+ *   2. 原值保留（值不换）：--link-warning-hover-color(#ffb848)。
+ *   3. 非颜色/尺寸，不动：--bk-prefix、--popover-max-height、--font-size-*、--line-height-*、
+ *      --component-size-*、--border-width/style-base、--border-radius-base(2px)、--input-broder-radius(3px)、
+ *      --input-horizontal-padding、--menu-width、--menu-collapse-width、--date-picker-dropdown-mb。
+ *
+ * 本文件即已重声明清单本体；设计拍板出处见 docs/theme-style/THEME.md。
  */
 :root {
   --primary-color: var(--bkms-brand-2);
