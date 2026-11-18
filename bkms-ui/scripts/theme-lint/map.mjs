@@ -74,34 +74,65 @@ export function normalizeHex(input) {
   return null;
 }
 
+// ── 圆角维度：@layer 分段是唯一切分口径，uno 注册与 lint 反查共用 ──────────
+
+const RADIUS_SOURCE = readTokenFile('radius.css');
+
+/** 只认 @layer 标记内的声明：语义档写在标记外时 uno 不会注册，lint 也就不能建议它 */
+const radiusLayerBlocks = layer => RADIUS_SOURCE.match(new RegExp(`@layer ${layer}[\\s\\S]*?@endgroup`, 'g')) || [];
+
+/** 档位：名字即像素值，只被语义层引用 */
+const RADIUS_SCALE = radiusLayerBlocks('scale').flatMap(block =>
+  [...block.matchAll(/--bkms-radius-(\d+)\s*:/g)].map(m => ({ name: `--bkms-radius-${m[1]}`, px: Number(m[1]) })),
+);
+
 /**
- * 圆角档位类：radius.css 的档位区 → rounded-bkms-<px>，仅供迁移过渡期使用。
+ * 语义档：px 来自它引用的档位（`--bkms-radius-control: var(--bkms-radius-6)`）。
+ * 同值一对多是常态——6px 有 control/card/overlay/tab 四个，值相同不代表场景相同，
+ * 所以 lint 只给候选、不替人挑语义。
+ */
+const RADIUS_SEMANTIC = radiusLayerBlocks('semantic')
+  .flatMap(block =>
+    [...block.matchAll(/--bkms-radius-([a-z][a-z0-9-]*)\s*:\s*var\(\s*(--bkms-radius-\d+)\s*\)/g)].map(
+      ([, label, ref]) => ({
+        label,
+        name: `--bkms-radius-${label}`,
+        px: RADIUS_SCALE.find(t => t.name === ref)?.px,
+      }),
+    ),
+  )
+  .filter(t => Number.isFinite(t.px));
+
+/**
+ * 圆角档位类：rounded-bkms-<px>，仅供迁移过渡期使用。
  * key 必须带 bkms- 前缀：裸数字会被 uno 内置 spacing 刻度抢走（rounded-6 = 1.5rem）。
  * 新代码禁用档位类——直接写档位会绕过语义，改语义档时管不到这些地方。
  */
 export function parseRadiusScaleTokens() {
   const tokens = {};
-  for (const block of readTokenFile('radius.css').match(/@layer scale[\s\S]*?@endgroup/g) || []) {
-    for (const m of block.matchAll(/--bkms-radius-([0-9]+)\s*:/g)) {
-      tokens[`bkms-${m[1]}`] = `var(--bkms-radius-${m[1]})`;
-    }
-  }
+  for (const t of RADIUS_SCALE) tokens[`bkms-${t.px}`] = `var(${t.name})`;
   return tokens;
 }
 
 /**
  * 圆角语义变量：radius.css 的语义区 → theme.borderRadius，类名形如 rounded-card / rounded-t-field。
- * 只取 @layer semantic 组：档位（--bkms-radius-6 这类名字即像素值的）不注册，
- * 业务与覆写层只该消费语义档，注册会诱导 rounded-6 这种写法。
+ * 只取语义档：档位（--bkms-radius-6 这类名字即像素值的）不注册，注册会诱导 rounded-6 这种写法。
  */
 export function parseRadiusTokens() {
   const tokens = {};
-  for (const block of readTokenFile('radius.css').match(/@layer semantic[\s\S]*?@endgroup/g) || []) {
-    for (const m of block.matchAll(/--bkms-radius-([a-z0-9-]+)\s*:/g)) {
-      tokens[m[1]] = `var(--bkms-radius-${m[1]})`;
-    }
-  }
+  for (const t of RADIUS_SEMANTIC) tokens[t.label] = `var(${t.name})`;
   return tokens;
+}
+
+/** 档位变量（--bkms-radius-6）：只该被语义层引用，业务与覆写层直连它会绕过语义 */
+export const isRadiusScaleVar = name => RADIUS_SCALE.some(t => t.name === name);
+
+/** 语义档变量（--bkms-radius-card）：未定义时不能当合法目标，否则会修出 uno 没注册的类名 */
+export const isRadiusSemanticVar = name => RADIUS_SEMANTIC.some(t => t.name === name);
+
+/** 档位里没有同值（2px / 10px 这类）时退到最接近的档位，候选数受 limit 约束 */
+export function nearestRadiusSemantics(px, limit = 3) {
+  return [...RADIUS_SEMANTIC].sort((a, b) => Math.abs(a.px - px) - Math.abs(b.px - px)).slice(0, limit);
 }
 
 /** 色阶 + keep 令牌：color.css → theme.colors，类名形如 text-bkms-brand-2 / bg-bkms-keep-ffb848。
@@ -128,6 +159,11 @@ export function parseSemanticShortcuts() {
     shortcuts.push([`bkms-${group}-${name}`, `${prefixByGroup[group]}-[var(--bkms-${group}-${name})]`]);
   }
   return shortcuts;
+}
+
+/** 同值语义档候选；hint 只用于排序（命中场景词的那个排最前），不代替人判断 */
+export function radiusSemantics(px, hint) {
+  return RADIUS_SEMANTIC.filter(t => t.px === px).sort((a, b) => (b.label === hint) - (a.label === hint));
 }
 
 /** alpha：0~1 或百分比；整数 0~255 也兼容。缺省视为不透明 */

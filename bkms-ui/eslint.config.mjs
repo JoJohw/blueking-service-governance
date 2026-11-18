@@ -110,6 +110,8 @@ export default [
     rules: {
       'theme/no-hardcoded-color': 'warn',
       'theme/no-foreign-var': 'warn',
+      'theme/no-hardcoded-radius': 'warn',
+      'theme/prefer-radius-class': 'warn',
       'theme/no-default-palette': 'error',
       'theme/prefer-uno-class': 'error',
     },
@@ -122,6 +124,8 @@ export default [
     rules: {
       'theme/no-hardcoded-color': 'warn',
       'theme/no-foreign-var': 'warn',
+      'theme/no-hardcoded-radius': 'warn',
+      'theme/prefer-radius-class': 'warn',
     },
   },
   // 令牌定义层是复刻产物 / 真源，不适用消费层规则；
@@ -131,6 +135,8 @@ export default [
     rules: {
       'theme/no-hardcoded-color': 'off',
       'theme/no-foreign-var': 'off',
+      'theme/no-hardcoded-radius': 'off',
+      'theme/prefer-radius-class': 'off',
     },
   },
   // palette 是独立 dev 工具：骨架用自有 --pal-* 固定变量（shell.css 定义），
@@ -140,6 +146,8 @@ export default [
     rules: {
       'theme/no-hardcoded-color': 'off',
       'theme/no-foreign-var': 'off',
+      'theme/no-hardcoded-radius': 'off',
+      'theme/prefer-radius-class': 'off',
     },
   },
 ];

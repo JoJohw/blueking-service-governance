@@ -35,6 +35,8 @@ const RULE_TITLE = {
   'theme/prefer-uno-class': 'class 内 var() 任意值（改用注册类）',
   'theme/no-default-palette': 'uno 默认调色板类名',
   'theme/no-foreign-var': '非白名单 var() 引用',
+  'theme/no-hardcoded-radius': '写死圆角（改用语义档）',
+  'theme/prefer-radius-class': '圆角未走语义注册类',
 };
 
 const ruleFilter = process.argv.find(a => a.startsWith('--rule='))?.slice('--rule='.length);

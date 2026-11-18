@@ -2,13 +2,16 @@
 
 色值治理工具链：把 `src/styles/theme/tokens` 里的 CSS 变量当作唯一真源，检查业务代码有没有绕过它写死色值。
 
-三个文件分工：
+文件分工：
 
-| 文件         | 职责                                                                             |
-| ------------ | -------------------------------------------------------------------------------- |
-| `map.mjs`    | 解析令牌 + 反查类名/变量。**唯一真源**，`uno.config.ts` 与 eslint 规则都从这里取 |
-| `plugin.mjs` | eslint 插件，注册四条 `theme/*` 规则                                             |
-| `report.mjs` | 存量报表，只看不改（`pnpm theme:report`）                                        |
+| 文件               | 职责                                                                             |
+| ------------------ | -------------------------------------------------------------------------------- |
+| `map.mjs`          | 解析令牌 + 反查类名/变量。**唯一真源**，`uno.config.ts` 与 eslint 规则都从这里取 |
+| `plugin.mjs`       | 聚合入口：合并各维度规则，eslint 配置里仍以 `theme` 插件名引用                   |
+| `rules/shared.mjs` | 规则工厂（四路挂载）+ 定位换算 + 类名与声明切分；radius 两条已接入，color 四条仍内联 |
+| `rules/color.mjs`  | 颜色维度四条规则                                                                 |
+| `rules/radius.mjs` | 圆角维度两条规则                                                                 |
+| `report.mjs`       | 存量报表，只看不改（`pnpm theme:report`）                                        |
 
 测试在 `scripts/test/`，用 `pnpm test:scripts` 单独跑，不进 `test:unit` / `test:ci`。
 
@@ -21,18 +24,22 @@
 
 **新增令牌不需要改任何代码**：`map.mjs` 在模块加载时扫描这两个文件，`uno.config.ts` 据此注册类、eslint 据此给建议。色阶会自动生成 `text-` / `bg-` / `border-` 等全部颜色工具类，语义层自动生成 `bkms-text-*` / `bkms-bg-*` / `bkms-line-*` 快捷类（见 `uno.config.ts` 顶部注释的消费矩阵）。
 
-## 四条规则
+## 六条规则
 
-| 规则                 | 级别  | 检查什么                                                                   | 可自动修                              |
-| -------------------- | ----- | -------------------------------------------------------------------------- | ------------------------------------- |
-| `no-hardcoded-color` | warn  | 写死色值（hex / `rgb()` / `rgba()` / `hsl()`）                             | 有同值令牌且非复合值时可修（带 `/alpha` 转 `color-mix`） |
-| `no-default-palette` | error | uno 默认调色板类，如 `text-red-500`、`border-t-gray-900`、`shadow-red-500` | 否                                    |
-| `prefer-uno-class`   | error | class 内用 `var()` 任意值（`text-[var(--bkms-brand-2)]`）                  | 同层有注册类时可修（带 `/alpha` 转 `color-mix`） |
-| `no-foreign-var`     | warn  | `var()` 引用不在 `--bkms-*` 白名单、也不是同文件局部变量                   | 否                                    |
+| 规则                   | 级别  | 检查什么                                                                   | 可自动修                              |
+| ---------------------- | ----- | -------------------------------------------------------------------------- | ------------------------------------- |
+| `no-hardcoded-color`   | warn  | 写死色值（hex / `rgb()` / `rgba()` / `hsl()`）                             | 有同值令牌且非复合值时可修（带 `/alpha` 转 `color-mix`） |
+| `no-default-palette`   | error | uno 默认调色板类，如 `text-red-500`、`border-t-gray-900`、`shadow-red-500` | 否                                    |
+| `prefer-uno-class`     | error | class 内用 `var()` 任意值（`text-[var(--bkms-brand-2)]`）                  | 同层有注册类时可修（带 `/alpha` 转 `color-mix`） |
+| `no-foreign-var`       | warn  | `var()` 引用不在 `--bkms-*` 白名单、也不是同文件局部变量                   | 否                                    |
+| `no-hardcoded-radius`  | warn  | 写死圆角长度（`rounded-[6px]`、`border-radius: 6px`）                      | 同值语义档唯一时可修；多档只给候选     |
+| `prefer-radius-class`  | warn  | 圆角没走语义注册类：`rounded-lg`、`rounded-bkms-6`、`var(--bkms-radius-6)` | 语义 `var()` 任意值可换成注册类        |
 
-级别是渐进的：两条 warn 是存量软基线，清零后升 error；两条 error 当前零存量，直接拦。
+级别是渐进的：四条 warn 是存量软基线，清零后升 error；两条 error 当前零存量，直接拦。
 
 覆盖范围：`.vue`（template / script / `<style>` 块）、`.ts/.tsx/.js/.jsx`、独立 `.css`（走 `@eslint/css` 的 `css/css` language）。
+
+接入新令牌维度时不要往 `plugin.mjs` 里堆规则：写 `rules/<维度>.mjs` 导出规则对象，在聚合入口合并即可。
 
 ## 建议值怎么算
 
@@ -45,7 +52,18 @@
 
 找不到同值令牌时不硬猜，只给最接近的候选（`nearestClasses` / `nearestVars`，色差超过阈值不给），由 IDE 灯泡里人工点选。
 
-## 八处有意为之的例外
+### 圆角：同值多档是常态，所以大多不自动修
+
+颜色基本是「一个值一个语义」，圆角不是：`6px` 同时对应 `control` / `card` / `overlay` / `tab` 四个语义档，值相同但场景不同。于是：
+
+1. **同值语义档唯一**（`4px` → `scroll`、`8px` → `menu`）：直接自动修
+2. **同值多档**（`6px`）：只给候选，灯泡里按场景挑，不替你定
+3. **档位里没有同值**（`2px`、`10px`）：给最接近档位的候选，仍然不自动修
+4. **场景词只影响排序**：选择器 / class 里的 `tab`、`card`、`popover` 等词会把对应语义档排到候选第一位，但不据此自动改
+
+形状语义不进令牌，直接放行：`0`、`50%`、`100%`、`≥100px` 胶囊、`rounded-full`、`rounded-none`。
+
+## 十三处有意为之的例外
 
 - **`shadow-[…var(--bkms-shadow-*)]`**：uno 没把阴影注册成类，class 内 `var()` 是唯一合法写法，放行
 - **`ring-offset-[色值]`**：uno 也没有对应的颜色类，替换成 `ring-*` 会把外发光环改成实心环，所以**只报不修**
@@ -55,6 +73,11 @@
 - **跨令牌层的 `var()`**：`text-[var(--bkms-brand-2)]` → `bkms-text-brand` 同值但不同层，语义层分叉后会改错，`prefer-uno-class` 只给候选不自动修
 - **非 class 语境的任意值**：script 里的普通字符串（`const s = 'bg-[#fff]'`）只报不修，那里可能只是文案或选择器数据
 - **`color-mix(…)`**：半透明场景的合法写法，`prefer-uno-class` 放行
+- **圆角形状值**：`50%` / `100%` / `≥100px` 胶囊 / `rounded-full` / `rounded-none` 是形状不是档位，放行
+- **圆角多值简写**：`border-radius: 0 4px 4px 0` 四角语义各不相同，只报不修
+- **uno 内置圆角刻度**（`rounded-lg` 等）：值随根字号浮动（本项目根字号 12px），换算不出可靠档位，只报不修
+- **未知圆角语义档**（`rounded-[var(--bkms-radius-cardd)]`）：令牌里没有它就不给 autofix，只报「先新增令牌」，避免产出 uno 没注册的类名
+- **script 里的类名字符串**：动态类名同样检测，但可能只是数据 / 文案，只报不修
 
 ## 怎么用
 

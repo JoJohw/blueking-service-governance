@@ -17,7 +17,7 @@
  */
 
 /**
- * theme-lint 单测：令牌映射（map.mjs）+ 四条 eslint 规则（plugin.mjs）。
+ * theme-lint 单测：令牌映射（map.mjs）+ 六条 eslint 规则（plugin.mjs → rules/*.mjs）。
  *
  * 这是仓库工具自身的测试，不属于业务单测：用例统一放 scripts/test/，由 pnpm test:scripts 统一跑
  * （同目录的 vitest.config.mts），不进 test:unit / test:ci，GitHub 的单元测试流水线不感知它。
@@ -39,15 +39,18 @@ import vueParser from 'vue-eslint-parser';
 import {
   COLOR_KINDS,
   hexOfVar,
+  isRadiusScaleVar,
   isShadowVar,
   isThemeVar,
   layerOfClass,
   layerOfVar,
   nearestClasses,
+  nearestRadiusSemantics,
   nearestVars,
   normalizeHex,
   parseScaleColors,
   parseSemanticShortcuts,
+  radiusSemantics,
   suggestClass,
   suggestShadowVar,
   suggestVar,
@@ -59,6 +62,8 @@ const RULES = {
   'theme/no-default-palette': 'error',
   'theme/prefer-uno-class': 'error',
   'theme/no-foreign-var': 'error',
+  'theme/no-hardcoded-radius': 'error',
+  'theme/prefer-radius-class': 'error',
 };
 
 const configFor = {
@@ -750,5 +755,222 @@ describe('令牌目录定位', () => {
       encoding: 'utf8',
     });
     expect(Number(stdout)).toBe(Object.keys(parseScaleColors()).length);
+  });
+});
+
+describe('map 圆角反查', () => {
+  it('同值语义档：6px 对应 control/card/overlay/tab', () => {
+    expect(
+      radiusSemantics(6)
+        .map(t => t.label)
+        .sort(),
+    ).toEqual(['card', 'control', 'overlay', 'tab']);
+  });
+
+  it('唯一同值档：4px → scroll、8px → menu', () => {
+    expect(radiusSemantics(4).map(t => t.label)).toEqual(['scroll']);
+    expect(radiusSemantics(8).map(t => t.label)).toEqual(['menu']);
+  });
+
+  it('hint 只排序，不增删候选', () => {
+    const hinted = radiusSemantics(6, 'tab');
+    expect(hinted).toHaveLength(4);
+    expect(hinted[0].label).toBe('tab');
+  });
+
+  it('档位里没有同值时给最近档位', () => {
+    const near = nearestRadiusSemantics(2);
+    expect(near).toHaveLength(3);
+    expect(near[0].px).toBe(3);
+  });
+
+  it('isRadiusScaleVar 只认档位', () => {
+    expect(isRadiusScaleVar('--bkms-radius-6')).toBe(true);
+    expect(isRadiusScaleVar('--bkms-radius-card')).toBe(false);
+  });
+});
+
+describe('rule: no-hardcoded-radius', () => {
+  // 6px 有四个同值语义档：语义由场景决定，只给候选
+  it('同值多档只给候选，不自动修', () => {
+    const code = `<template><div class="rounded-[6px]" /></template>`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius');
+    expect(msg.messageId).toBe('useClassMulti');
+    expect(msg.fix).toBeUndefined();
+    expect(msg.suggestions).toHaveLength(4);
+    expect(fix(code).output).toBe(code);
+  });
+
+  it('唯一同值档自动修：rounded-[4px] → rounded-scroll', () => {
+    const code = `<template><div class="rounded-[4px]" /></template>`;
+    expect(fix(code).output).toBe(`<template><div class="rounded-scroll" /></template>`);
+  });
+
+  it('方向保留：rounded-t-[8px] → rounded-t-menu', () => {
+    const code = `<template><div class="rounded-t-[8px]" /></template>`;
+    expect(fix(code).output).toBe(`<template><div class="rounded-t-menu" /></template>`);
+  });
+
+  it('档位无同值（2px）时给最近档位候选，不自动修', () => {
+    const code = `<template><div class="rounded-[2px]" /></template>`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius');
+    expect(msg.messageId).toBe('useClassUnknown');
+    expect(msg.suggestions?.length).toBe(3);
+    expect(fix(code).output).toBe(code);
+  });
+
+  // 形状语义（圆形 / 直角 / 百分比 / 胶囊）不进档位
+  it.each(['rounded-full', 'rounded-none', 'rounded-[50%]', 'rounded-[999px]', 'rounded-[0]', 'rounded-card'])(
+    '%s 放行',
+    cls => {
+      expect(verifyRule(`<template><div class="${cls}" /></template>`, 'theme/no-hardcoded-radius')).toEqual([]);
+    },
+  );
+
+  it('<style> 块：唯一同值 → var()，!important 保留', () => {
+    const code = `<template><div /></template>\n<style>\n.a { border-radius: 4px !important; }\n</style>`;
+    expect(fix(code).output).toBe(code.replace('4px !important', 'var(--bkms-radius-scroll) !important'));
+  });
+
+  it('<style> 块：多值简写只报不修', () => {
+    const code = `<template><div /></template>\n<style>\n.a { border-radius: 0 4px 4px 0; }\n</style>`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius');
+    expect(msg.messageId).toBe('compound');
+    expect(fix(code).output).toBe(code);
+  });
+
+  it('内联 style 属性与脚本样式对象都命中', () => {
+    const [inline] = verifyRule(`<template><div style="border-radius: 4px" /></template>`, 'theme/no-hardcoded-radius');
+    expect(inline.message).toBe('写死圆角 4px，改用 var(--bkms-radius-scroll)');
+
+    const [script] = verifyRule(`const style = { borderRadius: '4px' };`, 'theme/no-hardcoded-radius', 'ts');
+    expect(script.messageId).toBe('useVar');
+
+    // fix 必须落在值本体上：漏掉字面量基址就会插到文件开头
+    expect(fix(`<template><div style="border-radius: 4px" /></template>`).output).toBe(
+      `<template><div style="border-radius: var(--bkms-radius-scroll)" /></template>`,
+    );
+    expect(fix(`const style = { borderRadius: '4px' };`, 'ts').output).toBe(
+      `const style = { borderRadius: 'var(--bkms-radius-scroll)' };`,
+    );
+  });
+
+  it('独立 .css 走 Declaration', () => {
+    const [msg] = verifyRule(`.a { border-radius: 8px; }`, 'theme/no-hardcoded-radius', 'css');
+    expect(msg.message).toBe('写死圆角 8px，改用 var(--bkms-radius-menu)');
+  });
+
+  it('非圆角属性里的数值不误报', () => {
+    expect(verifyRule(`.a { padding: 6px; font-size: 6px; }`, 'theme/no-hardcoded-radius', 'css')).toEqual([]);
+  });
+
+  // script 里的动态类名同样是 class：扫描口径一致，只是不给自动修（可能只是数据 / 文案）
+  it('script 里的类名字符串也报，但只报不修', () => {
+    const code = `const s = 'rounded-[2px]';`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius', 'ts');
+    expect(msg.messageId).toBe('useClassUnknown');
+    expect(msg.fix).toBeUndefined();
+    expect(msg.suggestions).toBeUndefined();
+    expect(fix(code, 'ts').output).toBe(code);
+  });
+
+  it('script 对象里的 kebab 键也认', () => {
+    const code = `const s = { 'border-radius': '4px' };`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius', 'ts');
+    expect(msg.messageId).toBe('useVar');
+    expect(fix(code, 'ts').output).toBe(`const s = { 'border-radius': 'var(--bkms-radius-scroll)' };`);
+  });
+});
+
+describe('rule: prefer-radius-class', () => {
+  it.each(['rounded', 'rounded-t', 'rounded-sm', 'rounded-lg', 'rounded-tl-xl'])('%s 是内置刻度', cls => {
+    const [msg] = verifyRule(`<template><div class="${cls}" /></template>`, 'theme/prefer-radius-class');
+    expect(msg.messageId).toBe('bannedScale');
+  });
+
+  it('档位类给语义候选，不自动修', () => {
+    const code = `<template><div class="rounded-bkms-6" /></template>`;
+    const [msg] = verifyRule(code, 'theme/prefer-radius-class');
+    expect(msg.messageId).toBe('bannedStep');
+    expect(msg.fix).toBeUndefined();
+    expect(fix(code).output).toBe(code);
+  });
+
+  it('语义令牌的 var() 任意值直接换成注册类（方向保留）', () => {
+    expect(fix(`<template><div class="rounded-[var(--bkms-radius-card)]" /></template>`).output).toBe(
+      `<template><div class="rounded-card" /></template>`,
+    );
+    expect(fix(`<template><div class="rounded-t-[var(--bkms-radius-card)]" /></template>`).output).toBe(
+      `<template><div class="rounded-t-card" /></template>`,
+    );
+  });
+
+  it('档位 var() 任意值只给候选', () => {
+    const [msg] = verifyRule(
+      `<template><div class="rounded-[var(--bkms-radius-6)]" /></template>`,
+      'theme/prefer-radius-class',
+    );
+    expect(msg.messageId).toBe('bannedStep');
+    expect(msg.suggestions).toHaveLength(4);
+  });
+
+  it('CSS 里直连档位变量也报', () => {
+    const code = `<template><div /></template>\n<style>\n.a { border-radius: var(--bkms-radius-6); }\n</style>`;
+    const [msg] = verifyRule(code, 'theme/prefer-radius-class');
+    expect(msg.messageId).toBe('bannedVar');
+  });
+
+  it.each(['rounded-card', 'rounded-full', 'rounded-none', 'rounded-t-control'])('%s 放行', cls => {
+    expect(verifyRule(`<template><div class="${cls}" /></template>`, 'theme/prefer-radius-class')).toEqual([]);
+  });
+
+  it('script 里的档位类也报，只报不修', () => {
+    const code = `const s = 'rounded-bkms-6';`;
+    const [msg] = verifyRule(code, 'theme/prefer-radius-class', 'ts');
+    expect(msg.messageId).toBe('bannedStep');
+    expect(msg.fix).toBeUndefined();
+    expect(msg.suggestions).toBeUndefined();
+    expect(fix(code, 'ts').output).toBe(code);
+  });
+
+  // 圆角令牌由本规则认领，颜色规则不能再落 bannedUnknown（「该令牌无注册类」是事实错误）
+  it('prefer-uno-class 不再对圆角任意值误报', () => {
+    const code = `<template><div class="rounded-[var(--bkms-radius-card)]" /></template>`;
+    expect(verifyRule(code, 'theme/prefer-uno-class')).toEqual([]);
+    const [msg] = verifyRule(code, 'theme/prefer-radius-class');
+    expect(msg.messageId).toBe('unregistered');
+  });
+
+  it('未知语义档只报不修（不产出 uno 没注册的类名）', () => {
+    const code = `<template><div class="rounded-[var(--bkms-radius-cardd)]" /></template>`;
+    const [msg] = verifyRule(code, 'theme/prefer-radius-class');
+    expect(msg.messageId).toBe('unknownSemantic');
+    expect(msg.fix).toBeUndefined();
+    expect(fix(code).output).toBe(code);
+  });
+
+  // 非 class 语境只认形态特殊的两种（任意值 / 档位类）：裸 rounded 在文案里是常见英文词
+  it.each([
+    ['template 属性值', '<template><div title="rounded" /></template>', 'vue'],
+    ['script 普通字符串', `const shape = 'rounded';`, 'ts'],
+    ['script 内置刻度词', `const shape = 'rounded-lg';`, 'ts'],
+  ])('非 class 语境的裸刻度词不误报：%s', (_label, code, target) => {
+    expect(verifyRule(code, 'theme/prefer-radius-class', target)).toEqual([]);
+  });
+
+  it('不存在的档位（rounded-bkms-99）不当档位，也不给候选', () => {
+    expect(verifyRule(`<template><div class="rounded-bkms-99" /></template>`, 'theme/prefer-radius-class')).toEqual(
+      [],
+    );
+  });
+
+  it('script 里的 var() 任意值文案不带「class 内」', () => {
+    const [msg] = verifyRule(
+      `const s = 'rounded-[var(--bkms-radius-card)]';`,
+      'theme/prefer-radius-class',
+      'ts',
+    );
+    expect(msg.messageId).toBe('unregistered');
+    expect(msg.message).not.toContain('class 内');
   });
 });
