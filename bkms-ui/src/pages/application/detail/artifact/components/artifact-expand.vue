@@ -140,7 +140,7 @@
         <span class="text-[12px] bkms-text-secondary ml-[4px]"> ({{ $t('仅展示前 5 条') }}) </span>
       </div>
       <div
-        v-bkloading="{ loading: isDeployRecordLoading, color: 'var(--bkms-neutral-7)]' }"
+        v-bkloading="{ loading: isDeployRecordLoading, color: 'var(--bkms-neutral-7)' }"
         class="flex-1 h-full"
       >
         <Timeline

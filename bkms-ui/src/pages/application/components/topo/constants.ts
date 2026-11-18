@@ -230,6 +230,7 @@ export const STATUS_CONFIG: Record<
     bgColor: string;
     color?: string;
     iconBgColor: string;
+    /** minimap 走 canvas 绘制，@antv/g 不解析 var()，此处必须是实色 */
     miniColor?: string;
   }
 > = {
@@ -241,7 +242,7 @@ export const STATUS_CONFIG: Record<
     bgColor: 'var(--bkms-bg-card)',
     iconBgColor: 'linear-gradient(90deg, var(--bkms-cyan-2) 0%, var(--bkms-cyan-3) 100%)',
     color: 'var(--bkms-cyan-3)',
-    miniColor: 'var(--bkms-success-6)',
+    miniColor: '#DAF6E5',
   },
   warning: {
     bgColor:
@@ -249,7 +250,7 @@ export const STATUS_CONFIG: Record<
     iconBgColor: 'linear-gradient(90deg, var(--bkms-warning-2) 0%, var(--bkms-warning-3) 100%)',
     badgeIconColor: 'var(--bkms-warning-2)',
     color: 'var(--bkms-warning-3)',
-    miniColor: 'var(--bkms-warning-6)',
+    miniColor: '#FDEED8',
   },
   error: {
     bgColor:
@@ -257,14 +258,14 @@ export const STATUS_CONFIG: Record<
     iconBgColor: 'linear-gradient(90deg, var(--bkms-danger-2) 0%, var(--bkms-danger-3) 100%)',
     badgeIconColor: 'var(--bkms-danger-2)',
     color: 'var(--bkms-danger-3)',
-    miniColor: 'var(--bkms-danger-5)',
+    miniColor: '#FEDDDD',
   },
   unknown: {
     bgColor: 'var(--bkms-bg-card)',
     iconBgColor: 'linear-gradient(90deg, var(--bkms-brand-3) 0%, var(--bkms-brand-4) 100%)',
     badgeIconColor: 'var(--bkms-brand-3)',
     color: 'var(--bkms-brand-4)',
-    miniColor: 'var(--bkms-brand-4)',
+    miniColor: '#99B1E0',
   },
 };
 

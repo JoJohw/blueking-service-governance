@@ -425,8 +425,8 @@
                 },
                 maskStyle: {
                   background: 'transparent',
-                  // 缩略图外遮罩：借 dialog 档位（原 #0000002d 18% → 20%），避免为一处遮罩单开令牌
-                  boxShadow: '0 0 10000px 10000px var(--bkms-shadow-dialog)',
+                  // G6 配置项里的色值统一用字面量，避免 var() 被误用到 canvas 渲染路径
+                  boxShadow: '0 0 10000px 10000px #0000002d',
                 },
                 filter: (id: string, elementType: string) => {
                   if (elementType !== 'node') return true;
@@ -449,7 +449,7 @@
                           y: 0,
                           width: NODE_WIDTH,
                           height: NODE_HEIGHT,
-                          fill: 'var(--bkms-text-inverse)',
+                          fill: '#FFFFFF',
                           radius: 10,
                         },
                       }),
