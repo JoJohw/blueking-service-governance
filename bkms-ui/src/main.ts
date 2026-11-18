@@ -37,6 +37,7 @@ echarts.use([
 ]);
 
 import { getUser } from '~/api/modules/user';
+import { initTheme } from '~/composables/use-theme';
 import { registerMonitorChartApi } from '~/pages/application/detail/deploy/monitor-chart-bridge.js';
 import { useUserStore } from '~/stores/user';
 
@@ -53,6 +54,10 @@ if (!w.timezone) w.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 // 主题覆写作用域：src/styles/theme/patches 的选择器统一以 body.bkms-themed 为前缀；
 // 挂 body 而非 app 根，teleport 到 body 的弹层（Modal/下拉/Message）天然在作用域内
 document.body.classList.add('bkms-themed');
+
+// 多主题：主题名挂到 html[data-theme]，具体色值在 src/styles/theme/themes/ 覆盖色阶。
+// index.html 的首帧脚本已按 localStorage 预置同名属性，此处只做一次兜底同步。
+initTheme();
 
 import type { UserModule } from './types.ts';
 
