@@ -19,7 +19,8 @@
 /**
  * 主题变量命名空间白名单：no-foreign-var / prefer-uno-class 的唯一填报点。
  * --bkms-viz- 已被 --bkms- 覆盖，双写是显式登记命名空间，不靠前缀包含关系隐式放行。
+ * --vscode- 由 monaco 主题服务注入，编辑器自身配色不属于业务令牌体系，单独放行。
  * 独立叶子模块（零 import）：map.mjs 被 uno.config.ts 直接 import，反向 import plugin.mjs
  * 会构成 map → plugin → rules/color → map 环，并把整棵规则树拖进 unconfig 的打包执行路径。
  */
-export const THEME_VAR_PREFIXES = ['--bkms-', '--bkms-viz-'];
+export const THEME_VAR_PREFIXES = ['--bkms-', '--bkms-viz-', '--vscode-'];

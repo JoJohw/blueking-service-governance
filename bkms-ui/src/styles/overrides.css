@@ -193,15 +193,17 @@
   height: 6px;
 }
 
-/* 解决 monaco-editor 不可编辑提示错位问题；配色与圆角均为 vscode 编辑器自身值，不令牌化 */
+/* 解决 monaco-editor 不可编辑提示错位问题 */
+
+/* stylelint-disable custom-property-pattern -- monaco 注入的变量名是 camelCase，必须同名引用 */
 .monaco-editor-overlaymessage {
   z-index: 9999;
 
   .message {
     padding: 2px 4px;
-    color: var(--bkms-navy-5);
-    background-color: #252526;
-    border: 1px solid #007acc;
+    color: var(--vscode-editorHoverWidget-foreground);
+    background-color: var(--vscode-editorHoverWidget-background);
+    border: 1px solid var(--vscode-inputValidation-infoBorder);
     border-radius: 3px;
   }
 
@@ -217,6 +219,8 @@
   }
 
   .anchor.below {
-    border-top-color: #007acc;
+    border-top-color: var(--vscode-inputValidation-infoBorder);
   }
 }
+
+/* stylelint-enable custom-property-pattern */
