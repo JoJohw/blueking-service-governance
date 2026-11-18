@@ -1,164 +1,150 @@
-# 主题色适配指南（多主题体系）
+# 主题体系（UI 主题色 + 多主题地基）
 
-> 版本记录：v0 = `THEME.md`（初版）；v1~v4 见 git 历史（`THEME-v1.md` ~ `THEME-v4.md`，2026-11-06 起文件名不再带版本后缀，历史版本只存在于 git）。本文为现行版，含 2026-11-06 目录重排：theme 移入 `src/styles/theme/`、令牌收进 `tokens/`、patches 按 `bkui-theme/`（生成）与 `bkms/`（手写）分域；设计确认值全部收编（mapping 230，含 2026-11-13 pending-designer-review 建议值拍板批），覆写内 pending 清零。
-> **关键决策（方向性变更）**：① **编译期替换层（postcss-theme-replace）退役**，组件库写死 hex 改由 **class 选择器覆写**承担；② 覆写层组织规约：按组件域分文件 + `body.bkms-themed` 统一作用域 + 全局无包裹段分离；③ specificity 策略、stylelint 豁免、漂移自检脚本明确；④ DoD 口径更换；⑤ 沿用已定内容：mapping 拆分「spec 已收录 / 待设计确认」、bridge 语义映射写死、UnoCSS 接入、多主题预留、dark 审计备注。
-> 本文数字均于 2026-11-03 对 `node_modules/bkui-vue/dist/style.variable.css`（v2.0.2-beta.97，226KB）实测复核，统计口径随数字标注。
-> 原则：重分析、轻方案；色值真源 = `bkms-color-spec.md`；`--bkms-*` 色阶唯一写在 tokens。
+> 本文件是 UI 主题体系的唯一指南：分层模型、覆写规约、操作步骤、现状快照、踩坑与下一阶段待办。
+> 2026-11-18 合并原 `THEME.md` / `THEME_STEPS.md` / `THEME-RECAP-v1.md`，历史版本见 git。
+> 可视化域（G6 / ECharts / Monaco / vxe / 第三方包）见同目录 `THIRD-PARTY-THEME.md`。
+> 原则：色值真源 = `src/styles/theme/tokens/`；`--bkms-*` 色阶只在 `tokens/color.css` 定义。
 
-## 范围声明
+## 一、范围
 
-**本期落地范围 = 需求单的「颜色映射」一块 + 多主题体系的令牌地基。** 需求单其余视觉块（圆角、顶栏/侧栏、表格、列表工具栏、成员管理）因需求单原文尚未提供，暂登记待核实项，不产出步骤。运行时第二主题（`data-theme` 切换）本期只预留扩展位、不实现。
+本期 = 需求单「颜色映射」一块 + 多主题令牌地基。圆角已进语义令牌维度；shadow 走语义变量。
+运行时第二主题只留扩展位（`themes/` + `[data-theme]`），dark 未做。
 
-## 一、为什么是 class 覆写：按值替换 vs 按选择器覆写
+## 二、为什么是 class 覆写
 
 | | 编译期替换（已退役） | class 覆写（现行） |
 | --- | --- | --- |
-| 替换粒度 | **按值**：`#3a84ff` 确认后库内 59 处一刀切全变 | **按选择器**：同一色值，按钮 hover 改、图例不改，"同值不同命" |
-| 与设计确认流程的契合 | 要求值级全量确认才能安全执行 | **支持"确认一批、覆盖一批"的条目级渐进** |
-| 失效形态 | 值匹配，抗选择器漂移 | 选择器匹配，库升级改选择器即**静默失效**——必须配自检脚本 |
-| 可见性 | 构建期魔法，排查读插件 | 普通 CSS，devtools 直接看命中关系 |
-| 构建依赖 | postcss 插件 + Vite 管线行为 | 无 |
+| 替换粒度 | 按值：`#3a84ff` 确认后库内 59 处一刀切 | 按选择器：同一色值，按钮 hover 改、图例不改 |
+| 与设计流程契合 | 要求值级全量确认 | 支持"确认一批、覆盖一批"的条目级渐进 |
+| 失效形态 | 值匹配，抗选择器漂移 | 选择器匹配，库升级改选择器即静默失效，必须配自检 |
+| 可见性 | 构建期魔法 | 普通 CSS，devtools 直接看命中 |
+| 构建依赖 | postcss 插件 + Vite 管线 | 无 |
 
-**结论**：设计确认是条目级而非值级，class 覆写与实际工作流粒度匹配。
-
-## 二、现状盘点（实测数字 + 口径）
-
-| 事实 | 数据 / 位置 | 对方案的影响 |
-| --- | --- | --- |
-| 组件库引入变量版样式 | `src/modules/bkui.ts:23` → `style.variable.css` | 组件库**变量驱动与写死色混杂**，非纯变量驱动 |
-| 组件库真实变量体系 | `:root` 定义 **129** 个（口径：`:root` 块内 `--xxx` 去重；含 `:root` 外定义则 **138**）：全局组 `--primary-color`(86)/`--success-color`(34)/`--warning-color`(25)/`--danger-color`(40)/`--default-color`(37)/`--gray-color`(21)/`--light-gray`(74)/`--white-color`(72)/`--whitesmoke-color`(6)/`--border-color`(2)/`--disable-color`(42)/`--disable-bg-color`(2) + 尺寸组（`--border-radius-base: 2px`、`--input-broder-radius: 3px`、`--component-size-*`）+ 组件级组（`--button-*`/`--menu-*`/`--table-*`(44)/`--input-*`/`--link-*`/`--message-*`/`--radio-*`/`--nav-*` 等） | **没有** `--bk-color-*` 系列（实测 0 命中）。变量重声明对象以本清单为准 |
-| 变量引用 vs 写死色 | `var(--*)` 引用 **822** 处；写死 hex：去重 **113 种**（口径 A：6 位 hex + 词边界）、**实际 549 处**；8 位 hex（带 alpha）26 个。`#3a84ff` 独占 59 处 | 桥接覆盖 822 处引用点；549 处写死 hex 走 **patches/ class 覆写**。只做桥接会混色 |
-| 业务侧零消费 | 全 src 搜组件库真实变量名 = **0** 处 | 业务与组件库色板两套孤岛，本次打通 |
-| 组件库 spec 未收录色 | `#3f87ff` 1 处（`--menu-active-bg-color` 渐变）、`#182132` 3 处（侧栏底）；另有 `#f0f8ff`/`#fff4e2`/`#ffeded`/`#eaf3ff` 等 message 系旧色 | **先出清单给设计拍板，不臆断归类**（见第五节） |
-| 硬编码色值规模（业务侧） | hex 约 2000 处 / 350+ 文件；rgba 约 210 文件 | 人肉不现实，映射表必须可被脚本消费 |
-| 已有存量补丁 | `src/styles/bk-patch.css`，19 条规则，以 `!important` 为主，实测仅 1 处色值 | 归宿：审计后布局/尺寸规则迁入全局无包裹段 |
-| 样式加载顺序 | `main.ts`：main.css(55) → @blueking/table(56) → uno(57-58)；bkui css 经 `import.meta.glob(eager:true)`(63) 间接加载 | bridge 引入位显式紧跟 `style.variable.css`（见第三节） |
-| uno 硬编码 | `uno.config.ts` env-tag-* 4 个 shortcuts | 走 theme 注册（见第七节） |
-| dark 挂载点 | `index.html:9-16`，死代码 | 运行时主题预留挂载点（见第八节） |
-| 业务侧硬编码非颜色 | border-radius/box-shadow 共 37 文件 | 圆角走桥接，见第六节 |
-
-## 三、分层模型（编译替换层移除，patches 升格）
+## 三、分层模型
 
 ```
-tokens/
-├── colors.css         原子色阶             --bkms-brand-2……（唯一写色值处，:root；uno 注册真源）
-└── semantic.css       语义层               --bkms-text-body…… 引用色阶
-patches/*/variables.css   桥接层               组件库 :root 变量重指向 --bkms-*（按域拆分：bkui-theme/ + bkms/，bkui.ts 加载）
-patches/
-└── bkui-theme/        class 覆写层 ★主角   组件库写死 hex 的选择器级覆盖（549 处的归属地，生成器管理）
-src/styles/overrides.css  手写覆写层        组件库形态/尺寸补丁（menu/navigation/vxe/monaco 等），生成器不触碰
-themes/             主题扩展位           [data-theme] 第二主题时启用
+tokens/color.css         原子色阶 + 语义层     唯一写色值处，:root，uno 注册真源
+tokens/radius.css        圆角语义档
+variables.css            变量桥接              组件库 :root 变量重指向 --bkms-*（bkui.ts 加载）
+patches/bkui-theme/      class 覆写层（主角）   组件库写死 hex 的选择器级覆盖，生成器管理
+patches/vendor/          第三方库覆写            见 THIRD-PARTY-THEME.md
+patches/ua-fill/         浏览器默认底色兜底      手写
+src/styles/overrides.css 手写形态覆写            生成器不触碰
+themes/                  第二主题扩展位          [data-theme] 时启用
 ```
 
-职责表：
-
-| 色出现位置 | 归属 | 手段 |
-| --- | --- | --- |
-| bkui 变量定义值（prop 以 `--` 开头） | patches/*/variables.css | 重声明同名变量指向 `var(--bkms-*)` |
-| bkui 组件规则字面量（含渐变/阴影函数参数） | **patches/（class 覆写）** | 复刻原选择器 + `var(--bkms-*)` 整值重写 |
-| 业务代码（`src/**` hex） | codemod | 源码期脚本替换 |
+职责：组件库变量定义值 → `variables.css` 重声明；组件规则字面量 → `patches/bkui-theme/` 复刻选择器整值重写；业务代码 hex → 已由 codemod 替换为 `var(--bkms-*)`。
 
 ## 四、目录结构与引入顺序
 
 ```
 src/styles/theme/
-├── tokens/
-│   ├── colors.css      # 色阶（唯一写色值处）
-│   └── semantic.css    # 语义层
-├── patches/
-│   ├── bkui-theme/     # class 覆写，按组件域分文件（生成器管理，重跑整体覆盖；每文件含变量版段+字面量段；variables.css 为手工桥接，生成器保留）
-│   │   ├── variables.css
-│   │   ├── form.css
-│   │   ├── dialog.css
-│   │   └── …
-│   └── bkms/           # 仅保留 variables.css 变量桥接位（CSS 补丁已迁至 src/styles/overrides.css）
-├── themes/             # 本期留空
-└── index.css           # 统一 @import（生成器重写）
+├── index.css          # 静态清单：tokens → themes → patches/bkui-theme → patches/vendor → patches/ua-fill
+├── variables.css      # 变量桥接聚合（bkui.ts 加载）
+├── tokens/            # color.css / radius.css / viz.css
+├── themes/index.css   # 第二主题占位
+└── patches/           # bkui-theme(43) / vendor(12) / ua-fill(2)
 ```
 
-**引入顺序**：
+1. `main.ts` 末尾 `import '~/styles/theme/index.css'`——`--bkms-*` 最早有定义。
+2. `modules/bkui.ts`：`style.variable.css` **紧接其后** import `theme/variables.css`——ES module 保证桥接后于组件库样式。
+3. `main.ts` 启动 `document.body.classList.add('bkms-themed')`——覆写作用域运行时挂载。
 
-1. `src/main.ts`：`import '~/styles/theme/index.css';`（整包：tokens + patches，放 CSS 组末尾）—— `--bkms-*` 最早有定义。
-2. `src/modules/bkui.ts`：`import 'bkui-vue/dist/style.variable.css';` **紧接其后** `import patches/bkui-theme/variables.css + patches/bkms/variables.css;`（经 theme/variables.css 聚合）—— ES module 规范保证变量桥接后于组件库样式加载。
-3. `src/main.ts` 启动时 `document.body.classList.add('bkms-themed')` —— 覆写作用域运行时挂载（见第五节）。
+## 五、覆写层规约
 
-## 五、覆写层组织规约
-
-**作用域类**：`patches/bkui-theme/` 所有覆写选择器加 `.bkms-themed ` 前缀（`.bkms-themed .bk-input { … }`）， specificity (0,2,0) > 库内 (0,1,0)，**全程不用 !important**。挂载在 `body` 上而非 app 根：Modal/Select 下拉/Message 等 teleport 到 body 的弹层天然在作用域内，无需额外补救。挂载点定案为 `main.ts` 启动时运行时添加（本项目 app.mount 在异步回调之后，时序安全）。`body`/`html` 自身样式与历史临时修正放**全局无包裹段**（`src/styles/overrides.css`，无前缀）。
-
-**值策略（占位制，2026-11-06 定案）**：覆写结构先行、不等设计全部拍板——设计已确认值直接写 `var(--bkms-*)`；待确认值先用组件库**原色值占位**并打 `pending` 标记（拍板后换 token 即可，结构零返工）；keep 值不生成。
-
-**文件组织**：按组件域分文件（button / form / table / dialog / alert-message / pagination / …），文件内分区注释（如 `/* — 边框色 — */`），与库内组件族一一对应。
-
-**选择器纪律**：逐字复刻原选择器（含伪类、`:not()`、组合器），扁平书写（`.bkms-themed .bk-input:hover:not(.is-focused)`）。
-
-**整值重写**：渐变/阴影函数参数里的 hex 不能局部替换，整条 value 重拼（部分色未确认时等齐或手动拼）；8 位 hex 用 `color-mix(in srgb, var(--bkms-*) N%, transparent)` 拼装。
-
-**原值注释**：每条覆写行尾注释保留原 hex，供 review 与漂移自检比对。
+- **作用域**：`patches/bkui-theme/` 所有选择器加 `.bkms-themed ` 前缀，specificity (0,2,0) > 库内 (0,1,0)，**不用 `!important`**。挂 `body` 是为了让 teleport 到 body 的弹层天然在作用域内。
+- **值策略**：已确认值写 `var(--bkms-*)`；待确认值用库内原色占位并打 `pending`；命中令牌值的声明原值生成。
+- **选择器纪律**：逐字复刻（含伪类、`:not()`、组合器），扁平书写。
+- **整值重写**：渐变/阴影里的 hex 不能局部替换；8 位 hex 用 `color-mix(in srgb, var(--bkms-*) N%, transparent)`。
+- **原值注释**：每条覆写行尾保留原 hex，供 review 与漂移自检比对。
+- **文件组织**：按组件域一文件（41 个组件域 + `index.css` + `variables.css`），文件内分区注释。
 
 ## 六、质量基建
 
-- **stylelint**：`patches/bkui-theme/` 与 `src/styles/overrides.css` 豁免**形态类规则**（`no-descending-specificity`、`selector-class-pattern`、`selector-pseudo-element-colon-notation`、`selector-attribute-quotes`、`order/properties-order`）——覆写逐字复刻 bkui/vxe 产物形态，按本项目规约改写选择器会破坏匹配；`color-no-hex` 全局启用仍待存量清完（排最后），覆写内原值只准进注释。
-- **漂移自检（必要基建，非可选）**：`check-overrides.mjs` 校验 `patches/bkui-theme/` 每条选择器仍存在于 bkui dist css 且原 hex 仍在，失效即报警，库升级后必跑。注意实现细节：覆写文件首条规则的 prelude 混有文件头注释，解析时需先剥注释再判定。
-- **工具链 scripts**（直接 node 执行，不占 package.json）：`stats-usage.mjs`（组件使用统计）→ `gen-overrides.mjs`（生成覆写）→ `check-overrides.mjs`（漂移自检），数据基线为 `reports/usage.json` + `data/keep.json`（2026-11-17 起 `mapping.json` / `pending-design.json` / `color-diff-backup.json` 与 `codemod.mjs`、`resolve-pending.mjs` 退役）。
-- **生成器（单源）**：`gen-overrides.mjs` 从 bkui dist css 抽取"prop 非 `--` 开头且 value 含 hex"的 declaration，按选择器+prop 聚合；**映射真源是既往产物**——重跑前先扫 `patches/bkui-theme/*.css` 里「令牌 var + 行尾原值注释」成对记录建 hex→token 索引，未收录的值按原值占位并进 `reports/gen-summary.md` 待拍板清单。拍板方式：直接改产物里的值与原值注释，重跑即继承（尾注释同时喂漂移自检，删了等于丢映射）。按组件域写入 `patches/bkui-theme/`，人工只审不写；每次重跑 `rmSync` 整个 `bkui-theme/` 重建，但**绝不触碰 `src/styles/overrides.css`**（手写覆写层，不参与生成器重跑）。
-- **纪律**：进 `patches/` 前先试 bridge（变量定义值都能走 bridge）；patches 内禁止裸 hex。
+- **stylelint**：`patches/**`（bkui-theme / vendor / ua-fill 三域）与 `overrides.css` 豁免形态类规则（`no-descending-specificity` / `no-duplicate-selectors` / `selector-class-pattern` / `selector-pseudo-element-colon-notation` / `selector-attribute-quotes` / `order/properties-order`）；`color-no-hex` 全局启用排在存量清零之后。
+- **漂移自检**：`check-overrides.mjs` 校验每条选择器仍存在于 bkui dist css 且原 hex 仍在，库升级后必跑。解析前需先剥文件头注释（首条规则 prelude 混有注释）。
+- **工具链**：`pnpm theme:report`（lint 报告 + viz 待补档）、`pnpm theme:check-vendor`（第三方包变量/选择器漂移）、`pnpm theme:designer`（palette 预览）。
+- **生成器（单源）**：`gen-overrides.mjs` 抽取 bkui dist 中「prop 非 `--` 且 value 含 hex」的 declaration；映射真源是**既往产物**——重跑前扫 `patches/bkui-theme/*.css` 的「令牌 + 行尾原值注释」建 hex→token 索引，未收录值按原值占位进 `reports/gen-summary.md`。每次重跑 `rmSync` 整个目录重建，只删自有 `<kebab>.css`，`variables.css` 白名单保留。
+- **纪律**：进 `patches/` 前先试 bridge；patches 内禁止裸 hex（原值只进注释）。
 
-## 七、映射表的可执行性
+## 七、非颜色 token 与 UnoCSS
 
-- 「不替换」清单 = `keep.json` 黑名单；hex 先小写化再匹配；3 位短写展开成 6 位后仅当命中 mapping 才处理；`rgba(` 人工处理；扫描与替换排除 `src/fonts/`（iconfont 平台生成物，改了会被覆盖，与 eslint ignores 对齐）。
-- 写死 hex 报告"去重种类（113）+ 出现处数（549）"两列都输出。
-- **spec 未收录色拆分**：spec 已收录 → `mapping.json`；未收录 → `pending-design.json`（附建议归类，标注待设计拍板），不臆断。基线已于 2026-11-06 按最新设计待确认清单同步（45 项），**设计同日全部拍板按建议值替换**——45 项已收编 `mapping.json`、`pending-design.json` 清空、patches 全量换 `var(--bkms-*)`。
-- **覆写内占位清零（2026-11-06）**：覆写后新暴露的 13 种清单外 hex 分三路收编完毕——① 与设计已采纳建议值重复（1890ff/253047/d8d8d8/e6e9ea/f7f7f7）；② ΔE≤6 进最近规范色（000000/babcc0）与 spec 原色邻近（333333/fea500）；③ 借鉴"设计已采纳 45 对建议值"的实证容忍度（ΔE 中位 8.39、30/45 超 6 仍被采纳）收录剩余 3 个（333c48/aaaaaa/4070cb）。**当前覆写内 pending = 0**；`reports/pending-values.md` 仅剩 30 种未收录 hex（多为未使用组件 one-dark/ColorPicker 色），留待全局无包裹段处理。
-- 判定规则待补：紫青收拢 / 色差 ≤6 进最近规范色（需求单核实后落脚本）。
-- **未命中兜底**：生成器与 codemod 共用"未命中 → 补 spec → 补 mapping → 重跑"，禁止静默跳过。
+- 圆角：`tokens/radius.css` 语义档 + `rounded-*` 注册类；组件库自带 `--border-radius-base: 2px` / `--input-broder-radius: 3px` 走 bridge。
+- shadow：6 个语义变量；`--bkms-shadow-button` 用 `color-mix(in srgb, var(--bkms-brand-2) 25%, transparent)` 随主题换色。
+- UnoCSS：`parseScaleColors()` 从 `tokens/color.css` 提取色阶，**必须注册扁平 key**（`'bkms-brand-6'` 整体）——嵌套 `{ bkms: { 'brand-6' } }` 会按 `-` 切段查不到而静默丢弃。`parseSemanticShortcuts()` 从语义层生成 `text-title` / `bg-card` 等别名。`THEME_DIR` 用 `resolveThemeDir()`（cwd 优先 + `color.css` 存在性校验）。
+- 已知限制：纯 `var()` 值不支持 `/50` alpha 修饰符，半透明显式写 `color-mix`。
 
-## 八、非颜色 token 与 UnoCSS
+## 八、运行时多主题与 dark
 
-- **圆角**：组件库自带 `--border-radius-base: 2px`、`--input-broder-radius: 3px`，走 bridge 重声明即可，不建业务侧 token；业务侧自有圆角按"≥3 次同语义才提 token"。
-- **shadow**：6 个语义变量，`--bkms-shadow-button` 用 `color-mix(in srgb, var(--bkms-brand-2) 25%, transparent)` 实现随主题换色。
-- **UnoCSS**：注册 `theme.colors.bkms`（值为 `var(--bkms-*)`），env-tag-* 改 `!bg-bkms-brand-6` 短写法；已知限制：纯 var() 值不支持 `/50` alpha 修饰符，半透明显式写 color-mix。
+- 色阶一律挂 `:root`；`[data-theme="x"]` 只覆盖色阶层，语义层与消费方自动跟随。
+- 换肤不漏色的前提：`--bkms-*` 色阶只允许在 `tokens/color.css` 定义。
+- 挂载：`index.html` 首帧脚本预置 `data-theme` + `localStorage('vueuse-color-scheme')`，`composables/use-theme.ts` 的 `applyTheme` 切 `data-theme` + `.dark` class。
+- dark 未做：需翻转 neutral 色阶的文字/背景用途，且 bkui 深色导航（`--menu-bg-color` / `--submenu-bg-color` 等）桥接未映射。
 
-## 九、运行时多主题预留（本期只留口子）
+## 九、操作步骤
 
-- 色阶一律挂 `:root`（colors.css）；`[data-theme="green"]` 未来只覆盖色阶层，语义层与消费方自动跟随。
-- `index.html:9-16` 的 dark class 死代码可复用为 `data-theme` 挂载点。
-- 换肤不漏色的前提：`--bkms-*` 色阶只允许在 colors.css 定义。
-- dark 主题审计备注：dark 需翻转 neutral 色阶的文字/背景用途，且 bkui 深色组件（`--menu-bg-color`/`--submenu-bg-color`）需反向覆盖——记入需求单输入，不在本次执行。
-
-## 十、决策清单
-
-1. ~~编译期替换选型~~ → **已决策退役**。
-2. **JS 内联样式**：inline style 无法被 class 覆写覆盖（除非 !important 或 JS 改写），维持 Step 0 盘点开关。
-3. **需求单原文**：6 大块数值、紫青/色差规则——待提供后核实回填。
-4. **存量 `bk-patch.css` 归宿**：审计后布局/尺寸规则迁入全局无包裹段。
-5. **dark class 挂载点 / echarts 内联色 / spec 未收录色**：同 v3，待定项不变。
-
-## 十一、流程约定
-
-- 新增颜色先查 spec 色阶；禁止业务代码直接写新 hex；`--bkms-*` 色阶只在 colors.css 定义。
-- 改组件库变量声明只允许出现在 patches/*/variables.css。
-- patches 内禁止裸 hex（原值只准进注释）；进 patches 前先试 bridge。
-- 映射字典与 spec 同步维护；未命中色值走统一消化流程，禁止静默跳过。
-- stylelint `color-no-hex` 全局启用替代人工 grep。
-- teleport 组件覆写天然被 `body.bkms-themed` 覆盖，patches 不依赖业务 scoped 作用域。
-- **Git 纪律**：大步骤拆子分支、点位强制 commit、验证后合入，细则见 `THEME_STEPS.md`。
-
-## v0~v3 勘误与合并记录
-
-| 来源 | 位置/问题 | 处理 |
+| Step | 内容 | 状态 |
 | --- | --- | --- |
-| v0 | "改 :root 变量即可全局换肤"（过强） | 修正为"变量 + 写死色混杂" |
-| v0 | `--bk-color-*` 凭记忆编造 | 改用实测 :root 清单 |
-| v0 | 圆角结论"4px 主导、不建 token" | 修正为"圆角走 bridge" |
-| v0/v1 | 无写死色处理步骤（致命漏项） | 独立成步（v4 定为 class 覆写批） |
-| v1 | `:root` 126 个、hex 113 处口径不明 | 修正为 129 个、113 种 / 549 处 |
-| v2 | 未命中色值静默漏替换 | 补"未命中清单"兜底 |
-| v2/v3 | bridge 引入依赖 glob 顺序假设 | 改为 bkui.ts 内显式相邻引入 |
-| v4 初版 | 编译期替换（postcss）与条目级设计确认流程粒度错位 | **原地覆盖：退役编译替换，改 class 覆写制** |
+| 0 | 前置准备：令牌骨架、codemod 工具 | 已执行 |
+| 1 | 基建批：color.css / 桥接 / 引入位 / `bkms-themed` 挂载 | 已执行 |
+| 2R | class 覆写批：生成器 + 41 组件域覆写 + 漂移自检 | 已执行 2026-11-06 |
+| 3 | 存量 patch 审计 → 全局无包裹段（`overrides.css`） | 已执行 |
+| 4 | 全局层替换：uno 注册、main.css 变量化、vxe 覆盖换 token | 已执行 |
+| 5 | codemod 批：业务层 hex → `var(--bkms-*)` | 已执行 2026-11-17（`mapping.json` / `codemod.mjs` 退役，改单源自举） |
+| 6 | 人工批：动态注入、rgba 阴影、漏网组件 | 部分遗留，见第十三节 |
+| 7 | 收尾验收：旧色 grep、漂移 0 失效、`color-no-hex` 启用 | 未完成，见第十三节 |
 
-## 待核实项（阻塞回填，不阻塞颜色主链路）
+每步 = 操作 + 验证 + 回滚；一个 PR 对应一步或一步的一个子批。Git：主特性分支只进不改，每步开子分支，规约点位强制 commit，验证后 `merge --no-ff`。message 规范 `theme(stepN): <动作>`。
 
-1. 需求单原文：6 大块具体数值。
-2. 紫青收拢 / 色差 ≤6 判定规则的原文表述。
-3. JS 内联样式盘点结论。
+## 十、现状快照（2026-11-18 实测）
+
+| 层 | 规模 |
+| --- | --- |
+| `tokens/color.css` | 104 个令牌（色阶 68 / 语义 28 / 阴影 8） |
+| `tokens/radius.css` | 圆角语义档（`--bkms-radius-*`） |
+| `tokens/viz.css` | 33 个令牌，独立实色，见 `THIRD-PARTY-THEME.md` |
+| `patches/bkui-theme/` | 43 个 CSS（41 组件域 + `index.css` + `variables.css`） |
+| `patches/vendor/` | 12 个 CSS（10 覆写 + 2 `index.css`），9 个库 |
+| `patches/ua-fill/` | 2 个 CSS（`form-control.css` + `index.css`） |
+| 业务层 hex 残留 | 6 位 hex 32 处（另 1 处在 `custom-image-push-guide.vue` 注释里；历史基线约 2000 处 / 350+ 文件） |
+| theme-lint | 6 条规则 / 3 个规则模块（颜色 / 圆角 / shared） |
+| 命令 | `theme:report`、`theme:check-vendor`、`theme:designer` |
+| 全量 lint 基线 | 仓库存量报错未清零（非本轮引入）；改动文件零新增 |
+
+## 十一、关键决策档案
+
+1. **class 覆写取代编译期替换**（`31dd8251`）：postcss 替换层退役，改生成器产出 `.bkms-themed` 覆写；漂移自检对 `style.variable.css` + `dist/style.css` 双源校验。
+2. **uno 令牌扁平注册**（`aa9f621a`）：unocss 按 `-` 切段查 theme，嵌套 key 静默丢弃；`resolveThemeDir()` 用 cwd 优先 + 存在性兜底（unconfig 打包后 `import.meta.url` 指向临时目录）。
+3. **级联保护与双源扫描**（`aa9f621a`、`77c7714b`）：覆写规则的全部色彩类声明随行生成；`transparent` / 令牌值命中原值保留；`dist/style.css`（lib/*.less 编译产物）选择器可能更具体，需单独成域复刻。
+4. **桥接分域、每域单一聚合入口**（`283c2a0a`）：变量层由 `bkui.ts` 紧随 `style.variable.css` 加载，不走 `index.css`（否则 dev 下 `:root` 后者覆盖）。
+5. **产物自举与一次性台账退役**（`9dee3d2b`）：`mapping.json` / `pending-design.json` / 备份文件不再入库，色值真源收敛到 `color.css` + 产物注释。
+6. **规则插件拆分**（`83c86081`）：颜色 / 圆角各成模块，`plugin.mjs` 只聚合；`map.mjs` 与 `uno.config.ts` 同源。
+7. **semantic.css 冻结、magicbox 不接入**：`@blueking/magicbox-theme` 架构同构但色板是另一套规范，暂不接入；新语义走 uno shortcut 语义类或场景类。
+8. **viz 域独立**（2026-11-18）：图表 / 编辑器 / 语法高亮不再派生 `--bkms-*`，详见 `THIRD-PARTY-THEME.md`。
+
+## 十二、踩坑清单
+
+| 坑 | 实证 | 结论 |
+| --- | --- | --- |
+| 生成器清理丢手写补丁 | `cleanGeneratedDir` 曾整目录 `rmSync` | 手写域必须平级分域，清理只删自有 `<kebab>.css` |
+| canvas 不解析 `var()` | `597f26b5` minimap `fill` 改 `var()` → `f8e6b7da` 改回实色 | 字典经 var 链解析后必须实色，桥接层负责解析与兜底 |
+| `import.meta.url` 指向临时目录 | `aa9f621a` 引入 `resolveThemeDir()` | cwd 优先 + 存在性校验 |
+| `.ts` 颜色字符串不在 codemod 台账 | 口径 65 处 `<script>`、明确不含 `.ts` | 记为已知盲区，不假装已全量覆盖 |
+| 根 `.gitignore` 的 `*vendor*` | 曾致 `scripts/theme-check-vendor.mjs` 与 `patches/vendor/` 被忽略 | 新增含 vendor 字样的路径必须 `git status -uall` 复核 |
+| markdown 自定义属性 camelCase | `--fgColor-*` 触发 `custom-property-pattern` | 第三方变量名同名重指向，用定点 `stylelint-disable` |
+
+## 十三、下一阶段待办
+
+1. **业务层 hex 收尾**：6 位 hex 剩 32 处（另一处在注释里），逐条确认归属（令牌值 / rgba / 动态注入）后，把 `stylelint color-no-hex` 全局启用（仅豁免 `tokens/color.css`）。
+2. **Step 6 剩余**：动态注入（`use-env-manager.ts` 4 处）、rgba 阴影对照 spec、JS 内联样式命中项。
+3. **dark 主题审计**：neutral 色阶用途翻转 + bkui 深色导航变量桥接，需单独立项。
+4. **换肤器接线**：`refreshXxxViz()` 系列目前零调用，`setTheme` 不重载；dark 落地时按「清缓存 → 各 refresh → 各库重绘」接（详见 `THIRD-PARTY-THEME.md`）。
+5. **待核实**：需求单 6 大块数值、紫青收拢/色差 ≤6 规则原文。
+
+## 十四、流程约定
+
+- 新增颜色先查 spec 色阶；禁止业务代码写新 hex；`--bkms-*` 色阶只在 `tokens/color.css`。
+- 组件库变量声明只允许出现在 `theme/variables.css`（及各域 `variables.css`）。
+- patches 内禁止裸 hex（原值只进注释）；进 patches 前先试 bridge。
+- 未命中色值走统一消化流程（补 spec → 补映射 → 重跑），禁止静默跳过。
+- teleport 弹层覆写天然被 `body.bkms-themed` 覆盖，不依赖业务 scoped 作用域。

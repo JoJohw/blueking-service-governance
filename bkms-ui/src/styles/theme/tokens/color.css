@@ -21,7 +21,7 @@
  * 两组用 layer 标记区分：scale 是色阶区（全库唯一允许色值字面量），semantic 只 var() 引用色阶，
  * 唯一例外是阴影组——值即完整效果色、无法由色阶派生。该标记同时是 palette 区分
  * 色阶组与语义组的唯一依据，漏标会让 palette 直接报错。
- * 真源：bkms-color-spec.md（不进 git，真源位置见 scripts/theme-codemod/rules.md）。
+ * 真源：bkms-color-spec.md（设计交接文件，不进 git）。
  * 色阶与语义一律挂 :root；[data-theme] 覆盖位预留。
  * 分组标记：@group 开组（值即展示标题）、@layer 标层、@note 分组描述、@endgroup 闭组（见 dev/palette/README.md）。
  */

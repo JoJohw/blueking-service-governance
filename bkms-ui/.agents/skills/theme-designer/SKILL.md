@@ -24,9 +24,9 @@ updated_at: 2026-11-17
 ## 真源
 
 - 色值真源：`bkms-color-spec.md`（**不进 git**，本地在 `C:\Users\Administrator\Downloads\bkms-color-spec.md`）。要改确认过的色值，以此为准。
-- 仓库里的落地文件：`src/styles/theme/tokens/colors.css`（色阶，唯一写 hex 的地方）和 `semantic.css`（语义，只引用色阶；阴影组例外）。
+- 仓库里的落地文件：`src/styles/theme/tokens/color.css`（色阶 + 语义，唯一写 hex 的地方；阴影组值即完整效果色，属例外）。
 
-`scripts/theme-codemod/` 下的 `mapping.json`、`keep.json`、`pending-design.json`、`color-diff-backup.json` 都是**主题改造过渡期**的迁移台账，正式版本不会保留。改现有 token 值不碰它们；只有做全仓 hex→token 批量迁移时才用得到，那不是本 skill 的场景。
+`scripts/theme-codemod/` 下的过渡期迁移台账（`mapping.json` / `keep.json` / `pending-design.json` / `color-diff-backup.json`）已全部退役删除。改现有 token 值只碰 `tokens/color.css`；需要全仓 hex→token 批量迁移时再重建工具链，那不是本 skill 的场景。
 
 ## token 文件的注释约定
 
