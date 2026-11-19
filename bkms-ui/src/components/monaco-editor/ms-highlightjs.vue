@@ -25,7 +25,7 @@
     <!-- 工具栏 -->
     <FlexRow
       :class="[
-        'h-[40px] px-[16px] rounded-t-sm border-b-[1px] border-b-bkms-neutral-5',
+        'h-[40px] px-[16px] rounded-t-bkms-card border-b-[1px] border-b-bkms-neutral-5',
         lightTheme ? 'bkms-bg-page' : 'bg-bkms-neutral-1',
       ]"
     >

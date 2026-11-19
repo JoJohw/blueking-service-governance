@@ -28,7 +28,7 @@
       <span>
         <span class="bkms-custom-filter-title">{{ label }}</span>
         <i
-          class="cursor-pointer hover:text-bkms-keep-737987 relative text-bkms-navy-5 top-[1px] left-[4px] vxe-filter--btn vxe-table-icon-funnel"
+          class="cursor-pointer hover:text-bkms-muted relative text-bkms-navy-5 top-[1px] left-[4px] vxe-filter--btn vxe-table-icon-funnel"
           :class="appliedFilters.length > 0 ? '!bkms-text-brand' : ''"
         ></i>
       </span>

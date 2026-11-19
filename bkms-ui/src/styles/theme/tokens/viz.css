@@ -17,7 +17,7 @@
  */
 
 /*
- * 可视化主题字典（viz 域）：拓扑图 / 图表 / Monaco / 语法高亮共用的独立色板。
+ * 可视化主题字典（viz 域）：拓扑图 / 部署监控折线图 / Monaco 编辑器 / Markdown 代码块共用的独立色板。
  * 只服务 CSS var() 与 readVizVar 两路消费，不注册 uno 类。
  *
  * 独立性：viz 域不从 --bkms-* 派生。UI 换品牌色、换明暗主题都不应带动图表——
@@ -29,69 +29,178 @@
  *   - @viz-locked：数据分类色，任何主题下都不漂移。
  * canvas 约束：解析后必须是实色；半透明由桥接层 hexToRgba 生成，不用 transparent / color-mix。
  * 业务已定的图表色（series 等）一律进本字典并标 @viz-locked，禁止在适配层另写一份。
+ * 分组标记：@group 开组、@layer 标层、@note 分组描述、@endgroup 闭组，供 palette 解析；每条变量上方写「用在」。
  */
 
 :root {
-  /* line */
+  /**
+   * @group 连线
+   * @layer semantic
+   * @note 拓扑图里节点之间连的那根线：平时灰蓝，被选中时变品牌蓝，异常时变红（红目前没用上）
+   */
+
+  /** 节点之间的默认连线（灰蓝） */
   --bkms-viz-line: #ABB5CC;
+
+  /** 连线被选中时变蓝；代码编辑器（写 YAML 的那块）也借这个蓝做光标和选中底 */
   --bkms-viz-line-active: #3B6EF5;
+
+  /** 异常状态连线的红；当前没有页面用到，属预留 */
   --bkms-viz-line-danger: #EA3636;
 
-  /* surface */
+  /* @endgroup */
+
+  /**
+   * @group 底色
+   * @layer semantic
+   * @note 大块铺底的颜色：节点卡片的白色底、缩略小地图的深色底、Markdown 代码块的浅灰底、压暗视口外的遮罩
+   */
+
+  /** 页面最底层的大底（浅蓝灰）；当前图表页面未用到，属预留 */
   --bkms-viz-bg-page: #F0F4FA;
+
+  /** 拓扑节点卡片的白色底；缩略小地图里每个节点也用这块白底板 */
   --bkms-viz-bg-card: #FFF;
+
+  /** 选中项的浅蓝底；当前页面未用到，属预留 */
   --bkms-viz-bg-active: #E5EDFF;
+
+  /** Markdown 代码块（``` 围起来的那段）的浅灰底 */
   --bkms-viz-bg-subtle: #F7F9FD;
+
+  /** 深色画布底：缩略小地图的背景，也用作代码编辑器里浮层的底 */
   --bkms-viz-surface-canvas: #242A35;
+
+  /** 半透明遮罩：缩略小地图里把视口之外的区域压暗的那层 */
   --bkms-viz-mask: #0000002D;
 
-  /* status：minimap 状态块只画实色，故与节点卡的语义色分开维护 */
+  /* @endgroup */
+
+  /**
+   * @group 节点状态
+   * @layer semantic
+   * @note 拓扑图工具栏「缩略图」打开的小地图上，每个节点左侧那块状态色块；节点超过 100 个时不画色块（性能考虑），所以大图上不会出现
+   */
+
+  /** 节点正常（健康）时的浅绿状态块 */
   --bkms-viz-status-healthy: #DAF6E5;
+
+  /** 节点告警时的浅橙状态块 */
   --bkms-viz-status-warning: #FDEED8;
+
+  /** 节点异常时的浅红状态块 */
   --bkms-viz-status-error: #FEDDDD;
+
+  /** 节点状态未知时的浅蓝状态块；侧栏「全部」筛选也借用它 */
   --bkms-viz-status-unknown: #99B1E0;
 
-  /* text */
+  /* @endgroup */
+
+  /**
+   * @group 文字
+   * @layer semantic
+   * @note 图表提示框、Markdown 代码块、代码编辑器里的文字层级，含深色底上的反白
+   */
+
+  /** 图表鼠标悬浮提示里的数值文字（最深的一档） */
   --bkms-viz-text-title: #111214;
+
+  /** Markdown 代码块里的正文文字 */
   --bkms-viz-text-body: #4A5973;
+
+  /** 次要灰：代码编辑器的行高亮底、滚动条滑块由它加透明度得到 */
   --bkms-viz-text-secondary: #8F9FBD;
+
+  /** 禁用态文字灰；当前页面未用到，属预留 */
   --bkms-viz-text-disabled: #C1CDE5;
+
+  /** 深色底上的反白文字：代码编辑器当前行号激活时用 */
   --bkms-viz-text-inverse: #FFF;
+
+  /** 品牌蓝文字；当前图表页面未用到，属预留 */
   --bkms-viz-text-brand: #3B6EF5;
 
-  /* chart */
+  /* @endgroup */
+
+  /**
+   * @group 图表结构
+   * @layer semantic
+   * @note 部署监控折线图的骨架：坐标轴、横向网格线、鼠标悬浮提示框、图例文字
+   */
+
+  /** 折线图坐标轴那条线 */
   --bkms-viz-axis-line: #E4E9F2;
+
+  /** 图里的横向网格线（比坐标轴更浅） */
   --bkms-viz-split-line: #E9EDF5;
+
+  /** 鼠标悬浮提示框的白底 */
   --bkms-viz-tooltip-surface: #FFF;
+
+  /** 提示框边框；代码编辑器的浮层边框、Markdown 代码块边框也用它 */
   --bkms-viz-tooltip-border: #C1CDE5;
+
+  /** 图例文字，以及图里没单独指定颜色的文字 */
   --bkms-viz-legend-text: #8F9FBD;
 
-  /* state */
+  /* @endgroup */
+
+  /**
+   * @group 选中高亮
+   * @layer semantic
+   * @note 拓扑图里节点被点选时，外面那圈描边
+   */
+
+  /** 节点被选中时的橙色描边 */
   --bkms-viz-selection: #F59500;
 
-  /* series：数据分类色（同类不同项需可区分），换主题不跟随 */
+  /* @endgroup */
+
+  /**
+   * @group 曲线配色
+   * @layer semantic
+   * @note 部署监控图表开启「时间对比」后，每条对比曲线用的颜色：1 分钟 / 5 分钟 / 1 小时 / 1 天 / 7 天 / 30 天 / 1 年各一色，图例与汇总表里的对应行也用同色。同一张图里的普通实例曲线不归这套色管（由图表组件自己上色）。锁定不随主题变，否则换肤后新旧对比线就对不上。
+   */
+
+  /** 对比曲线配色 1（红） */
 
   /* @viz-locked reason=数据分类色 theme=light-dark-pair */
   --bkms-viz-series-1: #EA3636;
 
+  /** 对比曲线配色 2（橙） */
+
   /* @viz-locked reason=数据分类色 theme=light-dark-pair */
   --bkms-viz-series-2: #FF9C01;
+
+  /** 对比曲线配色 3（蓝） */
 
   /* @viz-locked reason=数据分类色 theme=light-dark-pair */
   --bkms-viz-series-3: #3A84FF;
 
+  /** 对比曲线配色 4（绿） */
+
   /* @viz-locked reason=数据分类色 theme=light-dark-pair */
   --bkms-viz-series-4: #2DCB56;
+
+  /** 对比曲线配色 5（紫） */
 
   /* @viz-locked reason=数据分类色 theme=light-dark-pair */
   --bkms-viz-series-5: #A855F7;
 
+  /** 对比曲线配色 6（玫红） */
+
   /* @viz-locked reason=数据分类色 theme=light-dark-pair */
   --bkms-viz-series-6: #EC4899;
+
+  /** 对比曲线配色 7（青） */
 
   /* @viz-locked reason=数据分类色 theme=light-dark-pair */
   --bkms-viz-series-7: #14B8A6;
 
+  /** 对比曲线配色 8（靛蓝） */
+
   /* @viz-locked reason=数据分类色 theme=light-dark-pair */
   --bkms-viz-series-8: #6366F1;
+
+  /* @endgroup */
 }

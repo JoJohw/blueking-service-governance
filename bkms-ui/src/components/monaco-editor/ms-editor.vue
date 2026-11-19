@@ -23,7 +23,7 @@
     :class="{ 'ms-editor-readonly': readonly }"
   >
     <!-- 工具栏 -->
-    <div :class="['h-[40px] px-[16px] rounded-t-sm ms-editor', lightTheme ? 'bkms-bg-title' : 'bg-bkms-neutral-1']">
+    <div :class="['h-[40px] px-[16px] rounded-t-bkms-card ms-editor', lightTheme ? 'bkms-bg-title' : 'bg-bkms-neutral-1']">
       <div class="flex items-center justify-between h-full">
         <div
           :class="[
@@ -75,7 +75,7 @@
     </div>
     <div
       ref="editorContentRef"
-      class="h-[calc(100%-40px)] rounded-b-sm"
+      class="h-[calc(100%-40px)] rounded-b-bkms-card"
     ></div>
   </div>
 </template>

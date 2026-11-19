@@ -25,11 +25,17 @@ const asRecord = (value: unknown): ChartOptions =>
 
 /** ExploreChart 不透传 theme/initOptions，结构色只能在 options(options) 回调里注入 */
 export function applyEchartsViz(options: ChartOptions): ChartOptions {
+  // eslint-disable-next-line theme/no-hardcoded-color
   const axisColor = readVizVar('--bkms-viz-axis-line', '#E4E9F2');
+  // eslint-disable-next-line theme/no-hardcoded-color
   const splitColor = readVizVar('--bkms-viz-split-line', '#E9EDF5');
+  // eslint-disable-next-line theme/no-hardcoded-color
   const tooltipSurface = readVizVar('--bkms-viz-tooltip-surface', '#FFFFFF');
+  // eslint-disable-next-line theme/no-hardcoded-color
   const tooltipBorder = readVizVar('--bkms-viz-tooltip-border', '#C1CDE5');
+  // eslint-disable-next-line theme/no-hardcoded-color
   const legendText = readVizVar('--bkms-viz-legend-text', '#8F9FBD');
+  // eslint-disable-next-line theme/no-hardcoded-color
   const titleText = readVizVar('--bkms-viz-text-title', '#111214');
 
   if (options.xAxis !== undefined) options.xAxis = applyAxis(options.xAxis, axisColor, splitColor);

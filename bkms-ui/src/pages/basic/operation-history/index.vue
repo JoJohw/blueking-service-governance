@@ -214,10 +214,10 @@
       >
         <template #title>
           <div class="grid grid-cols-2 gap-[18px] text-[12px] text-center leading-[22px]">
-            <div class="w-[52px] h-[22px] bg-bkms-navy-3 rounded-[2px]">
+            <div class="w-[52px] h-[22px] bg-bkms-navy-3 rounded-bkms-menu">
               {{ $t('操作前') }}
             </div>
-            <div class="w-[52px] h-[22px] bg-bkms-keep-144628 rounded-[2px] text-bkms-success-2">
+            <div class="w-[52px] h-[22px] bg-bkms-diff-after rounded-bkms-base text-bkms-success-2">
               {{ $t('操作后') }}
             </div>
           </div>

@@ -66,7 +66,7 @@ patches/vendor/         覆写层    不提供 API 的库直接改 CSS
 
 - 前缀白名单：`scripts/theme-lint/var-prefix.mjs` 的 `THEME_VAR_PREFIXES` 显式登记 `--bkms-` / `--bkms-viz-` / `--vscode-`（Monaco 主题服务注入的编辑器自身配色），`map.mjs` 与 `plugin.mjs` 同源转发。新增命名空间必须追加一行，不靠前缀包含关系隐式放行。
 - `map.mjs`：viz.css 只进 `resolveHex` 的声明表，不进 `nearestVars` 建议池——数字结尾的令牌（如 `--bkms-viz-series-3`）会被当成 family 进建议池。
-- `no-hardcoded-color`：canvas 消费文件（`topo/**`、`monitor-chart-bridge.ts`、`echarts-viz.ts`、`monaco-theme.ts`）按文件 off 覆盖。
+- `no-hardcoded-color`：canvas 消费方（`topo-theme.ts`、`monitor-chart-bridge.ts`、`echarts-viz.ts`、`monaco-theme.ts`）的 `readVizVar` 兜底色逐行 `eslint-disable-next-line` 放行，不再在 `eslint.config.mjs` 里按目录 / 文件名列表关规则。
 - `theme:report`：viz 实色是定义，不计入业务 hex 债务；当前待补档 0、锁定 8。
 
 ## 七、各库接入

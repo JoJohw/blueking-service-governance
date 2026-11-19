@@ -159,32 +159,37 @@
   /* @endgroup */
 
   /**
-   * @group keep
+   * @group 场景色
    * @layer scale
-   * @note spec 不替换色，原值收编成 token，名字即色值，不参与设计映射
+   * @note spec 未覆盖的保留色：按用途命名、值直写，与色阶同形，用 text-/bg-/border- 类消费
    */
 
-  /** bkui warning 旧黄、构建记录 UNKNOWN 标签 */
-  --bkms-keep-ffb848: #FFB848;
+  /** bkui warning 旧黄：warning 组件 hover 的底/边/字，构建记录 UNKNOWN 状态字 */
+  --bkms-warning-alt: #FFB848;
 
-  /** 图表 palette 橙 */
-  --bkms-keep-ef6317: #EF6317;
+  /** 名称首字母头像的循环强调橙 */
+  --bkms-accent-orange: #EF6317;
 
-  /** 运维历史状态 tag 深绿底 */
-  --bkms-keep-144628: #144628;
-
-  /** iconcool 图标（HelmCharts）深蓝 */
-  --bkms-keep-0f1689: #0F1689;
-
-  /** iconcool 图标默认灰 */
-  --bkms-keep-737987: #737987;
-  --bkms-keep-7a8193: #7A8193;
+  /** 运维历史差异对比「操作后」的深绿底 */
+  --bkms-diff-after: #144628;
 
   /** Helm 编排文件列表的 BSCP 标签深棕底 */
-  --bkms-keep-6d5b42: #6D5B42;
+  --bkms-tag-bscp: #6D5B42;
 
-  /** 版本号规则 VN 标签、构建命令参数名的棕红字 */
-  --bkms-keep-ad7a6b: #AD7A6B;
+  /** 版本号 VN 标签、构建命令参数名的暖棕字 */
+  --bkms-accent-warm: #AD7A6B;
+
+  /** 深一档的灰：拓扑工具栏 Divider、筛选图标 hover、暗色下的占位字 */
+  --bkms-muted: #737987;
+
+  /** iconcool 图标 HelmCharts 深蓝（色值内置在字体 SVG，CSS 侧暂无消费） */
+  --bkms-icon-helm: #0F1689;
+
+  /** iconcool 图标默认灰（色值内置在字体 SVG，CSS 侧暂无消费） */
+  --bkms-icon-muted: #7A8193;
+
+  /** 深色半透明气泡、浮层的遮罩底 */
+  --bkms-mask: #000c;
 
   /* @endgroup */
 

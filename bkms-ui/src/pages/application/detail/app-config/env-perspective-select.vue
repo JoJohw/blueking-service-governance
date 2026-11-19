@@ -83,7 +83,7 @@
         </span>
         <span
           v-else
-          :class="['text-[14px] leading-[22px]', isDarkTheme ? 'text-bkms-keep-737987' : 'text-bkms-navy-5']"
+          :class="['text-[14px] leading-[22px]', isDarkTheme ? 'text-bkms-muted' : 'text-bkms-navy-5']"
         >
           {{ $t('请选择') }}
         </span>

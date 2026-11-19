@@ -235,7 +235,7 @@
                       theme="light"
                     >
                       <Tag
-                        class="!text-bkms-warning-7 !bg-bkms-keep-6d5b42 ml-[4px] h-[16px] text-[10px] px-[4px]"
+                        class="!text-bkms-warning-7 !bg-bkms-tag-bscp ml-[4px] h-[16px] text-[10px] px-[4px]"
                         theme="warning"
                       >
                         BSCP

@@ -65,6 +65,19 @@ const VAR_ONE_RE = /var\(\s*(--[\w-]+)/;
 const ANY_COLOR_RE = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)/;
 /** 同一份源的全局版：数任意值里有几个色值、把色值剥掉看剩余形态。不能复用带 g 的 lastIndex */
 const ANY_COLOR_G_RE = new RegExp(ANY_COLOR_RE.source, 'g');
+
+/**
+ * 候选目标（注册类 / var()）代表的色值：灯泡里带上具体 hex，才看得出换成的是哪个颜色。
+ * 类名去掉工具类前缀（含方向）后就是令牌名，与 var() 走同一条解析链。
+ */
+function targetWithHex(target) {
+  if (!target) return target;
+  const name = target.startsWith('var(')
+    ? target.slice(4, -1).trim()
+    : `--${target.replace(/^(?:text|bg|border|fill|stroke|ring|divide|outline|from|via|to|shadow)(?:-[a-z]{1,2})?-/, '')}`;
+  const hex = hexOfVar(name);
+  return hex ? `${target}（${hex}）` : target;
+}
 /** 任意值后的透明度修饰符：bg-[#fff]/50、bg-[#fff]/[0.5] */
 const ALPHA_SUFFIX_RE = /^\/(\[[^\]]+\]|\d+(?:\.\d+)?)/;
 /** 3 位 hex 歧义大（'#101' 可能是编号），只在颜色语境（属性名已知 / class 任意值）才认定 */
@@ -174,6 +187,9 @@ function isCrossLayer(name, target) {
 
 /** 工具类前缀 → { kind, dir }：border-t → { kind: 'border', dir: 't' } */
 function kindOfUtility(prefix) {
+  // drop-shadow 是 filter 版阴影，与 shadow 同属「uno 未注册类、class 内 var() 合法」的例外；
+  // 不能交给下面的按 `-` 切分（会切出 head=drop），那样色值会被静默放过
+  if (prefix === 'drop-shadow') return { kind: 'shadow' };
   const [head, dir] = prefix.split('-');
   if (head === 'border' && dir) return { kind: 'border', dir };
   // divide-x / divide-y 只定义分隔线宽度，颜色只有不带方向的 divide-<color>：
@@ -204,7 +220,7 @@ export default {
         useClassUnknown: '写死色值 {{value}}，token 层无同值色值：新增 token 或改用最近的语义类',
         useVar: '写死色值 {{value}}，改用 {{target}}',
         useVarUnknown: '写死色值 {{value}}，token 层无同值色值：先新增 token（src/styles/theme/tokens）',
-        shadow: '写死色值 {{value}}，改用 shadow-[…{{target}}]（uno 未注册阴影类，class 内 var() 属例外）',
+        shadow: '写死色值 {{value}}，改用 {{utility}}-[…{{target}}]（uno 未注册阴影类，class 内 var() 属例外）',
         unregistered: '写死色值 {{value}}，{{utility}} 未注册 uno 类：先补注册再改（不自动修复，避免语义被改）',
         compound:
           '写死色值 {{value}} 位于 {{utility}} 的复合值（渐变 / 函数参数）里：换成单一注册类会丢内容，请手工改写',
@@ -242,7 +258,7 @@ export default {
             node,
             loc,
             messageId: 'shadow',
-            data: { value: hex, target: target ?? 'var(--bkms-shadow-*)' },
+            data: { value: hex, target: target ?? 'var(--bkms-shadow-*)', utility: prefix },
           });
           return;
         }
@@ -292,7 +308,7 @@ export default {
               ? undefined
               : nearestClasses(hex, utility.kind, { dir: utility.dir }).map(cls => ({
                   messageId: 'suggestClass',
-                  data: { target: cls },
+                  data: { target: targetWithHex(cls) },
                   fix: fixer => fixer.replaceTextRange([index, index + whole.length], cls),
                 })),
         });
@@ -332,7 +348,7 @@ export default {
               ? undefined
               : nearestVars(m[0], { group }).map(v => ({
                   messageId: 'suggestVar',
-                  data: { target: v },
+                  data: { target: targetWithHex(v) },
                   fix: fixer => fixer.replaceTextRange([start, end], v),
                 })),
           });
@@ -352,7 +368,7 @@ export default {
             ? undefined
             : nearestVars(raw, { group }).map(v => ({
                 messageId: 'suggestVar',
-                data: { target: v },
+                data: { target: targetWithHex(v) },
                 fix: fixer => fixer.replaceTextRange([start, end], v),
               })),
         });
@@ -498,7 +514,9 @@ export default {
             messageId: crossLayer ? 'crossLayer' : target ? 'banned' : 'bannedUnknown',
             data: { value: name, target },
             fix: target && !crossLayer ? replace : undefined,
-            suggest: crossLayer ? [{ messageId: 'suggestClass', data: { target }, fix: replace }] : undefined,
+            suggest: crossLayer
+              ? [{ messageId: 'suggestClass', data: { target: targetWithHex(target) }, fix: replace }]
+              : undefined,
           });
         }
       }

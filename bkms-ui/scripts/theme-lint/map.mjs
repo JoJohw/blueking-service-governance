@@ -23,13 +23,12 @@
  * CSS 是令牌真源，新增令牌零注册（见 src/styles/theme/tokens）。
  *
  * 消费矩阵（class 内禁止 var()，只能用注册类）：
- *   --bkms-{family}-{step}  → text-/bg-/border-/fill-/stroke-/divide-/ring-/outline-/-{dir}- + bkms-{family}-{step}
- *   --bkms-keep-{hex6}      → 同上色阶形态，keep 族（名字即色值，如 bg-bkms-keep-ffb848）
- *   --bkms-text-{name}      → shortcut bkms-text-{name}
- *   --bkms-bg-{name}        → shortcut bkms-bg-{name}
- *   --bkms-line-{name}      → shortcut bkms-line-{name}（方向边框除外，用色阶类保留方向）
+ *   --bkms-{name}（@layer scale）          → text-/bg-/border-/fill-/stroke-/divide-/ring-/outline-/-{dir}- + bkms-{name}
+ *   --bkms-text-{name}（@layer semantic）  → shortcut bkms-text-{name}
+ *   --bkms-bg-{name}（@layer semantic）    → shortcut bkms-bg-{name}
+ *   --bkms-line-{name}（@layer semantic）  → shortcut bkms-line-{name}（方向边框除外，用色阶类保留方向）
  *   --bkms-shadow-*         → 未注册（值不是数字结尾），class 内 var() 属例外，放行
- *   --bkms-radius-{语义}     → theme.borderRadius，类名 rounded-{语义}（档位 --bkms-radius-<px> 不注册）
+ *   --bkms-radius-{语义}     → theme.borderRadius，类名 rounded-bkms-{语义}（与色阶 text-bkms-* 同形）
  *   ring-offset-*           → 未注册（uno 无色环颜色类），只报不修，避免压平成 ring-*
  */
 import fs from 'node:fs';
@@ -106,45 +105,57 @@ const RADIUS_SEMANTIC = radiusLayerBlocks('semantic')
   .filter(t => Number.isFinite(t.px));
 
 /**
- * 圆角档位类：rounded-bkms-<px>，仅供迁移过渡期使用。
- * key 必须带 bkms- 前缀：裸数字会被 uno 内置 spacing 刻度抢走（rounded-6 = 1.5rem）。
- * 新代码禁用档位类——直接写档位会绕过语义，改语义档时管不到这些地方。
+ * 档位类 rounded-bkms-<档位>：尺度档仅供迁移过渡期，形状档是业务合法写法。
+ * key 必须带 bkms- 前缀：裸 sm/md 会被 uno 内置刻度抢走。
  */
 export function parseRadiusScaleTokens() {
   const tokens = {};
-  for (const t of RADIUS_SCALE) tokens[`bkms-${t.px}`] = `var(${t.name})`;
+  for (const t of [...RADIUS_SCALE, ...RADIUS_SHAPE]) tokens[`bkms-${t.label}`] = `var(${t.name})`;
   return tokens;
 }
 
 /**
- * 圆角语义变量：radius.css 的语义区 → theme.borderRadius，类名形如 rounded-card / rounded-t-field。
- * 只取语义档：档位（--bkms-radius-6 这类名字即像素值的）不注册，注册会诱导 rounded-6 这种写法。
+ * 圆角语义变量：radius.css 的语义区 → theme.borderRadius，类名形如 rounded-bkms-card / rounded-t-bkms-field。
+ * 只取语义档：尺度档直接写会绕过语义，改语义档时管不到这些地方。
  */
 export function parseRadiusTokens() {
   const tokens = {};
-  for (const t of RADIUS_SEMANTIC) tokens[t.label] = `var(${t.name})`;
+  for (const t of RADIUS_SEMANTIC) tokens[`bkms-${t.label}`] = `var(${t.name})`;
   return tokens;
 }
 
-/** 档位变量（--bkms-radius-6）：只该被语义层引用，业务与覆写层直连它会绕过语义 */
+/** 尺度档变量（--bkms-radius-md）：只该被语义层引用，业务与覆写层直连它会绕过语义 */
 export const isRadiusScaleVar = name => RADIUS_SCALE.some(t => t.name === name);
+
+/** 形状档变量（--bkms-radius-none）：业务可直接使用，不参与语义候选池 */
+export const isRadiusShapeVar = name => RADIUS_SHAPE.some(t => t.name === name);
 
 /** 语义档变量（--bkms-radius-card）：未定义时不能当合法目标，否则会修出 uno 没注册的类名 */
 export const isRadiusSemanticVar = name => RADIUS_SEMANTIC.some(t => t.name === name);
+
+/** 尺度档名 → 像素值；档位类与档位 var() 的候选换算都走这里 */
+export const radiusScaleVarPx = name => RADIUS_SCALE.find(t => t.name === name)?.px ?? null;
 
 /** 档位里没有同值（2px / 10px 这类）时退到最接近的档位，候选数受 limit 约束 */
 export function nearestRadiusSemantics(px, limit = 3) {
   return [...RADIUS_SEMANTIC].sort((a, b) => Math.abs(a.px - px) - Math.abs(b.px - px)).slice(0, limit);
 }
 
-/** 色阶 + keep 令牌：color.css → theme.colors，类名形如 text-bkms-brand-2 / bg-bkms-keep-ffb848。
- * step 兼容 6 位 hex（keep 族命名即色值），hex 替代排在 \d+ 之后防全数字 hex 走错分支。
- * 语义与阴影变量结尾不是数字/hex，不会被这条正则捕获 */
+// ── 颜色维度：@layer 分段是色阶 / 语义的唯一切分口径，与 radius.css 同源 ──────
+
+const COLOR_SOURCE = readTokenFile('color.css');
+const colorLayerBlocks = layer => COLOR_SOURCE.match(new RegExp(`@layer ${layer}[\\s\\S]*?@endgroup`, 'g')) || [];
+
+/**
+ * 色阶令牌：@layer scale 区 → theme.colors，类名形如 text-bkms-brand-2 / text-bkms-warning-alt。
+ * key 扁平（uno 按 '-' 切段查嵌套，带 dash 的 key 嵌套注册会查不到）；场景色与数字档同形消费。
+ */
 export function parseScaleColors() {
   const tokens = {};
-  for (const m of readTokenFile('color.css').matchAll(/--bkms-([a-z-]+)-(\d+|[0-9a-f]{6})\s*:/g)) {
-    const [, family, step] = m;
-    tokens[`bkms-${family}-${step}`] = `var(--bkms-${family}-${step})`;
+  for (const block of colorLayerBlocks('scale')) {
+    for (const m of block.matchAll(/--bkms-([a-z0-9-]+)\s*:/g)) {
+      tokens[`bkms-${m[1]}`] = `var(--bkms-${m[1]})`;
+    }
   }
   return tokens;
 }
@@ -156,16 +167,22 @@ export function parseScaleColors() {
 export function parseSemanticShortcuts() {
   const prefixByGroup = { text: 'text', line: 'border', bg: 'bg' };
   const shortcuts = [];
-  for (const m of readTokenFile('color.css').matchAll(/--bkms-(text|line|bg)-([a-z-]+)\s*:/g)) {
-    const [, group, name] = m;
-    shortcuts.push([`bkms-${group}-${name}`, `${prefixByGroup[group]}-[var(--bkms-${group}-${name})]`]);
+  for (const block of colorLayerBlocks('semantic')) {
+    for (const m of block.matchAll(/--bkms-(text|line|bg)-([a-z-]+)\s*:/g)) {
+      const [, group, name] = m;
+      shortcuts.push([`bkms-${group}-${name}`, `${prefixByGroup[group]}-[var(--bkms-${group}-${name})]`]);
+    }
   }
   return shortcuts;
 }
 
-/** 同值语义档候选；hint 只用于排序（命中场景词的那个排最前），不代替人判断 */
+/** 同值语义档候选；hint 只用于排序（命中场景词的那个排最前），不代替人判断；无场景命中时 base 兜底 */
 export function radiusSemantics(px, hint) {
-  return RADIUS_SEMANTIC.filter(t => t.px === px).sort((a, b) => (b.label === hint) - (a.label === hint));
+  const same = RADIUS_SEMANTIC.filter(t => t.px === px);
+  const hinted = same.some(t => t.label === hint);
+  return same.sort(
+    (a, b) => (hinted ? (b.label === hint) - (a.label === hint) : 0) || (b.label === 'base') - (a.label === 'base'),
+  );
 }
 
 /** alpha：0~1 或百分比；整数 0~255 也兼容。缺省视为不透明 */
@@ -229,22 +246,23 @@ function resolveHex(name, seen = new Set()) {
   return normalizeHex(value);
 }
 
-/** 色阶令牌：[{ name, family, step, hex }]（step 兼容 keep 族的 6 位 hex 后缀） */
+/** 色阶令牌：[{ name, label, hex }]；label 是去掉 --bkms- 的整名，场景色与数字档同形 */
 const SCALE = [];
-for (const name of decls.keys()) {
-  const m = name.match(/^--bkms-([a-z-]+)-(\d+|[0-9a-f]{6})$/);
-  if (!m) continue;
-  const hex = resolveHex(name);
-  if (hex) SCALE.push({ name, family: m[1], step: m[2], hex });
+for (const block of colorLayerBlocks('scale')) {
+  for (const m of block.matchAll(/(--bkms-[a-z0-9-]+)\s*:/g)) {
+    const hex = resolveHex(m[1]);
+    if (hex) SCALE.push({ name: m[1], label: m[1].slice('--bkms-'.length), hex });
+  }
 }
 
-/** 语义令牌：[{ name: '--bkms-bg-card', label: 'bg-card', group: 'bg', hex }] */
+/** 语义令牌：[{ name: '--bkms-bg-card', label: 'bg-card', group: 'bg', hex }]；只收 @layer semantic 区 */
 const SEMANTIC = [];
-for (const name of decls.keys()) {
-  const m = name.match(/^--bkms-(text|line|bg)-([a-z-]+)$/);
-  if (!m) continue;
-  const hex = resolveHex(name);
-  if (hex) SEMANTIC.push({ name, label: `${m[1]}-${m[2]}`, group: m[1], hex });
+for (const block of colorLayerBlocks('semantic')) {
+  for (const m of block.matchAll(/--bkms-(text|line|bg)-([a-z-]+)\s*:/g)) {
+    const name = `--bkms-${m[1]}-${m[2]}`;
+    const hex = resolveHex(name);
+    if (hex) SEMANTIC.push({ name, label: `${m[1]}-${m[2]}`, group: m[1], hex });
+  }
 }
 
 /** 阴影令牌名（非数字结尾，未注册进 uno） */
@@ -363,7 +381,7 @@ function hexToRgb(hex) {
 function scaleClassOf(hex, kind, dir) {
   const hit = SCALE.find(t => t.hex === hex);
   if (!hit) return null;
-  const suffix = `bkms-${hit.family}-${hit.step}`;
+  const suffix = `bkms-${hit.label}`;
   return dir ? `${kind}-${dir}-${suffix}` : `${kind}-${suffix}`;
 }
 
@@ -388,7 +406,7 @@ export function nearestClasses(value, kind, { dir } = {}, limit = 3) {
     }
   }
   for (const t of SCALE) {
-    const suffix = `bkms-${t.family}-${t.step}`;
+    const suffix = `bkms-${t.label}`;
     candidates.push({ label: dir ? `${kind}-${dir}-${suffix}` : `${kind}-${suffix}`, hex: t.hex });
   }
 

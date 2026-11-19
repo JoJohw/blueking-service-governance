@@ -226,13 +226,21 @@ export function getCachedMetric(
 export function getColorByOffset(offset: number): string {
   // series 是 @locked 实色；字典读取带原 hex 兜底，避免加载时快照
   const palette = readVizSeries([
+    // eslint-disable-next-line theme/no-hardcoded-color
     '#EA3636',
+    // eslint-disable-next-line theme/no-hardcoded-color
     '#FF9C01',
+    // eslint-disable-next-line theme/no-hardcoded-color
     '#3A84FF',
+    // eslint-disable-next-line theme/no-hardcoded-color
     '#2DCB56',
+    // eslint-disable-next-line theme/no-hardcoded-color
     '#A855F7',
+    // eslint-disable-next-line theme/no-hardcoded-color
     '#EC4899',
+    // eslint-disable-next-line theme/no-hardcoded-color
     '#14B8A6',
+    // eslint-disable-next-line theme/no-hardcoded-color
     '#6366F1',
   ]);
   const known: Record<number, number> = {

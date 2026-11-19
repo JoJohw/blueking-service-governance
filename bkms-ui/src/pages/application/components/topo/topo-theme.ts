@@ -31,10 +31,15 @@ const STATUS_VARS: Record<NodeStatus, string> = {
 
 /** viz 变量取不到实色时的兜底，与 viz.css 未落值前的字面色一致 */
 const STATUS_FALLBACK: Record<NodeStatus, string> = {
+  // eslint-disable-next-line theme/no-hardcoded-color
   all: '#99B1E0',
+  // eslint-disable-next-line theme/no-hardcoded-color
   error: '#FEDDDD',
+  // eslint-disable-next-line theme/no-hardcoded-color
   healthy: '#DAF6E5',
+  // eslint-disable-next-line theme/no-hardcoded-color
   unknown: '#99B1E0',
+  // eslint-disable-next-line theme/no-hardcoded-color
   warning: '#FDEED8',
 };
 
@@ -58,10 +63,15 @@ export function getTopoViz(): TopoViz {
     warning: statusColor('warning'),
   };
   return {
+    // eslint-disable-next-line theme/no-hardcoded-color
     edgeStroke: readVizVar('--bkms-viz-line', '#ABB5CC'),
+    // eslint-disable-next-line theme/no-hardcoded-color
     minimapBackground: readVizVar('--bkms-viz-surface-canvas', '#242A35'),
+    // eslint-disable-next-line theme/no-hardcoded-color
     minimapMask: readVizVar('--bkms-viz-mask', '#0000002d'),
+    // eslint-disable-next-line theme/no-hardcoded-color
     nodePlate: readVizVar('--bkms-viz-bg-card', '#FFFFFF'),
+    // eslint-disable-next-line theme/no-hardcoded-color
     selection: readVizVar('--bkms-viz-selection', '#F59500'),
     statusColors,
   };

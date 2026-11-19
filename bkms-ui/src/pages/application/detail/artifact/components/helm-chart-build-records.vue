@@ -229,7 +229,7 @@
     RUNNING: 'text-bkms-brand-3',
     SUCCED: 'text-bkms-success-2',
     FAILED: 'text-bkms-danger-2',
-    UNKNOWN: 'text-bkms-keep-ffb848',
+    UNKNOWN: 'text-bkms-warning-alt',
   };
   const failedStatus = ['failed', 'pollingBroken'];
 

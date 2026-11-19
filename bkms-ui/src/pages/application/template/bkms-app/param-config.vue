@@ -734,7 +734,7 @@
   }
 
   .equivalent-build-command :deep(.build-command-arg-key) {
-    color: var(--bkms-keep-ad7a6b);
+    color: var(--bkms-accent-warm);
   }
 
   .equivalent-build-command :deep(.build-command-image) {

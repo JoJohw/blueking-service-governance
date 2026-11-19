@@ -31,7 +31,7 @@
 
     <Divider
       class="h-[50%]"
-      color="var(--bkms-keep-737987)"
+      color="var(--bkms-muted)"
       direction="vertical"
       type="solid"
     />
@@ -59,7 +59,7 @@
 
     <Divider
       class="h-[50%]"
-      color="var(--bkms-keep-737987)"
+      color="var(--bkms-muted)"
       direction="vertical"
       type="solid"
     />

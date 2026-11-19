@@ -117,7 +117,7 @@
                     <div class="text-[12px] leading-[20px]">
                       {{ $t('每次保存或回滚将自动递增生成新版本号，格式为') }}
                       <span
-                        class="inline-block h-[16px] leading-[16px] bg-bkms-neutral-2 text-bkms-keep-ad7a6b text-[10px] px-[4px] rounded-[2px]"
+                        class="inline-block h-[16px] leading-[16px] bg-bkms-neutral-2 text-bkms-accent-warm text-[10px] px-[4px] rounded-bkms-tag"
                         >VN
                       </span>
                       {{ $t('。') }}

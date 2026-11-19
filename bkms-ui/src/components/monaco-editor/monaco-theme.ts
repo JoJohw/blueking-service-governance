@@ -46,14 +46,19 @@ export function resolveMonacoTheme(theme: string): string {
 }
 
 function themeColors(): Record<string, string> {
+  // eslint-disable-next-line theme/no-hardcoded-color
   const brand = readVizVar('--bkms-viz-line-active', '#3B6EF5');
+  // eslint-disable-next-line theme/no-hardcoded-color
   const secondary = readVizVar('--bkms-viz-text-secondary', '#8F9FBD');
   return {
     'editorCursor.foreground': brand,
     'editor.selectionBackground': hexWithAlpha(brand, 0.3),
     'editor.lineHighlightBackground': hexWithAlpha(secondary, 0.12),
+    // eslint-disable-next-line theme/no-hardcoded-color
     'editorLineNumber.activeForeground': readVizVar('--bkms-viz-text-inverse', '#FFFFFF'),
+    // eslint-disable-next-line theme/no-hardcoded-color
     'editorWidget.background': readVizVar('--bkms-viz-surface-canvas', '#242A35'),
+    // eslint-disable-next-line theme/no-hardcoded-color
     'editorWidget.border': readVizVar('--bkms-viz-tooltip-border', '#C1CDE5'),
     'scrollbarSlider.background': hexWithAlpha(secondary, 0.3),
     'scrollbarSlider.hoverBackground': hexWithAlpha(secondary, 0.5),

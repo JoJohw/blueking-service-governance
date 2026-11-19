@@ -101,9 +101,9 @@
   border: none;
 }
 
-/* 半透明深色气泡：刻意视觉，spec 无对应 token，rgba 原值保留 */
+/* 半透明深色气泡：遮罩底走 --bkms-mask（token 内置 alpha） */
 .popover-dark-translucent {
-  background: rgb(0 0 0 / 80%) !important;
+  background: var(--bkms-mask) !important;
 }
 
 .no-padding-popover {

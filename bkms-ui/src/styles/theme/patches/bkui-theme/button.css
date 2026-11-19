@@ -162,8 +162,8 @@
 
 .bkms-themed .bk-button.bk-button-warning:hover,
 .bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-warning:hover {
-  background-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
-  border-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
+  background-color: var(--bkms-warning-alt); /* 原 #ffb848 */
+  border-color: var(--bkms-warning-alt); /* 原 #ffb848 */
 }
 
 .bkms-themed .bk-button.bk-button-warning:active,
@@ -182,8 +182,8 @@
 
 .bkms-themed .bk-button.bk-button-warning.is-outline:hover,
 .bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-outline:hover {
-  background-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
-  border-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
+  background-color: var(--bkms-warning-alt); /* 原 #ffb848 */
+  border-color: var(--bkms-warning-alt); /* 原 #ffb848 */
   color: var(--bkms-text-inverse); /* 原 #fff */
 }
 
@@ -203,7 +203,7 @@
 
 .bkms-themed .bk-button.bk-button-warning.is-text:not(.is-disabled):hover,
 .bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-text:not(.is-disabled):hover {
-  color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
+  color: var(--bkms-warning-alt); /* 原 #ffb848 */
 }
 
 .bkms-themed .bk-button.bk-button-warning.is-disabled,
@@ -220,8 +220,8 @@
 
 .bkms-themed .bk-button.bk-button-hover-warning:hover,
 .bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-hover-warning:hover {
-  background-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
-  border-color: var(--bkms-keep-ffb848); /* 原 #ffb848 */
+  background-color: var(--bkms-warning-alt); /* 原 #ffb848 */
+  border-color: var(--bkms-warning-alt); /* 原 #ffb848 */
   color: var(--bkms-text-inverse); /* 原 #fff */
 }
 
