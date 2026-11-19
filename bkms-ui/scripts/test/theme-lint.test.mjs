@@ -420,11 +420,12 @@ describe('rule: no-hardcoded-color', () => {
   it('灯泡候选带上具体 hex', () => {
     const [msg] = verifyRule(`<template><div class="bg-[#010203]" /></template>`, 'theme/no-hardcoded-color');
     expect(msg.messageId).toBe('useClassUnknown');
-    for (const s of msg.suggestions) expect(s.data.target).toMatch(/（#[0-9a-f]{6}）$/);
+    // mask 一类的令牌自带 alpha，是合法的 8 位 hex
+    for (const s of msg.suggestions) expect(s.data.target).toMatch(/（#[0-9a-f]{6,8}）$/);
 
     const [varMsg] = verifyRule(`<template><div style="color: #010203" /></template>`, 'theme/no-hardcoded-color');
     expect(varMsg.messageId).toBe('useVarUnknown');
-    for (const s of varMsg.suggestions) expect(s.data.target).toMatch(/^var\(--bkms-.+\)（#[0-9a-f]{6}）$/);
+    for (const s of varMsg.suggestions) expect(s.data.target).toMatch(/^var\(--bkms-.+\)（#[0-9a-f]{6,8}）$/);
   });
 
   it('rgb() 归一为 hex 后能命中同值令牌', () => {
