@@ -165,12 +165,12 @@
 
 <style lang="postcss" scoped>
   :deep(.bk-tag-info) {
-    background-color: #e1ecff;
     color: #1768ef;
+    background-color: #e1ecff;
   }
 
   :deep(.bk-tag-warning) {
-    background-color: #fdeed8;
     color: #e38b02;
+    background-color: #fdeed8;
   }
 </style>

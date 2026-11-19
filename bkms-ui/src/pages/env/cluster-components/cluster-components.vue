@@ -592,9 +592,11 @@
   .comp-expand-icon {
     transition: transform 0.3s ease;
   }
+
   :deep(.bk-exception) {
     margin: 8px 0;
   }
+
   :deep(.bk-exception-img) {
     width: auto !important;
     height: auto !important;

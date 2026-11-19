@@ -374,15 +374,16 @@
 <style lang="postcss" scoped>
   .hover-expand-textarea {
     position: absolute;
-    transition: all 0.2s ease;
-    height: 30px;
-    min-height: 30px;
     top: 0;
     left: 0;
+    height: 30px;
+    min-height: 30px;
+    transition: all 0.2s ease;
+
     &.is-focused {
+      z-index: 9;
       height: auto;
       max-height: 80px;
-      z-index: 9;
     }
   }
 

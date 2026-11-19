@@ -393,19 +393,18 @@
 
   .batch-popover__title {
     margin-bottom: 8px;
-    color: #313238;
     font-size: 16px;
     font-weight: 700;
     line-height: 24px;
+    color: #313238;
   }
 
   /* 表头与数据行共用一个 grid，列宽由内容自适应，保证跨行对齐且无边框 */
   .batch-popover__grid {
     display: grid;
     grid-template-columns: max-content max-content max-content max-content;
+    gap: 6px 24px;
     align-items: center;
-    column-gap: 24px;
-    row-gap: 6px;
     width: max-content;
     font-size: 12px;
     line-height: 20px;

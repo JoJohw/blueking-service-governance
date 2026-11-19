@@ -857,10 +857,12 @@
   .action-tab-wrapper {
     overflow-y: auto !important;
   }
+
   :deep(.build-table) {
     ::-webkit-scrollbar {
       height: 8px !important;
     }
+
     .vxe-cell--sort {
       height: 20px;
       padding: 0 3px;

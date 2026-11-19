@@ -35,28 +35,32 @@
 
 <style lang="postcss" scoped>
   .default {
-    background-color: var(--bkms-bg-subtle);
     color: var(--bkms-text-body);
+    background-color: var(--bkms-bg-subtle);
     border-color: var(--bkms-line-default);
   }
+
   .success {
-    background-color: var(--bkms-bg-success);
     color: var(--bkms-success-2);
+    background-color: var(--bkms-bg-success);
     border-color: var(--bkms-success-4);
   }
+
   .danger {
+    color: var(--bkms-danger-2);
     background-color: var(--bkms-bg-danger);
-    color: var(--bkms-danger-2);
     border-color: var(--bkms-line-danger);
   }
+
   .warning {
-    background-color: var(--bkms-bg-warning-soft);
     color: var(--bkms-danger-2);
+    background-color: var(--bkms-bg-warning-soft);
     border-color: var(--bkms-line-danger);
   }
+
   .info {
-    background-color: var(--bkms-bg-active);
     color: var(--bkms-text-brand);
+    background-color: var(--bkms-bg-active);
     border-color: var(--bkms-success-4);
   }
 </style>

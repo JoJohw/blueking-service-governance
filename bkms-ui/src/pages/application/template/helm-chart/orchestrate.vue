@@ -678,7 +678,8 @@
   :deep(.multi-values-tag-popover) {
     padding: 8px !important;
   }
+
   :deep(.bk-resize-layout-aside) {
-    border: 0px;
+    border: 0;
   }
 </style>

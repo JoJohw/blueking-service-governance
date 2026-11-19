@@ -841,12 +841,15 @@
   :deep(.bk-tab-content) {
     padding: 8px 0 !important;
   }
+
   :deep(.bk-resize-layout-aside) {
     border: 0;
   }
+
   :deep(.is-collapsed .bk-resize-layout-main) {
     padding-left: 20px;
   }
+
   :deep(.select-group .bk-input) {
     border-radius: var(--bkms-radius-none);
   }

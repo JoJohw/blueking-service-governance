@@ -744,32 +744,37 @@
     ::-webkit-scrollbar {
       height: 8px !important;
     }
+
     .vxe-cell--sort {
       height: 20px;
       padding: 0 3px;
     }
   }
+
   :deep(.bk-dialog-footer) {
     padding-top: 0;
     padding-bottom: 16px;
     background-color: var(--bkms-bg-card);
     border: none;
   }
+
   :deep(.promoted-tag-tooltip .tippy-content) {
     white-space: pre-line;
   }
+
   :deep(.bk-modal-body) {
     .bk-modal-header {
       .bk-dialog-header {
         padding-top: 48px;
       }
     }
+
     .bk-modal-footer {
       .bk-dialog-footer {
-        border: none;
-        background-color: unset;
         padding-top: 0;
         padding-bottom: 24px;
+        background-color: unset;
+        border: none;
       }
     }
   }

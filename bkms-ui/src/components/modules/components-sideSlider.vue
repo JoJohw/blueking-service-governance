@@ -1195,7 +1195,7 @@
     overflow: auto;
 
     .bk-tab-panel {
-      height: 0px !important;
+      height: 0 !important;
     }
 
     &::-webkit-scrollbar {
@@ -1233,15 +1233,18 @@
     &.form-item-properties {
       .bk-form-label {
         display: flex;
+
         & > span {
           display: flex;
-          max-width: calc(100% - 18px);
-          align-items: center;
           gap: 4px;
+          align-items: center;
+          max-width: calc(100% - 18px);
         }
+
         .position-relative {
           min-width: 0;
         }
+
         &::after {
           position: unset !important;
         }

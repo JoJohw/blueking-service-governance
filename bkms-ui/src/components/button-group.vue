@@ -50,8 +50,8 @@
 <style lang="postcss" scoped>
   .bk-button-group {
     .is-selected {
-      background-color: var(--bkms-brand-2) !important;
       color: var(--bkms-text-inverse) !important;
+      background-color: var(--bkms-brand-2) !important;
     }
   }
 </style>

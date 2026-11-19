@@ -579,6 +579,7 @@
       background-color: var(--bkms-bg-active-hover) !important;
     }
   }
+
   .env-normal {
     color: var(--bkms-text-body);
     background-color: var(--bkms-neutral-6);

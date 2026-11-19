@@ -398,18 +398,21 @@
 
 <style lang="postcss" scoped>
   :deep(.bk-tab-header) {
-    background-color: var(--bkms-bg-card);
     padding: 0 24px;
+    background-color: var(--bkms-bg-card);
   }
+
   :deep(.bk-tab-header-nav .bk-tab-header-item) {
     padding: 0 !important;
     margin-right: 32px !important;
     font-size: 14px;
   }
+
   :deep(.bk-tab-content) {
-    background-color: var(--bkms-bg-card);
     height: 100%;
     overflow: auto;
+    background-color: var(--bkms-bg-card);
+
     &:has(.custom-resource-topology) {
       padding: 0 !important;
     }

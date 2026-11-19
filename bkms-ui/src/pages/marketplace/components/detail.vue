@@ -506,21 +506,26 @@
 
   :deep(.create-version) {
     padding: 0 3px;
+
     .bk-button-text {
       width: 100%;
     }
   }
+
   .version-active,
   .version-content:hover {
     border-color: var(--bkms-line-active);
+
     .version {
       color: var(--bkms-text-brand);
     }
+
     .reference-count {
       color: var(--bkms-text-brand);
       background-color: var(--bkms-bg-active);
     }
   }
+
   .version-content:hover {
     .delete-version {
       display: flex;

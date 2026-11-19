@@ -139,6 +139,7 @@
 <style lang="postcss" scoped>
   :deep(.bk-form-item) {
     margin-bottom: 16px;
+
     .bk-form-error-tips {
       right: 28px;
     }

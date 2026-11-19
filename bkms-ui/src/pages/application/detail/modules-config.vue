@@ -665,19 +665,19 @@
     border-radius: var(--bkms-radius-card);
   }
 
-  @media (max-width: 1440px) {
+  @media (width <= 1440px) {
     .grid-container {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  @media (min-width: 1440px) and (max-width: 1600px) {
+  @media (width >= 1440px) and (width <= 1600px) {
     .grid-container {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
-  @media (min-width: 1600px) {
+  @media (width >= 1600px) {
     .grid-container {
       grid-template-columns: repeat(5, minmax(0, 1fr));
     }

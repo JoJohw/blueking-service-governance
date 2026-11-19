@@ -1286,12 +1286,6 @@
     border-bottom: 1px dashed var(--bkms-neutral-3);
   }
 
-  .env-instance-table:first-child {
-    .env-header {
-      border-top: 1px solid var(--bkms-line-default);
-    }
-  }
-
   .env-header {
     border: 1px solid var(--bkms-line-default);
     border-top: none;
@@ -1303,6 +1297,12 @@
 
     &:hover {
       background-color: var(--bkms-neutral-6);
+    }
+  }
+
+  .env-instance-table:first-child {
+    .env-header {
+      border-top: 1px solid var(--bkms-line-default);
     }
   }
 

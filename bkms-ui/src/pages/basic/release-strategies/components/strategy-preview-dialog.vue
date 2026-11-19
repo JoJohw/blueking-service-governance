@@ -209,24 +209,24 @@
 
 <style lang="postcss" scoped>
   :deep(.bk-tag-info) {
-    background-color: #e1ecff;
     color: #1768ef;
+    background-color: #e1ecff;
   }
 
   :deep(.bk-tag-warning) {
-    background-color: #fdeed8;
     color: #e38b02;
+    background-color: #fdeed8;
   }
 
   .step-item-title::before,
   .step-item-tag::before {
+    position: absolute;
+    left: 12px;
     display: block;
-    content: '';
     width: 2px;
     height: 100%;
-    left: 12px;
+    content: '';
     background-color: #dcdee5;
-    position: absolute;
   }
 
   /* 末批节点只连到圆点中心，避免时间线尾部悬空（含末批的暂停标签） */

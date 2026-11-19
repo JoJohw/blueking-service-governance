@@ -233,13 +233,13 @@
     justify-content: center;
     width: 100%;
     height: 52px;
-    color: var(--bkms-text-brand);
     font-size: 14px;
+    color: var(--bkms-text-brand);
+    cursor: pointer;
     background-color: var(--bkms-bg-card);
     border: 1px dashed var(--bkms-line-input);
     border-radius: var(--bkms-radius-card);
     box-shadow: 0 2px 4px 0 var(--bkms-shadow-card);
-    cursor: pointer;
 
     &:hover {
       background-color: var(--bkms-bg-hover);
@@ -274,10 +274,10 @@
 
   .add-config-menu__title {
     padding: 16px;
-    color: var(--bkms-text-title);
     font-size: 14px;
     font-weight: 700;
     line-height: 22px;
+    color: var(--bkms-text-title);
   }
 
   .add-config-menu__row-wrapper {
@@ -298,28 +298,28 @@
   }
 
   .add-config-menu__info {
-    min-width: 0;
     flex: 1;
+    min-width: 0;
     font-size: 12px;
   }
 
   .add-config-menu__label {
-    color: var(--bkms-text-body);
     font-weight: 700;
     line-height: 20px;
+    color: var(--bkms-text-body);
   }
 
   .add-config-menu__desc {
-    color: var(--bkms-text-secondary);
     line-height: 20px;
+    color: var(--bkms-text-secondary);
   }
 
   .add-config-menu__action {
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    color: var(--bkms-text-brand);
     font-size: 12px;
     line-height: 20px;
+    color: var(--bkms-text-brand);
   }
 </style>

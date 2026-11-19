@@ -125,18 +125,18 @@
     top: 50%;
     right: 6px;
     z-index: 9999;
-    transform: translateY(-50%);
     color: var(--bkms-text-disabled);
-    opacity: 0;
     cursor: pointer;
+    opacity: 0;
+    transform: translateY(-50%);
     transition: opacity 0.2s ease;
-  }
-
-  .user-selector-wrapper:hover .user-selector-clear-btn {
-    opacity: 1;
   }
 
   .user-selector-clear-btn:hover {
     color: var(--bkms-text-secondary);
+  }
+
+  .user-selector-wrapper:hover .user-selector-clear-btn {
+    opacity: 1;
   }
 </style>

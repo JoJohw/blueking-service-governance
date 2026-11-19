@@ -219,10 +219,12 @@
     padding: 0 12px;
     font-size: 12px;
     transition: all 0.3s ease;
+
     &.is-selected {
       color: var(--bkms-brand-2);
       background-color: var(--bkms-brand-6);
     }
+
     &:hover {
       background-color: var(--bkms-brand-6);
     }

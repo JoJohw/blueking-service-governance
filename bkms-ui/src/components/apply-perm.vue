@@ -178,27 +178,34 @@
   :deep(.bk-modal-wrapper) {
     z-index: 9999 !important;
   }
+
   .permission-modal {
     .permission-header {
       text-align: center;
+
       .title-icon {
         display: inline-block;
       }
+
       .lock-img {
         width: 120px;
       }
+
       h3 {
         margin: 6px 0 24px;
-        color: var(--bkms-text-body);
         font-size: 20px;
         font-weight: normal;
         line-height: 1;
+        color: var(--bkms-text-body);
       }
     }
   }
+
   .button-group {
     display: flex;
     justify-content: flex-end;
+
+    /* stylelint-disable-next-line selector-class-pattern */
     .Button {
       margin-left: 7px;
     }

@@ -549,8 +549,6 @@
   );
 </script>
 
-<style lang="postcss" scoped></style>
-
 <style lang="postcss">
   .public-env-var-table .vxe-table--filter-wrapper .vxe-table--filter-body {
     min-height: 100px;

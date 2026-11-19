@@ -776,9 +776,9 @@
   }
 
   :deep(.pre-stop-exec-mode.bk-radio-capsule .bk-radio-button-label) {
-    border: none;
     height: 24px;
     line-height: 24px;
+    border: none;
   }
 
   :deep(.pre-stop-exec-mode.bk-radio-capsule .bk-radio-button.is-checked) {
@@ -788,7 +788,7 @@
   }
 
   .field-diff-highlight {
-    border-left: 3px solid var(--bkms-warning-2);
     padding-left: 6px;
+    border-left: 3px solid var(--bkms-warning-2);
   }
 </style>

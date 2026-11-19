@@ -429,10 +429,10 @@
     align-items: center;
     height: 32px;
     padding: 0 16px;
-    color: var(--bkms-text-title);
     font-size: 14px;
     font-weight: 700;
     line-height: 22px;
+    color: var(--bkms-text-title);
     background-color: var(--bkms-bg-page);
     border-radius: var(--bkms-radius-card);
   }

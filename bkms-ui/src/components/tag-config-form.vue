@@ -208,13 +208,15 @@
   :deep(.bk-radio) {
     margin-left: 0;
   }
+
   :deep(.bk-checkbox) {
     margin-left: 0;
   }
+
   .tag-config-form-item :deep(.bk-form-label::after) {
-    content: '*';
-    color: var(--bkms-danger-2);
-    font-size: 12px;
     margin-left: 4px;
+    font-size: 12px;
+    color: var(--bkms-danger-2);
+    content: '*';
   }
 </style>

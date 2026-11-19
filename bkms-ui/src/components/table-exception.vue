@@ -94,8 +94,9 @@
     width: 220px;
     height: 120px;
   }
+
   :deep(.bk-exception-title) {
+    margin-top: 0;
     font-size: 14px;
-    margin-top: 0px;
   }
 </style>

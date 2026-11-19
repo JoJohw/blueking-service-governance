@@ -386,8 +386,8 @@
 
   :deep(.params-type) {
     .bk-form-label {
-      color: var(--bkms-text-title);
       font-weight: bold;
+      color: var(--bkms-text-title);
     }
   }
 

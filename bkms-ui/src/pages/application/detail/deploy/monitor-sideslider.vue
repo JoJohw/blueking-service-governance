@@ -1171,11 +1171,11 @@
   }
 
   .monitor-ranking-label {
-    @apply flex h-[32px] shrink-0 items-center whitespace-nowrap b b-r-0 px-[6px] text-[12px];
-
     color: var(--bkms-text-body);
     background-color: var(--bkms-neutral-8);
     border-color: var(--bkms-navy-5);
+
+    @apply flex h-[32px] shrink-0 items-center whitespace-nowrap b b-r-0 px-[6px] text-[12px];
   }
 
   .monitor-ranking-metric {

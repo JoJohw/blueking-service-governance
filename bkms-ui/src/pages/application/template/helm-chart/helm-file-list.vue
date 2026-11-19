@@ -556,10 +556,12 @@
   :deep(.bk-tree) {
     .bk-node-row {
       padding-left: 12px;
+
       &:hover {
         background-color: var(--bkms-neutral-6);
       }
     }
+
     .bk-node-prefix {
       transform: translateY(2px);
     }

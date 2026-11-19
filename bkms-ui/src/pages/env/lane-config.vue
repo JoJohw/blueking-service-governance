@@ -946,6 +946,7 @@
   .custom-shadow {
     box-shadow: 0 -1px 0 0 var(--bkms-neutral-5);
   }
+
   :deep(.bk-sideslider-footer) {
     margin-top: 0;
   }

@@ -199,37 +199,37 @@
 <style lang="postcss" scoped>
   :deep(.bk-resize-layout) {
     .bk-resize-layout-aside {
-      border-top: 6px;
-      margin-top: -1px;
       position: relative;
+      margin-top: -1px;
+      border-top: 6px;
 
       .bk-resize-trigger {
         background-color: var(--bkms-neutral-1) !important;
 
         &::before {
+          position: absolute;
           width: 4px;
           height: 5px;
           content: '';
           background-color: var(--bkms-danger-2);
-          position: absolute;
         }
 
         &::after {
           position: absolute;
+          top: 4px;
+          left: 50%;
+          z-index: 1;
           width: 2px;
           height: 2px;
           color: var(--bkms-neutral-4);
-          background: var(--bkms-neutral-4);
           content: '';
+          background: var(--bkms-neutral-4);
           box-shadow:
             0 4px 0 0 var(--bkms-neutral-4),
             0 8px 0 0 var(--bkms-neutral-4),
             0 -4px 0 0 var(--bkms-neutral-4),
             0 -8px 0 0 var(--bkms-neutral-4);
-          top: 4px;
-          left: 50%;
           transform: translate3d(-50%, 0, 0) rotate(90deg);
-          z-index: 1;
         }
       }
 
@@ -256,9 +256,9 @@
       }
 
       .bk-resize-collapse {
-        background-color: var(--bkms-neutral-2);
-        display: inline-flex !important;
         bottom: calc(100% - 1px);
+        display: inline-flex !important;
+        background-color: var(--bkms-neutral-2);
 
         &:hover {
           background-color: var(--bkms-brand-2);

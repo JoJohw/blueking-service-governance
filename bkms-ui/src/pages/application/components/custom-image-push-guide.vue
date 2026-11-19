@@ -231,15 +231,15 @@
 
 <style lang="postcss" scoped>
   .push-guide-mono {
-    color: var(--bkms-neutral-2);
     font-family: Consolas, 'Courier New', monospace;
+    color: var(--bkms-neutral-2);
   }
 
   .push-guide-pre {
     margin: 0;
-    background: transparent !important;
-    white-space: pre-wrap;
     word-break: break-all;
+    white-space: pre-wrap;
+    background: transparent !important;
   }
 
   .push-guide-step-circle {
@@ -248,12 +248,12 @@
     justify-content: center;
     width: 20px;
     height: 22px;
-    border-radius: var(--bkms-radius-full);
-    background-color: var(--bkms-neutral-6);
-    color: var(--bkms-neutral-2);
     font-size: 14px;
     font-weight: 700;
     line-height: 22px;
+    color: var(--bkms-neutral-2);
+    background-color: var(--bkms-neutral-6);
+    border-radius: var(--bkms-radius-full);
   }
 
   .push-guide-content :deep(.push-guide-command-keyword) {

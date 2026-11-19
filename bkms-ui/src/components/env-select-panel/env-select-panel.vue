@@ -1090,37 +1090,45 @@
 <style lang="postcss" scoped>
   :deep(.bk-select-trigger) {
     height: 32px;
-    border: none !important;
-    border-radius: var(--bkms-radius-none) !important;
-    border-right: 1px solid var(--bkms-line-input) !important;
     background: transparent !important;
+    border: none !important;
+    border-right: 1px solid var(--bkms-line-input) !important;
+    border-radius: var(--bkms-radius-none) !important;
+
     .bk-input {
       border: none !important;
       box-shadow: none !important;
     }
+
     .bk-select-tag {
       font-size: 12px;
       color: var(--bkms-text-body);
     }
   }
+
   :deep(.bk-input.is-simplicity) {
     border-bottom-color: var(--bkms-line-default) !important;
     border-radius: var(--bkms-radius-none) !important;
+
     &:hover {
       background-color: transparent !important;
     }
+
     .bk-input--text {
       background-color: transparent !important;
     }
   }
+
   /* 覆盖 Popover 面板样式 */
   :deep(.bk-popover-reference) {
     outline: none;
   }
+
   .feature-env-child {
     position: relative;
     padding-left: 31px;
   }
+
   .feature-env-branch {
     position: absolute;
     top: 0;
@@ -1135,18 +1143,18 @@
       left: -8px;
       width: 16px;
       height: 16px;
-      border-left: 1px solid var(--bkms-line-default);
-      border-bottom: 1px solid var(--bkms-line-default);
-      border-bottom-left-radius: var(--bkms-radius-field);
       content: '';
+      border-bottom: 1px solid var(--bkms-line-default);
+      border-left: 1px solid var(--bkms-line-default);
+      border-bottom-left-radius: var(--bkms-radius-field);
     }
   }
 </style>
 <style lang="postcss">
   .c-env-select-popover {
-    padding: 0 8px 8px 8px !important;
-    border-radius: var(--bkms-radius-overlay) !important;
+    padding: 0 8px 8px !important;
     border: none;
+    border-radius: var(--bkms-radius-overlay) !important;
     box-shadow: 0 2px 4px 0 var(--bkms-shadow-card) !important;
 
     .env-list-scroll {

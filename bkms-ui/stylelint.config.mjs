@@ -22,6 +22,8 @@ import stylelintConfig from '@blueking/bkui-lint/stylelint.mjs';
 const consumerRules = {
   'color-no-hex': [true, { severity: 'warning' }],
   'function-disallowed-list': [['rgb', 'rgba', 'hsl', 'hsla'], { severity: 'warning' }],
+  // BEM 的 __element / --modifier 是存量组件的既有命名，放开这两段但保留普通类名 kebab 约束
+  'selector-class-pattern': ['^([a-z][a-z0-9]*)(-[a-z0-9]+)*((__|--)[a-z0-9]+(-[a-z0-9]+)*)*$', {}],
   // 圆角多值简写（含多个 var() 令牌）无法表达语义归属、换档要逐角跟改：
   // 一律 border-radius 写整体语义 + border-start/end-*-radius 写单角覆盖
   'declaration-property-value-disallowed-list': [
@@ -89,6 +91,8 @@ if (Array.isArray(stylelintConfig)) {
 
 export default {
   ...stylelintConfig,
+  // 图标库是生成物，类名与声明顺序都由图标名决定，整体不参与业务样式规则
+  ignoreFiles: ['src/fonts/**'],
   rules: { ...stylelintConfig.rules, ...consumerRules },
   overrides: [
     ...(stylelintConfig.overrides ?? []),

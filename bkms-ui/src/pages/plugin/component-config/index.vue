@@ -73,28 +73,30 @@
 </script>
 <style lang="postcss" scoped>
   :deep(.bk-tab-header) {
-    box-shadow: 0 3px 4px 0 var(--bkms-shadow-header);
-    border-bottom: none;
     z-index: 1;
-    padding-left: 24px !important;
     padding-right: 24px !important;
+    padding-left: 24px !important;
+    border-bottom: none;
+    box-shadow: 0 3px 4px 0 var(--bkms-shadow-header);
   }
+
   :deep(.bk-tab-content) {
     display: flex;
-    min-height: 0px;
-    min-width: 0px;
+    min-width: 0;
+    min-height: 0;
+    padding: 0 !important;
     overflow: auto;
     background-color: var(--bkms-bg-page);
-    padding: 0 !important;
 
     .bk-tab-panel {
-      flex: 1;
-      min-height: 0px;
-      min-width: 0px;
       display: flex;
+      flex: 1;
       flex-direction: column;
+      min-width: 0;
+      min-height: 0;
     }
   }
+
   :deep(.bk-tab-header-nav .bk-tab-header-item) {
     padding: 0 !important;
     margin-right: 32px !important;

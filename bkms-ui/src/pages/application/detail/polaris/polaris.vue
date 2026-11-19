@@ -1039,9 +1039,10 @@
   .view-solutions-message {
     .overview {
       align-items: center !important;
+
       .describe {
-        max-width: 600px !important;
         width: 600px !important;
+        max-width: 600px !important;
       }
     }
   }

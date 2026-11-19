@@ -361,5 +361,3 @@
     { immediate: true },
   );
 </script>
-
-<style lang="postcss" scoped></style>

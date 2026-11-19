@@ -307,10 +307,12 @@
 <style lang="postcss" scoped>
   :deep(.bk-timeline) {
     padding-left: 6px;
+
     li {
       padding-bottom: 12px;
     }
   }
+
   :deep(.bk-timeline-section) {
     margin-left: 4px;
     overflow: hidden;

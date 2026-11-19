@@ -145,9 +145,9 @@
   }
 
   :deep(.bk-dialog-footer) {
-    border: none;
-    background-color: unset;
     padding-top: 0;
     padding-bottom: 24px;
+    background-color: unset;
+    border: none;
   }
 </style>

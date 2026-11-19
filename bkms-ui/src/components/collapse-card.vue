@@ -63,16 +63,18 @@
 
 <style lang="postcss" scoped>
   .collapse-card {
+    padding-bottom: 0;
+
     & :deep(.bk-card-head) {
-      margin: 0 16px;
-      padding: unset;
       width: calc(100% - 32px);
-      border-color: var(--bkms-line-default);
+      padding: unset;
+      margin: 0 16px;
       cursor: auto;
+      border-color: var(--bkms-line-default);
     }
+
     & :deep(.bk-card-body) {
       padding: 12px 16px;
     }
-    padding-bottom: 0px;
   }
 </style>

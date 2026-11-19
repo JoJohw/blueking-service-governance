@@ -215,6 +215,7 @@
     width: 220px !important;
     height: 100px !important;
   }
+
   :deep(.bk-exception-part .bk-exception-description) {
     width: 100% !important;
   }

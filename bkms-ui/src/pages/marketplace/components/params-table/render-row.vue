@@ -265,45 +265,46 @@
 <style lang="postcss" scoped>
   :deep(.description-textarea) {
     &.bk-textarea {
-      min-height: 32px;
-      transition: all 0.3s ease;
       position: absolute;
       top: 0;
       left: 0;
+      min-height: 32px;
       border: 1px solid transparent;
-      &.is-focused {
-        z-index: 9999;
-        height: auto;
-        box-shadow: 0px 0px 3px 0px var(--bkms-brand-4);
-
-        textarea {
-          overflow: unset;
-          text-overflow: unset;
-          white-space: unset;
-          max-height: 300px;
-          width: 100%;
-        }
-      }
-
-      &:hover {
-        border: 1px solid var(--bkms-brand-4);
-        background-color: var(--bkms-neutral-8);
-
-        textarea {
-          background-color: var(--bkms-neutral-8);
-        }
-      }
+      transition: all 0.3s ease;
 
       textarea {
-        cursor: pointer;
-        min-height: 32px !important;
-        height: 42px;
         width: calc(100% - 16px);
+        height: 42px;
+        min-height: 32px !important;
         padding: 12px 16px !important;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        cursor: pointer;
         scrollbar-width: none;
+      }
+
+      &.is-focused {
+        z-index: 9999;
+        height: auto;
+        box-shadow: 0 0 3px 0 var(--bkms-brand-4);
+
+        textarea {
+          width: 100%;
+          max-height: 300px;
+          overflow: unset;
+          text-overflow: unset;
+          white-space: unset;
+        }
+      }
+
+      &:hover {
+        background-color: var(--bkms-neutral-8);
+        border: 1px solid var(--bkms-brand-4);
+
+        textarea {
+          background-color: var(--bkms-neutral-8);
+        }
       }
     }
   }

@@ -144,8 +144,8 @@
 <style scoped>
   .card-grid {
     display: grid;
-    gap: 16px;
-    grid-auto-rows: max-content;
     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    grid-auto-rows: max-content;
+    gap: 16px;
   }
 </style>

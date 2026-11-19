@@ -846,8 +846,8 @@
   }
 
   .section-modified-label {
-    border-left: 3px solid var(--bkms-warning-2);
     padding-left: 6px;
+    border-left: 3px solid var(--bkms-warning-2);
   }
 
   :deep(.bk-form-error) {

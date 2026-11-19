@@ -63,6 +63,7 @@
 
 <style lang="postcss" scoped>
   .label {
+    /* stylelint-disable-next-line value-keyword-case -- v-bind 参数是 JS 变量，大小写敏感 */
     font-size: v-bind(fontSize);
   }
 </style>

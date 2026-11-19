@@ -152,6 +152,7 @@
   :deep(.bk-dialog-title) {
     text-align: center !important;
   }
+
   :deep(.bk-dialog-footer) {
     padding-top: 0;
     padding-bottom: 16px;

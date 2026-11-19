@@ -528,10 +528,12 @@
       width: 440px;
       height: 200px;
     }
+
     .bk-exception-title {
       color: var(--bkms-text-body);
     }
   }
+
   .square-radio-button {
     :deep(.bk-radio-button-label) {
       padding: 0 5px;

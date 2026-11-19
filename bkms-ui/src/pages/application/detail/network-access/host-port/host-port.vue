@@ -622,8 +622,8 @@
   }
 
   .host-port-scope {
-    width: var(--host-port-scope-width);
     flex-shrink: 0;
+    width: var(--host-port-scope-width);
     border-left: 1px solid var(--host-port-border);
   }
 
@@ -646,16 +646,16 @@
 
   /* 用 span 模拟 Tag 外观，避免深层覆盖 bk-tag 内部结构 */
   .host-port-env-tag {
+    box-sizing: border-box;
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
-    box-sizing: border-box;
     max-width: none;
     padding: 0 8px;
     overflow: visible;
-    color: var(--bkms-neutral-2);
     font-size: 12px;
     line-height: 22px;
+    color: var(--bkms-neutral-2);
     white-space: nowrap;
     background: var(--bkms-neutral-6);
     border-radius: var(--bkms-radius-tag);

@@ -53,8 +53,10 @@
     height: calc(100% - 52px) !important;
     overflow: hidden !important;
     scrollbar-gutter: auto !important;
+
     > div {
       height: 100%;
+
       .bk-sideslider-content {
         height: 100%;
       }

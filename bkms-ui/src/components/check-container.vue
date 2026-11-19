@@ -57,14 +57,15 @@
     right: 0;
     width: 0;
     height: 0;
+    border-color: transparent var(--bkms-brand-2) transparent transparent;
     border-style: solid;
     border-width: 0 42px 42px 0;
-    border-color: transparent var(--bkms-brand-2) transparent transparent;
+
     .nc-check-small {
       position: absolute;
-      color: var(--bkms-text-inverse);
       top: 0;
       right: -44px;
+      color: var(--bkms-text-inverse);
     }
   }
 </style>

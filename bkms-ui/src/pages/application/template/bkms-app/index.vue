@@ -59,8 +59,8 @@
           <div
             class="pb-[20px]"
             style="
-              padding-left: calc(clamp(24px, calc((100vw - 910px) / 2), 245px) + 135px);
               padding-right: clamp(24px, calc((100vw - 910px) / 2), 245px);
+              padding-left: calc(clamp(24px, calc((100vw - 910px) / 2), 245px) + 135px);
             "
           >
             <div class="flex items-center rounded-bkms-base bkms-bg-page px-[16px] py-[12px]">

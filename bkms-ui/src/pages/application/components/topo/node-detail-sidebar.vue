@@ -293,20 +293,24 @@
     padding: 0 24px;
     background-color: var(--bkms-bg-card);
   }
+
   :deep(.bk-modal-content) {
     overflow: hidden !important;
     scrollbar-gutter: auto !important;
   }
+
   :deep(.bk-tab-header-nav .bk-tab-header-item) {
     padding: 0 !important;
     margin-right: 24px !important;
     font-size: 14px;
   }
+
   :deep(.bk-sideslider-content) {
     height: calc(100vh - 53px);
   }
+
   :deep(.bk-tab-content) {
-    padding: 0 !important;
     height: calc(100% - 42px);
+    padding: 0 !important;
   }
 </style>

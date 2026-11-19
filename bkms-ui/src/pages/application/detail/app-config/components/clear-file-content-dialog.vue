@@ -146,9 +146,9 @@
     }
 
     &.is-active {
-      border-color: var(--bkms-brand-2);
-      background: var(--bkms-neutral-7);
       color: var(--bkms-brand-2) !important;
+      background: var(--bkms-neutral-7);
+      border-color: var(--bkms-brand-2);
 
       :deep(.bk-radio-label),
       :deep(.bk-radio-label *) {
@@ -182,9 +182,9 @@
   }
 
   :deep(.bk-dialog-footer) {
-    border: none;
-    background-color: unset;
-    padding-bottom: 24px;
     padding-top: 0;
+    padding-bottom: 24px;
+    background-color: unset;
+    border: none;
   }
 </style>

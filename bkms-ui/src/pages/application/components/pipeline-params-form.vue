@@ -151,7 +151,7 @@
   });
 </script>
 <style lang="postcss" scoped>
-  :deep(.bk-form-item.is-required .bk-form-label:after) {
+  :deep(.bk-form-item.is-required .bk-form-label::after) {
     position: relative;
     display: inline-block;
   }

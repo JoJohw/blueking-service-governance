@@ -587,8 +587,8 @@
 
   :deep(.field-diff-highlight) {
     .bk-form-label {
-      border-left: 3px solid var(--bkms-warning-2) !important;
       padding-left: 6px !important;
+      border-left: 3px solid var(--bkms-warning-2) !important;
     }
   }
 </style>

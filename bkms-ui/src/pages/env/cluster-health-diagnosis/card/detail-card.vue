@@ -162,7 +162,7 @@
 <style lang="postcss" scoped>
   :deep(.markdown-body) {
     ol {
-      padding-left: 0px;
+      padding-left: 0;
     }
   }
 </style>

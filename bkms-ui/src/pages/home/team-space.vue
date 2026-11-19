@@ -539,24 +539,26 @@
 
   :deep(.custom-form-item) {
     .bk-form-label {
-      margin-bottom: 0px;
+      margin-bottom: 0;
     }
+
     .bk-form-content {
       .bk-form-error {
-        margin-left: 94px;
         margin-top: 6px;
+        margin-left: 94px;
       }
     }
   }
 
   :deep(.form-item-has-tips) {
     .bk-form-label {
-      margin-bottom: 0px;
+      margin-bottom: 0;
     }
+
     .bk-form-content {
       .bk-form-error {
-        margin-left: 94px;
         margin-top: 26px;
+        margin-left: 94px;
       }
     }
   }

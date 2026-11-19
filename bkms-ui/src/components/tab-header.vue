@@ -95,20 +95,20 @@
 
 <style lang="postcss" scoped>
   .tab-header-container {
-    box-shadow: 0 3px 4px 0 var(--bkms-shadow-header);
     border-bottom: none;
+    box-shadow: 0 3px 4px 0 var(--bkms-shadow-header);
 
     :deep(.bk-tab-header) {
-      padding-left: 0 !important;
       padding-right: 0 !important;
+      padding-left: 0 !important;
       border: none !important;
     }
 
     :deep(.bk-tab-header-nav .bk-tab-header-item) {
       padding: 0 !important;
       margin-right: 32px !important;
-      line-height: 36px !important;
       font-size: 14px;
+      line-height: 36px !important;
     }
 
     :deep(.bk-tab-content) {

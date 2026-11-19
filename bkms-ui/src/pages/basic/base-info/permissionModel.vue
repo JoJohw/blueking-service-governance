@@ -233,6 +233,7 @@
       border-bottom: 2px solid var(--bkms-line-active);
     }
   }
+
   .col--current {
     --vxe-ui-table-border-color: var(--bkms-line-active);
   }

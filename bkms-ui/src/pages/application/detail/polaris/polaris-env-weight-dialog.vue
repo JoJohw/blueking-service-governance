@@ -299,13 +299,13 @@
 
   .weight-tip-dot {
     display: inline-block;
+    flex-shrink: 0;
     width: 4px;
     height: 4px;
     margin-top: 8px;
     margin-right: 8px;
-    flex-shrink: 0;
+    background-color: currentcolor;
     border-radius: var(--bkms-radius-full);
-    background-color: currentColor;
   }
 
   :deep(.weight-input-error) {

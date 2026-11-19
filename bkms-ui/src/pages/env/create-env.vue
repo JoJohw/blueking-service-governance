@@ -484,8 +484,8 @@
     }
 
     &.is-active {
-      border-color: var(--bkms-line-active);
       background: var(--bkms-bg-active);
+      border-color: var(--bkms-line-active);
     }
 
     :deep(.bk-radio) {

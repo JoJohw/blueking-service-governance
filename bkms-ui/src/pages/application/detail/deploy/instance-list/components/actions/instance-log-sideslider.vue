@@ -141,13 +141,16 @@
     height: calc(100% - 52px) !important;
     overflow: hidden !important;
     scrollbar-gutter: auto !important;
+
     > div {
       height: 100%;
+
       .bk-sideslider-content {
         height: 100%;
       }
     }
   }
+
   .instance-log-sideslider :deep(.bk-sideslider-header) {
     border-bottom: none;
   }

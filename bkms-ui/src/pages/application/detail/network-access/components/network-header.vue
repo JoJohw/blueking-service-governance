@@ -72,9 +72,11 @@
 <style lang="postcss" scoped>
   .network-header-container {
     box-shadow: 0 3px 4px 0 var(--bkms-shadow-header);
+
     :deep(.bk-tab-header) {
       border: none !important;
     }
+
     :deep(.bk-tab-content) {
       display: none;
     }

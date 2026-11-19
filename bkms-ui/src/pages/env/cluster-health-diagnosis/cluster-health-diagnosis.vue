@@ -836,11 +836,11 @@
     margin-top: 52px;
   }
 
-  @media (min-width: 1600px) {
+  @media (width >= 1600px) {
     .responsive-container {
       max-width: 1600px;
-      margin-left: auto;
       margin-right: auto;
+      margin-left: auto;
     }
   }
 </style>

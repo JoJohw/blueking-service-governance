@@ -343,6 +343,8 @@
   }
 
   .target-unit :deep(.bk-select) {
-    border-radius: 0 2px 2px 0;
+    border-radius: var(--bkms-radius-field);
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
   }
 </style>

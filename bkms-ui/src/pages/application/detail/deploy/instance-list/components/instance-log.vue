@@ -106,6 +106,7 @@
   :deep(span:has(> i.task-log-auto-refresh)) {
     display: none !important;
   }
+
   /* :deep(.bk-task-log-scroll) {
     white-space: pre !important;
   } */

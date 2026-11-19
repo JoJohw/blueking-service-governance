@@ -202,8 +202,8 @@ imagePullSecret:
   :deep(.bk-tab-panel) {
     display: flex;
     flex: 1;
-    min-height: 0;
     min-width: 0;
+    min-height: 0;
   }
 
   :deep(.image-secret-tip .bk-alert-wraper) {
@@ -211,6 +211,7 @@ imagePullSecret:
     width: 100%;
     min-width: 0;
     padding: 10px 16px 16px 10px;
+
     .bk-alert-icon-info {
       margin-top: 4px;
     }

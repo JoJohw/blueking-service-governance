@@ -80,9 +80,9 @@
 <style lang="postcss" scoped>
   /* 子页面将 TabHeader 放入 header 后，隐藏默认标题并撑开高度 */
   :deep(.container-header:has(.tab-header-container)) {
+    align-items: stretch !important;
     height: auto !important;
     padding: 0 !important;
-    align-items: stretch !important;
   }
 
   :deep(.container-header:has(.tab-header-container) .space-page-header-title) {
@@ -90,7 +90,7 @@
   }
 
   :deep(.container-header .tab-header-container) {
-    box-shadow: none;
     width: 100%;
+    box-shadow: none;
   }
 </style>

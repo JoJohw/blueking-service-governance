@@ -60,6 +60,7 @@
 </script>
 
 <style lang="postcss" scoped>
+  /* stylelint-disable-next-line selector-class-pattern */
   :deep(.monaco-diff-editor) .diffOverview {
     background-color: var(--bkms-neutral-1);
   }

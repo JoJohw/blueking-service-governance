@@ -261,14 +261,14 @@
   }
 
   :deep(.bkms-content-title) {
-    background-color: var(--bkms-bg-title);
     height: 42px;
+    background-color: var(--bkms-bg-title);
   }
 
   /* 表头：背景白色 + 默认文字颜色 */
   :deep(.dev-mode-table .vxe-header--column) {
-    background-color: var(--bkms-bg-card);
     color: var(--bkms-text-body);
+    background-color: var(--bkms-bg-card);
   }
 
   /* 表格正文：默认文字颜色 */

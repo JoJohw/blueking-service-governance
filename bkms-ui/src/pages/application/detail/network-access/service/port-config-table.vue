@@ -363,6 +363,7 @@
     :deep(.bk-form-error-tips) {
       z-index: 999;
     }
+
     .port-item :deep(.bk-form-error-tips) {
       right: 28px;
     }

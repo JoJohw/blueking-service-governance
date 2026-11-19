@@ -496,8 +496,8 @@
     gap: 8px;
 
     .icon-loading::before {
-      content: '';
       display: none;
+      content: '';
     }
 
     .bk-step-title::after {
@@ -508,20 +508,16 @@
       position: relative;
     }
 
-    &.done:not(.current) .bk-step-number {
-      border-color: #cbf0da;
-      background-color: #cbf0da;
-      color: #2caf5e;
-    }
-
-    &:not(.current):not(.done) .bk-step-number {
-      border-color: #eaebf0;
-      background-color: #eaebf0;
+    &:not(.current, .done) .bk-step-number {
       color: #4d4f56;
+      background-color: #eaebf0;
+      border-color: #eaebf0;
     }
 
-    &.done .bk-step-number::after {
-      background-image: none;
+    &.done:not(.current) .bk-step-number {
+      color: #2caf5e;
+      background-color: #cbf0da;
+      border-color: #cbf0da;
     }
 
     .bk-step-number::after {
@@ -530,8 +526,12 @@
       left: 30px;
       width: 4000px;
       height: 1px;
-      background-color: #dcdee5;
       content: '';
+      background-color: #dcdee5;
+    }
+
+    &.done .bk-step-number::after {
+      background-image: none;
     }
 
     /* 最后一个步骤右侧不再延伸连接线 */

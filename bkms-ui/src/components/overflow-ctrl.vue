@@ -162,10 +162,10 @@
     justify-content: center;
     width: 16px;
     height: 32px;
-    cursor: pointer;
     color: var(--bkms-text-secondary);
-    transition: color 0.2s;
+    cursor: pointer;
     background-color: var(--bkms-neutral-6);
+    transition: color 0.2s;
 
     &:hover {
       color: var(--bkms-text-brand);

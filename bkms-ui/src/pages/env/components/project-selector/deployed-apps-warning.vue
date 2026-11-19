@@ -79,6 +79,7 @@
       margin-top: 30px;
       margin-bottom: 18px;
     }
+
     .bk-modal-footer {
       display: none;
     }

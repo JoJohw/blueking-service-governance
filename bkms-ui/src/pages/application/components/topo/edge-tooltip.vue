@@ -76,6 +76,7 @@
   .edge-tooltip-fade-leave-active {
     transition: opacity 0.15s ease;
   }
+
   .edge-tooltip-fade-enter-from,
   .edge-tooltip-fade-leave-to {
     opacity: 0;
