@@ -18,24 +18,24 @@
  */
 
 /**
- * theme-check-vendor —— 第三方覆写漂移校验（独立脚本，不进 lint 主链路）
+ * check-lib —— 第三方覆写漂移校验（独立脚本，不进 lint 主链路）
  *
  * 第三方包小版本升级可能换选择器或改变量名，覆写会静默失效。本脚本校验三类真源：
- *   1. vendor 里出现的 --vxe-ui-* 仍在 @blueking/table/vue3/vue3.css 中定义；
- *   2. vendor 引用的 --bkms-viz-* 仍在 tokens/viz.css 中定义；
+ *   1. 第三方覆写里出现的 --vxe-ui-* 仍在 @blueking/table/vue3/vue3.css 中定义；
+ *   2. 第三方覆写引用的 --bkms-viz-* 仍在 tokens/viz.css 中定义；
  *   3. 每个覆写文件登记的关键选择器仍同时存在于覆写与所属库的 CSS 中。
- * 用法：node scripts/theme-codemod/scripts/theme-check-vendor.mjs
+ * 用法：node scripts/theme-codemod/scripts/check-lib.mjs
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const projectRoot = path.resolve(fileURLToPath(new URL('../../..', import.meta.url)));
-const VENDOR_DIR = path.join(projectRoot, 'src/styles/theme/patches/vendor');
+const LIB_DIR = path.join(projectRoot, 'src/styles/theme/patches/lib');
 const VXE_CSS = 'node_modules/@blueking/table/vue3/vue3.css';
 const VIZ_CSS = 'src/styles/theme/tokens/viz.css';
 
-/** 覆写文件（相对 patches/vendor/ 的路径）→ 所属库 CSS，新增覆写文件必须在这里登记 */
+/** 覆写文件（相对 patches/lib/ 的路径）→ 所属库 CSS，新增覆写文件必须在这里登记 */
 const LIB_CSS = {
   '@blueking/bk-table.css': VXE_CSS,
   '@blueking/date-picker.css': 'node_modules/@blueking/date-picker/vue3/vue3.css',
@@ -72,8 +72,8 @@ const isDeclared = (source, name) => new RegExp(`${name}\\s*:`).test(source);
 
 const problems = [];
 
-if (!fs.existsSync(VENDOR_DIR)) {
-  console.error(`✗ [theme-check-vendor] 覆写目录不存在 ${VENDOR_DIR}`);
+if (!fs.existsSync(LIB_DIR)) {
+  console.error(`✗ [check-lib] 覆写目录不存在 ${LIB_DIR}`);
   process.exit(1);
 }
 
@@ -95,10 +95,10 @@ function collectOverrideFiles(dir, base = dir) {
   return out.sort();
 }
 
-const files = collectOverrideFiles(VENDOR_DIR);
+const files = collectOverrideFiles(LIB_DIR);
 
 for (const file of files) {
-  const source = fs.readFileSync(path.join(VENDOR_DIR, file), 'utf8');
+  const source = fs.readFileSync(path.join(LIB_DIR, file), 'utf8');
 
   for (const name of new Set([...source.matchAll(/--vxe-ui-[\w-]+/g)].map(m => m[0]))) {
     if (vxeSource && !isDeclared(vxeSource, name)) problems.push(`${file}: ${name} 已不在 ${VXE_CSS}`);
@@ -125,10 +125,10 @@ for (const file of files) {
 }
 
 if (problems.length) {
-  console.error(`✗ [theme-check-vendor] ${problems.length} 处漂移`);
+  console.error(`✗ [check-lib] ${problems.length} 处漂移`);
   for (const item of problems) console.error(`  - ${item}`);
-  console.error('\n第三方包升级后请重跑本命令；缺失的变量名/选择器需同步改 patches/vendor/ 下对应覆写文件');
+  console.error('\n第三方包升级后请重跑本命令；缺失的变量名/选择器需同步改 patches/lib/ 下对应覆写文件');
   process.exit(1);
 }
 
-console.log(`✓ [theme-check-vendor] ${files.length} 个覆写文件的变量与关键选择器在当前依赖版本中均存在`);
+console.log(`✓ [check-lib] ${files.length} 个覆写文件的变量与关键选择器在当前依赖版本中均存在`);

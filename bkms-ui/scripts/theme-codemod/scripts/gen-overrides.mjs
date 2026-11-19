@@ -92,7 +92,7 @@ const INK_SEMANTIC_BY_HEX = {
  * 映射索引的唯一来源：现有产物。逐条解析 `属性: 含 var 的值 + 行尾原值注释`，
  * 值里的 var 与原值注释里的 hex 按出现顺序成对（多色渐变也能对上）。
  * 生成器整体覆盖写之前先读一遍旧文件，人工拍板的改动因此可继承。
- * 扫描目录覆盖 bkui-theme 与 vendor：vendor 产物同样整包重写，不给它喂回台账就永远改不动。
+ * 扫描目录覆盖 bkui-theme 与 lib：lib 产物同样整包重写，不给它喂回台账就永远改不动。
  */
 const PATCH_LEDGER = new Map();
 function collectPatchCssFiles(dir, out = []) {
@@ -576,16 +576,16 @@ for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].
   }
 }
 
-// ---------- 3b. vendor 包整包覆写 ----------
+// ---------- 3b. 第三方包整包覆写 ----------
 /**
  * 第三方包整包生成：这类库的选择器没有 .bk- 前缀族可供分组件，整包归属一个文件；
  * 与 bkui-theme 共用同一套 hex→令牌映射与级联保护，避免手写几十条规则后静默失效。
- * 目录约定：@blueking/* 的包输出到 patches/vendor/@blueking/，其余第三方库与 vendor/index.css 平级。
+ * 目录约定：@blueking/* 的包输出到 patches/lib/@blueking/，其余第三方库与 lib/index.css 平级。
  * 清理：本域与手写覆写（bk-table / vxe / monitor / notice / task-log / user-selector / highlight / markdown）混放，
- * 不能像 bkui-theme 那样整目录清理；从 VENDOR_SOURCES 摘掉一个库后，须手工删除对应产物文件及 index.css 里的 import。
+ * 不能像 bkui-theme 那样整目录清理；从 LIB_SOURCES 摘掉一个库后，须手工删除对应产物文件及 index.css 里的 import。
  */
-const VENDOR_DIR = path.join(ROOT, 'src/styles/theme/patches/vendor');
-const VENDOR_SOURCES = [
+const LIB_DIR = path.join(ROOT, 'src/styles/theme/patches/lib');
+const LIB_SOURCES = [
   {
     file: 'node_modules/@blueking/date-picker/vue3/vue3.css',
     out: '@blueking/date-picker.css',
@@ -598,12 +598,12 @@ const VENDOR_SOURCES = [
   },
 ];
 
-/** vendor 专属豁免：ediatable 打包了 tippy 提示层（.tippy-*），那是第三方 tooltip 的全局主题，
+/** lib 专属豁免：ediatable 打包了 tippy 提示层（.tippy-*），那是第三方 tooltip 的全局主题，
  * 非组件设计面；在本作用域里覆写会波及全站 tooltip，故跳过 */
-const VENDOR_SKIP_SELECTOR_RE = /\btippy-/;
-const vendorStats = [];
+const LIB_SKIP_SELECTOR_RE = /\btippy-/;
+const libStats = [];
 
-for (const source of VENDOR_SOURCES) {
+for (const source of LIB_SOURCES) {
   const rawRules = [];
   // 库内注释（如 stylelint-disable 指令）混在选择器与声明之间会污染产物，先整体剥掉
   const sourceCss = fs.readFileSync(path.join(ROOT, source.file), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
@@ -611,7 +611,7 @@ for (const source of VENDOR_SOURCES) {
   const bucket = new Map();
   let pendingHexes = 0;
   for (const rule of rawRules) {
-    if (SKIP_SELECTOR_RE.test(rule.selector) || VENDOR_SKIP_SELECTOR_RE.test(rule.selector)) continue;
+    if (SKIP_SELECTOR_RE.test(rule.selector) || LIB_SKIP_SELECTOR_RE.test(rule.selector)) continue;
     const decls = [];
     let hasHexDecl = false;
     for (const piece of rule.body.split(';')) {
@@ -641,7 +641,7 @@ for (const source of VENDOR_SOURCES) {
   const lines = [
     ...LICENSE_LINES,
     '',
-    `/* ${source.name} 覆写 — 由 gen-overrides.mjs 生成（VENDOR_SOURCES），重跑会整体覆盖本文件 */`,
+    `/* ${source.name} 覆写 — 由 gen-overrides.mjs 生成（LIB_SOURCES），重跑会整体覆盖本文件 */`,
     '',
     '/* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */',
     '',
@@ -659,10 +659,10 @@ for (const source of VENDOR_SOURCES) {
     rules++;
   }
 
-  const outPath = path.join(VENDOR_DIR, source.out);
+  const outPath = path.join(LIB_DIR, source.out);
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, `${lines.join('\n').trimEnd()}\n`);
-  vendorStats.push({ file: source.out, rules, pendingHexes });
+  libStats.push({ file: source.out, rules, pendingHexes });
 }
 
 // 域内聚合入口：每个 patches 子目录一个 index.css，theme/index.css 只引各域这一个文件
@@ -693,13 +693,13 @@ const summary = [
   `- 字面量段（dist/style.css）：${literalRules} 条 / ${literalDecls} 声明（并入 bkui-theme/ 组件文件，${perComponent.filter(p => p.litRules > 0).length} 个组件含字面量段；未归属 ${literalUnassigned} 条不计入台账）`,
   `- 未归属规则（选择器无白名单组件前缀）：${unassigned.length} 条`,
   `- 未收录 hex（既对不上既有映射、也不在令牌值）：${unknownHexes.size} 种`,
-  `- vendor 整包覆写：${vendorStats.length} 个包 / ${vendorStats.reduce((n, v) => n + v.rules, 0)} 条规则（待拍板 hex ${vendorStats.reduce((n, v) => n + v.pendingHexes, 0)} 处）`,
+  `- lib 整包覆写：${libStats.length} 个包 / ${libStats.reduce((n, v) => n + v.rules, 0)} 条规则（待拍板 hex ${libStats.reduce((n, v) => n + v.pendingHexes, 0)} 处）`,
   '',
-  '## vendor 整包产出（VENDOR_SOURCES）',
+  '## lib 整包产出（LIB_SOURCES）',
   '',
   '| 文件 | 规则数 | 待拍板 hex |',
   '| --- | --- | --- |',
-  ...vendorStats.map(v => `| patches/vendor/${v.file} | ${v.rules} | ${v.pendingHexes} |`),
+  ...libStats.map(v => `| patches/lib/${v.file} | ${v.rules} | ${v.pendingHexes} |`),
   '',
   '## 按组件产出',
   '',

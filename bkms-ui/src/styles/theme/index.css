@@ -23,5 +23,5 @@
 @import './tokens/radius.css';
 @import './themes/index.css';
 @import './patches/bkui-theme/index.css';
-@import './patches/vendor/index.css';
+@import './patches/lib/index.css';
 @import './patches/ua-fill/index.css';

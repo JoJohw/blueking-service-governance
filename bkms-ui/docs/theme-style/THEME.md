@@ -27,7 +27,7 @@ tokens/color.css         原子色阶 + 语义层     唯一写色值处，:root
 tokens/radius.css        圆角语义档
 variables.css            变量桥接              组件库 :root 变量重指向 --bkms-*（bkui.ts 加载）
 patches/bkui-theme/      class 覆写层（主角）   组件库写死 hex 的选择器级覆盖，生成器管理
-patches/vendor/          第三方库覆写            见 THIRD-PARTY-THEME.md
+patches/lib/          第三方库覆写            见 THIRD-PARTY-THEME.md
 patches/ua-fill/         浏览器默认底色兜底      手写
 src/styles/overrides.css 手写形态覆写            生成器不触碰
 themes/                  第二主题扩展位          [data-theme] 时启用
@@ -39,11 +39,11 @@ themes/                  第二主题扩展位          [data-theme] 时启用
 
 ```
 src/styles/theme/
-├── index.css          # 静态清单：tokens → themes → patches/bkui-theme → patches/vendor → patches/ua-fill
+├── index.css          # 静态清单：tokens → themes → patches/bkui-theme → patches/lib → patches/ua-fill
 ├── variables.css      # 变量桥接聚合（bkui.ts 加载）
 ├── tokens/            # color.css / radius.css / viz.css
 ├── themes/index.css   # 第二主题占位
-└── patches/           # bkui-theme(43) / vendor(12) / ua-fill(2)
+└── patches/           # bkui-theme(43) / lib(12) / ua-fill(2)
 ```
 
 1. `main.ts` 末尾 `import '~/styles/theme/index.css'`——`--bkms-*` 最早有定义。
@@ -61,9 +61,9 @@ src/styles/theme/
 
 ## 六、质量基建
 
-- **stylelint**：`patches/**`（bkui-theme / vendor / ua-fill 三域）豁免形态类规则（`no-descending-specificity` / `no-duplicate-selectors` / `selector-class-pattern` / `selector-pseudo-element-colon-notation` / `selector-attribute-quotes` / `order/properties-order`）；`overrides.css` 是手写层，只豁免同一批形态类规则，圆角多值（`declaration-property-value-disallowed-list`）照常生效；`color-no-hex` 全局启用排在存量清零之后。
+- **stylelint**：`patches/**`（bkui-theme / lib / ua-fill 三域）豁免形态类规则（`no-descending-specificity` / `no-duplicate-selectors` / `selector-class-pattern` / `selector-pseudo-element-colon-notation` / `selector-attribute-quotes` / `order/properties-order`）；`overrides.css` 是手写层，只豁免同一批形态类规则，圆角多值（`declaration-property-value-disallowed-list`）照常生效；`color-no-hex` 全局启用排在存量清零之后。
 - **漂移自检**：`check-overrides.mjs` 校验每条选择器仍存在于 bkui dist css 且原 hex 仍在，库升级后必跑。解析前需先剥文件头注释（首条规则 prelude 混有注释）。
-- **工具链**：`pnpm theme:report`（lint 报告 + viz 待补档）、`node scripts/theme-codemod/scripts/theme-check-vendor.mjs`（第三方包变量/选择器漂移）、`pnpm theme:designer`（palette 预览）。
+- **工具链**：`pnpm theme:report`（lint 报告 + viz 待补档）、`node scripts/theme-codemod/scripts/check-lib.mjs`（第三方包变量/选择器漂移）、`pnpm theme:designer`（palette 预览）。
 - **生成器（单源）**：`gen-overrides.mjs` 抽取 bkui dist 中「prop 非 `--` 且 value 含 hex」的 declaration；映射真源是**既往产物**——重跑前扫 `patches/bkui-theme/*.css` 的「令牌 + 行尾原值注释」建 hex→token 索引，未收录值按原值占位进 `reports/gen-summary.md`。每次重跑清掉 `patches/bkui-theme/` 下非白名单产物（`variables.css`、`radius.css` 保留），不删目录。`gen-radius-overrides.mjs` 按 `config/radius-components.json` 白名单从 `dist/style.css` 复刻 `border-radius` 规则生成 `radius.css`（多值统一成整体语义 + 逻辑角清零，`!important` 原样保留），组件族给默认 token，`rules[].match` 按选择器正则对后代换档（椭圆角标 `full`、1px 细条 `indicator`、标签 `tag`、浮层 `overlay`）；每次重跑同步产出 `reports/radius-summary.md` 台账（原值 → token），产物同样受 `check-overrides.mjs` 校验；生成器共享的事实性白名单在 `config/overrides.mjs`。
 - **纪律**：进 `patches/` 前先试 bridge；patches 内禁止裸 hex（原值只进注释）。
 
@@ -104,11 +104,11 @@ src/styles/theme/
 | `tokens/radius.css` | 8 个档位（尺度 6 + 形状 2）+ 11 个语义档（`--bkms-radius-*`） |
 | `tokens/viz.css` | 33 个令牌，独立实色，见 `THIRD-PARTY-THEME.md` |
 | `patches/bkui-theme/` | 43 个 CSS（41 组件域 + `index.css` + `variables.css`） |
-| `patches/vendor/` | 12 个 CSS（10 覆写 + 2 `index.css`），9 个库 |
+| `patches/lib/` | 12 个 CSS（10 覆写 + 2 `index.css`），9 个库 |
 | `patches/ua-fill/` | 2 个 CSS（`form-control.css` + `index.css`） |
 | 业务层 hex 残留 | 6 位 hex 32 处（另 1 处在 `custom-image-push-guide.vue` 注释里；历史基线约 2000 处 / 350+ 文件） |
 | theme-lint | 7 条规则 / 3 个规则模块（颜色 / 圆角 / shared） |
-| 命令 | `theme:report`、`node scripts/theme-codemod/scripts/theme-check-vendor.mjs`、`theme:designer` |
+| 命令 | `theme:report`、`node scripts/theme-codemod/scripts/check-lib.mjs`、`theme:designer` |
 | 全量 lint 基线 | 仓库存量报错未清零（非本轮引入）；改动文件零新增 |
 
 ## 十一、关键决策档案
@@ -130,7 +130,7 @@ src/styles/theme/
 | canvas 不解析 `var()` | `597f26b5` minimap `fill` 改 `var()` → `f8e6b7da` 改回实色 | 字典经 var 链解析后必须实色，桥接层负责解析与兜底 |
 | `import.meta.url` 指向临时目录 | `aa9f621a` 引入 `resolveThemeDir()` | cwd 优先 + 存在性校验 |
 | `.ts` 颜色字符串不在 codemod 台账 | 口径 65 处 `<script>`、明确不含 `.ts` | 记为已知盲区，不假装已全量覆盖 |
-| 根 `.gitignore` 的 `*vendor*` | 曾致 `scripts/theme-codemod/scripts/theme-check-vendor.mjs` 与 `patches/vendor/` 被忽略 | 新增含 vendor 字样的路径必须 `git status -uall` 复核 |
+| 根 `.gitignore` 的 `*vendor*` | 曾致覆写目录与校验脚本被忽略；两者已改名 `lib` / `check-lib.mjs` 规避 | 新增含 vendor 字样的路径必须 `git status -uall` 复核 |
 | markdown 自定义属性 camelCase | `--fgColor-*` 触发 `custom-property-pattern` | 第三方变量名同名重指向，用定点 `stylelint-disable` |
 
 ## 十三、下一阶段待办

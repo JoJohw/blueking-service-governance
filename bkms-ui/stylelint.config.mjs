@@ -55,7 +55,7 @@ const patchesOverrides = [
   {
     files: [
       'src/styles/theme/patches/bkui-theme/**/*.css',
-      'src/styles/theme/patches/vendor/**/*.css',
+      'src/styles/theme/patches/lib/**/*.css',
       'src/styles/theme/patches/ua-fill/**/*.css',
     ],
     rules: {
