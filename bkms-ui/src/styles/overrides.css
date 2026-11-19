@@ -23,6 +23,17 @@
  * 颜色归 tokens / 变量桥接，本文件只写形态与尺寸；刻意保留的原色值见各条注释。
  */
 
+/* ══════════ bkui：主按钮阴影 ══════════ */
+
+.bkms-themed .bk-button.bk-button-primary:not(.is-disabled, .is-text, .is-outline) {
+  box-shadow: 0 4px 10px var(--bkms-shadow-button);
+}
+
+/* color.css 已定「按钮组不加」，按钮组内的 primary 需单独压掉 */
+.bkms-themed .bk-button-group .bk-button.bk-button-primary:not(.is-disabled, .is-text, .is-outline) {
+  box-shadow: none;
+}
+
 /* ══════════ bkui：导航壳层 ══════════ */
 
 /* bk-navigation 主内容区去掉默认内边距，间距由页面级容器自行控制 */
