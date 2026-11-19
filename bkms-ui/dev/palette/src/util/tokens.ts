@@ -18,8 +18,9 @@
 
 import colorRaw from '../../../../src/styles/theme/tokens/color.css?raw';
 import radiusRaw from '../../../../src/styles/theme/tokens/radius.css?raw';
+import vizRaw from '../../../../src/styles/theme/tokens/viz.css?raw';
 
-export type TokenKind = 'color' | 'shadow' | 'radius';
+export type TokenKind = 'color' | 'shadow' | 'radius' | 'viz';
 /** 令牌层：色阶原子 / 语义引用。由 token 文件里的 @layer 标记决定，不再靠文件名区分 */
 export type TokenLayer = 'scale' | 'semantic';
 
@@ -74,7 +75,7 @@ function splitDirectives(raw: string): { tags: Directive[]; text: string } {
 /**
  * 解析 CSS，注释约定（CSS 不识别 @tag，本工具自行解析）：
  * - 组标记块：\/**
- *     @group keep             分组名，开组（同时也是展示标题）
+ *     @group brand            分组名，开组（同时也是展示标题）
  *     @layer scale            所属层：scale（色阶原子）| semantic（语义引用），必填
  *     @note 描述文字           分组描述，可多行续写（@description 同义）
  *   *\/
@@ -89,7 +90,7 @@ function toLayer(label: string, raw: string): TokenLayer {
   throw new Error(`[palette] 分组「${label}」的 @layer 必须是 scale 或 semantic，当前为：${raw || '(缺失)'}`);
 }
 
-function parse(css: string, prefix: string): ParsedCss {
+export function parse(css: string, prefix: string, kindOverride: TokenKind | null = null): ParsedCss {
   const tokens: Token[] = [];
   const groups: Group[] = [];
   let group: Group | null = null;
@@ -154,7 +155,8 @@ function parse(css: string, prefix: string): ParsedCss {
       note,
       ref: /^var\((--[\w-]+)\)$/.exec(value)?.[1] ?? '',
       group: current.label,
-      kind: name.includes('shadow') ? 'shadow' : name.startsWith('--bkms-radius-') ? 'radius' : 'color',
+      kind:
+        kindOverride ?? (name.includes('shadow') ? 'shadow' : name.startsWith('--bkms-radius-') ? 'radius' : 'color'),
     };
     tokens.push(token);
     current.tokens.push(token);
@@ -199,6 +201,7 @@ function parse(css: string, prefix: string): ParsedCss {
 
 const colorFile = parse(colorRaw, 'ramp');
 const radiusFile = parse(radiusRaw, 'rad');
+const vizFile = parse(vizRaw, 'viz', 'viz');
 
 const colorMap = new Map(colorFile.tokens.map(token => [token.name, token.value]));
 
@@ -211,17 +214,12 @@ export function resolved(value: string, seen = new Set<string>()): string {
   return next === undefined ? value : resolved(next, seen);
 }
 
-/** keep 族名字以 6 位色值结尾（含纯数字），不能按结尾数字排，否则 144628 会被当成 step */
-const sortTokens = (tokens: Token[]): Token[] => {
-  if (tokens.every(token => /^--bkms-keep-/.test(token.name))) {
-    return [...tokens].sort((a, b) => a.name.localeCompare(b.name));
-  }
-  return [...tokens].sort((a, b) => {
+const sortTokens = (tokens: Token[]): Token[] =>
+  [...tokens].sort((a, b) => {
     const na = Number(a.name.match(/-(\d+)$/)?.[1] ?? 0);
     const nb = Number(b.name.match(/-(\d+)$/)?.[1] ?? 0);
     return na - nb;
   });
-};
 
 /** 色阶组：@layer scale 的分组，组内按数字正序（1 最深在前） */
 export const rampGroups: Group[] = colorFile.groups
@@ -233,3 +231,6 @@ export const allSemanticGroups: Group[] = colorFile.groups.filter(group => group
 
 /** 圆角维度：两个分组（档位 / 圆角语义），语义档只 var() 引用档位，故 resolved() 解析不出色值，由预览组件直接按长度渲染 */
 export const radiusGroups: Group[] = radiusFile.groups;
+
+/** 可视化字典：viz.css 的分组独立成第三视图，不并入颜色视图的色阶 / 语义二分；值是实色，resolved() 直接展示 */
+export const vizGroups: Group[] = vizFile.groups;

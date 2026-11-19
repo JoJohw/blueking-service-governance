@@ -26,9 +26,36 @@
       class="sample-board"
       :style="radiusVar"
     >
+      <!-- none：直角方框 -->
+      <div
+        v-if="sample === 'none'"
+        class="shape-none"
+      >
+        <span class="shape-none-line" />
+        <span class="shape-none-line shape-none-line-short" />
+      </div>
+
+      <!-- full：正圆与胶囊 -->
+      <div
+        v-else-if="sample === 'full'"
+        class="shape-full-row"
+      >
+        <span class="shape-circle" />
+        <span class="shape-pill">胶囊</span>
+      </div>
+
+      <!-- base：无场景归属的通用基准方框 -->
+      <div
+        v-else-if="sample === 'base'"
+        class="base-box"
+      >
+        <span class="base-line" />
+        <span class="base-line base-line-short" />
+      </div>
+
       <!-- field：输入框 + 占位文字 -->
       <p
-        v-if="sample === 'field'"
+        v-else-if="sample === 'field'"
         class="field"
       >
         <span class="field-placeholder">请输入</span>
@@ -41,17 +68,6 @@
       >
         <span class="tag">标签</span>
         <span class="tag tag-quiet">标签</span>
-      </div>
-
-      <!-- checkbox：未选 + 选中 -->
-      <div
-        v-else-if="sample === 'checkbox'"
-        class="checkbox-row"
-      >
-        <span class="checkbox" />
-        <span class="checkbox checkbox-checked">
-          <span class="checkbox-tick">✓</span>
-        </span>
       </div>
 
       <!-- scroll：细 track + 圆头 thumb -->
@@ -207,6 +223,79 @@
     width: 100%;
   }
 
+  /* shape */
+  .shape-none {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 76%;
+    padding: 16px;
+    background: var(--pal-bg-card);
+    border: 1px solid var(--pal-line);
+    border-radius: var(--sample-radius, 0);
+  }
+
+  .shape-none-line {
+    height: 6px;
+    background: var(--pal-line);
+  }
+
+  .shape-none-line-short {
+    width: 60%;
+  }
+
+  .shape-full-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .shape-circle {
+    width: 56px;
+    height: 56px;
+    background: var(--pal-bg-card);
+    border: 2px solid var(--pal-brand);
+    border-radius: var(--sample-radius, 6px);
+  }
+
+  .shape-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 28px;
+    font-size: 12px;
+    color: var(--pal-text-body);
+    background: var(--pal-bg-card);
+    border: 2px solid var(--pal-brand);
+    border-radius: var(--sample-radius, 6px);
+  }
+
+  /* base */
+  .base-box {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 76%;
+    padding: 16px;
+    background: var(--pal-bg-card);
+    border: 1px solid var(--pal-line);
+    border-radius: var(--sample-radius, 6px);
+  }
+
+  .base-line {
+    height: 6px;
+    background: var(--pal-line);
+    border-radius: 3px;
+  }
+
+  .base-line-short {
+    width: 60%;
+  }
+
   /* field */
   .field {
     box-sizing: border-box;
@@ -250,36 +339,6 @@
     color: var(--pal-text-body);
     background: var(--pal-bg-subtle);
     border-color: var(--pal-line);
-  }
-
-  /* checkbox */
-  .checkbox-row {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-  }
-
-  .checkbox {
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    background: var(--pal-bg-card);
-    border: 1px solid var(--pal-text-muted);
-    border-radius: var(--sample-radius, 3px);
-  }
-
-  .checkbox-checked {
-    background: var(--pal-brand);
-    border-color: var(--pal-brand);
-  }
-
-  .checkbox-tick {
-    font-size: 12px;
-    line-height: 1;
-    color: var(--pal-text-inverse);
   }
 
   /* scroll */
@@ -473,7 +532,7 @@
     padding: 8px 10px;
     font-size: 13px;
     color: var(--pal-text-body);
-    border-radius: var(--sample-radius, 8px);
+    border-radius: var(--sample-radius, 6px);
   }
 
   .menu-item-active {

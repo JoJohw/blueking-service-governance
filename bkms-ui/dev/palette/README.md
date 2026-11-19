@@ -1,6 +1,6 @@
 # BKMS 主题色板
 
-一个查看、检索和比对 BKMS 主题色值的小工具。色值直接解析自主题 token 源文件，点击任意色块即可复制对应的 `var()` 引用。
+一个查看、检索和比对 BKMS 主题令牌的小工具。左侧顶部的分段控件切换「颜色 / 圆角 / 可视化」三个视图，数据直接解析自主题 token 源文件，点击任意卡片即可复制对应的 `var()` 引用。
 
 功能演进见[更新记录](./CHANGELOG.md)。
 
@@ -26,8 +26,16 @@ npx vite build --config dev/palette/vite.config.ts
 
 - **色阶**：以原始色值展示，如 `--bkms-brand-2` → `#3B6EF5`。
 - **语义层**：显示 token 引用的色阶，以及解析后的 hex；阴影组也在这里——阴影是按场景命名的效果值，直接写 8 位带 alpha 色，无法由色阶派生。
-- 两侧都会出现「用途预览」（文字 / 线条 / 背景 / 阴影）：**预览形态由 token 类别决定，与挂在哪个分区无关**——没有用途语境的原子色（品牌色、中性色、keep 级）显示纯色块。
+- 两侧都会出现「用途预览」（文字 / 线条 / 背景 / 阴影）：**预览形态由 token 类别决定，与挂在哪个分区无关**——没有用途语境的原子色（品牌色、中性色）显示纯色块。
 - 点击任意卡片复制 `var(--bkms-xxx)`，顶部会弹出复制成功提示。
+
+### 圆角与可视化字典
+
+切换到「圆角」按档位层 / 语义档查看半径。档位层是量级刻度 `xs/sm/md/lg`（3/4/6/8px）与形状档 `none/full`：尺度档走三尺寸方框，`none` 渲染直角方框、`full` 渲染正圆与胶囊；语义档渲染仿制的真实控件（输入框、标签、勾选框、滚动条、按钮、卡片、浮层、tab、菜单项，以及通用基准方框）。切换到「可视化」按语义场景分组展示 `viz.css`：
+
+- **连线 / 底色 / 节点状态 / 文字 / 图表结构 / 选中高亮 / 曲线配色**各有对应形态的仿制小样（三种笔形连线、画布与卡片、缩略小地图状态块、浅深双底文字样张、带网格与浮层的迷你折线图、节点选中描边、八条曲线各取一色的迷你折线图）。
+- 小样里的颜色全部读 `var(--bkms-viz-*)`，被审视的那一项用当前 token；分类色标「锁定」，表示任何主题下都不漂移。
+- 专注模式、复制反馈与 `?focus=<分组名>` 在三个视图下行为一致；搜索仍是颜色视图专属，切换视图时会清空搜索与专注并回到顶部。
 
 ### 搜索
 
@@ -54,16 +62,17 @@ npx vite build --config dev/palette/vite.config.ts
 
 ## 数据来源与口径
 
-- 颜色令牌全部来自 `src/styles/theme/tokens/color.css`，由 `src/util/tokens.ts` 解析；色阶区与语义区按组标记里的 `@layer scale` / `@layer semantic` 区分。语义 token 通过 `var()` 引用色阶，工具会递归解析到最终色值。
+- 颜色令牌全部来自 `src/styles/theme/tokens/color.css`，由 `src/util/tokens.ts` 解析；色阶区与语义区按组标记里的 `@layer scale` / `@layer semantic` 区分。色阶区含 spec 未覆盖的「场景色」（按用途命名、直写原值），与数字色阶一样是原子色值；语义 token 一般通过 `var()` 引用色阶，工具会递归解析到最终色值（阴影组例外，值即完整效果）。
+- 圆角来自 `radius.css`：档位层是量级刻度 `xs/sm/md/lg` 与形状档 `none/full`（值即字面量），语义层只 `var()` 引用档位、按组件场景命名；可视化字典来自 `viz.css`。两者各自解析成独立分组，不并入颜色视图的色阶 / 语义二分。`viz.css` 的分组同样用 `@group` / `@layer semantic` / `@note` / `@endgroup`；`@viz-locked` 标记数据分类色在任何主题下都不漂移。viz 值是实色、不进 `var()` 链解析，卡片直接展示色值。
 - CSS 本身不支持 JSDoc，`@tag` 是工具自定义、解析器自行识别的注释约定（浏览器忽略）。分组用显式起止标识符标记，描述显示在分组标题下：
 
   ```css
   /**
-   * @group keep            分组名，开组（必填，值即展示标题）
+   * @group brand           分组名，开组（必填，值即展示标题）
    * @layer scale           所属层，必填：scale（色阶区）| semantic（语义区）
-   * @note 原值收编成 token   分组描述，可多行续写（@description 同义）
+   * @note 品牌主色           分组描述，可多行续写（@description 同义）
    */
-  --bkms-keep-ffb848: #FFB848;
+  --bkms-brand-2: #3B6EF5;
   /* @endgroup */          闭组标识，之后到下一个 @group 之前的声明归入「未分组」
   ```
 
@@ -86,8 +95,12 @@ src/
 │  ├─ TokenCell.vue            # 卡片内容：形态由 previews 规则决定，分区只定尺寸
 │  ├─ ColorAdvisor.vue         # 色值建议面板
 │  └─ previews/                # 按 token 类别选预览组件（文字/线条/背景/阴影/色块兜底）
+│     ├─ VizPreview.vue        # viz 语义仿制小样（线条/面/状态/文字/图表/选中态/分类色）
+│     ├─ vizSamples.ts         # viz 前缀 → 小样标识
+│     ├─ RadiusPreview.vue     # 圆角语义仿制小样
+│     └─ radiusSamples.ts      # 圆角语义 → 小样标识
 └─ util/
-   ├─ tokens.ts                # 解析 CSS token、递归解析 var()
+   ├─ tokens.ts                # 解析 CSS token（颜色 / 圆角 / viz 三路），递归解析 var()
    ├─ color-diff.ts            # CIEDE2000 与颜色输入归一化
    ├─ suggest.ts               # 色值建议候选池与筛选
    ├─ search.ts                # 搜索匹配

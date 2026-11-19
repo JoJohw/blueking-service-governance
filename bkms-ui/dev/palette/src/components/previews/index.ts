@@ -25,6 +25,7 @@ import RadiusPreview from './RadiusPreview.vue';
 import ShadowPreview from './ShadowPreview.vue';
 import SwatchPreview from './SwatchPreview.vue';
 import TextPreview from './TextPreview.vue';
+import VizPreview from './VizPreview.vue';
 
 interface PreviewRule {
   match: (token: Token) => boolean;
@@ -38,6 +39,7 @@ interface PreviewRule {
  * 圆角语义的映射表在 `./radiusSamples.ts`，模板分支在 `./RadiusPreview.vue`。
  */
 const rules: PreviewRule[] = [
+  { match: token => token.kind === 'viz', component: VizPreview },
   { match: token => token.kind === 'radius', component: RadiusPreview },
   { match: token => token.kind === 'shadow', component: ShadowPreview },
   { match: token => token.name.startsWith('--bkms-text-'), component: TextPreview },
@@ -45,7 +47,7 @@ const rules: PreviewRule[] = [
   { match: token => token.name.startsWith('--bkms-bg-'), component: BackgroundPreview },
 ];
 
-/** 没有用途语境的原子色（色阶级、keep 级）落到色块 */
+/** 没有用途语境的原子色（色阶级）落到色块 */
 export function previewFor(token: Token): Component {
   return rules.find(rule => rule.match(token))?.component ?? SwatchPreview;
 }

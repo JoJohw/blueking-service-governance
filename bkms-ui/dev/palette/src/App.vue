@@ -23,9 +23,10 @@
   >
     <aside class="palette-aside">
       <header class="palette-head">
-        <h1>{{ viewMode === 'color' ? 'BKMS 主题色板' : 'BKMS 圆角令牌' }}</h1>
+        <h1>{{ viewTitle }}</h1>
         <p v-if="viewMode === 'color'">源自 <code>color.css</code>。点色块复制 <code>var()</code>。</p>
-        <p v-else>源自 <code>radius.css</code>。点卡片复制 <code>var()</code>。</p>
+        <p v-else-if="viewMode === 'radius'">源自 <code>radius.css</code>。点卡片复制 <code>var()</code>。</p>
+        <p v-else>源自 <code>viz.css</code>。按语义看小样，点卡片复制 <code>var()</code>。</p>
       </header>
 
       <nav class="view-tabs">
@@ -63,7 +64,7 @@
             {{ group.label }}
           </a>
         </template>
-        <template v-else>
+        <template v-else-if="viewMode === 'radius'">
           <p class="nav-label">档位</p>
           <a
             v-for="group in radiusScaleGroups"
@@ -78,6 +79,18 @@
           <a
             v-for="group in radiusSemanticGroups"
             :key="`nav-rad-sem-${group.id}`"
+            :class="{ 'is-active': activeId === group.id }"
+            href="javascript:void(0)"
+            @click="scrollTo(group.id)"
+          >
+            {{ group.label }}
+          </a>
+        </template>
+        <template v-else>
+          <p class="nav-label">语义场景</p>
+          <a
+            v-for="group in vizGroups"
+            :key="`nav-viz-${group.id}`"
             :class="{ 'is-active': activeId === group.id }"
             href="javascript:void(0)"
             @click="scrollTo(group.id)"
@@ -234,13 +247,54 @@
       </TransitionGroup>
 
       <TransitionGroup
-        v-else
+        v-else-if="viewMode === 'radius'"
         class="section-list"
         name="section"
         tag="div"
       >
         <SectionPanel
           v-for="group in visibleRadiusGroups"
+          :id="group.id"
+          :key="group.id"
+          :count="group.tokens.length"
+          :focus="isFocus"
+          :note="group.note"
+          :title="group.label"
+        >
+          <template #tools>
+            <button
+              class="focus-toggle"
+              type="button"
+              @click="toggleFocus(group.id)"
+            >
+              {{ focusId === group.id ? '退出专注' : '专注模式' }}
+            </button>
+          </template>
+          <TransitionGroup
+            class="ramp"
+            :class="{ 'ramp-grid': isFocus }"
+            name="card"
+            tag="div"
+          >
+            <TokenCell
+              v-for="token in group.tokens"
+              :key="token.name"
+              :token="token"
+              variant="semantic"
+              @copy="copy"
+            />
+          </TransitionGroup>
+        </SectionPanel>
+      </TransitionGroup>
+
+      <TransitionGroup
+        v-else
+        class="section-list"
+        name="section"
+        tag="div"
+      >
+        <SectionPanel
+          v-for="group in visibleVizGroups"
           :id="group.id"
           :key="group.id"
           :count="group.tokens.length"
@@ -321,7 +375,7 @@
   import SectionPanel from './components/SectionPanel.vue';
   import TokenCell from './components/TokenCell.vue';
   import { registerSearchGroups, searchTokens } from './util/search';
-  import { allSemanticGroups, radiusGroups, rampGroups } from './util/tokens';
+  import { allSemanticGroups, radiusGroups, rampGroups, vizGroups } from './util/tokens';
   import { useDrag } from './util/useDrag';
 
   registerSearchGroups([
@@ -332,8 +386,12 @@
   const viewTabs = [
     { label: '颜色', value: 'color' as const },
     { label: '圆角', value: 'radius' as const },
+    { label: '可视化', value: 'viz' as const },
   ];
-  const viewMode = ref<'color' | 'radius'>('color');
+  const viewMode = ref<'color' | 'radius' | 'viz'>('color');
+  const viewTitle = computed(() =>
+    viewMode.value === 'color' ? 'BKMS 主题色板' : viewMode.value === 'radius' ? 'BKMS 圆角令牌' : 'BKMS 可视化字典',
+  );
   const radiusScaleGroups = computed(() => radiusGroups.filter(group => group.layer === 'scale'));
   const radiusSemanticGroups = computed(() => radiusGroups.filter(group => group.layer === 'semantic'));
 
@@ -389,7 +447,13 @@
 
   const activeId = ref('');
   const mainRef = ref<HTMLElement | null>(null);
-  const allGroups = computed(() => (viewMode.value === 'color' ? [...rampGroups, ...allSemanticGroups] : radiusGroups));
+  const allGroups = computed(() =>
+    viewMode.value === 'color'
+      ? [...rampGroups, ...allSemanticGroups]
+      : viewMode.value === 'radius'
+        ? radiusGroups
+        : vizGroups,
+  );
   const sectionIds = computed(() => allGroups.value.map(group => group.id));
   let clickLockId = '';
 
@@ -405,18 +469,24 @@
   const visibleRadiusGroups = computed(() =>
     focusId.value ? radiusGroups.filter(group => group.id === focusId.value) : radiusGroups,
   );
+  const visibleVizGroups = computed(() =>
+    focusId.value ? vizGroups.filter(group => group.id === focusId.value) : vizGroups,
+  );
 
   /** ?focus= 链接可跨视图打开，命中圆角分组时切到圆角视图 */
   function readFocus(): void {
     const label = new URLSearchParams(window.location.search).get('focus');
     if (!label) return;
-    const group = [...rampGroups, ...allSemanticGroups, ...radiusGroups].find(item => item.label === label);
+    const group = [...rampGroups, ...allSemanticGroups, ...radiusGroups, ...vizGroups].find(
+      item => item.label === label,
+    );
     if (!group) return;
     if (radiusGroups.includes(group)) viewMode.value = 'radius';
+    else if (vizGroups.includes(group)) viewMode.value = 'viz';
     focusId.value = group.id;
   }
 
-  function switchView(mode: 'color' | 'radius'): void {
+  function switchView(mode: 'color' | 'radius' | 'viz'): void {
     if (viewMode.value === mode) return;
     viewMode.value = mode;
     searchQuery.value = '';

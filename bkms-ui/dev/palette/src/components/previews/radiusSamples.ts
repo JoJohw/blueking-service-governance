@@ -25,15 +25,18 @@
  */
 
 /** 语义小样的标识；标识与 RadiusPreview.vue 里的模板分支一一对应 */
-export type RadiusSample = 'card' | 'checkbox' | 'control' | 'field' | 'menu' | 'overlay' | 'scroll' | 'tab' | 'tag';
+export type RadiusSample =
+  'base' | 'card' | 'control' | 'field' | 'full' | 'menu' | 'none' | 'overlay' | 'scroll' | 'tab' | 'tag';
 
 /** token 名 → 小样标识。key 为去掉 `--bkms-` 前缀后的语义名 */
 const radiusSampleMap: Record<string, RadiusSample> = {
+  base: 'base',
   card: 'card',
-  checkbox: 'checkbox',
   control: 'control',
   field: 'field',
+  full: 'full',
   menu: 'menu',
+  none: 'none',
   overlay: 'overlay',
   scroll: 'scroll',
   tab: 'tab',
@@ -43,7 +46,7 @@ const radiusSampleMap: Record<string, RadiusSample> = {
 /**
  * 取圆角令牌的语义小样标识。
  * @param name 令牌名，如 `--bkms-radius-field`
- * @returns 命中的小样标识；档位令牌（`--bkms-radius-3` 等）与未知语义返回 null
+ * @returns 命中的小样标识；尺度档令牌（`--bkms-radius-md` 等）与未知语义返回 null
  */
 export function radiusSampleOf(name: string): RadiusSample | null {
   const key = /^--bkms-radius-(.+)$/.exec(name)?.[1];
