@@ -22,7 +22,6 @@
     "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
     "theme:designer": "vite --config dev/palette/vite.config.ts",
     "theme:report": "node scripts/theme-lint/report.mjs",
-    "theme:check-vendor": "node scripts/theme-check-vendor.mjs",
     "format": "prettier --write .",
     "stylelint": "stylelint \"src/**/*.{css,scss,vue}\"",
     "stylelint:fix": "stylelint \"src/**/*.{css,scss,vue}\" --fix",

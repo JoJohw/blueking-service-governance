@@ -19,7 +19,7 @@
 /*
  * @blueking/* 包覆写清单。date-picker.css / ediatable.css 由 gen-overrides.mjs 生成（VENDOR_SOURCES），重跑整体覆盖；
  * 其余为手写，颜色一律使用 --bkms-* 令牌，库内变量只在 vxe.css 单点定义。
- * 新增文件必须同时登记到 scripts/theme-check-vendor.mjs 的 LIB_CSS / KEY_SELECTORS。
+ * 新增文件必须同时登记到 scripts/theme-codemod/scripts/theme-check-vendor.mjs 的 LIB_CSS / KEY_SELECTORS。
  */
 @import './bk-table.css';
 @import './date-picker.css';

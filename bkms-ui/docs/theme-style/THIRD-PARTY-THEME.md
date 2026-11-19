@@ -99,6 +99,6 @@ patches/vendor/         覆写层    不提供 API 的库直接改 CSS
 
 ## 九、验证与遗留
 
-- `pnpm theme:check-vendor`：10 个覆写文件，`--vxe-ui-*` 变量与关键选择器缺失 0。
+- `node scripts/theme-codemod/scripts/theme-check-vendor.mjs`：10 个覆写文件，`--vxe-ui-*` 变量与关键选择器缺失 0。
 - `pnpm theme:report`：viz 待补档 0、锁定 8。
 - 遗留（非决策，随 dark）：换肤器未接线——`refreshTopoViz()` / `refreshBkmsMonacoTheme()` 零调用，`setTheme` 不重载，`readVizVar` 有模块级缓存、`resource-topology.vue` 的 `topoViz` 是快照。当前单主题不暴露，dark 立项时按第五节刷新契约接。

@@ -7,7 +7,7 @@
 
 ```
 theme-codemod/
-├── scripts/    # 可执行脚本（npm 入口见下表）
+├── scripts/    # 可执行脚本（直接 node 执行，清单见下表）
 │   ├── config/                      # 生成器输入（非算法：只放组件库事实）
 │   │   ├── overrides.mjs            # 组件族收编（EXTRA_OWNERS）+ 类前缀别名（PREFIX_ALIAS）
 │   │   └── radius-components.json   # 圆角组件族 + 选择器级 token 分派
@@ -40,9 +40,9 @@ theme-codemod/
 ### 警告
 
 - **不要手改生成产物**：`patches/bkui-theme/*.css`（`variables.css` 除外）、`patches/vendor/@blueking/date-picker.css`、`patches/vendor/@blueking/ediatable.css`，重跑即丢。要改值，bkui 域按「既往产物即映射真源」改产物里的 `var()` 与原值注释后重跑，或回令牌层补档。
-- **生成器不处理的属性（如给 date-picker / ediatable 补圆角）别写进那两个产物文件**，放 `patches/ua-fill/`（最后加载能压住），按库新建文件并在 `ua-fill/index.css` 登记 `@import`。注意 `scripts/theme-check-vendor.mjs` 只校验 vendor 域，覆盖不到 ua-fill，这层没有自动漂移校验。
+- **生成器不处理的属性（如给 date-picker / ediatable 补圆角）别写进那两个产物文件**，放 `patches/ua-fill/`（最后加载能压住），按库新建文件并在 `ua-fill/index.css` 登记 `@import`。注意 `scripts/theme-codemod/scripts/theme-check-vendor.mjs` 只校验 vendor 域，覆盖不到 ua-fill，这层没有自动漂移校验。
 - **vendor 手写文件不会被清理**：该域与生成产物混放，生成器不做整目录清理；从 `VENDOR_SOURCES` 摘掉一个库时，须手工删产物文件并摘掉 `@blueking/index.css` 里的 `@import`。
-- **新增 `patches/vendor/@blueking/*.css` 手写文件**时，要同步登记 `scripts/theme-check-vendor.mjs` 的 `LIB_CSS` 与 `KEY_SELECTORS`，否则校验脚本不认这层覆写。
+- **新增 `patches/vendor/@blueking/*.css` 手写文件**时，要同步登记 `scripts/theme-codemod/scripts/theme-check-vendor.mjs` 的 `LIB_CSS` 与 `KEY_SELECTORS`，否则校验脚本不认这层覆写。
 
 ## 脚本入口（直接 node 执行，不占 package.json）
 
@@ -52,6 +52,7 @@ theme-codemod/
 | `scripts/gen-overrides.mjs` | 双源扫描 bkui dist（style.variable.css 变量版 + style.css 字面量版），生成 `patches/bkui-theme/`（每组件一文件：变量版段 + 字面量段，字面量段压制 lib/*.less 旧色）+ `index.css` + `reports/gen-summary.md`（含未归属规则与待拍板占位清单）。缺 `usage.json` 时会提示先跑 stats-usage |
 | `scripts/gen-radius-overrides.mjs` | 读 `config/radius-components.json`：组件族给默认 token，`rules[].match`（选择器正则）对特定后代换档——椭圆角标走 `full`、1px 细条走 `indicator`、标签走 `tag`、浮层走 `overlay`。生成 `patches/bkui-theme/radius.css`（按组件分段）+ `reports/radius-summary.md`（原值→token 台账，供设计核对）；零命中组件、未命中的分派规则都告警 |
 | `scripts/check-overrides.mjs` | 漂移自检：按文件内「字面量版源」段标记切分，变量版段对 style.variable.css、字面量段对 style.css 校验选择器与原 hex 仍在，失效即 exit 1。**库升级后必跑**；圆角产物因带字面量段标记一并受检 |
+| `scripts/theme-check-vendor.mjs` | 第三方覆写漂移自检：校验 `patches/vendor/` 里的 `--vxe-ui-*` / `--bkms-viz-*` 变量与登记的关键选择器在当前依赖版本中仍存在，失效即 exit 1 |
 
 ## 典型工作流
 
