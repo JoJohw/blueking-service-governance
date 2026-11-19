@@ -57,6 +57,7 @@ const patchesOverrides = [
       'src/styles/theme/patches/bkui-theme/**/*.css',
       'src/styles/theme/patches/lib/**/*.css',
       'src/styles/theme/patches/ua-fill/**/*.css',
+      'src/styles/theme/patches/boost.css',
     ],
     rules: {
       'no-descending-specificity': null,
