@@ -45,7 +45,7 @@
     </template>
     <template #title>
       <div class="flex items-center gap-[8px] text-[12px] leading-[20px]">
-        <div class="min-w-0 flex-1 truncate text-[#4D4F56]">
+        <div class="min-w-0 flex-1 truncate text-bkms-neutral-2">
           <span>{{ $t('当前环境灰度发布：') }}</span>
           <!-- 本批更新中 / 尚未开始 -->
           <template v-if="view.kind === 'updating'">
@@ -224,8 +224,8 @@
                   class="!h-[32px] !px-[16px] !text-[12px] !leading-[32px]"
                   :class="
                     isActionDisabled(item)
-                      ? '!pointer-events-none !text-[#C4C6CC]'
-                      : '!text-[#4D4F56] hover:!bg-[#F0F1F5]'
+                      ? '!pointer-events-none !text-bkms-navy-5'
+                      : '!text-bkms-neutral-2 hover:!bg-bkms-neutral-6'
                   "
                   @click="handleAction(item)"
                 >
@@ -298,28 +298,28 @@
    */
   const THEMES: Record<BatchReleaseBannerView['kind'], BannerTheme> = {
     completed: {
-      container: '!border-[#A1E3BA] !bg-[#EBFAF0]',
-      status: 'text-[#2CAF5E]',
+      container: '!border-bkms-success-4 !bkms-bg-success-soft',
+      status: 'text-bkms-success-2',
     },
     failed: {
-      container: '!border-[#F8B4B4] !bg-[#FFF0F0]',
-      status: 'text-[#EA3636]',
+      container: '!border-bkms-danger-4 !bkms-bg-danger-soft',
+      status: 'text-bkms-danger-2',
     },
     paused: {
-      container: '!border-[#F9D090] !bg-[#FDF4E8]',
-      status: 'text-[#F59500]',
+      container: '!border-bkms-warning-4 !bkms-bg-warning-soft',
+      status: 'text-bkms-warning-2',
     },
     rolledBack: {
-      container: '!border-[#F9D090] !bg-[#FDF4E8]',
-      status: 'text-[#F59500]',
+      container: '!border-bkms-warning-4 !bkms-bg-warning-soft',
+      status: 'text-bkms-warning-2',
     },
     rollingBack: {
-      container: '!border-[#F9D090] !bg-[#FDF4E8]',
-      status: 'text-[#F59500]',
+      container: '!border-bkms-warning-4 !bkms-bg-warning-soft',
+      status: 'text-bkms-warning-2',
     },
     updating: {
-      container: '!border-[#A3C5FD] !bg-[#F0F5FF]',
-      status: 'text-[#3A84FF]',
+      container: '!border-bkms-brand-4 !bg-bkms-brand-7',
+      status: 'text-bkms-brand-2',
     },
   };
 
@@ -476,6 +476,6 @@
   }
 
   .batch-release-banner :deep(.bk-button-default) {
-    background-color: #fff;
+    background-color: var(--bkms-bg-card);
   }
 </style>

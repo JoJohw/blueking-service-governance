@@ -58,6 +58,7 @@ src/styles/theme/
 - **整值重写**：渐变/阴影里的 hex 不能局部替换；8 位 hex 用 `color-mix(in srgb, var(--bkms-*) N%, transparent)`。
 - **原值注释**：每条覆写行尾保留原 hex，供 review 与漂移自检比对。
 - **文件组织**：按组件域一文件（41 个组件域 + `index.css` + `variables.css`），文件内分区注释。
+- **业务侧覆盖**：业务 scoped 编译后为 `[data-v] + n 类`，而覆写层普遍是 3~5 类（多出 `.bkms-themed` 一级）。业务要改颜色时，`:deep()` 内至少带 2 个类并参考该组件既有覆写规则的层级，必要时用 `!important`（存量先例：`custom-filter.vue`、`env-select-panel.vue`）。
 
 ## 六、质量基建
 
@@ -132,6 +133,9 @@ src/styles/theme/
 | `.ts` 颜色字符串不在 codemod 台账 | 口径 65 处 `<script>`、明确不含 `.ts` | 记为已知盲区，不假装已全量覆盖 |
 | 根 `.gitignore` 的 `*vendor*` | 曾致覆写目录与校验脚本被忽略；两者已改名 `lib` / `check-lib.mjs` 规避 | 新增含 vendor 字样的路径必须 `git status -uall` 复核 |
 | markdown 自定义属性 camelCase | `--fgColor-*` 触发 `custom-property-pattern` | 第三方变量名同名重指向，用定点 `stylelint-disable` |
+| 业务 scoped 覆盖被覆写层压掉 | `batch-release-progress-panel` 的 `background-image: none`：业务 `[data-v] .bk-step.done .bk-step-number::after` (0,4,0) < `steps.css` `.bkms-themed .bk-steps-primary .bk-step.done .bk-step-indicator:after` (0,5,0) | 覆写层比库原规则多一级 `.bkms-themed`，业务 4 类以内的覆盖由「同分靠顺序」变成「必然输」；`:deep()` 补层级（`.bk-steps.bk-steps-primary .bk-step`）或 `!important` |
+| 同元素不同类名致覆盖误判 | bkui Steps 的 `.bk-step-indicator` 与 `.bk-step-number` 是同一个 `span`（`lib/steps/index.js` render） | 排查覆盖失效以 DOM 实际元素为准，不能只比对类名；按类名扫权重会漏这类 |
+| 业务覆盖与覆写层平手 | `custom-navigation.vue`（header/container）、`helm-file-list.vue`（tree hover）与 `navigation.css` / `tree.css` 均 4:4 | dev 靠 scoped 后注入取胜，生产打包顺序变化会翻转；值不同的平手项需按需加固 |
 
 ## 十三、下一阶段待办
 

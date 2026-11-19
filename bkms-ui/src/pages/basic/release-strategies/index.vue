@@ -113,16 +113,16 @@
               trigger="hover"
             >
               <div class="flex items-center gap-[8px] w-fit">
-                <span class="text-[#4D4F56]">{{ t('{0} 批', [batchCount(row)]) }}</span>
+                <span class="text-bkms-neutral-2">{{ t('{0} 批', [batchCount(row)]) }}</span>
                 <div class="flex items-center gap-[2px] w-[100px]">
                   <span
                     v-for="(ratio, index) in batchSegments(row)"
                     :key="index"
-                    class="h-[6px] bg-[#3A84FF] rounded-[2px]"
+                    class="h-[6px] bg-bkms-brand-2 rounded-bkms-base"
                     :style="{ flexGrow: ratio }"
                   ></span>
                 </div>
-                <div class="text-[#979BA5] text-[12px] leading-[20px] no-wrap overflow-hidden text-ellipsis">
+                <div class="text-bkms-neutral-3 text-[12px] leading-[20px] no-wrap overflow-hidden text-ellipsis">
                   {{ formatBatchesSummary(row.batches, targetTexts) }}
                 </div>
               </div>
@@ -162,7 +162,7 @@
           min-width="200"
         >
           <template #default="{ row }">
-            <span class="text-[#4D4F56]">{{ row.description || '--' }}</span>
+            <span class="text-bkms-neutral-2">{{ row.description || '--' }}</span>
           </template>
         </TableColumn>
         <TableColumn
@@ -375,10 +375,12 @@
    */
   function renderDeleteInfoBoxContent(name: string) {
     return h('div', [
-      h('div', { class: 'text-[14px] leading-[22px] text-[#313238]' }, [`${t('策略名称')}：${name}`]),
-      h('div', { class: 'mt-[16px] bg-[#F5F7FA] px-[16px] py-[12px] text-[14px] leading-[22px] text-[#4D4F56]' }, [
-        t('删除后无法恢复，部署应用时将不能再选择该策略。'),
-      ]),
+      h('div', { class: 'text-[14px] leading-[22px] text-bkms-neutral-1' }, [`${t('策略名称')}：${name}`]),
+      h(
+        'div',
+        { class: 'mt-[16px] bg-bkms-neutral-7 px-[16px] py-[12px] text-[14px] leading-[22px] text-bkms-neutral-2' },
+        [t('删除后无法恢复，部署应用时将不能再选择该策略。')],
+      ),
     ]);
   }
 
@@ -396,7 +398,7 @@
     font-size: 16px;
     font-weight: 700;
     line-height: 24px;
-    color: #313238;
+    color: var(--bkms-neutral-1);
   }
 
   /* 表头与数据行共用一个 grid，列宽由内容自适应，保证跨行对齐且无边框 */
@@ -417,10 +419,10 @@
 
   .batch-popover__head {
     padding-bottom: 4px;
-    color: #979ba5;
+    color: var(--bkms-neutral-3);
   }
 
   .batch-popover__cell {
-    color: #4d4f56;
+    color: var(--bkms-neutral-2);
   }
 </style>

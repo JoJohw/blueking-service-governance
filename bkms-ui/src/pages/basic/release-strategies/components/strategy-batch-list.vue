@@ -23,7 +23,7 @@
         v-for="(batch, index) in batches"
         :key="batch.key"
         :aria-pressed="batch.key === activeKey"
-        class="group relative flex h-[56px] w-full rounded-[2px] shrink-0 cursor-pointer flex-col justify-center gap-[2px] border border-solid px-[12px] py-[8px] text-left outline-none transition-colors"
+        class="group relative flex h-[56px] w-full rounded-bkms-card shrink-0 cursor-pointer flex-col justify-center gap-[2px] border border-solid px-[12px] py-[8px] text-left outline-none transition-colors"
         :class="cardClass(batch)"
         :data-batch-key="batch.key"
         data-testid="batch-card"
@@ -34,12 +34,12 @@
         @keydown.space.prevent="emit('select', batch.key)"
       >
         <span class="flex min-w-0 items-center gap-[6px] pr-[20px]">
-          <span class="truncate text-[12px] font-700 leading-[20px] text-[#313238]">
+          <span class="truncate text-[12px] font-700 leading-[20px] text-bkms-neutral-1">
             {{ formatBatchCardTitle(batch, index, t) }}
           </span>
           <Tag
             v-if="isFullPercentBatch(batch)"
-            class="shrink-0 !bg-[#e1ecff] !text-[#1768ef]"
+            class="shrink-0 !bg-bkms-brand-6 !text-bkms-brand-2"
             data-testid="batch-full-tag"
             size="small"
           >
@@ -49,14 +49,14 @@
         <!-- 第二行：有校验错误时用红色错误文案替换暂停说明，未修正前不可提交 -->
         <span
           v-if="errors[batch.key]"
-          class="truncate text-[12px] leading-[20px] text-[#ea3636]"
+          class="truncate text-[12px] leading-[20px] text-bkms-danger-2"
           data-testid="batch-card-error"
         >
           {{ errors[batch.key] }}
         </span>
         <span
           v-else
-          class="truncate text-[12px] leading-[20px] text-[#979ba5]"
+          class="truncate text-[12px] leading-[20px] text-bkms-neutral-3"
         >
           {{ formatBatchPauseText(batch, t) }}
         </span>
@@ -65,7 +65,7 @@
         <Button
           v-if="!readonly && batches.length > 1"
           :aria-label="t('删除')"
-          class="pointer-events-none absolute right-[12px] top-[18px] flex h-[20px] w-[20px] items-center justify-center rounded-[2px] text-[14px] text-[#979ba5] opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-[#f0f1f5] hover:text-[#ea3636]"
+          class="pointer-events-none absolute right-[12px] top-[18px] flex h-[20px] w-[20px] items-center justify-center rounded-bkms-tag text-[14px] text-bkms-neutral-3 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-bkms-neutral-6 hover:text-bkms-danger-2"
           data-testid="batch-remove"
           text
           :title="t('删除')"
@@ -83,11 +83,11 @@
         content: t('已达 100%，不能添加后续批次'),
         disabled: !hasFullPercentBatch,
       }"
-      class="flex h-[32px] w-full shrink-0 items-center justify-center rounded-[2px] border border-dashed text-[14px] leading-[20px] transition-colors"
+      class="flex h-[32px] w-full shrink-0 items-center justify-center rounded-bkms-control border border-dashed text-[14px] leading-[20px] transition-colors"
       :class="
         hasFullPercentBatch
-          ? 'border-[#dcdee5] bg-[#fafbfd] text-[#c4c6cc]'
-          : 'border-[#c4c6cc] bg-white text-[#3a84ff] hover:border-[#3a84ff] hover:bg-[#f0f5ff]'
+          ? 'border-bkms-neutral-5 bg-bkms-neutral-8 text-bkms-navy-5'
+          : 'border-bkms-navy-5 bg-white text-bkms-brand-2 hover:border-bkms-brand-2 hover:bg-bkms-brand-7'
       "
       :disabled="hasFullPercentBatch"
       @click="emit('add')"
@@ -97,7 +97,7 @@
     </Button>
     <div
       v-if="!readonly && !hasFullPercentBatch"
-      class="text-[12px] leading-[20px] text-[#979ba5]"
+      class="text-[12px] leading-[20px] text-bkms-neutral-3"
       data-testid="full-percent-tip"
     >
       {{ t('最后一批完成后，剩余未更新的实例将自动更新。') }}
@@ -148,9 +148,13 @@
     const isActive = batch.key === props.activeKey;
     const isError = Boolean(props.errors[batch.key]);
     if (isActive) {
-      return ['bg-[#f0f5ff]', isError ? 'border-[#ea3636]' : 'border-[#a3c5fd]', 'shadow-[inset_3px_0_0_0_#3a84ff]'];
+      return [
+        'bg-bkms-brand-7',
+        isError ? 'bkms-line-danger' : 'border-bkms-brand-4',
+        'shadow-[inset_3px_0_0_0_var(--bkms-brand-2)]',
+      ];
     }
-    return ['bg-white hover:bg-[#f5f7fa]', isError ? 'border-[#ea3636]' : 'border-[#dcdee5]'];
+    return ['bg-white hover:bg-bkms-neutral-7', isError ? 'bkms-line-danger' : 'border-bkms-neutral-5'];
   }
 
   /** 单个批次是否为累计 100% 的全量批次 */

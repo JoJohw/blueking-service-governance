@@ -22,7 +22,7 @@
 -->
 <template>
   <div
-    class="shadow-[0_2px_4px_0_#0000001a] bg-[#fff] p-[16px]"
+    class="shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] bkms-bg-card p-[16px]"
     data-testid="canary-instance-table"
   >
     <div class="flex items-center justify-between gap-[16px] mb-[16px]">
@@ -43,8 +43,8 @@
             <!-- 计数角标：选中态蓝底蓝字，未选中白底灰字 -->
             <span
               :class="[
-                'flex h-[16px] items-center justify-center rounded-full px-[6px] text-[12px] leading-none',
-                activeFilter === option.id ? 'bg-[#E1ECFF] text-[#3A84FF]' : 'bg-white text-[#63656E]',
+                'flex h-[16px] items-center justify-center rounded-bkms-full px-[6px] text-[12px] leading-none',
+                activeFilter === option.id ? 'bg-bkms-brand-6 text-bkms-brand-2' : 'bg-white text-bkms-neutral-2',
               ]"
             >
               {{ counts[option.id] }}
@@ -108,7 +108,7 @@
             <span>{{ row.image?.split(':')?.pop() || '--' }}</span>
             <Tag
               v-if="resolveInstanceCanaryState(row, progress) === 'new'"
-              class="!border-none !bg-[#DAF6E5] !text-[12px] !leading-[18px] !text-[#299E56]"
+              class="!border-none !bkms-bg-success !text-[12px] !leading-[18px] !text-bkms-success-1"
               size="small"
             >
               {{ $t('灰度新起') }}
@@ -330,7 +330,7 @@
 <style lang="postcss" scoped>
   :deep(.bk-radio-capsule) {
     .is-checked {
-      box-shadow: 0 2px 4px 0 rgb(0 0 0 / 10%);
+      box-shadow: 0 2px 4px 0 var(--bkms-shadow-hover);
     }
   }
 </style>

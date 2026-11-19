@@ -18,31 +18,31 @@
 
 <template>
   <div
-    class="flex min-w-0 flex-1 flex-col gap-[16px] rounded-[2px] border border-solid border-[#dcdee5] bg-white p-[16px]"
+    class="flex min-w-0 flex-1 flex-col gap-[16px] rounded-bkms-card border border-solid border-bkms-neutral-5 bg-white p-[16px]"
     data-testid="batch-detail"
   >
-    <div class="flex flex-wrap items-baseline gap-x-[12px] border-b border-b-solid border-b-[#f0f1f5] pb-[12px]">
-      <span class="text-[14px] font-700 leading-[22px] text-[#313238]">
+    <div class="flex flex-wrap items-baseline gap-x-[12px] border-b border-b-solid border-b-bkms-neutral-6 pb-[12px]">
+      <span class="text-[14px] font-700 leading-[22px] text-bkms-neutral-1">
         {{ formatBatchCardTitle(batch, index, t) }}
       </span>
-      <span class="text-[12px] leading-[20px] text-[#979ba5]">
+      <span class="text-[12px] leading-[20px] text-bkms-neutral-3">
         {{ t('修改后点「预览策略」可查看整体效果') }}
       </span>
     </div>
 
     <div class="flex flex-col gap-[12px]">
-      <div class="text-[12px] font-700 leading-[20px] text-[#313238]">{{ t('目标资源') }}</div>
+      <div class="text-[12px] font-700 leading-[20px] text-bkms-neutral-1">{{ t('目标资源') }}</div>
       <!-- 错误文案紧跟输入行（gap 4px），说明文案在其下方 -->
       <div class="flex flex-col gap-[4px]">
         <div class="flex items-stretch">
           <span
-            class="flex h-[32px] shrink-0 items-center whitespace-nowrap rounded-[2px_0_0_2px] border border-solid border-[#c4c6cc] border-r-0 bg-[#fafbfd] px-[12px] text-[12px] text-[#63656e]"
+            class="flex h-[32px] shrink-0 items-center whitespace-nowrap rounded-l-bkms-base border border-solid border-bkms-navy-5 border-r-0 bg-bkms-neutral-8 px-[12px] text-[12px] text-bkms-neutral-2"
           >
             {{ t('累计更新副本数') }}
           </span>
           <Input
             class="target-value w-[120px] ml-[-1px] relative hover:z-10"
-            :class="{ 'border-[#EA3636] z-10': Boolean(error) }"
+            :class="{ 'bkms-line-danger z-10': Boolean(error) }"
             data-testid="target-value"
             :disabled="readonly"
             :max="targetValueMax"
@@ -62,13 +62,13 @@
         </div>
         <div
           v-if="error"
-          class="text-[12px] leading-[20px] text-[#ea3636]"
+          class="text-[12px] leading-[20px] text-bkms-danger-2"
           data-testid="target-error"
         >
           {{ error }}
         </div>
       </div>
-      <div class="text-[12px] leading-[20px] text-[#979ba5]">
+      <div class="text-[12px] leading-[20px] text-bkms-neutral-3">
         <i18n-t keypath="填到本批结束时应更新的{total}（按累计值推进），不是本批新增数。">
           <template #total>
             <span class="font-bold">{{ t('总量') }}</span>
@@ -77,8 +77,8 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-[8px] border-t border-t-solid border-t-[#f0f1f5] pt-[16px]">
-      <div class="text-[12px] font-700 leading-[20px] text-[#313238]">{{ t('暂停') }}</div>
+    <div class="flex flex-col gap-[8px] border-t border-t-solid border-t-bkms-neutral-6 pt-[16px]">
+      <div class="text-[12px] font-700 leading-[20px] text-bkms-neutral-1">{{ t('暂停') }}</div>
       <Radio.Group
         class="flex flex-wrap"
         :disabled="readonly || isFullPercent"
@@ -106,7 +106,7 @@
       </Radio.Group>
       <div
         v-if="isFullPercent"
-        class="text-[12px] leading-[20px] text-[#979ba5]"
+        class="text-[12px] leading-[20px] text-bkms-neutral-3"
         data-testid="full-percent-pause-tip"
       >
         {{ t('达到 100% 后全部实例已更新完毕，发布将直接结束，无需暂停。') }}
@@ -137,7 +137,7 @@
             <!-- 与错误文案同一位置：校验通过时展示取值说明，失败时由 error 插槽替换 -->
             <div
               v-if="!pauseInvalid"
-              class="pt-[2px] text-[12px] leading-[20px] text-[#979ba5]"
+              class="pt-[2px] text-[12px] leading-[20px] text-bkms-neutral-3"
               data-testid="pause-hint"
             >
               {{ translate(t, '可填 {0} ~ {1} 秒的整数（最长 24 小时）。', [PAUSE_SECONDS_MIN, PAUSE_SECONDS_MAX]) }}
@@ -335,7 +335,7 @@
   }
 
   .target-value :deep(.bk-input) {
-    border-radius: 0;
+    border-radius: var(--bkms-radius-none);
   }
 
   .target-unit {
@@ -344,7 +344,7 @@
 
   .target-unit :deep(.bk-select) {
     border-radius: var(--bkms-radius-field);
-    border-start-start-radius: 0;
-    border-end-start-radius: 0;
+    border-start-start-radius: var(--bkms-radius-none);
+    border-end-start-radius: var(--bkms-radius-none);
   }
 </style>

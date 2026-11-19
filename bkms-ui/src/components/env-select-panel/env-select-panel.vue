@@ -1102,7 +1102,7 @@
 
     .bk-select-tag {
       font-size: 12px;
-      color: var(--bkms-text-body);
+      color: var(--bkms-text-body) !important;
     }
   }
 

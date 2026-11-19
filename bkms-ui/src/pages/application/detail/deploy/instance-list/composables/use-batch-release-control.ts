@@ -298,7 +298,8 @@ export function useBatchReleaseControl(options: UseBatchReleaseControlOptions) {
       content: h(
         'div',
         {
-          class: 'rounded-[2px] bg-[#F5F7FA] px-[12px] py-[16px] text-[14px] leading-[22px] text-[#4D4F56]',
+          class:
+            'rounded-bkms-card bg-bkms-neutral-7 px-[12px] py-[16px] text-[14px] leading-[22px] text-bkms-neutral-2',
         },
         t(confirm.descriptionKey),
       ),

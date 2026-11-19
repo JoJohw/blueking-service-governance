@@ -23,7 +23,7 @@
     data-testid="batch-release-progress-panel"
   >
     <!-- 返回栏 -->
-    <FlexRow class="h-[48px] py-[8px] px-[16px] shrink-0 bg-[#fff] shadow-[0_2px_4px_0_#0000001a]">
+    <FlexRow class="h-[48px] py-[8px] px-[16px] shrink-0 bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-hover)]">
       <template #left>
         <div class="flex items-center gap-[12px]">
           <Button
@@ -38,14 +38,14 @@
           </Button>
           <Divider
             class="!mx-0 !h-[14px]"
-            color="#EAEBF0"
+            color="var(--bkms-neutral-6)"
             direction="vertical"
             type="solid"
           />
-          <span class="text-[14px] font-bold leading-[22px] text-[#313238]">{{ $t('灰度发布进度') }}</span>
-          <span class="text-[12px] leading-[20px] text-[#979BA5]">
+          <span class="text-[14px] font-bold leading-[22px] text-bkms-neutral-1">{{ $t('灰度发布进度') }}</span>
+          <span class="text-[12px] leading-[20px] text-bkms-neutral-3">
             {{ $t('环境：') }}
-            <span class="text-[#4D4F56]">{{ envDisplayName || '--' }}</span>
+            <span class="text-bkms-neutral-2">{{ envDisplayName || '--' }}</span>
           </span>
           <!-- 环境类型 Tag + 特性环境 Tag，与环境选择器展示口径一致 -->
           <Tag
@@ -57,7 +57,7 @@
           </Tag>
           <Tag
             v-if="isFeatureEnv"
-            class="bg-[#E2F5F7] text-[#3A9EAA] shrink-0"
+            class="bg-bkms-cyan-6 text-bkms-cyan-2 shrink-0"
             size="small"
           >
             {{ $t('特性') }}
@@ -68,13 +68,13 @@
 
     <!-- 语义色大横幅 -->
     <div
-      :class="['batch-release-progress-banner rounded-[2px] border px-[16px] py-[16px]', themeClass.container]"
+      :class="['batch-release-progress-banner rounded-bkms-card border px-[16px] py-[16px]', themeClass.container]"
       data-testid="batch-release-progress-banner"
     >
       <div class="flex items-center justify-between gap-[16px]">
         <div class="flex min-w-0 items-center gap-[8px]">
           <span
-            class="shrink-0 text-[14px] font-bold leading-[22px] text-[#313238]"
+            class="shrink-0 text-[14px] font-bold leading-[22px] text-bkms-neutral-1"
             data-testid="batch-release-progress-status"
           >
             {{ statusText }}
@@ -92,7 +92,7 @@
           <template v-if="strategyName">
             <Divider
               class="!mx-0 !h-[12px]"
-              color="#DCDEE5"
+              color="var(--bkms-neutral-5)"
               direction="vertical"
               type="solid"
             />
@@ -100,8 +100,8 @@
               class="shrink-0 text-[12px] leading-[20px]"
               data-testid="batch-release-progress-strategy"
             >
-              <span class="text-[#979BA5]">{{ $t('发布策略') }}：</span>
-              <span class="text-[#4D4F56]">{{ strategyName }}</span>
+              <span class="text-bkms-neutral-3">{{ $t('发布策略') }}：</span>
+              <span class="text-bkms-neutral-2">{{ strategyName }}</span>
             </span>
             <Popover
               placement="bottom"
@@ -110,7 +110,7 @@
               trigger="hover"
             >
               <i
-                class="bkms-icon bkms-icon-circle-info text-[#979ba5] hover:text-[#3a84ff] shrink-0 text-[14px]"
+                class="bkms-icon bkms-icon-circle-info text-bkms-neutral-3 hover:text-bkms-brand-2 shrink-0 text-[14px]"
                 data-testid="batch-release-progress-strategy-info"
               ></i>
               <template #content>
@@ -153,13 +153,13 @@
       <!-- 元信息行：批次 / 已更新 / 镜像等已由步骤条与实例表筛选胶囊直观展示，仅失败态保留失败原因 -->
       <div
         v-if="view.kind === 'failed' && view.message"
-        class="mt-[6px] flex flex-wrap items-center gap-x-[24px] gap-y-[4px] text-[12px] leading-[20px] text-[#4D4F56]"
+        class="mt-[6px] flex flex-wrap items-center gap-x-[24px] gap-y-[4px] text-[12px] leading-[20px] text-bkms-neutral-2"
       >
         <span class="flex items-center gap-[4px]">
           <span>{{ $t('失败原因') }}</span>
           <span
             v-bk-tooltips="{ content: view.message, disabled: !view.message }"
-            class="max-w-[360px] truncate font-bold text-[#313238]"
+            class="max-w-[360px] truncate font-bold text-bkms-neutral-1"
           >
             {{ view.message }}
           </span>
@@ -252,44 +252,44 @@
    *  回滚中按设计稿为蓝色系（过程态，先恢复实例再清理灰度资源），已回滚 / 暂停为橙色。 */
   const THEMES: Record<BatchReleaseBannerView['kind'], PanelTheme> = {
     completed: {
-      container: '!border-[#A1E3BA] !bg-[#EBFAF0]',
-      divider: '!border-[#A1E3BA]',
-      status: 'text-[#2CAF5E]',
+      container: '!border-bkms-success-4 !bkms-bg-success-soft',
+      divider: '!border-bkms-success-4',
+      status: 'text-bkms-success-2',
     },
     failed: {
-      container: '!border-[#F8B4B4] !bg-[#FFF0F0]',
-      divider: '!border-[#F8B4B4]',
-      status: 'text-[#EA3636]',
+      container: '!border-bkms-danger-4 !bkms-bg-danger-soft',
+      divider: '!border-bkms-danger-4',
+      status: 'text-bkms-danger-2',
     },
     paused: {
-      container: '!border-[#F9D090] !bg-[#FDF4E8]',
-      divider: '!border-[#F9D090]',
-      status: 'text-[#F59500]',
+      container: '!border-bkms-warning-4 !bkms-bg-warning-soft',
+      divider: '!border-bkms-warning-4',
+      status: 'text-bkms-warning-2',
     },
     rolledBack: {
-      container: '!border-[#F9D090] !bg-[#FDF4E8]',
-      divider: '!border-[#F9D090]',
-      status: 'text-[#F59500]',
+      container: '!border-bkms-warning-4 !bkms-bg-warning-soft',
+      divider: '!border-bkms-warning-4',
+      status: 'text-bkms-warning-2',
     },
     rollingBack: {
-      container: '!border-[#A3C5FD] !bg-[#F0F5FF]',
-      divider: '!border-[#A3C5FD]',
-      status: 'text-[#3A84FF]',
+      container: '!border-bkms-brand-4 !bg-bkms-brand-7',
+      divider: '!border-bkms-brand-4',
+      status: 'text-bkms-brand-2',
     },
     updating: {
-      container: '!border-[#A3C5FD] !bg-[#F0F5FF]',
-      divider: '!border-[#A3C5FD]',
-      status: 'text-[#3A84FF]',
+      container: '!border-bkms-brand-4 !bg-bkms-brand-7',
+      divider: '!border-bkms-brand-4',
+      status: 'text-bkms-brand-2',
     },
   };
 
   /** 状态 Tag 主题 → bkui Tag 配色：default 深灰字浅灰底，其余主题统一白字彩底。 */
   const TAG_CLASSES = {
-    danger: '!border-none !bg-[#EA3636] !text-[#FFF]',
-    default: '!border-none !bg-[#F0F1F5] !text-[#4D4F56]',
-    info: '!border-none !bg-[#3A84FF] !text-[#FFF]',
-    success: '!border-none !bg-[#2CAF5E] !text-[#FFF]',
-    warning: '!border-none !bg-[#F59500] !text-[#FFF]',
+    danger: '!border-none !bg-bkms-danger-2 !bkms-text-inverse',
+    default: '!border-none !bg-bkms-neutral-6 !text-bkms-neutral-2',
+    info: '!border-none !bg-bkms-brand-2 !bkms-text-inverse',
+    success: '!border-none !bg-bkms-success-2 !bkms-text-inverse',
+    warning: '!border-none !bg-bkms-warning-2 !bkms-text-inverse',
   } as const;
 
   const themeClass = computed(() => THEMES[props.view.kind]);
@@ -394,10 +394,10 @@
    * 当前批次（更新中 loading / 暂停中 warning）蓝色；失败红色；其余深灰，未开始浅灰。
    */
   function stepTitleClass(step: BatchReleaseStepVM): string {
-    if (step.stepStatus === 'loading' || step.tagTheme === 'warning') return 'text-[#3A84FF]';
-    if (step.stepStatus === 'error') return 'text-[#EA3636]';
-    if (step.stepStatus === 'done') return 'text-[#313238]';
-    return 'text-[#979BA5]';
+    if (step.stepStatus === 'loading' || step.tagTheme === 'warning') return 'text-bkms-brand-2';
+    if (step.stepStatus === 'error') return 'text-bkms-danger-2';
+    if (step.stepStatus === 'done') return 'text-bkms-neutral-1';
+    return 'text-bkms-neutral-3';
   }
 
   /** 占位标记：先把参数替换成标记再翻译，用于把标题切分为「普通文本 + 加粗参数」片段。 */
@@ -435,7 +435,7 @@
       ...(step.stepStatus ? { status: step.stepStatus } : {}),
       description: h(
         'div',
-        { class: 'text-[12px] leading-[18px] text-[#C4C6CC]' },
+        { class: 'text-[12px] leading-[18px] text-bkms-navy-5' },
         t(step.subtitle.key, step.subtitle.params),
       ),
       title: h('div', { class: 'flex items-center gap-[4px] text-[12px] leading-[20px]' }, [
@@ -490,7 +490,8 @@
 </script>
 
 <style lang="postcss" scoped>
-  :deep(.bk-step) {
+  /* 两层类名用于压过主题覆写层的 5 类选择器，单层 :deep(.bk-step) 只到 5 类，仅靠加载顺序取胜 */
+  :deep(.bk-steps.bk-steps-primary .bk-step) {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -509,15 +510,15 @@
     }
 
     &:not(.current, .done) .bk-step-number {
-      color: #4d4f56;
-      background-color: #eaebf0;
-      border-color: #eaebf0;
+      color: var(--bkms-neutral-2);
+      background-color: var(--bkms-neutral-6);
+      border-color: var(--bkms-neutral-6);
     }
 
     &.done:not(.current) .bk-step-number {
-      color: #2caf5e;
-      background-color: #cbf0da;
-      border-color: #cbf0da;
+      color: var(--bkms-success-2);
+      background-color: var(--bkms-success-5);
+      border-color: var(--bkms-success-5);
     }
 
     .bk-step-number::after {
@@ -527,7 +528,7 @@
       width: 4000px;
       height: 1px;
       content: '';
-      background-color: #dcdee5;
+      background-color: var(--bkms-neutral-5);
     }
 
     &.done .bk-step-number::after {
@@ -548,7 +549,7 @@
   }
 
   .batch-release-progress-banner :deep(.bk-button-default) {
-    background-color: #fff;
+    background-color: var(--bkms-bg-card);
   }
 </style>
 
@@ -570,12 +571,12 @@
   }
 
   .release-detail-popover__label {
-    color: #979ba5;
+    color: var(--bkms-neutral-3);
     white-space: nowrap;
   }
 
   .release-detail-popover__value {
-    color: #313238;
+    color: var(--bkms-neutral-1);
     white-space: nowrap;
   }
 </style>

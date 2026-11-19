@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="flex h-full min-h-0 flex-col overflow-hidden bg-[#f5f7fa]">
+  <div class="flex h-full min-h-0 flex-col overflow-hidden bg-bkms-neutral-7">
     <TabHeader
       v-model:active-tab="activeTab"
       :tabs="tabList"
@@ -64,7 +64,7 @@
             />
           </template>
           <template #description>
-            <div class="mt-[12px] text-[24px] leading-[32px] text-[#313238]">{{ $t('暂未配置七彩石') }}</div>
+            <div class="mt-[12px] text-[24px] leading-[32px] text-bkms-neutral-1">{{ $t('暂未配置七彩石') }}</div>
             <div class="mt-[4px] text-[14px]">{{ $t('配置页面地址后，会在下方嵌入七彩石页面。') }}</div>
           </template>
           <Button
@@ -126,7 +126,7 @@
             <p
               v-if="!draftEnabled"
               id="rainbow-disable-hint"
-              class="text-[12px] leading-[20px] text-[#979ba5]"
+              class="text-[12px] leading-[20px] text-bkms-neutral-3"
             >
               {{ $t('关闭后，当前应用将不再嵌入七彩石页面，七彩石上的原有配置不受影响。') }}
             </p>
@@ -148,14 +148,14 @@
           />
           <p
             id="rainbow-url-hint"
-            class="mt-[8px] text-[12px] leading-[20px] text-[#979ba5]"
+            class="mt-[8px] text-[12px] leading-[20px] text-bkms-neutral-3"
           >
             {{ $t('只支持 https。建议填写适配 iframe、没有顶部导航的七彩石页面地址。') }}
           </p>
           <p
             v-show="validationError"
             id="rainbow-url-error"
-            class="mt-[4px] text-[12px] text-[#ea3636]"
+            class="mt-[4px] text-[12px] text-bkms-danger-2"
             role="alert"
           >
             {{ validationError }}

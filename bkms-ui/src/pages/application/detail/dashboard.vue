@@ -70,7 +70,7 @@
             <Select
               ref="dashboardSelectRef"
               v-model="selectedDashboardUid"
-              class="w-[280px] bkms-bg-card"
+              class="w-[280px]"
               :clearable="false"
               filterable
               :placeholder="$t('请选择仪表盘')"

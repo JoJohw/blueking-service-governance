@@ -32,8 +32,8 @@
       >
         <span>{{ title }}</span>
         <template v-if="headerName">
-          <span class="mx-[12px] h-[12px] w-px shrink-0 bg-[#dcdee5]"></span>
-          <span class="text-[14px] leading-[22px] text-[#979ba5]">{{ headerName }}</span>
+          <span class="mx-[12px] h-[12px] w-px shrink-0 bg-bkms-neutral-5"></span>
+          <span class="text-[14px] leading-[22px] text-bkms-neutral-3">{{ headerName }}</span>
           <Tag
             v-if="showBuiltinTag"
             class="ml-[8px]"
@@ -114,8 +114,8 @@
       >
         <div class="flex flex-col gap-[8px]">
           <div class="flex items-center gap-[4px] text-[12px] leading-[20px]">
-            <span class="font-700 text-[#313238]">{{ t('发布批次') }}</span>
-            <span class="text-[#ea3636]">*</span>
+            <span class="font-700 text-bkms-neutral-1">{{ t('发布批次') }}</span>
+            <span class="text-bkms-danger-2">*</span>
             <!-- <span class="text-[#979ba5]"> （{{ t('更新实例会换镜像；调整流量只改已更新实例的北极星权重') }}） </span> -->
           </div>
 
@@ -141,7 +141,7 @@
 
           <div
             v-if="batchesEmptyError"
-            class="text-[12px] leading-[20px] text-[#ea3636]"
+            class="text-[12px] leading-[20px] text-bkms-danger-2"
           >
             {{ batchesEmptyError }}
           </div>

@@ -73,7 +73,7 @@
               <span class="truncate">{{ item.label }}</span>
               <span
                 v-if="item.isBuiltin"
-                class="shrink-0 rounded-[2px] bg-[#F0F1F5] px-[6px] text-[10px] leading-[16px] text-[#4D4F56]"
+                class="shrink-0 rounded-bkms-tag bg-bkms-neutral-6 px-[6px] text-[10px] leading-[16px] text-bkms-neutral-2"
               >
                 {{ $t('平台内置') }}
               </span>
@@ -85,12 +85,12 @@
               @click="handleCreateStrategy"
             >
               <Plus
-                class="border-[1px] border-solid rounded-[50%] border-[#979BA5]"
-                fill="#979BA5"
+                class="border-[1px] border-solid rounded-bkms-full border-bkms-neutral-3"
+                fill="var(--bkms-neutral-3)"
                 height="16px"
                 width="16px"
               />
-              <span class="text-[#4D4F56] !text-[12px]">
+              <span class="text-bkms-neutral-2 !text-[12px]">
                 {{ $t('新建策略') }}
               </span>
             </div>
@@ -109,7 +109,7 @@
       </div>
       <div
         v-if="hintText"
-        class="mt-[8px] text-[12px] leading-[20px] text-[#979BA5]"
+        class="mt-[8px] text-[12px] leading-[20px] text-bkms-neutral-3"
       >
         {{ hintText }}
       </div>
