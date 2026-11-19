@@ -17,32 +17,27 @@
  */
 
 import { deltaE, normalizeHex } from './color-diff';
-import { type Token, resolved } from './tokens';
+import { type Group, type Token, resolved } from './tokens';
 
 export interface SearchHit {
-  groupId: string;
-  groupLabel: string;
-  kind: 'ramp' | 'semantic';
+  group: Group;
   token: Token;
 }
 
-interface SearchableGroup {
-  id: string;
-  kind: 'ramp' | 'semantic';
-  label: string;
-  note?: string;
-  tokens: Token[];
+/** 结果分块的呈现描述，由调用方按视图组装，搜索层与展示组件都只消费 */
+export interface SearchBlock {
+  key: string;
+  title: string;
+  variant: 'ramp' | 'semantic';
+  hits: SearchHit[];
 }
 
-const groups: SearchableGroup[] = [];
-
-/** 注册可搜索的分组（色阶 + 语义层），调用一次即可 */
-export function registerSearchGroups(list: SearchableGroup[]): void {
-  groups.splice(0, groups.length, ...list);
-}
-
-/** 按关键字搜索 token：颜色格式转 hex 后匹配解析色值（精确优先、ΔE≤3 兜底），否则按名称/说明/引用/分组匹配 */
-export function searchTokens(input: string): SearchHit[] {
+/**
+ * 在给定分组里搜 token：作用域由调用方传入（当前视图的分组），本模块不认识视图概念。
+ * 颜色格式转 hex 后按 CIEDE2000 匹配解析色值（精确优先、ΔE≤3 兜底），否则按名称/说明/引用/分组匹配。
+ * 长度令牌（圆角）转不出 hex，色差为 NaN 自然落选，文本路径仍能命中 value。
+ */
+export function searchTokens(groups: Group[], input: string): SearchHit[] {
   const query = input.trim();
   if (!query) return [];
   const hex = normalizeHex(query);
@@ -52,7 +47,7 @@ export function searchTokens(input: string): SearchHit[] {
   const hits: SearchHit[] = [];
   for (const group of groups) {
     for (const token of group.tokens) {
-      const hit: SearchHit = { groupId: group.id, groupLabel: group.label, kind: group.kind, token };
+      const hit: SearchHit = { group, token };
       if (hex !== null) {
         const distance = deltaE(hex, resolved(token.value));
         if (distance <= 3) colored.push({ ...hit, distance });
@@ -69,17 +64,10 @@ export function searchTokens(input: string): SearchHit[] {
     }
   }
   if (hex !== null) {
-    if (colored.length) {
-      const exact = colored.filter(item => item.distance === 0);
-      const chosen = exact.length ? exact : colored.sort((a, b) => a.distance - b.distance);
-      return chosen.map(item => ({
-        groupId: item.groupId,
-        groupLabel: item.groupLabel,
-        kind: item.kind,
-        token: item.token,
-      }));
-    }
-    return [];
+    if (!colored.length) return [];
+    const exact = colored.filter(item => item.distance === 0);
+    const chosen = exact.length ? exact : colored.sort((a, b) => a.distance - b.distance);
+    return chosen.map(({ group, token }) => ({ group, token }));
   }
   return hits;
 }

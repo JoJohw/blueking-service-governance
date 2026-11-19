@@ -203,14 +203,16 @@ const colorFile = parse(colorRaw, 'ramp');
 const radiusFile = parse(radiusRaw, 'rad');
 const vizFile = parse(vizRaw, 'viz', 'viz');
 
-const colorMap = new Map(colorFile.tokens.map(token => [token.name, token.value]));
+const valueMap = new Map(
+  [...colorFile.tokens, ...radiusFile.tokens, ...vizFile.tokens].map(token => [token.name, token.value]),
+);
 
-/** 解开 var() 链拿到色值；非纯 var()（如 color-mix）原样交给浏览器解析，用 seen 防循环引用 */
+/** 解开 var() 链拿到最终值（色值 / 圆角长度）；非纯 var()（如 color-mix）原样交给浏览器解析，用 seen 防循环引用 */
 export function resolved(value: string, seen = new Set<string>()): string {
   const ref = /^var\((--[\w-]+)\)$/.exec(value)?.[1];
   if (!ref || seen.has(ref)) return value;
   seen.add(ref);
-  const next = colorMap.get(ref);
+  const next = valueMap.get(ref);
   return next === undefined ? value : resolved(next, seen);
 }
 
@@ -229,7 +231,7 @@ export const rampGroups: Group[] = colorFile.groups
 /** 语义层：@layer semantic 的分组——语义 token 引用色阶，主题换色时自动联动；阴影组按场景命名，值即完整效果 */
 export const allSemanticGroups: Group[] = colorFile.groups.filter(group => group.layer === 'semantic');
 
-/** 圆角维度：两个分组（档位 / 圆角语义），语义档只 var() 引用档位，故 resolved() 解析不出色值，由预览组件直接按长度渲染 */
+/** 圆角维度：两个分组（档位 / 圆角语义），语义档只 var() 引用档位，resolved() 按长度值解开 */
 export const radiusGroups: Group[] = radiusFile.groups;
 
 /** 可视化字典：viz.css 的分组独立成第三视图，不并入颜色视图的色阶 / 语义二分；值是实色，resolved() 直接展示 */

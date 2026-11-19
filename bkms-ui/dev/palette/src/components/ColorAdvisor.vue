@@ -130,9 +130,9 @@
             </li>
           </ul>
         </template>
-
-        <p class="advisor-foot">CIEDE2000 · 阈值 ΔE ≤ {{ threshold }}</p>
       </div>
+
+      <p class="advisor-foot">CIEDE2000 · 阈值 ΔE ≤ {{ threshold }}</p>
     </div>
   </Transition>
 </template>
@@ -159,7 +159,14 @@
 
   const panelRef = ref<HTMLElement | null>(null);
   const inputRef = ref<HTMLInputElement | null>(null);
-  const { pos, onPointerDown, onPointerMove, onPointerUp } = useDrag({ target: panelRef });
+  const { pos, dragging, onPointerDown, onPointerMove, onPointerUp: endDrag } = useDrag({ target: panelRef });
+
+  /**
+   * 面板下沿：打开时取胶囊顶部上方的快照，内容变高时向上长而不是向下铺。
+   * 快照语义——面板开着时把胶囊拖走不跟随，只在下次打开或面板自身拖动结束时刷新。
+   */
+  const anchorBottom = ref(0);
+  let observer: null | ResizeObserver = null;
 
   function onKeydown(event: KeyboardEvent): void {
     if (props.open && event.key === 'Escape') emit('update:open', false);
@@ -169,25 +176,44 @@
     raw.value = (event.target as HTMLInputElement).value.toUpperCase();
   }
 
+  function onPointerUp(): void {
+    endDrag();
+    const panel = panelRef.value;
+    if (panel) anchorBottom.value = pos.value.y + panel.offsetHeight;
+  }
+
+  function syncToAnchor(): void {
+    const panel = panelRef.value;
+    if (!panel || dragging.value) return;
+    pos.value = { ...pos.value, y: Math.max(12, anchorBottom.value - panel.offsetHeight) };
+  }
+
   watch(
     () => props.open,
     open => {
+      observer?.disconnect();
       if (!open) return;
       nextTick(() => {
         const panel = panelRef.value;
-        if (panel) {
-          pos.value = {
-            x: Math.max(12, Math.min(props.anchor.x - 40, window.innerWidth - panel.offsetWidth - 12)),
-            y: Math.max(12, props.anchor.y - panel.offsetHeight - 12),
-          };
-        }
+        if (!panel) return;
+        anchorBottom.value = props.anchor.y - 12;
+        pos.value = {
+          x: Math.max(12, Math.min(props.anchor.x - 40, window.innerWidth - panel.offsetWidth - 12)),
+          y: Math.max(12, anchorBottom.value - panel.offsetHeight),
+        };
         inputRef.value?.focus();
+        observer = new ResizeObserver(syncToAnchor);
+        observer.observe(panel);
       });
     },
+    { immediate: true },
   );
 
   onMounted(() => window.addEventListener('keydown', onKeydown));
-  onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
+  onBeforeUnmount(() => {
+    observer?.disconnect();
+    window.removeEventListener('keydown', onKeydown);
+  });
 </script>
 
 <style scoped>
@@ -197,7 +223,10 @@
     left: 0;
     z-index: 50;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     width: 520px;
+    max-height: calc(100vh - 24px);
     overflow: hidden;
     font:
       14px/1.5 -apple-system,
@@ -214,6 +243,7 @@
 
   .advisor-bar {
     display: flex;
+    flex: none;
     align-items: center;
     justify-content: space-between;
     padding: 16px 22px;
@@ -243,7 +273,10 @@
   }
 
   .advisor-body {
+    flex: 1;
+    min-height: 0;
     padding: 20px 22px 16px;
+    overflow-y: auto;
   }
 
   .field-label {
@@ -385,10 +418,8 @@
   }
 
   .advisor-list {
-    max-height: 280px;
     padding: 0;
     margin: 8px 0 0;
-    overflow-y: auto;
     list-style: none;
   }
 
@@ -461,8 +492,9 @@
   }
 
   .advisor-foot {
-    padding-top: 14px;
-    margin: 12px 0 0;
+    flex: none;
+    padding: 12px 22px 14px;
+    margin: 0;
     font-size: 11px;
     color: var(--pal-text-muted, var(--pal-text-body));
     text-align: center;

@@ -24,9 +24,11 @@
     <aside class="palette-aside">
       <header class="palette-head">
         <h1>{{ viewTitle }}</h1>
-        <p v-if="viewMode === 'color'">源自 <code>color.css</code>。点色块复制 <code>var()</code>。</p>
-        <p v-else-if="viewMode === 'radius'">源自 <code>radius.css</code>。点卡片复制 <code>var()</code>。</p>
-        <p v-else>源自 <code>viz.css</code>。按语义看小样，点卡片复制 <code>var()</code>。</p>
+        <p v-if="viewMode === 'color'">源自 <code>color.css</code>。点色块复制色值，悬停可复制 <code>var()</code>。</p>
+        <p v-else-if="viewMode === 'radius'">
+          源自 <code>radius.css</code>。点卡片复制半径，悬停可复制 <code>var()</code>。
+        </p>
+        <p v-else>源自 <code>viz.css</code>。按语义看小样，点卡片复制色值，悬停可复制 <code>var()</code>。</p>
       </header>
 
       <nav class="view-tabs">
@@ -101,75 +103,24 @@
       </nav>
     </aside>
 
-    <div
-      v-if="!isFocus && viewMode === 'color'"
-      class="search-bar"
-    >
-      <span class="search-icon">⌕</span>
-      <input
-        v-model="searchQuery"
-        aria-label="搜索色值 token"
-        class="search-input"
-        placeholder="搜索 token 名 / 用途 / 分组，或输入颜色值（hex / rgb / hsl）"
-        spellcheck="false"
-        type="text"
-      />
-      <button
-        v-if="searchQuery"
-        aria-label="清空搜索"
-        class="search-clear"
-        type="button"
-        @click="searchQuery = ''"
-      >
-        ×
-      </button>
-    </div>
+    <SearchBar
+      v-if="!isFocus"
+      v-model="searchQuery"
+      :compact="isSearching"
+      :placeholder="searchPlaceholder"
+    />
 
     <main
       ref="mainRef"
       class="palette-main"
     >
-      <div
-        v-if="isSearching && viewMode === 'color'"
-        class="search-results"
-      >
-        <template v-if="searchHits.length">
-          <p class="search-result-count">找到 {{ searchHits.length }} 个 token</p>
-          <section
-            v-for="block in searchBlocks"
-            :key="block.key"
-            class="search-block"
-          >
-            <h3 class="search-block-title">
-              {{ block.title }} <span>{{ block.hits.length }}</span>
-            </h3>
-            <div class="ramp ramp-grid">
-              <TokenCell
-                v-for="hit in block.hits"
-                :key="hit.token.name"
-                :token="hit.token"
-                :variant="block.variant"
-                @copy="copy"
-              />
-            </div>
-          </section>
-        </template>
-        <div
-          v-else
-          class="search-empty"
-        >
-          <span class="search-empty-icon">⌕</span>
-          <p>没有找到匹配的 token</p>
-          <small>换个关键字，或试试 hex / rgb() / hsl() 颜色值</small>
-          <button
-            class="search-empty-reset"
-            type="button"
-            @click="searchQuery = ''"
-          >
-            清空搜索
-          </button>
-        </div>
-      </div>
+      <SearchResults
+        v-if="isSearching"
+        :blocks="searchBlocks"
+        :empty-hint="searchEmptyHint"
+        @clear="searchQuery = ''"
+        @copy="copy"
+      />
 
       <TransitionGroup
         v-else-if="viewMode === 'color'"
@@ -372,16 +323,13 @@
   import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 
   import ColorAdvisor from './components/ColorAdvisor.vue';
+  import SearchBar from './components/SearchBar.vue';
+  import SearchResults from './components/SearchResults.vue';
   import SectionPanel from './components/SectionPanel.vue';
   import TokenCell from './components/TokenCell.vue';
-  import { registerSearchGroups, searchTokens } from './util/search';
+  import { type SearchBlock, searchTokens } from './util/search';
   import { allSemanticGroups, radiusGroups, rampGroups, vizGroups } from './util/tokens';
   import { useDrag } from './util/useDrag';
-
-  registerSearchGroups([
-    ...rampGroups.map(group => ({ ...group, kind: 'ramp' as const })),
-    ...allSemanticGroups.map(group => ({ ...group, kind: 'semantic' as const })),
-  ]);
 
   const viewTabs = [
     { label: '颜色', value: 'color' as const },
@@ -395,26 +343,78 @@
   const radiusScaleGroups = computed(() => radiusGroups.filter(group => group.layer === 'scale'));
   const radiusSemanticGroups = computed(() => radiusGroups.filter(group => group.layer === 'semantic'));
 
+  const activeId = ref('');
+  const mainRef = ref<HTMLElement | null>(null);
+  const allGroups = computed(() =>
+    viewMode.value === 'color'
+      ? [...rampGroups, ...allSemanticGroups]
+      : viewMode.value === 'radius'
+        ? radiusGroups
+        : vizGroups,
+  );
+  const sectionIds = computed(() => allGroups.value.map(group => group.id));
+  let clickLockId = '';
+
   const copied = ref('');
   const advisorOpen = ref(false);
   const searchQuery = ref('');
   const isSearching = computed(() => searchQuery.value.trim().length > 0);
-  const searchHits = computed(() => searchTokens(searchQuery.value));
-  const searchBlocks = computed(() =>
-    [
-      {
-        key: 'ramp',
-        variant: 'ramp' as const,
-        title: '色阶',
-        hits: searchHits.value.filter(hit => hit.kind === 'ramp'),
-      },
-      {
-        key: 'semantic',
-        variant: 'semantic' as const,
-        title: '语义层',
-        hits: searchHits.value.filter(hit => hit.kind === 'semantic'),
-      },
-    ].filter(block => block.hits.length > 0),
+  const searchHits = computed(() => searchTokens(allGroups.value, searchQuery.value));
+  const searchBlocks = computed<SearchBlock[]>(() => {
+    const hits = searchHits.value;
+    const buckets = new Map<string, SearchBlock>();
+    const push = (key: string, title: string, variant: SearchBlock['variant'], list: SearchBlock['hits']) => {
+      if (list.length) buckets.set(key, { key, title, variant, hits: list });
+    };
+    if (viewMode.value === 'color') {
+      push(
+        'ramp',
+        '色阶',
+        'ramp',
+        hits.filter(hit => hit.group.layer === 'scale'),
+      );
+      push(
+        'semantic',
+        '语义层',
+        'semantic',
+        hits.filter(hit => hit.group.layer === 'semantic'),
+      );
+    } else if (viewMode.value === 'radius') {
+      push(
+        'rad-scale',
+        '档位',
+        'semantic',
+        hits.filter(hit => hit.group.layer === 'scale'),
+      );
+      push(
+        'rad-semantic',
+        '圆角语义',
+        'semantic',
+        hits.filter(hit => hit.group.layer === 'semantic'),
+      );
+    } else {
+      for (const hit of hits) {
+        const block: SearchBlock = buckets.get(hit.group.id) ?? {
+          key: hit.group.id,
+          title: hit.group.label,
+          variant: 'semantic',
+          hits: [],
+        };
+        block.hits.push(hit);
+        buckets.set(block.key, block);
+      }
+    }
+    return [...buckets.values()];
+  });
+  const searchPlaceholder = computed(() =>
+    viewMode.value === 'radius'
+      ? '搜索档位 / 用途 / 分组，或输入半径值（如 6px）'
+      : '搜索 token 名 / 用途 / 分组，或输入颜色值（hex / rgb / hsl）',
+  );
+  const searchEmptyHint = computed(() =>
+    viewMode.value === 'radius'
+      ? '换个关键字，或试试档位名 / 半径值（如 6px）'
+      : '换个关键字，或试试 hex / rgb() / hsl() 颜色值',
   );
   let copyTimer = 0;
 
@@ -444,18 +444,6 @@
     }
     advisorOpen.value = !advisorOpen.value;
   }
-
-  const activeId = ref('');
-  const mainRef = ref<HTMLElement | null>(null);
-  const allGroups = computed(() =>
-    viewMode.value === 'color'
-      ? [...rampGroups, ...allSemanticGroups]
-      : viewMode.value === 'radius'
-        ? radiusGroups
-        : vizGroups,
-  );
-  const sectionIds = computed(() => allGroups.value.map(group => group.id));
-  let clickLockId = '';
 
   const focusId = ref<null | string>(null);
   const isFocus = computed(() => focusId.value !== null);
@@ -639,149 +627,8 @@
     scrollbar-gutter: stable;
   }
 
-  .search-bar {
-    position: fixed;
-    top: 18px;
-    left: calc(50% + 110px);
-    z-index: 45;
-    box-sizing: border-box;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    width: min(680px, 64vw);
-    padding: 12px 18px;
-    background: var(--pal-bg-card);
-    border: 1px solid var(--pal-line);
-    border-radius: 24px;
-    box-shadow: 0 4px 16px var(--pal-shadow-popover);
-    transform: translateX(-50%);
-    transition: left 0.3s ease;
-  }
-
-  .is-searching .search-bar {
-    left: 50%;
-  }
-
-  .search-icon {
-    flex: none;
-    font-size: 22px;
-    line-height: 1;
-    color: var(--pal-text-muted, var(--pal-text-body));
-  }
-
-  .search-input {
-    flex: 1;
-    min-width: 0;
-    padding: 0;
-    font: inherit;
-    font-size: 16px;
-    color: var(--pal-text-title);
-    outline: none;
-    background: none;
-    border: none;
-  }
-
-  .search-input::placeholder {
-    color: var(--pal-text-muted, var(--pal-text-body));
-  }
-
-  .search-clear {
-    display: flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 26px;
-    padding: 0;
-    font-size: 20px;
-    line-height: 1;
-    color: var(--pal-text-body);
-    cursor: pointer;
-    background: var(--pal-bg-head);
-    border: none;
-    border-radius: 50%;
-  }
-
-  .search-clear:hover {
-    color: var(--pal-text-title);
-    background: var(--pal-bg-hover);
-  }
-
   .section-list {
     padding-top: 72px;
-  }
-
-  .search-results {
-    padding-top: 72px;
-  }
-
-  .search-result-count {
-    padding: 0 16px;
-    margin: 0 0 16px;
-    font-size: 13px;
-    color: var(--pal-text-body);
-  }
-
-  .search-block + .search-block {
-    margin-top: 24px;
-  }
-
-  .search-block-title {
-    display: flex;
-    gap: 8px;
-    align-items: baseline;
-    padding: 0 16px;
-    margin: 0 0 12px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--pal-text-title);
-  }
-
-  .search-block-title span {
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--pal-text-muted, var(--pal-text-body));
-  }
-
-  .search-empty {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-    padding: 96px 0;
-    color: var(--pal-text-muted, var(--pal-text-body));
-    text-align: center;
-  }
-
-  .search-empty-icon {
-    font-size: 48px;
-    line-height: 1;
-  }
-
-  .search-empty p {
-    margin: 0;
-    font-size: 16px;
-    color: var(--pal-text-body);
-  }
-
-  .search-empty small {
-    font-size: 13px;
-  }
-
-  .search-empty-reset {
-    padding: 6px 18px;
-    margin-top: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--pal-brand);
-    cursor: pointer;
-    background: var(--pal-bg-card);
-    border: 1px solid var(--pal-brand);
-    border-radius: 4px;
-  }
-
-  .search-empty-reset:hover {
-    background: var(--pal-bg-active);
   }
 
   .palette-head h1 {
@@ -931,7 +778,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .ramp-grid > :deep(*) {
+  .ramp-grid > :deep(.token-card-wrap) {
     width: auto;
   }
 
