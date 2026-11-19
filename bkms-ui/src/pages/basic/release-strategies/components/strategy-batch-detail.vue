@@ -34,15 +34,21 @@
       <div class="text-[12px] font-700 leading-[20px] text-bkms-neutral-1">{{ t('目标资源') }}</div>
       <!-- 错误文案紧跟输入行（gap 4px），说明文案在其下方 -->
       <div class="flex flex-col gap-[4px]">
-        <div class="flex items-stretch">
+        <div
+          class="target-group inline-flex h-[32px] items-stretch self-start overflow-hidden rounded-bkms-field border border-solid"
+          :class="
+            error
+              ? 'border-bkms-danger-2'
+              : 'border-bkms-navy-5 hover:border-bkms-neutral-3 focus-within:border-bkms-brand-2'
+          "
+        >
           <span
-            class="flex h-[32px] shrink-0 items-center whitespace-nowrap rounded-l-bkms-base border border-solid border-bkms-navy-5 border-r-0 bg-bkms-neutral-8 px-[12px] text-[12px] text-bkms-neutral-2"
+            class="flex shrink-0 items-center whitespace-nowrap border-r border-r-bkms-navy-5 bg-bkms-neutral-8 px-[12px] text-[12px] leading-[20px] text-bkms-neutral-2"
           >
             {{ t('累计更新副本数') }}
           </span>
           <Input
-            class="target-value w-[120px] ml-[-1px] relative hover:z-10"
-            :class="{ 'bkms-line-danger z-10': Boolean(error) }"
+            class="target-value"
             data-testid="target-value"
             :disabled="readonly"
             :max="targetValueMax"
@@ -52,7 +58,7 @@
             @update:model-value="handleTargetChange"
           />
           <Select
-            class="target-unit w-[96px] ml-[-1px] relative hover:z-10"
+            class="target-unit"
             :clearable="false"
             :disabled="readonly"
             :list="unitList"
@@ -329,22 +335,35 @@
     line-height: 20px;
   }
 
-  /* 三段拼接的输入组：靠深层选择器抹平组件库圆角，原子类无法穿透子组件根节点 */
+  /* 三段视为一个控件：边框与圆角只由外层容器承载，内部控件去边框、去圆角 */
   .target-value {
+    flex-shrink: 0;
     width: 120px;
   }
 
-  .target-value :deep(.bk-input) {
-    border-radius: var(--bkms-radius-none);
-  }
-
   .target-unit {
+    flex-shrink: 0;
     width: 96px;
   }
 
-  .target-unit :deep(.bk-select) {
-    border-radius: var(--bkms-radius-field);
-    border-start-start-radius: var(--bkms-radius-none);
-    border-end-start-radius: var(--bkms-radius-none);
+  .target-group :deep(.bk-input),
+  .target-group :deep(.bk-select-trigger) {
+    height: 100%;
+    background-color: transparent;
+    border: 0;
+    border-radius: var(--bkms-radius-none);
+  }
+
+  /* 单位选择器左侧留一条分隔线，与标签右侧分隔线同色 */
+  .target-group :deep(.bk-select) {
+    height: 100%;
+    background-color: transparent;
+    border: 0;
+    border-left: 1px solid var(--bkms-navy-5);
+    border-radius: var(--bkms-radius-none);
+  }
+
+  .target-group :deep(.is-disabled) {
+    background-color: var(--bkms-bg-subtle);
   }
 </style>
