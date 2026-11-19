@@ -37,6 +37,7 @@ const RULE_TITLE = {
   'theme/no-foreign-var': '非白名单 var() 引用',
   'theme/no-hardcoded-radius': '写死圆角（改用语义档）',
   'theme/prefer-radius-class': '圆角未走语义注册类',
+  'theme/no-stacked-radius': '圆角类叠加（同一角多个来源）',
 };
 
 const ruleFilter = process.argv.find(a => a.startsWith('--rule='))?.slice('--rule='.length);

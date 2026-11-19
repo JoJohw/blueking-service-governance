@@ -22,7 +22,7 @@
     class="h-full min-h-0 p-[16px]"
   >
     <div
-      class="max-h-full overflow-hidden rounded-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+      class="max-h-full overflow-hidden rounded-bkms-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
     >
       <Skeleton
         :loading="loading"
@@ -614,14 +614,14 @@
         'div',
         {
           class:
-            'bkms-bg-page leading-[32px] px-[16px] mt-[16px] border-1 bkms-line-light rounded-[2px] border-b-transparent',
+            'bkms-bg-page leading-[32px] px-[16px] mt-[16px] border-1 bkms-line-light rounded-bkms-base border-b-transparent',
         },
         [h('span', [t('已选择以下 {0} 个实例', [selections.value.length])])],
       ),
       h(
         'div',
         {
-          class: 'max-h-[160px] overflow-auto border-1 border-t-transparent bkms-line-light rounded-[2px]',
+          class: 'max-h-[160px] overflow-auto border-1 border-t-transparent bkms-line-light rounded-bkms-base',
         },
         [...instances],
       ),

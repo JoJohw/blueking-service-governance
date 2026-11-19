@@ -32,7 +32,7 @@
     <div
       v-bind="$attrs"
       :class="[
-        'flex items-center min-w-[280px] h-[32px] rounded-[2px] cursor-pointer overflow-hidden transition-all duration-200',
+        'flex items-center min-w-[280px] h-[32px] rounded-bkms-field cursor-pointer overflow-hidden transition-all duration-200',
         isDarkTheme
           ? 'h-full bg-bkms-navy-2 hover:bg-bkms-neutral-2'
           : 'border border-bkms-navy-5 bkms-bg-card transition-border-color hover:bkms-line-hover',
@@ -422,7 +422,7 @@
 <style lang="postcss" scoped>
   :deep(.bk-input.is-simplicity) {
     border-bottom-color: var(--bkms-neutral-5) !important;
-    border-radius: 0 !important;
+    border-radius: var(--bkms-radius-none) !important;
 
     &:hover {
       background-color: transparent !important;
@@ -460,7 +460,7 @@
       content: '';
       border-bottom: 1px solid var(--bkms-neutral-5);
       border-left: 1px solid var(--bkms-neutral-5);
-      border-bottom-left-radius: 8px;
+      border-bottom-left-radius: var(--bkms-radius-field);
     }
   }
 </style>

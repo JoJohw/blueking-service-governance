@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="flex items-center h-[32px] bg-bkms-neutral-6 rounded-[2px] px-[4px] flex-nowrap">
+  <div class="flex items-center h-[32px] bg-bkms-neutral-6 rounded-bkms-tab px-[4px] flex-nowrap">
     <div
       v-for="(item, index) in tabs"
       :key="index"

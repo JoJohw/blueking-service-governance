@@ -24,10 +24,8 @@
     <!-- 搜索输入框 -->
     <div
       :class="[
-        'topo-search__input group flex items-center h-[32px] border rounded-[2px] transition-colors',
-        isFocused
-          ? 'bkms-line-active bkms-bg-card'
-          : 'border-bkms-navy-5 bkms-bg-card hover:bkms-line-hover',
+        'topo-search__input group flex items-center h-[32px] border rounded-bkms-field transition-colors',
+        isFocused ? 'bkms-line-active bkms-bg-card' : 'border-bkms-navy-5 bkms-bg-card hover:bkms-line-hover',
       ]"
     >
       <input
@@ -56,7 +54,7 @@
           class="flex items-center gap-[2px] text-[12px] bkms-text-secondary shrink-0"
         >
           <span
-            class="flex items-center justify-center w-[20px] h-[20px] cursor-pointer hover:bkms-text-brand rounded-[2px] hover:bg-bkms-neutral-6"
+            class="flex items-center justify-center w-[20px] h-[20px] cursor-pointer hover:bkms-text-brand rounded-bkms-field hover:bg-bkms-neutral-6"
             :title="t('上一个')"
             @click.stop="navigatePrev"
           >
@@ -64,7 +62,7 @@
           </span>
           <span class="tabular-nums">{{ currentIndex + 1 }} / {{ matchedNodes.length }}</span>
           <span
-            class="flex items-center justify-center w-[20px] h-[20px] cursor-pointer hover:bkms-text-brand rounded-[2px] hover:bg-bkms-neutral-6"
+            class="flex items-center justify-center w-[20px] h-[20px] cursor-pointer hover:bkms-text-brand rounded-bkms-field hover:bg-bkms-neutral-6"
             :title="t('下一个')"
             @click.stop="navigateNext"
           >
@@ -93,7 +91,7 @@
       <div
         v-show="showDropdown"
         ref="dropdownRef"
-        class="topo-search-dropdown fixed z-[9999] bkms-bg-card rounded-[4px] shadow-[0_3px_8px_0_var(--bkms-shadow-popover)] border bkms-line-default max-h-[320px] overflow-y-auto py-[4px]"
+        class="topo-search-dropdown fixed z-[9999] bkms-bg-card rounded-bkms-overlay shadow-[0_3px_8px_0_var(--bkms-shadow-popover)] border bkms-line-default max-h-[320px] overflow-y-auto py-[4px]"
         :style="dropdownStyle"
       >
         <!-- 有结果 -->

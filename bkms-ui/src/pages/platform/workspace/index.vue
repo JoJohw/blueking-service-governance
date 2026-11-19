@@ -32,12 +32,12 @@
         >
           <span class="inline-flex gap-[7px] items-center">
             <span
-              class="w-[8px] h-[8px] rounded-full shadow-[0_0_0_3px_var(--bkms-neutral-6)]"
+              class="w-[8px] h-[8px] rounded-bkms-full shadow-[0_0_0_3px_var(--bkms-neutral-6)]"
               :style="{ backgroundColor: item.color }"
             />
             <span>{{ item.label }}</span>
             <span
-              class="min-w-[22px] px-[8px] leading-[20px] bkms-text-body text-center bkms-bg-card rounded-[10px]"
+              class="min-w-[22px] px-[8px] leading-[20px] bkms-text-body text-center bkms-bg-card rounded-bkms-card"
               :class="activeState === item.value ? '!bkms-text-brand !bkms-bg-active' : ''"
             >
               {{ formatCount(statusCounts[item.key]) }}
@@ -90,7 +90,7 @@
         <template #default="{ row, rowIndex }: { row: WorkspaceWithStatsOutput; rowIndex?: number }">
           <div class="flex items-center min-w-0">
             <span
-              class="inline-flex shrink-0 items-center justify-center w-[40px] h-[40px] text-[16px] font-semibold bkms-text-inverse rounded-[4px]"
+              class="inline-flex shrink-0 items-center justify-center w-[40px] h-[40px] text-[16px] font-semibold bkms-text-inverse rounded-bkms-base"
               :style="{ backgroundColor: getIconBackground(rowIndex) }"
             >
               {{ getWorkspaceInitial(row) }}
@@ -149,7 +149,7 @@
         <template #default="{ row }: { row: WorkspaceWithStatsOutput }">
           <span class="inline-flex gap-[10px] items-center">
             <span
-              class="w-[8px] h-[8px] rounded-full shadow-[0_0_0_3px_var(--bkms-neutral-6)]"
+              class="w-[8px] h-[8px] rounded-bkms-full shadow-[0_0_0_3px_var(--bkms-neutral-6)]"
               :style="{ backgroundColor: getStateColor(row.state) }"
             />
             {{ getStateLabel(row.state) }}

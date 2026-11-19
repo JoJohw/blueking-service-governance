@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center gap-[8px] text-[12px]">
     <span
-      class="inline-block w-[4px] h-[14px] rounded-[1px]"
+      class="inline-block w-[4px] h-[14px] rounded-bkms-indicator"
       :style="{ backgroundColor: color }"
     ></span>
     <span>{{ label }}</span>

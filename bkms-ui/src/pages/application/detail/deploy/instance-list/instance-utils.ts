@@ -73,9 +73,7 @@ export function renderDeleteInfoBoxContent(selectedInstances: AppInstanceOutputO
   }
 
   const instances = selectedInstances.map((item, i) =>
-    h('div', { class: ['px-[16px] leading-[32px]', { 'bkms-bg-subtle': i % 2 > 0 }] }, [
-      `${item.id} (${item.ip})`,
-    ]),
+    h('div', { class: ['px-[16px] leading-[32px]', { 'bkms-bg-subtle': i % 2 > 0 }] }, [`${item.id} (${item.ip})`]),
   );
 
   return h('div', [
@@ -84,15 +82,14 @@ export function renderDeleteInfoBoxContent(selectedInstances: AppInstanceOutputO
       'div',
       {
         class:
-          'bkms-bg-page leading-[32px] px-[16px] mt-[16px] border-1 bkms-line-light rounded-[2px] border-b-transparent',
+          'bkms-bg-page leading-[32px] px-[16px] mt-[16px] border-1 bkms-line-light rounded-bkms-base border-b-transparent',
       },
       [h('span', [t('已选择以下 {0} 个实例', [selectedInstances.length])])],
     ),
     h(
       'div',
       {
-        class:
-          'max-h-[200px] overflow-auto border-1 border-t-transparent bkms-line-light rounded-[2px] p-[12px]',
+        class: 'max-h-[200px] overflow-auto border-1 border-t-transparent bkms-line-light rounded-bkms-base p-[12px]',
       },
       [...instances],
     ),

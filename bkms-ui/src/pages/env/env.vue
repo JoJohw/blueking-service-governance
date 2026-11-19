@@ -167,7 +167,7 @@
           </template>
           <template #default="{ row }">
             <span
-              class="env-normal inline-flex items-center justify-center min-w-[40px] px-[8px] rounded-[2px]"
+              class="env-normal inline-flex items-center justify-center min-w-[40px] px-[8px] rounded-bkms-base"
               :class="envTypeTagClassMap[row.type]"
             >
               {{ envTypeMap(row.type) || '--' }}
@@ -185,7 +185,7 @@
               v-if="row?.status === 'Ready'"
               class="flex items-center gap-[8px]"
             >
-              <div class="bg-bkms-success-5 rounded-[50%] flex items-center justify-center w-[14px] h-[14px]">
+              <div class="bg-bkms-success-5 rounded-bkms-full flex items-center justify-center w-[14px] h-[14px]">
                 <Done
                   :height="12"
                   text="var(--bkms-success-2)"

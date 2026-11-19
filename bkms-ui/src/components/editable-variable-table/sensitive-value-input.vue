@@ -22,7 +22,7 @@
     <!-- 占位状态 -->
     <div
       v-if="isUnchanged"
-      class="flex items-center h-[32px] px-[10px] border border-solid bkms-line-input rounded-[2px] cursor-text bkms-bg-card hover:bkms-line-hover"
+      class="flex items-center h-[32px] px-[10px] border border-solid bkms-line-input rounded-bkms-field cursor-text bkms-bg-card hover:bkms-line-hover"
       @click="handlePlaceholderClick"
     >
       <SensitiveValuePlaceholder :count="unchangedDotCount" />

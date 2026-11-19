@@ -34,13 +34,13 @@
       </template>
       <template #right>
         <i
-          class="bkms-icon bkms-icon-full-screen text-[16px] bkms-bg-subtle cursor-pointer p-[4px] rounded-[4px] hover:bkms-text-brand"
+          class="bkms-icon bkms-icon-full-screen text-[16px] bkms-bg-subtle cursor-pointer p-[4px] rounded-bkms-base hover:bkms-text-brand"
           @click="handleFullScreen"
         ></i>
         <a
           v-if="standaloneMonitorUrl"
           :aria-label="$t('在新标签页打开')"
-          class="bkms-icon bkms-icon-jump-link text-[16px] bg-bkms-neutral-8 cursor-pointer p-[4px] rounded-[4px] hover:bkms-text-brand"
+          class="bkms-icon bkms-icon-jump-link text-[16px] bg-bkms-neutral-8 cursor-pointer p-[4px] rounded-bkms-base hover:bkms-text-brand"
           :href="standaloneMonitorUrl"
           rel="noopener noreferrer"
           target="_blank"

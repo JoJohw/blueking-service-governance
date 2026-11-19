@@ -16,5 +16,7 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-/* UA 默认底色兜底层 — 手写，不参与 gen-overrides 重跑（生成器只重写 patches/bkui-theme/） */
+/* UA 默认底色兜底层 — 手写，不参与 gen-overrides 重跑（生成器只重写 patches/bkui-theme/）。
+ * 本域在 theme/index.css 里最后加载，可压过 bkui-theme 与 vendor 的覆写；生成器不管的第三方属性（如给
+ * date-picker / ediatable 补圆角）放这里，新建文件时记得在本文件登记 @import。 */
 @import './form-control.css';

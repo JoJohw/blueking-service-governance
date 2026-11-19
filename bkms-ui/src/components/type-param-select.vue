@@ -29,7 +29,7 @@
   >
     <div
       :class="[
-        'flex items-center px-[8px] rounded-[2px] cursor-pointer bkms-bg-card transition-all duration-200',
+        'flex items-center px-[8px] rounded-bkms-field cursor-pointer bkms-bg-card transition-all duration-200',
         { 'bkms-text-brand': isPopoverShow },
       ]"
       :style="styleVars"

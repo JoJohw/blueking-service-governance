@@ -21,12 +21,12 @@
     <!-- 骨架屏 -->
     <template v-if="loading">
       <Layout.shape
-        class="mb-[16px] !block w-full rounded-[2px]"
+        class="mb-[16px] !block w-full rounded-bkms-base"
         height="40px"
         type="rect"
         width="100%"
       />
-      <div class="overflow-hidden rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+      <div class="overflow-hidden rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
         <div class="flex h-[32px] items-center bg-bkms-neutral-6 px-[16px]">
           <Layout.shape
             height="16px"
@@ -94,7 +94,7 @@
     <!-- 没有联邦集群环境时整个功能用不上，不给表单 -->
     <div
       v-else-if="showEmptyGuide"
-      class="host-port-empty-guide bkms-bg-card rounded-[2px] py-[60px]"
+      class="host-port-empty-guide bkms-bg-card rounded-bkms-card py-[60px]"
     >
       <Exception
         scene="part"
@@ -176,9 +176,7 @@
             >
               <table class="min-w-0 flex-1 border-collapse">
                 <thead>
-                  <tr
-                    class="host-port-row--head border-b border-[var(--host-port-border)] bkms-text-title"
-                  >
+                  <tr class="host-port-row--head border-b border-[var(--host-port-border)] bkms-text-title">
                     <th class="host-port-cell w-[120px] text-left font-normal">{{ $t('容器端口') }}</th>
                     <th class="host-port-cell text-left font-normal">{{ $t('节点端口的环境变量') }}</th>
                   </tr>
@@ -317,7 +315,7 @@
                   $t('对所有绑定联邦集群的环境生效')
                 }}</span>
               </div>
-              <div class="bkms-bg-page rounded-[2px] px-[16px] py-[12px]">
+              <div class="bkms-bg-page rounded-bkms-base px-[16px] py-[12px]">
                 <ScopeEnvList
                   :env-states="envStates"
                   :envs="scopeEnvs"

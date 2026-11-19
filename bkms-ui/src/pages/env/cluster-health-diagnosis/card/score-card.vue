@@ -38,12 +38,8 @@
     <div>
       <ul class="grid gap-y-[12px]">
         <li
-          class="min-w-[186px] h-[68px] bkms-bg-page rounded-[2px] cursor-pointer flex flex-col items-center p-[12px] hover:bkms-bg-brand-soft"
-          :class="
-            activeCard === LEVEL_VALUE.RISK
-              ? 'outline outline-[1px] outline-bkms-brand-2 !bkms-bg-active'
-              : ''
-          "
+          class="min-w-[186px] h-[68px] bkms-bg-page rounded-bkms-card cursor-pointer flex flex-col items-center p-[12px] hover:bkms-bg-brand-soft"
+          :class="activeCard === LEVEL_VALUE.RISK ? 'outline outline-[1px] outline-bkms-brand-2 !bkms-bg-active' : ''"
           @click="handleActiveChange(LEVEL_VALUE.RISK)"
         >
           <span class="text-[24px] leading-[24px] text-bkms-danger-2 font-bold">
@@ -54,12 +50,8 @@
           </span>
         </li>
         <li
-          class="min-w-[186px] h-[68px] bkms-bg-page rounded-[2px] cursor-pointer flex flex-col items-center p-[12px] hover:bkms-bg-brand-soft"
-          :class="
-            activeCard === LEVEL_VALUE.WARN
-              ? 'outline outline-[1px] outline-bkms-brand-2 !bkms-bg-active'
-              : ''
-          "
+          class="min-w-[186px] h-[68px] bkms-bg-page rounded-bkms-card cursor-pointer flex flex-col items-center p-[12px] hover:bkms-bg-brand-soft"
+          :class="activeCard === LEVEL_VALUE.WARN ? 'outline outline-[1px] outline-bkms-brand-2 !bkms-bg-active' : ''"
           @click="handleActiveChange(LEVEL_VALUE.WARN)"
         >
           <span class="text-[24px] leading-[24px] text-bkms-warning-2 font-bold">
@@ -70,11 +62,9 @@
           </span>
         </li>
         <li
-          class="min-w-[186px] h-[68px] bkms-bg-page rounded-[2px] cursor-pointer flex flex-col items-center p-[12px] hover:bkms-bg-brand-soft"
+          class="min-w-[186px] h-[68px] bkms-bg-page rounded-bkms-card cursor-pointer flex flex-col items-center p-[12px] hover:bkms-bg-brand-soft"
           :class="
-            activeCard === LEVEL_VALUE.RECOVERED
-              ? 'outline outline-[1px] outline-bkms-brand-2 !bkms-bg-active'
-              : ''
+            activeCard === LEVEL_VALUE.RECOVERED ? 'outline outline-[1px] outline-bkms-brand-2 !bkms-bg-active' : ''
           "
           @click="handleActiveChange(LEVEL_VALUE.RECOVERED)"
         >

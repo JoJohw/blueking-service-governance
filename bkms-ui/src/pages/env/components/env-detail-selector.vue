@@ -29,13 +29,13 @@
     @after-show="handlePopoverShown"
   >
     <div
-      class="env-detail-selector flex items-center justify-between w-full h-full bg-bkms-neutral-6 overflow-hidden group bkms-text-body text-[12px] cursor-pointer rounded-[2px] hover:bg-bkms-neutral-6"
+      class="env-detail-selector flex items-center justify-between w-full h-full bg-bkms-neutral-6 overflow-hidden group bkms-text-body text-[12px] cursor-pointer rounded-bkms-field hover:bg-bkms-neutral-6"
     >
       <div class="flex min-w-0 items-center">
         <div class="flex px-[10px] shrink-0 items-center justify-center">
           <!-- 首字母 -->
           <div
-            class="flex shrink-0 items-center justify-center w-[20px] h-[20px] text-[12px] font-bold bkms-text-inverse rounded-[2px]"
+            class="flex shrink-0 items-center justify-center w-[20px] h-[20px] text-[12px] font-bold bkms-text-inverse rounded-bkms-field"
             :style="{ backgroundColor: currentEnvAvatarColor }"
           >
             {{ currentEnvInitial }}
@@ -251,7 +251,7 @@
 <style lang="postcss" scoped>
   :deep(.bk-input.is-simplicity) {
     border-bottom-color: var(--bkms-line-default) !important;
-    border-radius: 0 !important;
+    border-radius: var(--bkms-radius-none) !important;
 
     &:hover {
       background-color: transparent !important;

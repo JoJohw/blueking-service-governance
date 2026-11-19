@@ -114,18 +114,20 @@
         <!-- 集群健康分数 -->
         <ScoreCard
           :active="curScoreCardActive as string"
-          class="score-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+          class="score-card rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           :count="levelCount"
           :value="clusterData?.score || 0"
           @change="handleScoreCardChange"
         />
         <!-- 基础信息 -->
         <BasicInfoCard
-          class="rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+          class="rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           :cluster-info="clusterData?.clusterInfo"
         />
       </div>
-      <div class="col-span-2 bkms-bg-card px-[16px] mt-[16px] rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+      <div
+        class="col-span-2 bkms-bg-card px-[16px] mt-[16px] rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+      >
         <Tab
           :key="tabKey"
           :active="filterData.isRecovered"
@@ -154,7 +156,7 @@
             <template #label>
               <div class="flex items-center">
                 <span>{{ item.label }}</span>
-                <div class="bkms-bg-active h-[16px] leading-[16px] px-[8px] ml-[4px] rounded-[8px]">
+                <div class="bkms-bg-active h-[16px] leading-[16px] px-[8px] ml-[4px] rounded-bkms-base">
                   {{ item.count }}
                 </div>
               </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-card flex min-h-0 flex-col gap-[16px]">
+  <div class="rounded-bkms-card flex min-h-0 flex-col gap-[16px]">
     <!-- 头部区域：Alert + 工具栏 -->
     <div
       ref="headerRef"
@@ -81,7 +81,7 @@
             overflow-mode="popover"
           >
             <template #default="{ item }: { item: UserGroupUser }">
-              <span class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-bkms-neutral-6 cursor-default">
+              <span class="flex items-center gap-[4px] rounded-bkms-base px-[8px] bg-bkms-neutral-6 cursor-default">
                 <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
                 {{ item.display_name || item.id || '--' }}
               </span>

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="group border rounded-[2px] bkms-text-body hover:bkms-line-active">
+  <div class="group border rounded-bkms-base bkms-text-body hover:bkms-line-active">
     <div
       :class="[
         'bkms-bg-subtle px-[16px] py-[8px] border-b leading-[22px] flex justify-between items-center relative',

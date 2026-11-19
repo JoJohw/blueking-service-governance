@@ -97,13 +97,17 @@
   const buttonStyle = computed(() => {
     if (props.position === 'left') {
       return {
-        expand: 'border-radius: 0 4px 4px 0;',
-        collapse: 'border-radius: 0 4px 4px 0;',
+        expand:
+          'border-radius: var(--bkms-radius-control); border-start-start-radius: var(--bkms-radius-none); border-end-start-radius: var(--bkms-radius-none);',
+        collapse:
+          'border-radius: var(--bkms-radius-control); border-start-start-radius: var(--bkms-radius-none); border-end-start-radius: var(--bkms-radius-none);',
       };
     } else {
       return {
-        expand: 'border-radius: 4px 0 0 4px;',
-        collapse: 'border-radius: 4px 0 0 4px;',
+        expand:
+          'border-radius: var(--bkms-radius-control); border-start-end-radius: var(--bkms-radius-none); border-end-end-radius: var(--bkms-radius-none);',
+        collapse:
+          'border-radius: var(--bkms-radius-control); border-start-end-radius: var(--bkms-radius-none); border-end-end-radius: var(--bkms-radius-none);',
       };
     }
   });

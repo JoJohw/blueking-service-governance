@@ -138,7 +138,7 @@
               :label="$t('高级命令')"
             >
               <ToggleCard
-                class="bkms-bg-card rounded-[2px] border-[1px] bkms-line-light"
+                class="bkms-bg-card rounded-bkms-card border-[1px] bkms-line-light"
                 content-class="p-[16px]"
                 :model-value="false"
                 type="normal"

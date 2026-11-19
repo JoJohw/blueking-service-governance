@@ -29,7 +29,7 @@
         <div class="flex items-center gap-[8px] min-w-0">
           <!-- 资源图标 -->
           <div
-            class="flex items-center justify-center size-[32px] rounded-[4px] shrink-0"
+            class="flex items-center justify-center size-[32px] rounded-bkms-menu shrink-0"
             :style="{ background: statusConfig.iconBgColor, color: statusConfig.color }"
           >
             <component

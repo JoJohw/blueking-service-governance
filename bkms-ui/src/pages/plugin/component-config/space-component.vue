@@ -83,7 +83,7 @@
                 <span>{{ value.label }}</span>
                 <span
                   :class="[
-                    'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-[8px]',
+                    'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-bkms-base',
                     componentType === key ? 'bkms-bg-active bkms-text-brand' : 'bkms-bg-card',
                   ]"
                 >

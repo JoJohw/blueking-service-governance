@@ -37,7 +37,7 @@
             width="100%"
           />
         </div>
-        <div class="rounded-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+        <div class="rounded-bkms-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <div class="mb-[16px] flex justify-end"><Layout.shape :width="560" /></div>
           <Layout.table />
         </div>
@@ -61,7 +61,7 @@
               {{ option.label }}
               <span
                 :class="[
-                  'ml-[4px] h-[16px] rounded-[8px] px-[6px] leading-[16px]',
+                  'ml-[4px] h-[16px] rounded-bkms-base px-[6px] leading-[16px]',
                   option.value === globalTypeFilter ? 'bkms-bg-active bkms-text-brand' : 'bkms-bg-card',
                 ]"
               >
@@ -107,7 +107,7 @@
           v-for="stat in stats"
           :key="stat.key"
           :class="[
-            'flex min-w-0 cursor-pointer items-center justify-between gap-[12px] rounded-card bkms-bg-card px-[16px] py-[12px] text-left shadow-[0_2px_4px_0_var(--bkms-shadow-card)] hover:shadow-[0_2px_8px_0_var(--bkms-shadow-hover)]',
+            'flex min-w-0 cursor-pointer items-center justify-between gap-[12px] rounded-bkms-card bkms-bg-card px-[16px] py-[12px] text-left shadow-[0_2px_4px_0_var(--bkms-shadow-card)] hover:shadow-[0_2px_8px_0_var(--bkms-shadow-hover)]',
             activeStat === stat.key ? '!bkms-bg-active outline outline-[1px] outline-bkms-brand-2' : '',
           ]"
           type="button"
@@ -131,7 +131,7 @@
             </div>
           </div>
           <span
-            class="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-full"
+            class="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-bkms-full"
             :style="{ backgroundColor: stat.iconBg, color: stat.iconColor }"
           >
             <StatIcon :name="stat.key" />
@@ -141,7 +141,7 @@
 
       <!-- 表格容器占满剩余高度，仅表格内容滚动，顶部筛选与分页保持可见。 -->
       <div
-        class="flex min-h-0 flex-1 flex-col rounded-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+        class="flex min-h-0 flex-1 flex-col rounded-bkms-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
       >
         <div class="mb-[16px] flex shrink-0 justify-end">
           <SearchSelect

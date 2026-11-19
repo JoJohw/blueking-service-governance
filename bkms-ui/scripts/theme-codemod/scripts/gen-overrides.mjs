@@ -41,6 +41,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { EXTRA_OWNERS, PREFIX_ALIAS } from './config/overrides.mjs';
 import { collectBlocks, splitSelectorList } from './lib/css-blocks.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -171,34 +172,10 @@ for (const h of TOKEN_HEX.values()) {
 }
 const WHITELIST = new Set(usage.components.map(c => c.kebab));
 
-/** 台账收编：真实渲染但不在 usage 白名单的类前缀。
- * 依据：Popover 浮层基础类 .bk-popper（styles/mixins/popper.css）、Input textarea 形态（lib/input/index.js）；
- * monitor-vue3-components 渲染 .bk-collapse/.bk-slider；@blueking/bk-user-selector 等第三方包渲染 .scroll-bar-style；
- * @blueking/table 的 :pagination 内部渲染 .bk-pagination（项目无直接 <bk-pagination>，stats-usage 判为未使用）。
- * prefixes 对 .bk-<prefix> 族（含 - 后代类）；rawPrefixes 对无 bk- 前缀的独立工具类。 */
-const EXTRA_OWNERS = [
-  { kebab: 'popper', name: 'Popper（Popover 浮层）', prefixes: ['popper'] },
-  { kebab: 'collapse', name: 'Collapse（monitor 渲染）', prefixes: ['collapse'] },
-  { kebab: 'slider', name: 'Slider（monitor 渲染）', prefixes: ['slider'] },
-  { kebab: 'textarea', name: 'Textarea（Input textarea 形态）', prefixes: ['textarea'] },
-  {
-    kebab: 'scroll-util',
-    name: 'ScrollUtil（第三方滚动条）',
-    prefixes: ['scroll-y', 'scroll-x', 'f-scroll-x'],
-    rawPrefixes: ['scroll-bar-style'],
-  },
-  { kebab: 'pagination', name: 'Pagination（@blueking/table 渲染）', prefixes: ['pagination'] },
-];
 const COMPONENT_NAME = new Map([
   ...usage.components.map(c => [c.kebab, c.name]),
   ...EXTRA_OWNERS.map(e => [e.kebab, e.name]),
 ]);
-
-/** 组件 -> 类前缀别名：部分组件的 DOM 类前缀与导出名 kebab 不一致 */
-const PREFIX_ALIAS = {
-  dialog: ['dialog', 'modal'], // Dialog 渲染 .bk-modal-wrapper 等类
-  'date-picker': ['date-picker', 'picker-panel', 'picker-confirm'], // 面板类 .bk-picker-panel-*
-};
 
 /** 两个产物源：变量版 = 项目引入的 style.variable.css；字面量版 = dist/style.css（lib/*.less 的编译合体，
  * dev 下组件入口 lib/<comp>/index.js 按需加载 .less，选择器与变量版不完全一致（如 .bk-button.bk-button-primary），
@@ -410,8 +387,8 @@ scanDist(DIST_FILE, patches, true);
 scanDist(LITERAL_DIST_FILE, literalPatches, false);
 
 // ---------- 3. 输出 patches + index.css ----------
-// 生成目录清理：只删生成器自有的 <kebab>.css，保留手工 variables.css（桥接文件，由 bkui.ts 加载）
-const GENERATED_BUILTINS = new Set(['variables.css']);
+// 生成目录清理：只删生成器自有的 <kebab>.css，保留手工 variables.css 与另一生成器产出的 radius.css
+const GENERATED_BUILTINS = new Set(['variables.css', 'radius.css']);
 function cleanGeneratedDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
   for (const f of fs.readdirSync(dir)) {
@@ -694,11 +671,11 @@ function writeDomainIndex(dir, files, header) {
 }
 writeDomainIndex(
   PATCHES_DIR,
-  perComponent.map(p => `${p.kebab}.css`),
+  [...perComponent.map(p => `${p.kebab}.css`), 'radius.css'],
   [
     ...LICENSE_LINES,
     '',
-    '/* bkui 覆写清单 — 由 gen-overrides.mjs 生成，重跑整体覆盖；variables.css 为手工桥接，不在此列 */',
+    '/* bkui 覆写清单 — 由 gen-overrides.mjs 生成，重跑整体覆盖；variables.css 手工桥接不在此列，radius.css 由 gen-radius-overrides.mjs 产出并随清单引入 */',
     '',
   ],
 );

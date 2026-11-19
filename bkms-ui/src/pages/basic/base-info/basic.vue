@@ -116,7 +116,7 @@
       class="w-[clac(100% - 80px)] min-h-[172px] bkms-bg-card p-[24px] flex shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
     >
       <div class="w-[80px]">
-        <div class="w-[100%] h-[80px] bkms-bg-brand-soft rounded-lg flex items-center justify-center">
+        <div class="w-[100%] h-[80px] bkms-bg-brand-soft rounded-bkms-card flex items-center justify-center">
           <span class="bkms-icon bkms-icon-space-basic text-[38px] bkms-text-brand"></span>
         </div>
       </div>

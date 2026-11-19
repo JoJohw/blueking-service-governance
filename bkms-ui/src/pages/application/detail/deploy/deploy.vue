@@ -145,7 +145,7 @@
             <i
               :class="[
                 'inline-block bkms-bg-card ml-[6px] size-[32px] leading-[32px]',
-                'border border-bkms-navy-5 rounded-[2px] cursor-pointer',
+                'border border-bkms-navy-5 rounded-bkms-menu cursor-pointer',
                 'bkms-icon bkms-icon-more-fill',
               ]"
             ></i>
@@ -263,7 +263,7 @@
               </div>
             </template>
           </Alert>
-          <div class="rounded-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+          <div class="rounded-bkms-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
             <template v-if="isMultiEnvMode || isDeployStatusVisible">
               <!-- 单环境 -->
               <InstanceList

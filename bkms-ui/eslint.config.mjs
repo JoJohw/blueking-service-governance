@@ -112,6 +112,7 @@ export default [
       'theme/no-foreign-var': 'warn',
       'theme/no-hardcoded-radius': 'warn',
       'theme/prefer-radius-class': 'warn',
+      'theme/no-stacked-radius': 'error',
       'theme/no-default-palette': 'error',
       'theme/prefer-uno-class': 'error',
     },
@@ -137,19 +138,7 @@ export default [
       'theme/no-foreign-var': 'off',
       'theme/no-hardcoded-radius': 'off',
       'theme/prefer-radius-class': 'off',
-    },
-  },
-  // canvas 消费必须落实色：这些文件里的 hex 是配置数据与字典兜底值，不是样式字面量
-  {
-    files: [
-      'src/pages/application/components/topo/**',
-      'src/pages/application/detail/deploy/monitor-chart-bridge.ts',
-      'src/pages/application/detail/deploy/echarts-viz.ts',
-      'src/components/monaco-editor/monaco-theme.ts',
-      'src/common/theme/viz-theme.ts',
-    ],
-    rules: {
-      'theme/no-hardcoded-color': 'off',
+      'theme/no-stacked-radius': 'off',
     },
   },
   // palette 是独立 dev 工具：骨架用自有 --pal-* 固定变量（shell.css 定义），
@@ -161,6 +150,7 @@ export default [
       'theme/no-foreign-var': 'off',
       'theme/no-hardcoded-radius': 'off',
       'theme/prefer-radius-class': 'off',
+      'theme/no-stacked-radius': 'off',
     },
   },
 ];

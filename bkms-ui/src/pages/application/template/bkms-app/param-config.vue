@@ -26,7 +26,7 @@
       :rules="rules"
     >
       <ToggleCard
-        class="bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+        class="bkms-bg-card rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
         :name="$t('基础信息')"
         type="normal"
       >
@@ -57,7 +57,7 @@
       </ToggleCard>
       <!-- 构建配置 -->
       <ToggleCard
-        class="mt-[16px] bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+        class="mt-[16px] bkms-bg-card rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
         :name="$t('构建配置')"
         type="normal"
       >
@@ -170,7 +170,7 @@
                 :label="$t('高级命令')"
               >
                 <ToggleCard
-                  class="bkms-bg-card rounded-[2px] border-[1px] bkms-line-light"
+                  class="bkms-bg-card rounded-bkms-card border-[1px] bkms-line-light"
                   content-class="p-[16px]"
                   :model-value="false"
                   type="normal"
@@ -312,7 +312,7 @@
       </ToggleCard>
       <ToggleCard
         v-if="formData.framework === 'blank'"
-        class="mt-[16px] bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+        class="mt-[16px] bkms-bg-card rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
         :name="$t('启动配置')"
         type="normal"
       >

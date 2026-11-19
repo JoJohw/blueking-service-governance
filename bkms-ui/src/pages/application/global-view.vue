@@ -80,13 +80,13 @@
         <div class="flex items-center gap-[12px] text-[12px] bkms-text-body">
           <span>{{ $t('Tag 图例') }}：</span>
           <span class="inline-flex items-center gap-[6px]">
-            <i class="inline-block h-[14px] w-[14px] rounded-[2px] bg-bkms-success-5"></i>{{ $t('部署成功') }}
+            <i class="inline-block h-[14px] w-[14px] rounded-bkms-base bg-bkms-success-5"></i>{{ $t('部署成功') }}
           </span>
           <span class="inline-flex items-center gap-[6px]">
-            <i class="inline-block h-[14px] w-[14px] rounded-[2px] bg-bkms-danger-5"></i>{{ $t('部署失败') }}
+            <i class="inline-block h-[14px] w-[14px] rounded-bkms-base bg-bkms-danger-5"></i>{{ $t('部署失败') }}
           </span>
           <span class="inline-flex items-center gap-[6px]">
-            <i class="inline-block h-[14px] w-[14px] rounded-[2px] bkms-bg-active"></i>{{ $t('部署中') }}
+            <i class="inline-block h-[14px] w-[14px] rounded-bkms-base bkms-bg-active"></i>{{ $t('部署中') }}
           </span>
         </div>
       </div>
@@ -679,9 +679,7 @@
                 {
                   class: [
                     'flex h-[36px] cursor-pointer items-center gap-[8px] px-[12px] text-[12px] hover:bkms-bg-page',
-                    selectedDeployStatus.value === option.value
-                      ? 'bkms-bg-active bkms-text-brand'
-                      : 'bkms-text-body',
+                    selectedDeployStatus.value === option.value ? 'bkms-bg-active bkms-text-brand' : 'bkms-text-body',
                   ],
                   onClick: () => handleSelectDeployStatus(option.value),
                 },
@@ -787,10 +785,7 @@
       },
       {
         default: () => h('span', env.displayName || env.name),
-        content: () => [
-          h('div', env.displayName || env.name),
-          h('div', { class: 'text-bkms-navy-5' }, env.name),
-        ],
+        content: () => [h('div', env.displayName || env.name), h('div', { class: 'text-bkms-navy-5' }, env.name)],
       },
     );
   }

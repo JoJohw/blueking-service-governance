@@ -18,12 +18,12 @@
 
 <template>
   <div
-    class="flex items-center px-[4px] h-[32px] bg-bkms-neutral-2 rounded-control shadow-[0_4px_12px_0_var(--bkms-shadow-float)] z-10 select-none"
+    class="flex items-center px-[4px] h-[32px] bg-bkms-neutral-2 rounded-bkms-control shadow-[0_4px_12px_0_var(--bkms-shadow-float)] z-10 select-none"
   >
     <!-- 1:1 -->
     <span
       v-bk-tooltips="$t('恢复100%')"
-      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[4px] hover:bg-bkms-navy-2"
+      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-bkms-menu hover:bg-bkms-navy-2"
       @click="zoomToOriginal"
     >
       <i class="bkms-icon bkms-icon-reset-1_1 text-bkms-neutral-7 text-[16px]" />
@@ -39,7 +39,7 @@
     <!-- 缩小 -->
     <span
       v-bk-tooltips="$t('缩小')"
-      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[4px] hover:bg-bkms-navy-2"
+      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-bkms-menu hover:bg-bkms-navy-2"
       @click="zoomOut"
     >
       <i class="bkms-icon bkms-icon-jianhao text-bkms-neutral-7 text-[16px]" />
@@ -51,7 +51,7 @@
     <!-- 放大 -->
     <span
       v-bk-tooltips="$t('放大')"
-      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[4px] hover:bg-bkms-navy-2"
+      class="flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-bkms-menu hover:bg-bkms-navy-2"
       @click="zoomIn"
     >
       <i class="bkms-icon bkms-icon-jiahao text-bkms-neutral-7 text-[16px]" />
@@ -68,7 +68,7 @@
     <span
       v-bk-tooltips="minimapDisabled ? $t('节点数量过多，已禁用缩略图') : $t('缩略图')"
       :class="[
-        'flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-[2px] hover:bg-bkms-navy-2',
+        'flex items-center justify-center w-[24px] h-[24px] cursor-pointer rounded-bkms-menu hover:bg-bkms-navy-2',
         showMinimap ? '!bg-bkms-brand-2' : '',
         minimapDisabled ? 'opacity-50 cursor-not-allowed hover:bg-transparent' : '',
       ]"
@@ -78,7 +78,7 @@
     </span>
 
     <div
-      class="custom-minimap !absolute top-[40px] left-0 rounded-card border-none overflow-hidden bg-bkms-neutral-6 shadow-[0_2px_10px_0_var(--bkms-shadow-float)]"
+      class="custom-minimap !absolute top-[40px] left-0 rounded-bkms-card border-none overflow-hidden bg-bkms-neutral-6 shadow-[0_2px_10px_0_var(--bkms-shadow-float)]"
       :style="{ display: showMinimap ? 'block' : 'none' }"
     ></div>
   </div>

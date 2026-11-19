@@ -25,7 +25,7 @@
       <div
         v-for="index in 2"
         :key="index"
-        class="overflow-hidden rounded-[2px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+        class="overflow-hidden rounded-bkms-card bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
       >
         <div class="flex h-[42px] items-center justify-between bg-bkms-neutral-6 px-[16px]">
           <Layout.shape
@@ -269,7 +269,7 @@
   .add-config-menu {
     width: 100%;
     background: var(--bkms-bg-card);
-    border-radius: 8px;
+    border-radius: var(--bkms-radius-base);
   }
 
   .add-config-menu__title {

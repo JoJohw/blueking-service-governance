@@ -53,9 +53,9 @@ import {
  * 3. 方向边框必须保留工具类方向：`border-t-[#...]` 只能转成 `border-t-bkms-*`，不能压平为 `bkms-line-*`；后者会生成通用 `border-color`。
  * 4. 半透明：纯 var() token 不支持 `/50` alpha 修饰符，用 `color-mix(in srgb, var(--bkms-brand-2) 25%, transparent)`。
  * 5. `--bkms-shadow-*` 未注册为 uno 类（值不以数字结尾），`shadow-[…var(--bkms-shadow-card)]` 是唯一合法例外。
- * 6. 圆角优先用语义类 `rounded-{语义}` / `rounded-t-{语义}`；`rounded-bkms-{px}` 是迁移过渡期的档位类，
- *    新代码禁用（绕过语义后，改语义档管不到它）。裸数字档位注册不了——`rounded-6` 会被 uno 的
- *    spacing 刻度抢走（= 1.5rem）。
+ * 6. 圆角一律 `rounded-bkms-*`（与色阶 `text-bkms-*` 同形）：语义档 `rounded-bkms-{语义}` / `rounded-t-bkms-{语义}`，
+ *    形状档 `rounded-bkms-{none|full}`。尺度档 `rounded-bkms-{hairline|xs|sm|md|lg|xl}` 是迁移过渡期写法，新代码禁用
+ *    （绕过语义后，改语义档管不到它）。裸档位注册不了——`rounded-md` 会被 uno 内置刻度抢走。
  */
 /*
  * 令牌解析（parseScaleColors / parseSemanticShortcuts）在 scripts/theme-lint/map.mjs：

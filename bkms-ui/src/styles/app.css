@@ -57,8 +57,8 @@
         var(--bkms-nav-indicator-3) 100%
       );
 
-      /* 胶囊形状：高仅 4px，圆角被高度钳制，与圆角档位无关 */
-      border-radius: 999px;
+      /* 胶囊形状：高仅 4px，圆角被高度钳制 */
+      border-radius: var(--bkms-radius-full);
       transform: translateX(-50%);
     }
   }

@@ -35,7 +35,7 @@
         </span>
       </div>
     </template>
-    <div class="mb-[16px] px-[16px] py-[12px] bkms-bg-subtle rounded-[2px]">
+    <div class="mb-[16px] px-[16px] py-[12px] bkms-bg-subtle rounded-bkms-base">
       <div class="font-bold mb-[6px]">
         {{ $t('将移除应用在「{0}」的全部实例，移除后', [trpcDeployStore.curEnvItem?.displayName ?? '']) }}:
       </div>

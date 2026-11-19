@@ -18,56 +18,66 @@
 
 /*
  * BKMS 圆角令牌：全库唯一允许出现圆角长度字面量的文件。
- * 档位名即像素值（--bkms-radius-6 = 6px）：加档直接加新数字，不占量级名、不撞名、不用重排。
- * 语义层按组件场景命名，只允许引用档位；同值不代表同源（control/card/overlay 现都是 6px）。
- * 形状语义不进令牌：50%、100%、rounded-full、胶囊（20px+）属于形状而非圆角档位。
- * 消费方：patches/bkui-theme/variables.css（bkui 变量桥接）、src/styles/overrides.css（写死值覆写）。
+ * 两层结构：档位层定义尺度（hairline/xs/sm/md/lg/xl）与形状（none/full），语义层按组件场景命名并只引用档位层。
+ * 档位名不带像素值：换主题重定义档位即可带动全部语义档，名字不会因改值而撒谎。
+ * 形状档不随主题变化，也不进语义候选池；50% 正圆与 999px 胶囊统一由 full 表达（仅用于正方形/胶囊元素）。
+ * 图形半径（G6 / ECharts / 组件 radius prop）不是 CSS 圆角，不归本文件。
  */
 :root {
   /**
    * @group 档位
    * @layer scale
-   * @note 名字即像素值，新增档位直接加 --bkms-radius-<px>；只被语义层引用
+   * @note 圆角尺子，从最细到最圆：hairline 1px、xs 3px、sm 4px、md 6px、lg 8px、xl 20px；none = 直角、full = 正圆/胶囊，这两个是形状不是尺寸，别拿来表达大小。改任一档位值，所有引用它的语义档会一起变。
    */
-  --bkms-radius-3: 3px;
-  --bkms-radius-4: 4px;
-  --bkms-radius-6: 6px;
-  --bkms-radius-8: 8px;
+  --bkms-radius-hairline: 1px;
+  --bkms-radius-xs: 3px;
+  --bkms-radius-sm: 4px;
+  --bkms-radius-md: 6px;
+  --bkms-radius-lg: 8px;
+  --bkms-radius-xl: 20px;
+  --bkms-radius-none: 0;
+  --bkms-radius-full: 9999px;
 
   /* @endgroup */
 
   /**
    * @group 圆角语义
    * @layer semantic
-   * @note 按组件场景命名：field/tag/checkbox 小构件、control/card/overlay 容器级、tab/menu 独立讨论项
+   * @note 按「页面上这是块什么控件」来挑，不是按数字接近来挑：输入框找 field、按钮找 control、卡片找 card、弹层找 overlay。没有贴切场景才用 base 兜底。各档当前多数落在 md——这是有意的统一提档（对齐 bkms 业务层观感），bkui 原生的 2px/3px 由 patches/bkui-theme/radius.css 逐选择器接管。
    */
 
-  /** 输入域：input / textarea / search-select */
-  --bkms-radius-field: var(--bkms-radius-3);
+  /** 兜底档：没有专属场景的圆角都放这——应用切换浮层、默认配置菜单、编辑器底部状态条、列头筛选勾选框、侧滑折叠把手、monaco 悬停提示 */
+  --bkms-radius-base: var(--bkms-radius-md);
 
-  /** 标签：bk-tag / select 内小标签 / tag-input 项 */
-  --bkms-radius-tag: var(--bkms-radius-3);
+  /** 输入类控件外框：搜索框、输入框、下拉选择、级联、日期时间、颜色选择、标签输入，以及环境选择面板下拉处的小三角内弧 */
+  --bkms-radius-field: var(--bkms-radius-md);
 
-  /** 勾选框：bk-checkbox 方框（含半选态内块） */
-  --bkms-radius-checkbox: var(--bkms-radius-3);
+  /** 小标签：表格上方已选排序条件的灰底小块、端口配置里的环境名标记，以及 bk-tag 一类的小元素（全文件唯一的 4px 档） */
+  --bkms-radius-tag: var(--bkms-radius-sm);
 
-  /** 滚动条：全局 thumb */
-  --bkms-radius-scroll: var(--bkms-radius-4);
+  /** 1px 窄条：告警记录的级别色标（4×14 竖条）、竖分隔线这类细长元素 */
+  --bkms-radius-indicator: var(--bkms-radius-hairline);
 
-  /** 可点控件：按钮 / 选择器 / 级联 / 取色 / 日期输入 / 分页 / 穿梭 / 折叠头 / 开关 / 上传项 */
-  --bkms-radius-control: var(--bkms-radius-6);
+  /** 全站滚动条滑块：main.css 统一定义的那根，滚动容器里才可见 */
+  --bkms-radius-scroll: var(--bkms-radius-sm);
 
-  /** 容器：bk-card / alert / 上传触发区 / 业务面板 / 分组标题条 */
-  --bkms-radius-card: var(--bkms-radius-6);
+  /** 可点的方角控件：主按钮、分页、分段选择、折叠面板标题、顶部导航链接、表格行内图标按钮 */
+  --bkms-radius-control: var(--bkms-radius-md);
 
-  /** 弹层：popover / dropdown / modal / 日期面板 / message / notify */
-  --bkms-radius-overlay: var(--bkms-radius-6);
+  /** 面状容器：部署配置的卡片与新增虚线框、侧滑栏里的分组标题条、端口配置左右分栏、应用详情章节标题、上传拖拽区 */
+  --bkms-radius-card: var(--bkms-radius-md);
 
-  /** tab：卡片式 tab 头 / 方块数字 tab */
-  --bkms-radius-tab: var(--bkms-radius-6);
+  /** 大图标卡：80×80 左右的应用/组件图标容器（空态页 logo） */
+  --bkms-radius-tile: var(--bkms-radius-xl);
 
-  /** 菜单项：侧边导航 */
-  --bkms-radius-menu: var(--bkms-radius-8);
+  /** 浮层外框：下拉面板、环境选择器、气泡卡片、弹窗、侧滑面板、Message/Notify 提示 */
+  --bkms-radius-overlay: var(--bkms-radius-md);
+
+  /** 标签页：卡片式 tab 头、带数字的方块角标；普通下划线 tab 不涉及圆角 */
+  --bkms-radius-tab: var(--bkms-radius-md);
+
+  /** 侧边导航的单个菜单项（选中态那块底色） */
+  --bkms-radius-menu: var(--bkms-radius-md);
 
   /* @endgroup */
 }

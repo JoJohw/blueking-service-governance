@@ -40,7 +40,7 @@
       <div
         v-for="group in appTypeGroups"
         :key="group.appType"
-        class="rounded-[2px] border border-solid mb-[8px] last:mb-0"
+        class="rounded-bkms-base border border-solid mb-[8px] last:mb-0"
         :style="groupStatusMap[group.appType].style"
       >
         <!-- 应用类型头部行 -->
@@ -103,7 +103,7 @@
           <div
             v-for="item in group.allAddons"
             :key="item.addon.name"
-            class="rounded-[2px] border border-solid bkms-line-light mb-[8px] last:mb-0 px-[16px] h-[40px] flex items-center justify-between bkms-bg-card"
+            class="rounded-bkms-card border border-solid bkms-line-light mb-[8px] last:mb-0 px-[16px] h-[40px] flex items-center justify-between bkms-bg-card"
           >
             <div class="flex items-center flex-1 min-w-0">
               <span class="text-[12px] font-700 bkms-text-title mr-[4px] flex-shrink-0">

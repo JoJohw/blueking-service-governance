@@ -33,13 +33,13 @@
     <template v-if="isIntersecting">
       <div
         :class="[
-          'relative flex items-center px-[8px] py-[4px] rounded-[10px] border border-bkms-neutral-10 shadow-[0_4px_8px_0_var(--bkms-shadow-float)]',
+          'relative flex items-center px-[8px] py-[4px] rounded-bkms-base border border-bkms-neutral-10 shadow-[0_4px_8px_0_var(--bkms-shadow-float)]',
           data.data?.kind !== 'App' ? 'topo-node cursor-pointer' : '',
         ]"
         :style="nodeStyle"
       >
         <div
-          class="flex items-center justify-center size-[32px] rounded-control shrink-0 mr-[8px]"
+          class="flex items-center justify-center size-[32px] rounded-bkms-control shrink-0 mr-[8px]"
           :style="{
             background: statusConfig.iconBgColor,
             color: statusConfig.color,
@@ -105,7 +105,7 @@
             />
           </svg>
           <span
-            class="collapse-btn absolute top-[50%] translate-y-[-50%] select-none bkms-bg-page rounded-[50%] flex items-center justify-center w-[18px] h-[18px]"
+            class="collapse-btn absolute top-[50%] translate-y-[-50%] select-none bkms-bg-page rounded-bkms-full flex items-center justify-center w-[18px] h-[18px]"
             :style="{ left: `calc(100% + ${EDGE_LENGTH / 2 - 9}px)` }"
             @click.stop.prevent="handleCollapse"
             @pointerdown.stop
@@ -121,7 +121,7 @@
     </template>
     <div
       v-else
-      class="bkms-bg-card rounded-[10px] shadow-[0_4px_8px_0_var(--bkms-shadow-float)]"
+      class="bkms-bg-card rounded-bkms-card shadow-[0_4px_8px_0_var(--bkms-shadow-float)]"
       :style="{
         width: `${NODE_WIDTH}px`,
         height: `${NODE_HEIGHT}px`,

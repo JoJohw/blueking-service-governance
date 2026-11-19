@@ -8,9 +8,9 @@
 | ------------------ | -------------------------------------------------------------------------------- |
 | `map.mjs`          | 解析令牌 + 反查类名/变量。**唯一真源**，`uno.config.ts` 与 eslint 规则都从这里取 |
 | `plugin.mjs`       | 聚合入口：合并各维度规则，eslint 配置里仍以 `theme` 插件名引用                   |
-| `rules/shared.mjs` | 规则工厂（四路挂载）+ 定位换算 + 类名与声明切分；radius 两条已接入，color 四条仍内联 |
+| `rules/shared.mjs` | 规则工厂（四路挂载）+ 定位换算 + 类名与声明切分；radius 三条已接入，color 四条仍内联 |
 | `rules/color.mjs`  | 颜色维度四条规则                                                                 |
-| `rules/radius.mjs` | 圆角维度两条规则                                                                 |
+| `rules/radius.mjs` | 圆角维度三条规则                                                                 |
 | `report.mjs`       | 存量报表，只看不改（`pnpm theme:report`）                                        |
 
 测试在 `scripts/test/`，用 `pnpm test:scripts` 单独跑，不进 `test:unit` / `test:ci`。
@@ -19,12 +19,12 @@
 
 `src/styles/theme/tokens/` 下两个文件：
 
-- `color.css` —— 颜色维度（一个维度一个文件）：`@layer scale` 区是原子色阶（`--bkms-brand-2`、`--bkms-neutral-10` …），全库唯一允许出现色值字面量的地方；`@layer semantic` 区是语义层（`--bkms-text-title`、`--bkms-bg-card` …），只 `var()` 引用色阶
-- `radius.css` —— 圆角维度：档位（名字即像素值 `--bkms-radius-3/4/6`）+ 语义档（field/tag/checkbox/scroll/control/card/overlay）
+- `color.css` —— 颜色维度（一个维度一个文件）：`@layer scale` 区是原子色阶与「场景色」（`--bkms-brand-2`、`--bkms-warning-alt` …），全库唯一允许色值字面量的地方——场景色是 spec 未覆盖的保留色，按用途命名后直写原值，与数字色阶同形消费；`@layer semantic` 区是语义层（`--bkms-text-title`、`--bkms-bg-card` …），只 `var()` 引用色阶（阴影组例外，值即完整效果）
+- `radius.css` —— 圆角维度：档位层（尺度档 `hairline/xs/sm/md/lg/xl` + 形状档 `none/full`）+ 语义档（base/field/tag/scroll/control/card/tile/indicator/overlay/tab/menu）。档位名不带像素值，换主题重定义档位即可带动全部语义档；`base` 指向 `md`（6px）通用基准，形状档不进语义候选池
 
 **新增令牌不需要改任何代码**：`map.mjs` 在模块加载时扫描这两个文件，`uno.config.ts` 据此注册类、eslint 据此给建议。色阶会自动生成 `text-` / `bg-` / `border-` 等全部颜色工具类，语义层自动生成 `bkms-text-*` / `bkms-bg-*` / `bkms-line-*` 快捷类（见 `uno.config.ts` 顶部注释的消费矩阵）。
 
-## 六条规则
+## 七条规则
 
 | 规则                   | 级别  | 检查什么                                                                   | 可自动修                              |
 | ---------------------- | ----- | -------------------------------------------------------------------------- | ------------------------------------- |
@@ -32,10 +32,11 @@
 | `no-default-palette`   | error | uno 默认调色板类，如 `text-red-500`、`border-t-gray-900`、`shadow-red-500` | 否                                    |
 | `prefer-uno-class`     | error | class 内用 `var()` 任意值（`text-[var(--bkms-brand-2)]`）                  | 同层有注册类时可修（带 `/alpha` 转 `color-mix`） |
 | `no-foreign-var`       | warn  | `var()` 引用不在 `--bkms-*` 白名单、也不是同文件局部变量                   | 否                                    |
-| `no-hardcoded-radius`  | warn  | 写死圆角长度（`rounded-[6px]`、`border-radius: 6px`）                      | 同值语义档唯一时可修；多档只给候选     |
-| `prefer-radius-class`  | warn  | 圆角没走语义注册类：`rounded-lg`、`rounded-bkms-6`、`var(--bkms-radius-6)` | 语义 `var()` 任意值可换成注册类        |
+| `no-hardcoded-radius`  | warn  | 写死圆角长度与形状值（`rounded-[6px]`、`border-radius: 0`、`50%`、`999px`） | 同值唯一且场景明确、形状值可修；其余只给候选 |
+| `prefer-radius-class`  | warn  | 圆角没走语义注册类：`rounded-lg`、`rounded-bkms-md`、`rounded-full`      | 语义 `var()` 任意值与内置形状类可换成注册类 |
+| `no-stacked-radius`    | error | 同一元素上多个圆角类压在同一角（`rounded-bkms-card` + `rounded-t-bkms-tile`）；静态 class 与 `:class` 绑定（数组 / 对象 / 字符串拼接）都检查 | 两条建议各删一个类，留哪个由人定（同名类重复不算叠加） |
 
-级别是渐进的：四条 warn 是存量软基线，清零后升 error；两条 error 当前零存量，直接拦。
+级别是渐进的：四条 warn 是存量软基线，清零后升 error；三条 error 当前零存量，直接拦。
 
 覆盖范围：`.vue`（template / script / `<style>` 块）、`.ts/.tsx/.js/.jsx`、独立 `.css`（走 `@eslint/css` 的 `css/css` language）。
 
@@ -54,18 +55,20 @@
 
 ### 圆角：同值多档是常态，所以大多不自动修
 
-颜色基本是「一个值一个语义」，圆角不是：`6px` 同时对应 `control` / `card` / `overlay` / `tab` 四个语义档，值相同但场景不同。于是：
+颜色基本是「一个值一个语义」，圆角不是：`md`（6px）同时对应 `base` / `field` / `control` / `card` / `overlay` / `tab` / `menu` 七个语义档，值相同但场景不同；`base` 是通用基准，无场景词命中时排在候选最前。于是：
 
-1. **同值语义档唯一**（`4px` → `scroll`、`8px` → `menu`）：直接自动修
-2. **同值多档**（`6px`）：只给候选，灯泡里按场景挑，不替你定
-3. **档位里没有同值**（`2px`、`10px`）：给最接近档位的候选，仍然不自动修
+1. **同值语义档唯一**（`1px` → `indicator`、`20px` → `tile`）：直接自动修
+2. **同值多档**（`4px` → `tag`/`scroll`、`6px` → 七个）：只给候选，灯泡里按场景挑，不替你定
+3. **档位里没有同值**（`3px`、`8px` 等）：给最接近档位的候选，仍然不自动修
 4. **场景词只影响排序**：选择器 / class 里的 `tab`、`card`、`popover` 等词会把对应语义档排到候选第一位，但不据此自动改
 
-形状语义不进令牌，直接放行：`0`、`50%`、`100%`、`≥100px` 胶囊、`rounded-full`、`rounded-none`。
+形状值不进语义候选池，但也不放行：`0` → `none`、百分比 / `≥100px` 胶囊 → `full`，映射到项目注册类 `rounded-bkms-none` / `rounded-bkms-full`（样式里是 `var(--bkms-radius-none/full)`），映射唯一所以直接自动修；uno 内置的 `rounded-full` / `rounded-none` 同样换成注册类。`20~99px` 在方块元素上属大圆角，不按形状处理，只给最近档位候选。
+
+档位是量级名而非像素名：`hairline=1px` / `xs=3px` / `sm=4px` / `md=6px` / `lg=8px` / `xl=20px`，换主题重定义档位即可带动语义档，名字不会因改值而撒谎。尺度档类（`rounded-bkms-md`）只在迁移过渡期出现，业务一律用语义类（`rounded-bkms-base` / `rounded-bkms-card` 等，与色阶 `text-bkms-*` 同形）。
 
 ## 十三处有意为之的例外
 
-- **`shadow-[…var(--bkms-shadow-*)]`**：uno 没把阴影注册成类，class 内 `var()` 是唯一合法写法，放行
+- **`shadow-[…var(--bkms-shadow-*)]` / `drop-shadow-[…var(--bkms-shadow-*)]`**：uno 没把阴影注册成类，class 内 `var()` 是唯一合法写法，放行（`drop-shadow` 前缀带连字符，需按整串识别，否则按 `-` 切分会把色值静默放过）
 - **`ring-offset-[色值]`**：uno 也没有对应的颜色类，替换成 `ring-*` 会把外发光环改成实心环，所以**只报不修**
 - **`divide-x-[色值]` / `divide-y-[色值]`**：uno 只给 `divide-<color>` 注册颜色，`divide-x` 只管宽度；压平会把横向分隔线改成四向，所以**只报不修**
 - **复合任意值（`bg-[linear-gradient(…)]`、`bg-[var(--x,#fff)]`）**：色值只是参数之一，整体换成单一注册类会连渐变 / 回退值一起抹掉，所以**只报不修**
@@ -73,8 +76,8 @@
 - **跨令牌层的 `var()`**：`text-[var(--bkms-brand-2)]` → `bkms-text-brand` 同值但不同层，语义层分叉后会改错，`prefer-uno-class` 只给候选不自动修
 - **非 class 语境的任意值**：script 里的普通字符串（`const s = 'bg-[#fff]'`）只报不修，那里可能只是文案或选择器数据
 - **`color-mix(…)`**：半透明场景的合法写法，`prefer-uno-class` 放行
-- **圆角形状值**：`50%` / `100%` / `≥100px` 胶囊 / `rounded-full` / `rounded-none` 是形状不是档位，放行
-- **圆角多值简写**：`border-radius: 0 4px 4px 0` 四角语义各不相同，只报不修
+- **形状档注册类与形状档 var()**：`rounded-bkms-none/full`、`border-radius: var(--bkms-radius-full)` 是业务合法写法，放行；只有 `20~99px` 这种方块大圆角仍按写死圆角上报，避免误判成正圆
+- **圆角多值简写**：`border-radius: 0 4px 4px 0` 四角语义各不相同，但「两侧清零 + 两侧同语义」的两种历史形态可自动拆成整体语义 + 逻辑角；其余只报。样式文件里由 stylelint `declaration-property-value-disallowed-list` 直接拦，不再走 lint 的修
 - **uno 内置圆角刻度**（`rounded-lg` 等）：值随根字号浮动（本项目根字号 12px），换算不出可靠档位，只报不修
 - **未知圆角语义档**（`rounded-[var(--bkms-radius-cardd)]`）：令牌里没有它就不给 autofix，只报「先新增令牌」，避免产出 uno 没注册的类名
 - **script 里的类名字符串**：动态类名同样检测，但可能只是数据 / 文案，只报不修

@@ -18,7 +18,7 @@
 
 <template>
   <div
-    class="service-item rounded-[2px] overflow-hidden bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-hover),0_2px_4px_0_var(--bkms-shadow-card)]"
+    class="service-item rounded-bkms-card overflow-hidden bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-hover),0_2px_4px_0_var(--bkms-shadow-card)]"
   >
     <div class="service-header px-[16px] pt-[12px] pb-[16px] flex items-center">
       <div class="flex items-center gap-[12px]">

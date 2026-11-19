@@ -159,7 +159,7 @@
               <!-- 连接信息与连通测试 -->
               <div
                 ref="connectionBlockRef"
-                class="mb-[24px] rounded-[2px] bkms-bg-page p-[16px]"
+                class="mb-[24px] rounded-bkms-base bkms-bg-page p-[16px]"
               >
                 <Form.FormItem
                   v-test="'polaris-config-namespace-options'"
@@ -311,7 +311,7 @@
                   :disabled="isEditMode"
                 >
                   <div
-                    class="w-full border border-solid rounded-[2px] px-[16px] py-[8px] transition-colors duration-200"
+                    class="w-full border border-solid rounded-bkms-base px-[16px] py-[8px] transition-colors duration-200"
                     :class="[
                       formModel.registerMode === 'immediate'
                         ? 'bkms-line-active bkms-bg-brand-soft'
@@ -329,7 +329,7 @@
                     </Radio>
                   </div>
                   <div
-                    class="w-full border border-solid rounded-[2px] px-[16px] py-[8px] transition-colors duration-200"
+                    class="w-full border border-solid rounded-bkms-base px-[16px] py-[8px] transition-colors duration-200"
                     :class="[
                       formModel.registerMode === 'on_deploy'
                         ? 'bkms-line-active bkms-bg-brand-soft'

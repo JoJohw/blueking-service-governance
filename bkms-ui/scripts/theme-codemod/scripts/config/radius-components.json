@@ -1,0 +1,69 @@
+{
+  "source": "node_modules/bkui-vue/dist/style.css",
+  "scope": ".bkms-themed",
+  "shapeMinPx": 20,
+  "components": [
+    { "kebab": "tag", "prefixes": ["tag"], "selectors": [".bk-tag"], "token": "tag" },
+    { "kebab": "input", "prefixes": ["input"], "token": "field" },
+    { "kebab": "textarea", "prefixes": ["textarea"], "token": "field" },
+    {
+      "kebab": "select",
+      "prefixes": ["select"],
+      "token": "field",
+      "rules": [{ "match": "bk-select-tag(?!-input)", "token": "tag" }]
+    },
+    {
+      "kebab": "search-select",
+      "prefixes": ["search-select"],
+      "token": "field",
+      "rules": [{ "match": "search-container-selected", "token": "tag" }]
+    },
+    {
+      "kebab": "tag-input",
+      "prefixes": ["tag-input"],
+      "token": "field",
+      "rules": [{ "match": "tag-list", "token": "tag" }]
+    },
+    {
+      "kebab": "cascader",
+      "prefixes": ["cascader"],
+      "token": "field",
+      "rules": [{ "match": "bk-cascader-popover", "token": "overlay" }]
+    },
+    {
+      "kebab": "color-picker",
+      "prefixes": ["color-picker"],
+      "token": "field",
+      "rules": [
+        { "match": "color-picker-hue-rectangle", "token": "indicator" },
+        { "match": "bk-color-picker-empty", "token": "indicator" }
+      ]
+    },
+    {
+      "kebab": "date-picker",
+      "prefixes": ["date-picker", "picker-panel", "picker-confirm"],
+      "token": "field",
+      "rules": [{ "match": "bk-date-picker-dropdown", "token": "overlay" }]
+    },
+    { "kebab": "time-picker", "prefixes": ["time-picker"], "token": "field" },
+    { "kebab": "button", "prefixes": ["button"], "token": "control" },
+    { "kebab": "radio", "prefixes": ["radio"], "token": "control" },
+    { "kebab": "pagination", "prefixes": ["pagination"], "token": "control" },
+    { "kebab": "collapse", "prefixes": ["collapse"], "token": "control" },
+    { "kebab": "upload", "prefixes": ["upload"], "token": "card" },
+    { "kebab": "card", "prefixes": ["card"], "token": "card" },
+    { "kebab": "alert", "prefixes": ["alert"], "token": "card" },
+    { "kebab": "navigation", "prefixes": ["navigation", "menu-item"], "selectors": [".bk-menu-item"], "token": "menu" },
+    {
+      "kebab": "tab",
+      "prefixes": ["tab"],
+      "token": "tab",
+      "rules": [{ "match": "has-num-elliptic", "token": "full" }]
+    },
+    { "kebab": "message", "prefixes": ["message"], "token": "overlay" },
+    { "kebab": "notify", "prefixes": ["notify"], "token": "overlay" },
+    { "kebab": "popover", "prefixes": ["popover", "popper", "pop-confirm", "pop2-content"], "token": "overlay" },
+    { "kebab": "dialog", "prefixes": ["dialog", "modal", "infobox"], "token": "overlay" },
+    { "kebab": "dropdown", "prefixes": ["dropdown"], "token": "overlay" }
+  ]
+}

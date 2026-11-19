@@ -43,7 +43,7 @@
     >
       <span
         v-bk-tooltips="$t('点击复制')"
-        class="font-bold text-bkms-danger-2 cursor-pointer rounded-[2px] px-[4px] hover:bkms-bg-danger"
+        class="font-bold text-bkms-danger-2 cursor-pointer rounded-bkms-overlay px-[4px] hover:bkms-bg-danger"
         @click="copyText(appDetailStore.app)"
       >
         {{ appDetailStore.app }}

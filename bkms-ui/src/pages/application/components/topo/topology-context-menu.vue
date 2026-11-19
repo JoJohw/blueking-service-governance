@@ -21,7 +21,7 @@
     <div
       v-if="visible"
       ref="menuRef"
-      class="fixed min-w-[120px] bkms-bg-card rounded-[4px] shadow-[0_4px_12px_0_var(--bkms-shadow-popover)] py-[4px] z-[9999]"
+      class="fixed min-w-[120px] bkms-bg-card rounded-bkms-overlay shadow-[0_4px_12px_0_var(--bkms-shadow-popover)] py-[4px] z-[9999]"
       :style="menuStyle"
       @contextmenu.prevent
     >
@@ -35,8 +35,7 @@
         }"
         class="flex items-center gap-[6px] px-[16px] py-[6px] text-[12px] bkms-text-body cursor-pointer whitespace-nowrap hover:bg-bkms-neutral-6 hover:bkms-text-brand"
         :class="{
-          'text-bkms-navy-5! cursor-not-allowed! hover:bg-transparent! hover:text-bkms-navy-5!':
-            item.disabled,
+          'text-bkms-navy-5! cursor-not-allowed! hover:bg-transparent! hover:text-bkms-navy-5!': item.disabled,
         }"
         @click="handleItemClick(item)"
       >

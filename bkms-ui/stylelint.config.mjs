@@ -22,6 +22,12 @@ import stylelintConfig from '@blueking/bkui-lint/stylelint.mjs';
 const consumerRules = {
   'color-no-hex': [true, { severity: 'warning' }],
   'function-disallowed-list': [['rgb', 'rgba', 'hsl', 'hsla'], { severity: 'warning' }],
+  // 圆角多值简写（含多个 var() 令牌）无法表达语义归属、换档要逐角跟改：
+  // 一律 border-radius 写整体语义 + border-start/end-*-radius 写单角覆盖
+  'declaration-property-value-disallowed-list': [
+    { '/^border-radius$/': [/\s/] },
+    { message: '圆角多值简写请拆开：整体语义写 border-radius，单角覆盖写 border-start/end-*-radius' },
+  ],
 };
 
 // 主题定义层：tokens / 生成覆写 / 补丁里的色值是定义与复刻产物，不适用
@@ -49,7 +55,6 @@ const patchesOverrides = [
       'src/styles/theme/patches/bkui-theme/**/*.css',
       'src/styles/theme/patches/vendor/**/*.css',
       'src/styles/theme/patches/ua-fill/**/*.css',
-      'src/styles/overrides.css',
     ],
     rules: {
       'no-descending-specificity': null,
@@ -58,9 +63,23 @@ const patchesOverrides = [
       'selector-pseudo-element-colon-notation': null,
       'selector-attribute-quotes': null,
       'order/properties-order': null,
+      'declaration-property-value-disallowed-list': null,
     },
   },
 ];
+
+// 手写覆写层不是复刻产物：形态类规则同样不适用，但圆角写法纪律必须生效
+const handwrittenOverride = {
+  files: ['src/styles/overrides.css'],
+  rules: {
+    'no-descending-specificity': null,
+    'no-duplicate-selectors': null,
+    'selector-class-pattern': null,
+    'selector-pseudo-element-colon-notation': null,
+    'selector-attribute-quotes': null,
+    'order/properties-order': null,
+  },
+};
 
 // 预设只导出对象形态（已确认非数组）。数组配置不支持顶层 files 键，那套"看起来兼容"的分支已删除；
 // 上游若改导出形态，这里显式抛错，避免报出来的是难以理解的 unknown key "0"。
@@ -71,5 +90,11 @@ if (Array.isArray(stylelintConfig)) {
 export default {
   ...stylelintConfig,
   rules: { ...stylelintConfig.rules, ...consumerRules },
-  overrides: [...(stylelintConfig.overrides ?? []), themeDefinitionOverride, paletteShellOverride, ...patchesOverrides],
+  overrides: [
+    ...(stylelintConfig.overrides ?? []),
+    themeDefinitionOverride,
+    paletteShellOverride,
+    handwrittenOverride,
+    ...patchesOverrides,
+  ],
 };

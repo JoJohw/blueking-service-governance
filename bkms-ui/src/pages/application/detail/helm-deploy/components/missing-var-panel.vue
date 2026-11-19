@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="rounded-[2px] border border-bkms-warning-4 bkms-bg-warning-soft px-[12px]">
+  <div class="rounded-bkms-card border border-bkms-warning-4 bkms-bg-warning-soft px-[12px]">
     <!-- Header -->
     <div
       class="flex cursor-pointer items-center justify-between py-[8px]"
@@ -30,9 +30,7 @@
           {{ title }}
         </span>
 
-        <span
-          class="rounded-[2px] bg-bkms-warning-5 px-[8px] py-[2px] text-[12px] text-bkms-warning-1"
-        >
+        <span class="rounded-bkms-tag bg-bkms-warning-5 px-[8px] py-[2px] text-[12px] text-bkms-warning-1">
           <i18n-t keypath="{0} 个变量">
             <span class="pl-[2px]">{{ data.length }}</span>
           </i18n-t>

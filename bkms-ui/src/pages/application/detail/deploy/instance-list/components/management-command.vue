@@ -63,12 +63,12 @@
         <!-- Trpc 应用 -->
         <div
           v-if="isTrpcApp"
-          class="flex-1 flex select-group rounded-[2px] overflow-hidden"
+          class="flex-1 flex select-group rounded-bkms-field overflow-hidden"
         >
           <Select
             ref="commandMethodSelectRef"
             v-model="commandMethod"
-            class="w-[180px] rounded-none"
+            class="w-[180px] rounded-bkms-none"
             :clearable="false"
           >
             <Select.Option
@@ -233,9 +233,7 @@
                   text
                   @click="handleAdd()"
                 >
-                  <i
-                    class="bkms-icon bkms-icon-plus-circle-shape bkms-text-secondary text-[14px] mr-[10px]"
-                  ></i>
+                  <i class="bkms-icon bkms-icon-plus-circle-shape bkms-text-secondary text-[14px] mr-[10px]"></i>
                 </Button>
                 <Button
                   :disabled="tableData.length === 1"
@@ -850,6 +848,6 @@
     padding-left: 20px;
   }
   :deep(.select-group .bk-input) {
-    border-radius: 0;
+    border-radius: var(--bkms-radius-none);
   }
 </style>

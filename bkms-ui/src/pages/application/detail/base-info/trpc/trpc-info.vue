@@ -210,11 +210,11 @@
                     <span v-if="isPlatformCommandsEmpty">--</span>
                     <div
                       v-else
-                      class="flex flex-col gap-0 flex-1 border rounded"
+                      class="flex flex-col gap-0 flex-1 border rounded-bkms-base"
                     >
                       <ToggleCard
                         v-if="platformCommandsPreBuild"
-                        class="rounded-[2px] overflow-hidden"
+                        class="rounded-bkms-base overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
                         header-class="!hover:bg-bkms-neutral-6"
                         normal-bg-color="var(--bkms-bg-page)"
@@ -236,7 +236,7 @@
                       </ToggleCard>
                       <ToggleCard
                         v-if="platformCommandsBuild"
-                        class="rounded-[2px] overflow-hidden"
+                        class="rounded-bkms-base overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
                         header-class="!hover:bg-bkms-neutral-6"
                         normal-bg-color="var(--bkms-bg-page)"
@@ -258,7 +258,7 @@
                       </ToggleCard>
                       <ToggleCard
                         v-if="platformExtraFiles"
-                        class="rounded-[2px] overflow-hidden"
+                        class="rounded-bkms-base overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
                         header-class="!hover:bg-bkms-neutral-6"
                         normal-bg-color="var(--bkms-bg-page)"
@@ -280,7 +280,7 @@
                       </ToggleCard>
                       <ToggleCard
                         v-if="platformCommandsRuntimeEnv"
-                        class="rounded-[2px] overflow-hidden"
+                        class="rounded-bkms-base overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
                         header-class="!hover:bg-bkms-neutral-6"
                         normal-bg-color="var(--bkms-bg-page)"
@@ -302,7 +302,7 @@
                       </ToggleCard>
                       <ToggleCard
                         v-if="platformCommandsStart"
-                        class="rounded-[2px] overflow-hidden"
+                        class="rounded-bkms-base overflow-hidden"
                         content-class="px-[38px] py-[8px] mt-0 border-t"
                         header-class="!hover:bg-bkms-neutral-6"
                         normal-bg-color="var(--bkms-bg-page)"

@@ -274,7 +274,7 @@
                     {{ $t('引用空间配置的实例') }}
                     <span
                       :class="[
-                        'bkms-text-secondary rounded-[8px] px-[8px] transition',
+                        'bkms-text-secondary rounded-bkms-overlay px-[8px] transition',
                         isUseInstance ? 'bg-bkms-brand-2 bkms-text-inverse' : 'bg-bkms-neutral-6',
                       ]"
                     >
@@ -1217,12 +1217,14 @@
 
   /* 组件名与「重选」拼成一条：外框 6px，衔接处直角 */
   :deep(.component-picker-input.bk-input) {
-    border-radius: 6px;
+    border-radius: var(--bkms-radius-overlay);
   }
 
   :deep(.component-picker-reselect.bk-button) {
     height: 100%;
-    border-radius: 0 6px 6px 0 !important;
+    border-radius: var(--bkms-radius-overlay) !important;
+    border-start-start-radius: var(--bkms-radius-none) !important;
+    border-end-start-radius: var(--bkms-radius-none) !important;
   }
 
   /** 不预留滚动条位置，避免侧栏有类似padding的效果 */

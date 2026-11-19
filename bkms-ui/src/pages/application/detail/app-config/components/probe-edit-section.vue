@@ -17,11 +17,9 @@
 -->
 
 <template>
-  <div class="probe-card border rounded-[8px] flex-1 min-w-0 overflow-hidden">
+  <div class="probe-card border rounded-bkms-card flex-1 min-w-0 overflow-hidden">
     <!-- 卡片标题行 -->
-    <div
-      class="flex items-center justify-between h-[32px] px-[12px] bkms-bg-page border-b border-b-bkms-neutral-6"
-    >
+    <div class="flex items-center justify-between h-[32px] px-[12px] bkms-bg-page border-b border-b-bkms-neutral-6">
       <div class="flex items-center gap-[6px]">
         <i
           v-if="isFieldModified"

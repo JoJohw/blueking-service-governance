@@ -25,7 +25,7 @@
     <template #loading>
       <div class="flex flex-col gap-[16px]">
         <!-- 环境概览 -->
-        <div class="flex items-start p-[24px] bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+        <div class="flex items-start p-[24px] bkms-bg-card rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <Layout.shape
             :height="72"
             :width="72"
@@ -71,10 +71,10 @@
         </div>
 
         <!-- 集群资源 -->
-        <div class="overflow-hidden rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+        <div class="overflow-hidden rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <div class="h-[32px] bg-bkms-neutral-6"></div>
           <div class="flex flex-wrap gap-[32px] p-[24px] bkms-bg-card">
-            <div class="w-[240px] shrink-0 overflow-hidden rounded-[2px]">
+            <div class="w-[240px] shrink-0 overflow-hidden rounded-bkms-base">
               <div class="flex items-center h-[136px] px-[24px] bkms-bg-subtle">
                 <Layout.shape
                   :height="80"
@@ -123,7 +123,7 @@
         </div>
 
         <!-- 集群组件 -->
-        <div class="overflow-hidden rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+        <div class="overflow-hidden rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <div class="h-[32px] bg-bkms-neutral-6"></div>
           <div class="min-h-[200px] p-[16px] bkms-bg-card">
             <Layout.shape
@@ -151,11 +151,11 @@
     </template>
     <div class="flex flex-col gap-[16px]">
       <!-- 环境概览 -->
-      <div class="bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)] rounded-[2px]">
+      <div class="bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)] rounded-bkms-card">
         <template v-if="!isBasicInfoEditing">
           <div class="flex items-start p-[24px]">
             <div
-              class="relative flex shrink-0 items-center justify-center w-[72px] h-[72px] text-[32px] font-bold bkms-text-inverse rounded-[8px]"
+              class="relative flex shrink-0 items-center justify-center w-[72px] h-[72px] text-[32px] font-bold bkms-text-inverse rounded-bkms-base"
               :style="{ backgroundColor: envAvatarColor }"
             >
               {{ envInitial }}
@@ -316,7 +316,7 @@
               opacity: 1,
               size: 'small',
             }"
-            class="w-[240px] shrink-0 flex flex-col rounded-[2px] overflow-hidden"
+            class="w-[240px] shrink-0 flex flex-col rounded-bkms-base overflow-hidden"
           >
             <div class="flex-1 flex flex-col items-center justify-center p-[12px] bkms-bg-subtle">
               <ClusterHealthScore

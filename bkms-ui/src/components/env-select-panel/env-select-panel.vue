@@ -32,7 +32,7 @@
     <div
       v-bind="$attrs"
       :class="[
-        'flex items-center min-w-[280px] max-w-[626px] border bkms-line-input rounded-[2px] bkms-bg-card cursor-pointer overflow-hidden transition-border-color duration-200 hover:bkms-line-hover',
+        'flex items-center min-w-[280px] max-w-[626px] border bkms-line-input rounded-bkms-field bkms-bg-card cursor-pointer overflow-hidden transition-border-color duration-200 hover:bkms-line-hover',
         { '!bkms-line-active shadow-[0_0_3px_0_var(--bkms-brand-4)]': isPopoverVisible },
         mode === 'multi' ? 'h-auto min-h-[32px] !w-[626px]' : 'h-[32px]',
         { '!max-w-none': !showEnvPrefix },
@@ -1091,7 +1091,7 @@
   :deep(.bk-select-trigger) {
     height: 32px;
     border: none !important;
-    border-radius: 0 !important;
+    border-radius: var(--bkms-radius-none) !important;
     border-right: 1px solid var(--bkms-line-input) !important;
     background: transparent !important;
     .bk-input {
@@ -1105,7 +1105,7 @@
   }
   :deep(.bk-input.is-simplicity) {
     border-bottom-color: var(--bkms-line-default) !important;
-    border-radius: 0 !important;
+    border-radius: var(--bkms-radius-none) !important;
     &:hover {
       background-color: transparent !important;
     }
@@ -1137,7 +1137,7 @@
       height: 16px;
       border-left: 1px solid var(--bkms-line-default);
       border-bottom: 1px solid var(--bkms-line-default);
-      border-bottom-left-radius: 8px;
+      border-bottom-left-radius: var(--bkms-radius-field);
       content: '';
     }
   }

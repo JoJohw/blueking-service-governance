@@ -288,7 +288,7 @@
       >
         {{ t('该镜像尚未部署到任何测试环境，请确认是否仍要晋级') }}
       </Alert>
-      <div class="rounded bkms-bg-page px-[16px] py-[12px]">
+      <div class="rounded-bkms-base bkms-bg-page px-[16px] py-[12px]">
         <FieldItem
           :container-height="32"
           :field-value="t('镜像 Tag')"

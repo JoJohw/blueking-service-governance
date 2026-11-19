@@ -25,7 +25,7 @@
   >
     <template #default="{ popoverShow }">
       <div
-        class="ml-[6px] inline-flex h-[22px] shrink-0 overflow-hidden rounded-[2px] bkms-bg-card border bkms-line-active bkms-text-brand opacity-0 transition group-hover:opacity-100"
+        class="ml-[6px] inline-flex h-[22px] shrink-0 overflow-hidden rounded-bkms-overlay bkms-bg-card border bkms-line-active bkms-text-brand opacity-0 transition group-hover:opacity-100"
         :class="{ 'opacity-100': popoverShow }"
       >
         <button

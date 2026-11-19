@@ -50,7 +50,7 @@
         @keydown.stop
       >
         <div
-          class="flex h-[32px] min-w-0 flex-1 items-center rounded-[2px] border bg-white text-[12px] text-bkms-neutral-2"
+          class="flex h-[32px] min-w-0 flex-1 items-center rounded-bkms-field border bkms-bg-card text-[12px] text-bkms-neutral-2"
           :class="showDraftError ? 'border-bkms-danger-2' : 'border-bkms-navy-5 focus-within:border-bkms-brand-2'"
         >
           <input

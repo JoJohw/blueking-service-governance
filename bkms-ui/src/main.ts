@@ -86,10 +86,11 @@ console.log(
   `%c${BK_BKMS_WELCOME} \n %c版本信息%c${BK_BKMS_VERSION}%c>> ${new Date().toString().slice(0, 16)}<<`,
   // eslint-disable-next-line theme/no-hardcoded-color
   'color: #2DCB56',
-  // eslint-disable-next-line theme/no-hardcoded-color
+  // console %c 的样式由 DevTools 渲染，不继承页面 :root 变量，圆角只能保留字面量
+  // eslint-disable-next-line theme/no-hardcoded-color, theme/no-hardcoded-radius
   'padding: 2px 5px; background: #ea3636; color: #FFF; border-radius: 3px 0 0 3px;',
-  // eslint-disable-next-line theme/no-hardcoded-color
+  // eslint-disable-next-line theme/no-hardcoded-color, theme/no-hardcoded-radius
   'padding: 2px 5px; background: #42c02e; color: #FFF; border-radius: 0 3px 3px 0; font-weight: bold;',
-  // eslint-disable-next-line theme/no-hardcoded-color
+  // eslint-disable-next-line theme/no-hardcoded-color, theme/no-hardcoded-radius
   'background-color: #3A84FF; color: #FFF; padding: 2px 5px; border-radius: 3px; font-weight: bold;margin-left: 16px;',
 );

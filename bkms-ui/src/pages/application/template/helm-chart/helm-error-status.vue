@@ -18,15 +18,10 @@
 
 <template>
   <div class="border-[1px] bkms-line-default max-h-[300px] bkms-bg-card">
-    <div
-      class="flex items-center h-[48px] text-[12px] bkms-text-body px-[24px] border-b-[1px] border-b-bkms-neutral-5"
-    >
+    <div class="flex items-center h-[48px] text-[12px] bkms-text-body px-[24px] border-b-[1px] border-b-bkms-neutral-5">
       <span class="font-bold">{{ $t('校验结果') }}</span>
       <span
-        :class="[
-          'inline-block w-[24px] h-[16px] rounded-[8px]',
-          'bkms-bg-active text-center ml-[4px] bkms-text-brand',
-        ]"
+        :class="['inline-block w-[24px] h-[16px] rounded-bkms-base', 'bkms-bg-active text-center ml-[4px] bkms-text-brand']"
         >{{ (data?.length || 0) + (errorLines?.length || 0) }}</span
       >
     </div>

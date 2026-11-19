@@ -18,7 +18,7 @@
 
 <template>
   <div
-    class="relative rounded-card bkms-bg-page bg-[radial-gradient(circle,color-mix(in_srgb,var(--bkms-neutral-4)_30%,transparent)_1px,transparent_1px)] bg-[length:16px_16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+    class="relative rounded-bkms-card bkms-bg-page bg-[radial-gradient(circle,color-mix(in_srgb,var(--bkms-neutral-4)_30%,transparent)_1px,transparent_1px)] bg-[length:16px_16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
   >
     <div
       id="topology-graph"

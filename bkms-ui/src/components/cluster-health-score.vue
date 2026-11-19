@@ -86,11 +86,11 @@
       class="flex flex-col gap-[12px]"
     >
       <div class="flex items-center gap-[8px]">
-        <span class="inline-block w-[8px] h-[8px] rounded-full bg-bkms-danger-2"></span>
+        <span class="inline-block w-[8px] h-[8px] rounded-bkms-full bg-bkms-danger-2"></span>
         <span class="text-[12px] bkms-text-body">{{ $t('致命问题') }}：{{ count?.RISK ?? '--' }}</span>
       </div>
       <div class="flex items-center gap-[8px]">
-        <span class="inline-block w-[8px] h-[8px] rounded-full bg-bkms-warning-2"></span>
+        <span class="inline-block w-[8px] h-[8px] rounded-bkms-full bg-bkms-warning-2"></span>
         <span class="text-[12px] bkms-text-body">{{ $t('预警问题') }}：{{ count?.WARN ?? '--' }}</span>
       </div>
     </div>

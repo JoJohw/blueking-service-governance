@@ -23,7 +23,7 @@
       class="min-h-0 flex-1 overflow-hidden p-[16px]"
     >
       <div
-        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-bkms-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
       >
         <Skeleton
           :loading="loading"
@@ -849,7 +849,7 @@
           h(
             'span',
             {
-              class: 'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-bkms-neutral-6',
+              class: 'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-bkms-full bg-bkms-neutral-6',
             },
             '1',
           ),
@@ -859,7 +859,7 @@
           h(
             'span',
             {
-              class: 'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-bkms-neutral-6',
+              class: 'mr-[8px] flex h-[20px] w-[20px] items-center justify-center rounded-bkms-full bg-bkms-neutral-6',
             },
             '2',
           ),
@@ -913,7 +913,7 @@
   /** 渲染删除弹窗中的环境列表，可按弹窗类型控制是否展示去部署入口。 */
   function renderRedeployEnvTable(envs: DeployedEnv[], options: { showDeployAction?: boolean } = {}) {
     const { showDeployAction = true } = options;
-    return h('div', { class: 'overflow-hidden rounded-[2px] border bkms-line-light' }, [
+    return h('div', { class: 'overflow-hidden rounded-bkms-base border bkms-line-light' }, [
       h(
         'div',
         {

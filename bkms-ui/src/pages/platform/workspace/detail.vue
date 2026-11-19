@@ -111,10 +111,12 @@
         </template>
 
         <!-- 空间基本信息 -->
-        <div class="flex items-center min-h-[160px] p-[24px] pt-[28px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+        <div
+          class="flex items-center min-h-[160px] p-[24px] pt-[28px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+        >
           <!-- 首字母头像 -->
           <div
-            class="relative flex shrink-0 items-center justify-center w-[72px] h-[72px] text-[32px] font-bold bkms-text-inverse rounded-[8px] bg-bkms-brand-2"
+            class="relative flex shrink-0 items-center justify-center w-[72px] h-[72px] text-[32px] font-bold bkms-text-inverse rounded-bkms-base bg-bkms-brand-2"
           >
             {{ workspaceInitial }}
           </div>
@@ -228,7 +230,15 @@
             <Button
               :class="{ 'mr-[1px]': !isCurrentUserWorkspaceAdmin }"
               :loading="isPermissionSubmitting"
-              :style="{ borderRadius: isCurrentUserWorkspaceAdmin ? '2px' : '2px 0 0 2px' }"
+              :style="{
+                borderRadius: 'var(--bkms-radius-base)',
+                ...(isCurrentUserWorkspaceAdmin
+                  ? {}
+                  : {
+                      borderStartEndRadius: 'var(--bkms-radius-none)',
+                      borderEndEndRadius: 'var(--bkms-radius-none)',
+                    }),
+              }"
               :theme="quickPermissionButtonTheme"
               @click="handleQuickPermissionAction"
             >
@@ -243,7 +253,11 @@
             >
               <Button
                 class="!min-w-[32px] !px-0"
-                style="border-radius: 0 2px 2px 0"
+                style="
+                  border-radius: var(--bkms-radius-base);
+                  border-start-start-radius: var(--bkms-radius-none);
+                  border-end-start-radius: var(--bkms-radius-none);
+                "
                 theme="primary"
               >
                 <AngleDownLine class="text-[12px]" />

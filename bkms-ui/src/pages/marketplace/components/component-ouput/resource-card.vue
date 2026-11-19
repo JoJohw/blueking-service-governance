@@ -30,7 +30,7 @@
     <template #header-right>
       <div class="flex items-center gap-[4px] text-[12px] bkms-text-body">
         <span
-          class="inline-block bg-bkms-brand-3 w-[12px] h-[12px] bkms-line-active border-[1px] border-solid rounded-[4px] mr-[6px]"
+          class="inline-block bg-bkms-brand-3 w-[12px] h-[12px] bkms-line-active border-[1px] border-solid rounded-bkms-card mr-[6px]"
         ></span>
         <span>{{ $t('附加资源') }}</span>
       </div>

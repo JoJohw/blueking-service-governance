@@ -90,7 +90,7 @@
           <div
             v-for="item in apmModeOptions"
             :key="item.value"
-            class="apm-radio-card cursor-pointer rounded-[2px] border border-solid bkms-line-default px-[16px] py-[12px] transition-all duration-300"
+            class="apm-radio-card cursor-pointer rounded-bkms-control border border-solid bkms-line-default px-[16px] py-[12px] transition-all duration-300"
             :class="{ 'is-active': apmMode === item.value }"
             @click="apmMode = item.value"
           >

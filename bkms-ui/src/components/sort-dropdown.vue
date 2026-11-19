@@ -98,7 +98,7 @@
   >
     <template #default>
       <section
-        class="bkms-sort-trigger inline-flex items-center justify-between h-[32px] min-w-[160px] pl-[12px] pr-[8px] bkms-bg-card border border-solid border-bkms-neutral-4 rounded-control text-[12px] text-bkms-neutral-2 whitespace-nowrap cursor-pointer hover:border-bkms-neutral-3"
+        class="bkms-sort-trigger inline-flex items-center justify-between h-[32px] min-w-[160px] pl-[12px] pr-[8px] bkms-bg-card border border-solid border-bkms-neutral-4 rounded-bkms-control text-[12px] text-bkms-neutral-2 whitespace-nowrap cursor-pointer hover:border-bkms-neutral-3"
         :class="{ 'is-open': isOpen }"
       >
         <span class="inline-flex items-center min-w-0">
@@ -187,7 +187,7 @@
     cursor: pointer;
     background: var(--bkms-neutral-8);
     border: 1px solid var(--bkms-neutral-5);
-    border-radius: 6px;
+    border-radius: var(--bkms-radius-tag);
   }
 
   .bkms-sort-tag:hover {
@@ -251,7 +251,7 @@
     padding: 4px 0;
     background: var(--bkms-neutral-10);
     border-color: var(--bkms-neutral-5);
-    border-radius: 6px;
+    border-radius: var(--bkms-radius-overlay);
     box-shadow: 0 2px 4px var(--bkms-shadow-card);
   }
 

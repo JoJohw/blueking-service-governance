@@ -38,7 +38,6 @@
   .bk-menu-item {
     width: auto;
     margin: 0 8px;
-    border-radius: var(--bkms-radius-menu);
 
     &:hover {
       background-image: linear-gradient(
@@ -204,7 +203,7 @@
     color: var(--vscode-editorHoverWidget-foreground);
     background-color: var(--vscode-editorHoverWidget-background);
     border: 1px solid var(--vscode-inputValidation-infoBorder);
-    border-radius: 3px;
+    border-radius: var(--bkms-radius-base);
   }
 
   .anchor {

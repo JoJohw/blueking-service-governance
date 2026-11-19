@@ -331,7 +331,7 @@
       width: 14px;
       height: 14px;
       border-color: var(--bkms-line-default);
-      border-radius: 3px;
+      border-radius: var(--bkms-radius-base);
       box-shadow: 0 0 0 1px var(--bkms-line-default);
     }
 

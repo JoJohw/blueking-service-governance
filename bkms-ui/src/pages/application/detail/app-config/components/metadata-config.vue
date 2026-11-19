@@ -42,11 +42,9 @@
         <div
           v-for="section in sectionItems"
           :key="section.key"
-          class="metadata-card border bkms-line-light rounded-[8px] min-w-0 overflow-hidden"
+          class="metadata-card border bkms-line-light rounded-bkms-card min-w-0 overflow-hidden"
         >
-          <div
-            class="flex items-center gap-[10px] h-[32px] px-[12px] bkms-bg-page border-b border-b-bkms-neutral-6"
-          >
+          <div class="flex items-center gap-[10px] h-[32px] px-[12px] bkms-bg-page border-b border-b-bkms-neutral-6">
             <span
               :class="[
                 'text-[12px] font-bold bkms-text-body',

@@ -17,15 +17,10 @@
 -->
 
 <template>
-  <div
-    :class="[
-      'flex flex-col h-full min-w-0 w-full rounded-[2px]',
-      border ? 'border-[1px] bkms-line-default' : '',
-    ]"
-  >
+  <div :class="['flex flex-col h-full min-w-0 w-full rounded-bkms-base', border ? 'border-[1px] bkms-line-default' : '']">
     <div
       v-if="showHeader"
-      class="flex-shrink-0 h-[40px] pl-[16px] rounded-t-sm border-b-[1px] text-[14px] font-bold border-b-bkms-neutral-5 bkms-bg-page flex items-center"
+      class="flex-shrink-0 h-[40px] pl-[16px] rounded-t-bkms-card border-b-[1px] text-[14px] font-bold border-b-bkms-neutral-5 bkms-bg-page flex items-center"
     >
       {{ $t('环境变量') }}
     </div>

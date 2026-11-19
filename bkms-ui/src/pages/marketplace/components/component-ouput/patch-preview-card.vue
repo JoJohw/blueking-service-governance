@@ -30,7 +30,7 @@
     <template #header-right>
       <div class="flex items-center gap-[4px] text-[12px] bkms-text-body">
         <span
-          class="inline-block bg-bkms-success-3 w-[12px] h-[12px] border-bkms-success-2 border-[1px] border-solid rounded-[4px] mr-[6px]"
+          class="inline-block bg-bkms-success-3 w-[12px] h-[12px] border-bkms-success-2 border-[1px] border-solid rounded-bkms-card mr-[6px]"
         ></span>
         <span>{{ $t('工作负载 Patch 内容') }}</span>
       </div>

@@ -128,7 +128,7 @@
         <!-- 已部署场景，展示总权重和占比 -->
         <div
           v-if="deployed"
-          class="mt-[8px] rounded-[2px] bkms-bg-page px-[12px] py-[8px] text-[12px] leading-[20px]"
+          class="mt-[8px] rounded-bkms-overlay bkms-bg-page px-[12px] py-[8px] text-[12px] leading-[20px]"
         >
           <i18n-t keypath="总权重 = {0}，预计占比 {1}%">
             <span class="font-bold bkms-text-title">{{ draftTotalWeight }}</span>
@@ -304,7 +304,7 @@
     margin-top: 8px;
     margin-right: 8px;
     flex-shrink: 0;
-    border-radius: 50%;
+    border-radius: var(--bkms-radius-full);
     background-color: currentColor;
   }
 

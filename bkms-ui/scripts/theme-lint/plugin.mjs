@@ -21,7 +21,7 @@
  *
  * 一个令牌维度一个模块，本文件只合并导出，eslint 配置里的 plugin 名保持 `theme` 不变：
  *   rules/color.mjs   颜色：no-hardcoded-color / no-default-palette / prefer-uno-class / no-foreign-var
- *   rules/radius.mjs  圆角：no-hardcoded-radius / prefer-radius-class
+ *   rules/radius.mjs  圆角：no-hardcoded-radius / prefer-radius-class / no-stacked-radius
  *
  * 覆盖范围：template / script / <style> 块 / 独立 .css（@eslint/css 提供 css language）。
  * 四路挂载与定位换算在 rules/shared.mjs；令牌反查真源在 map.mjs（与 uno.config.ts 同源）。

@@ -46,7 +46,7 @@
       <div
         v-for="item in actionOptions"
         :key="item.value"
-        class="clear-file-action-card cursor-pointer rounded-[4px] border border-solid bkms-line-default px-[16px] py-[14px] transition-all duration-300"
+        class="clear-file-action-card cursor-pointer rounded-bkms-overlay border border-solid bkms-line-default px-[16px] py-[14px] transition-all duration-300"
         :class="{ 'is-active': selectedAction === item.value }"
         @click="selectedAction = item.value"
       >

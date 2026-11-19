@@ -21,7 +21,7 @@
     <!-- 已有密码（编辑态入口）：6个圆点占位，点击进入编辑 -->
     <div
       v-if="!isEditing && isEditMode && props.hasCredential"
-      class="flex items-center h-[32px] px-[10px] border border-solid bkms-line-input rounded-[2px] cursor-text text-[14px] bkms-text-body bkms-bg-card leading-[30px] hover:bkms-line-hover"
+      class="flex items-center h-[32px] px-[10px] border border-solid bkms-line-input rounded-bkms-field cursor-text text-[14px] bkms-text-body bkms-bg-card leading-[30px] hover:bkms-line-hover"
       @click="handlePlaceholderClick"
     >
       <span class="bkms-text-body">••••••</span>

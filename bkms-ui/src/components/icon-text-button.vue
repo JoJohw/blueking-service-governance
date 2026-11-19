@@ -18,7 +18,7 @@
 
 <template>
   <Button
-    :class="['!px-[8px] !py-[6px] select-none', { '!bkms-bg-active rounded-[2px]': !!active }]"
+    :class="['!px-[8px] !py-[6px] select-none', { '!bkms-bg-active rounded-bkms-field': !!active }]"
     :disabled="disabled"
     text
     theme="primary"

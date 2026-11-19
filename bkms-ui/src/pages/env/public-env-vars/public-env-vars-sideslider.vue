@@ -67,7 +67,7 @@
               {{ tab.label }}
               <span
                 :class="[
-                  'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-[8px]',
+                  'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-bkms-overlay',
                   tab.key === activeTab ? 'bkms-bg-active bkms-text-brand' : 'bkms-bg-card',
                 ]"
                 >{{ tab.count }}</span
@@ -133,11 +133,7 @@
           </template>
           <template #default="{ row }">
             <Tag
-              :class="
-                row.isSensitive
-                  ? 'text-bkms-success-2 bkms-bg-success'
-                  : 'bkms-text-secondary bg-bkms-neutral-6'
-              "
+              :class="row.isSensitive ? 'text-bkms-success-2 bkms-bg-success' : 'bkms-text-secondary bg-bkms-neutral-6'"
               :theme="row.isSensitive ? 'success' : 'default'"
             >
               {{ row.isSensitive ? $t('是') : $t('否') }}

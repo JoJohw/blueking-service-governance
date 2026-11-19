@@ -40,6 +40,7 @@ import {
   COLOR_KINDS,
   hexOfVar,
   isRadiusScaleVar,
+  isRadiusShapeVar,
   isShadowVar,
   isThemeVar,
   layerOfClass,
@@ -48,8 +49,10 @@ import {
   nearestRadiusSemantics,
   nearestVars,
   normalizeHex,
+  parseRadiusScaleTokens,
   parseScaleColors,
   parseSemanticShortcuts,
+  radiusScaleVarPx,
   radiusSemantics,
   suggestClass,
   suggestShadowVar,
@@ -64,6 +67,7 @@ const RULES = {
   'theme/no-foreign-var': 'error',
   'theme/no-hardcoded-radius': 'error',
   'theme/prefer-radius-class': 'error',
+  'theme/no-stacked-radius': 'error',
 };
 
 const configFor = {
@@ -98,6 +102,12 @@ const configFor = {
 };
 
 const linter = new Linter();
+
+/** 建议项的 fix 已被 Linter 展开成 { range, text }，直接按区间拼回源码 */
+function applySuggestion(code, suggestion) {
+  const { range, text } = suggestion.fix;
+  return code.slice(0, range[0]) + text + code.slice(range[1]);
+}
 
 function fix(code, target = 'vue') {
   return linter.verifyAndFix(code, configFor[target], { filename: `demo.${target}` });
@@ -171,10 +181,11 @@ describe('map 令牌解析', () => {
     const names = Object.keys(scale);
     expect(names.length).toBeGreaterThan(0);
     for (const name of names) {
-      // step 是数字色阶，keep 族则是 6 位 hex（名字即色值）
-      expect(name).toMatch(/^bkms-[a-z-]+-(?:\d+|[0-9a-f]{6})$/);
+      expect(name).toMatch(/^bkms-[a-z0-9-]+$/);
       expect(scale[name]).toBe(`var(--${name})`);
     }
+    // 场景色与数字色阶同形注册，消费 text-bkms-text-warning-alt 这类类名
+    expect(scale['bkms-warning-alt']).toBe('var(--bkms-warning-alt)');
   });
 
   it('语义快捷类：line 组映射到 border-[var(...)]，text / bg 各自对齐', () => {
@@ -226,7 +237,7 @@ describe('map.suggest', () => {
       expect(hex).not.toBeNull();
       const cls = suggestClass(hex, 'bg');
       expect(cls).toEqual(expect.any(String));
-      expect(cls).toMatch(/^(bkms-bg-[a-z-]+|bg-bkms-[a-z-]+-(?:\d+|[0-9a-f]{6}))$/);
+      expect(cls).toMatch(/^(bkms-bg-[a-z0-9-]+|bg-bkms-[a-z0-9-]+)$/);
     }
   });
 
@@ -405,6 +416,17 @@ describe('rule: no-hardcoded-color', () => {
     expect(msg.suggestions?.length).toBeGreaterThan(0);
   });
 
+  // 候选只给类名时看不出是哪个颜色，灯泡里跟着带上候选自己的 hex
+  it('灯泡候选带上具体 hex', () => {
+    const [msg] = verifyRule(`<template><div class="bg-[#010203]" /></template>`, 'theme/no-hardcoded-color');
+    expect(msg.messageId).toBe('useClassUnknown');
+    for (const s of msg.suggestions) expect(s.data.target).toMatch(/（#[0-9a-f]{6}）$/);
+
+    const [varMsg] = verifyRule(`<template><div style="color: #010203" /></template>`, 'theme/no-hardcoded-color');
+    expect(varMsg.messageId).toBe('useVarUnknown');
+    for (const s of varMsg.suggestions) expect(s.data.target).toMatch(/^var\(--bkms-.+\)（#[0-9a-f]{6}）$/);
+  });
+
   it('rgb() 归一为 hex 后能命中同值令牌', () => {
     const [msg] = verifyRule(`<template><div style="color: rgb(17, 18, 20)" /></template>`, 'theme/no-hardcoded-color');
     expect(msg.messageId).toBe('useVar');
@@ -437,6 +459,16 @@ describe('rule: no-hardcoded-color', () => {
     );
     expect(msg.message).toBe(
       `写死色值 ${shadow}，改用 shadow-[…var(--bkms-shadow-card)]（uno 未注册阴影类，class 内 var() 属例外）`,
+    );
+  });
+
+  it('drop-shadow 同属阴影例外，不能因为前缀带连字符被静默放过', () => {
+    const [msg] = verifyRule(
+      `<template><div class="drop-shadow-[2px_0_2px_rgba(0,0,0,0.06)]" /></template>`,
+      'theme/no-hardcoded-color',
+    );
+    expect(msg.message).toBe(
+      '写死色值 rgba(0,0,0,0.06)，改用 drop-shadow-[…var(--bkms-shadow-*)]（uno 未注册阴影类，class 内 var() 属例外）',
     );
   });
 
@@ -769,56 +801,111 @@ describe('令牌目录定位', () => {
 });
 
 describe('map 圆角反查', () => {
-  it('同值语义档：6px 对应 control/card/overlay/tab', () => {
+  it('同值语义档：6px 对应七个语义，base 兜底排最前', () => {
     expect(
       radiusSemantics(6)
         .map(t => t.label)
         .sort(),
-    ).toEqual(['card', 'control', 'overlay', 'tab']);
+    ).toEqual(['base', 'card', 'control', 'field', 'menu', 'overlay', 'tab']);
+    expect(radiusSemantics(6)[0].label).toBe('base');
   });
 
-  it('唯一同值档：4px → scroll、8px → menu', () => {
-    expect(radiusSemantics(4).map(t => t.label)).toEqual(['scroll']);
-    expect(radiusSemantics(8).map(t => t.label)).toEqual(['menu']);
+  it('4px 两档（tag/scroll）、8px 与 3px 无同值语义', () => {
+    expect(radiusSemantics(4).map(t => t.label)).toEqual(['tag', 'scroll']);
+    expect(radiusSemantics(8).map(t => t.label)).toEqual([]);
+    expect(radiusSemantics(3).map(t => t.label)).toEqual([]);
   });
 
   it('hint 只排序，不增删候选', () => {
     const hinted = radiusSemantics(6, 'tab');
-    expect(hinted).toHaveLength(4);
+    expect(hinted).toHaveLength(7);
     expect(hinted[0].label).toBe('tab');
+    expect(hinted[1].label).toBe('base');
   });
 
   it('档位里没有同值时给最近档位', () => {
     const near = nearestRadiusSemantics(2);
     expect(near).toHaveLength(3);
-    expect(near[0].px).toBe(3);
+    expect(near[0].px).toBe(1);
   });
 
-  it('isRadiusScaleVar 只认档位', () => {
-    expect(isRadiusScaleVar('--bkms-radius-6')).toBe(true);
+  it('档位层拆成尺度档 hairline/xs/sm/md/lg/xl 与形状档 none/full', () => {
+    expect(Object.keys(parseRadiusScaleTokens())).toEqual([
+      'bkms-hairline',
+      'bkms-xs',
+      'bkms-sm',
+      'bkms-md',
+      'bkms-lg',
+      'bkms-xl',
+      'bkms-none',
+      'bkms-full',
+    ]);
+  });
+
+  it('isRadiusScaleVar 只认尺度档，形状档另有判定', () => {
+    expect(isRadiusScaleVar('--bkms-radius-md')).toBe(true);
+    expect(isRadiusScaleVar('--bkms-radius-lg')).toBe(true);
+    expect(isRadiusScaleVar('--bkms-radius-none')).toBe(false);
     expect(isRadiusScaleVar('--bkms-radius-card')).toBe(false);
+  });
+
+  it('isRadiusShapeVar 只认 none/full', () => {
+    expect(isRadiusShapeVar('--bkms-radius-none')).toBe(true);
+    expect(isRadiusShapeVar('--bkms-radius-full')).toBe(true);
+    expect(isRadiusShapeVar('--bkms-radius-md')).toBe(false);
+  });
+
+  it('radiusScaleVarPx 按档位名换算尺度档像素值', () => {
+    expect(radiusScaleVarPx('--bkms-radius-xs')).toBe(3);
+    expect(radiusScaleVarPx('--bkms-radius-sm')).toBe(4);
+    expect(radiusScaleVarPx('--bkms-radius-md')).toBe(6);
+    expect(radiusScaleVarPx('--bkms-radius-lg')).toBe(8);
+    expect(radiusScaleVarPx('--bkms-radius-full')).toBeNull();
   });
 });
 
 describe('rule: no-hardcoded-radius', () => {
-  // 6px 有四个同值语义档：语义由场景决定，只给候选
+  // 6px 有七个同值语义档：语义由场景决定，只给候选
   it('同值多档只给候选，不自动修', () => {
     const code = `<template><div class="rounded-[6px]" /></template>`;
     const [msg] = verifyRule(code, 'theme/no-hardcoded-radius');
     expect(msg.messageId).toBe('useClassMulti');
     expect(msg.fix).toBeUndefined();
-    expect(msg.suggestions).toHaveLength(4);
+    expect(msg.suggestions).toHaveLength(7);
     expect(fix(code).output).toBe(code);
   });
 
-  it('唯一同值档自动修：rounded-[4px] → rounded-scroll', () => {
-    const code = `<template><div class="rounded-[4px]" /></template>`;
-    expect(fix(code).output).toBe(`<template><div class="rounded-scroll" /></template>`);
+  // 候选是 token 对象，直接插值会变成 [object Object]，灯泡里看不出改什么
+  it('灯泡文案带真实替换目标', () => {
+    const [msg] = verifyRule(`<template><div class="bk-card rounded-[6px]" /></template>`, 'theme/no-hardcoded-radius');
+    expect(msg.suggestions.map(s => s.data.target)).toContain('rounded-bkms-card（6px）');
+    for (const s of msg.suggestions) expect(s.data.target).not.toContain('[object');
+
+    const [cssMsg] = verifyRule(
+      `<template><div /></template>\n<style>\n.a { border-radius: 6px; }\n</style>`,
+      'theme/no-hardcoded-radius',
+    );
+    expect(cssMsg.suggestions.map(s => s.data.target)).toContain('var(--bkms-radius-card)（6px）');
   });
 
-  it('方向保留：rounded-t-[8px] → rounded-t-menu', () => {
-    const code = `<template><div class="rounded-t-[8px]" /></template>`;
-    expect(fix(code).output).toBe(`<template><div class="rounded-t-menu" /></template>`);
+  it('4px 两档只给候选，不替人选 tag / scroll', () => {
+    const code = `<template><div class="rounded-[4px]" /></template>`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius');
+    expect(msg.messageId).toBe('useClassMulti');
+    expect(msg.suggestions).toHaveLength(2);
+    expect(fix(code).output).toBe(code);
+  });
+
+  it('3px 无同值语义档，只给最近候选', () => {
+    const code = `<template><div class="rounded-[3px]" /></template>`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius');
+    expect(msg.messageId).toBe('useClassUnknown');
+    expect(fix(code).output).toBe(code);
+  });
+
+  it('方向保留：唯一同值语义档 → rounded-t-bkms-indicator', () => {
+    const code = `<template><div class="rounded-t-[1px]" /></template>`;
+    expect(fix(code).output).toBe(`<template><div class="rounded-t-bkms-indicator" /></template>`);
   });
 
   it('档位无同值（2px）时给最近档位候选，不自动修', () => {
@@ -829,17 +916,51 @@ describe('rule: no-hardcoded-radius', () => {
     expect(fix(code).output).toBe(code);
   });
 
-  // 形状语义（圆形 / 直角 / 百分比 / 胶囊）不进档位
-  it.each(['rounded-full', 'rounded-none', 'rounded-[50%]', 'rounded-[999px]', 'rounded-[0]', 'rounded-card'])(
-    '%s 放行',
-    cls => {
-      expect(verifyRule(`<template><div class="${cls}" /></template>`, 'theme/no-hardcoded-radius')).toEqual([]);
-    },
-  );
+  // 形状值不再放行：映射到 none / full 唯一，所以直接自动修成项目注册的形状类
+  it.each([
+    ['rounded-[0]', 'rounded-bkms-none'],
+    ['rounded-[0px]', 'rounded-bkms-none'],
+    ['rounded-[50%]', 'rounded-bkms-full'],
+    ['rounded-[999px]', 'rounded-bkms-full'],
+  ])('%s 形状值自动修成 %s', (cls, target) => {
+    const code = `<template><div class="${cls}" /></template>`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius');
+    expect(msg.messageId).toBe('useClassShape');
+    expect(fix(code).output).toBe(`<template><div class="${target}" /></template>`);
+  });
 
-  it('<style> 块：唯一同值 → var()，!important 保留', () => {
-    const code = `<template><div /></template>\n<style>\n.a { border-radius: 4px !important; }\n</style>`;
-    expect(fix(code).output).toBe(code.replace('4px !important', 'var(--bkms-radius-scroll) !important'));
+  it('形状声明也自动修成形状档 var()', () => {
+    const cssCode = `.a { border-radius: 50%; }`;
+    const [msg] = verifyRule(cssCode, 'theme/no-hardcoded-radius', 'css');
+    expect(msg.messageId).toBe('useVarShape');
+    expect(fix(cssCode, 'css').output).toBe(`.a { border-radius: var(--bkms-radius-full); }`);
+
+    const inline = `<template><div style="border-radius: 0" /></template>`;
+    expect(fix(inline).output).toBe(`<template><div style="border-radius: var(--bkms-radius-none)" /></template>`);
+  });
+
+  it('项目注册的形状类与语义类放行', () => {
+    for (const cls of ['rounded-bkms-none', 'rounded-bkms-full', 'rounded-bkms-card']) {
+      expect(verifyRule(`<template><div class="${cls}" /></template>`, 'theme/no-hardcoded-radius')).toEqual([]);
+    }
+  });
+
+  // 20px 在 80×80 卡片上是大圆角方块，归 full 会被钳成正圆；阈值定在 100px
+  it('20px 有专属档位，落到 tile 语义', () => {
+    const code = `<template><div class="rounded-[20px]" /></template>`;
+    expect(fix(code).output).toBe(`<template><div class="rounded-bkms-tile" /></template>`);
+  });
+
+  it('档位里没有的值只给最近档位候选，不自动修', () => {
+    const code = `<template><div class="rounded-[10px]" /></template>`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius');
+    expect(msg.messageId).toBe('useClassUnknown');
+    expect(fix(code).output).toBe(code);
+  });
+
+  it('<style> 块：唯一同值语义档 → var()，!important 保留', () => {
+    const code = `<template><div /></template>\n<style>\n.bk-empty-home { border-radius: 20px !important; }\n</style>`;
+    expect(fix(code).output).toBe(code.replace('20px !important', 'var(--bkms-radius-tile) !important'));
   });
 
   it('<style> 块：多值简写只报不修', () => {
@@ -849,25 +970,115 @@ describe('rule: no-hardcoded-radius', () => {
     expect(fix(code).output).toBe(code);
   });
 
-  it('内联 style 属性与脚本样式对象都命中', () => {
-    const [inline] = verifyRule(`<template><div style="border-radius: 4px" /></template>`, 'theme/no-hardcoded-radius');
-    expect(inline.message).toBe('写死圆角 4px，改用 var(--bkms-radius-scroll)');
+  // 四角并列换成令牌后依然要逐角跟改、读不出语义归属，所以不再只在含字面量时上报
+  it('令牌化的多值简写同样只报不修', () => {
+    const code = `.a { border-radius: var(--bkms-radius-none) var(--bkms-radius-card); }`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius', 'css');
+    expect(msg.messageId).toBe('compound');
+    expect(fix(code, 'css').output).toBe(code);
+  });
 
-    const [script] = verifyRule(`const style = { borderRadius: '4px' };`, 'theme/no-hardcoded-radius', 'ts');
-    expect(script.messageId).toBe('useVar');
-
-    // fix 必须落在值本体上：漏掉字面量基址就会插到文件开头
-    expect(fix(`<template><div style="border-radius: 4px" /></template>`).output).toBe(
-      `<template><div style="border-radius: var(--bkms-radius-scroll)" /></template>`,
-    );
-    expect(fix(`const style = { borderRadius: '4px' };`, 'ts').output).toBe(
-      `const style = { borderRadius: 'var(--bkms-radius-scroll)' };`,
+  // 0 x x 0 / x 0 0 x 是历史产物的两种形态：整体语义 + 清零侧可以机械推出来
+  it.each([
+    ['0 20px 20px 0', 'border-start-start-radius', 'border-end-start-radius'],
+    ['20px 0 0 20px', 'border-start-end-radius', 'border-end-end-radius'],
+  ])('%s 给「整体 + 单角清零」建议', (value, first, second) => {
+    const code = `.a { border-radius: ${value}; }`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius', 'css');
+    expect(msg.suggestions).toHaveLength(1);
+    expect(applySuggestion(code, msg.suggestions[0])).toBe(
+      `.a { border-radius: var(--bkms-radius-tile);\n  ${first}: var(--bkms-radius-none);\n  ${second}: var(--bkms-radius-none); }`,
     );
   });
 
-  it('独立 .css 走 Declaration', () => {
+  it('CSS 语境按原声明缩进换行', () => {
+    const code = `<template><div /></template>\n<style>\n.a {\n  border-radius: 0 var(--bkms-radius-overlay) var(--bkms-radius-overlay) 0;\n}\n</style>`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius');
+    expect(applySuggestion(code, msg.suggestions[0])).toBe(
+      code.replace(
+        'border-radius: 0 var(--bkms-radius-overlay) var(--bkms-radius-overlay) 0;',
+        'border-radius: var(--bkms-radius-overlay);\n  border-start-start-radius: var(--bkms-radius-none);\n  border-end-start-radius: var(--bkms-radius-none);',
+      ),
+    );
+  });
+
+  // 内联 style 与 script 字符串里换行会破坏值本身，只能单行
+  it('内联 style 不换行', () => {
+    const code = `<template><div style="border-radius: 0 20px 20px 0" /></template>`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius');
+    const out = applySuggestion(code, msg.suggestions[0]);
+    expect(out).not.toContain('\n');
+    expect(out).toBe(
+      `<template><div style="border-radius: var(--bkms-radius-tile); border-start-start-radius: var(--bkms-radius-none); border-end-start-radius: var(--bkms-radius-none)" /></template>`,
+    );
+  });
+
+  // 只替换值会留下属性名与尾部 !important，应用后变成重复声明
+  it('拆开建议替换整条声明，属性名与 !important 不残留', () => {
+    const code = `.a { border-radius: 0 var(--bkms-radius-overlay) var(--bkms-radius-overlay) 0 !important; }`;
+    const [msg] = verifyRule(code, 'theme/no-hardcoded-radius', 'css');
+    expect(applySuggestion(code, msg.suggestions[0])).toBe(
+      `.a { border-radius: var(--bkms-radius-overlay) !important;\n  border-start-start-radius: var(--bkms-radius-none) !important;\n  border-end-start-radius: var(--bkms-radius-none) !important; }`,
+    );
+  });
+
+  // script 样式对象的值外层是引号，一条属性塞不下四条声明，只能报不能修
+  it('script 样式对象的多值不给拆开建议', () => {
+    const [msg] = verifyRule(`const style = { borderRadius: '0 20px 20px 0' };`, 'theme/no-hardcoded-radius', 'ts');
+    expect(msg.messageId).toBe('compound');
+    expect(msg.suggestions).toBeUndefined();
+  });
+
+  // 属性名藏在三元后面：不沿 ConditionalExpression 上溯到 Property，整条会被静默跳过
+  it('样式对象的三元值仍按属性名判定', () => {
+    const msgs = verifyRule(
+      `const style = { borderRadius: ok ? '4px' : '0 20px 20px 0' };`,
+      'theme/no-hardcoded-radius',
+      'ts',
+    );
+    expect(msgs.map(m => m.messageId)).toContain('compound');
+  });
+
+  // 4px 有 tag / scroll 两个同值档：拆开后整体语义同样由场景定，只给候选
+  it('字面量多值给多档候选，不替人选', () => {
+    const [msg] = verifyRule(`.a { border-radius: 0 4px 4px 0; }`, 'theme/no-hardcoded-radius', 'css');
+    expect(msg.suggestions.length).toBeGreaterThan(1);
+    for (const s of msg.suggestions) expect(s.data.target).toMatch(/^var\(--bkms-radius-[\w-]+\)$/);
+  });
+
+  it('推不出整体语义的多值（四角各异）不给建议', () => {
+    const [msg] = verifyRule(`.a { border-radius: 4px 6px 8px 10px; }`, 'theme/no-hardcoded-radius', 'css');
+    expect(msg.messageId).toBe('compound');
+    expect(msg.suggestions).toBeUndefined();
+  });
+
+  it('内联 style 属性与脚本样式对象都命中，4px 只给候选', () => {
+    const inlineCode = `<template><div style="border-radius: 4px" /></template>`;
+    const [inline] = verifyRule(inlineCode, 'theme/no-hardcoded-radius');
+    expect(inline.messageId).toBe('useVarMulti');
+    expect(inline.suggestions).toHaveLength(2);
+
+    const scriptCode = `const style = { borderRadius: '4px' };`;
+    const [script] = verifyRule(scriptCode, 'theme/no-hardcoded-radius', 'ts');
+    expect(script.messageId).toBe('useVarMulti');
+    expect(script.suggestions).toHaveLength(2);
+
+    // fix 必须落在值本体上：漏掉字面量基址就会插到文件开头
+    expect(inlineCode.slice(...inline.suggestions[0].fix.range)).toBe('4px');
+    expect(inline.suggestions[0].fix.text).toBe('var(--bkms-radius-tag)');
+    expect(scriptCode.slice(...script.suggestions[0].fix.range)).toBe('4px');
+    expect(script.suggestions[0].fix.text).toBe('var(--bkms-radius-tag)');
+  });
+
+  it('独立 .css 走 Declaration：8px 无同值给最近候选', () => {
     const [msg] = verifyRule(`.a { border-radius: 8px; }`, 'theme/no-hardcoded-radius', 'css');
-    expect(msg.message).toBe('写死圆角 8px，改用 var(--bkms-radius-menu)');
+    expect(msg.messageId).toBe('useVarUnknown');
+    expect(msg.message).toBe('写死圆角 8px：档位无同值，最近的语义档是 base / field / control');
+  });
+
+  it('独立 .css 走 Declaration：唯一同值语义档自动修', () => {
+    const [msg] = verifyRule(`.a { border-radius: 20px; }`, 'theme/no-hardcoded-radius', 'css');
+    expect(msg.message).toBe('写死圆角 20px，改用 var(--bkms-radius-tile)');
   });
 
   it('非圆角属性里的数值不误报', () => {
@@ -887,8 +1098,9 @@ describe('rule: no-hardcoded-radius', () => {
   it('script 对象里的 kebab 键也认', () => {
     const code = `const s = { 'border-radius': '4px' };`;
     const [msg] = verifyRule(code, 'theme/no-hardcoded-radius', 'ts');
-    expect(msg.messageId).toBe('useVar');
-    expect(fix(code, 'ts').output).toBe(`const s = { 'border-radius': 'var(--bkms-radius-scroll)' };`);
+    expect(msg.messageId).toBe('useVarMulti');
+    expect(msg.suggestions).toHaveLength(2);
+    expect(fix(code, 'ts').output).toBe(code);
   });
 });
 
@@ -898,44 +1110,61 @@ describe('rule: prefer-radius-class', () => {
     expect(msg.messageId).toBe('bannedScale');
   });
 
-  it('档位类给语义候选，不自动修', () => {
-    const code = `<template><div class="rounded-bkms-6" /></template>`;
+  it('尺度档类给语义候选，不自动修', () => {
+    const code = `<template><div class="rounded-bkms-md" /></template>`;
     const [msg] = verifyRule(code, 'theme/prefer-radius-class');
     expect(msg.messageId).toBe('bannedStep');
     expect(msg.fix).toBeUndefined();
     expect(fix(code).output).toBe(code);
   });
 
+  it('内置形状类自动换成项目注册类', () => {
+    for (const label of ['none', 'full']) {
+      const code = `<template><div class="rounded-${label}" /></template>`;
+      const [msg] = verifyRule(code, 'theme/prefer-radius-class');
+      expect(msg.messageId).toBe('useBuiltinShape');
+      expect(fix(code).output).toBe(`<template><div class="rounded-bkms-${label}" /></template>`);
+    }
+  });
+
   it('语义令牌的 var() 任意值直接换成注册类（方向保留）', () => {
     expect(fix(`<template><div class="rounded-[var(--bkms-radius-card)]" /></template>`).output).toBe(
-      `<template><div class="rounded-card" /></template>`,
+      `<template><div class="rounded-bkms-card" /></template>`,
     );
     expect(fix(`<template><div class="rounded-t-[var(--bkms-radius-card)]" /></template>`).output).toBe(
-      `<template><div class="rounded-t-card" /></template>`,
+      `<template><div class="rounded-t-bkms-card" /></template>`,
     );
   });
 
-  it('档位 var() 任意值只给候选', () => {
+  it('尺度档 var() 任意值只给候选', () => {
     const [msg] = verifyRule(
-      `<template><div class="rounded-[var(--bkms-radius-6)]" /></template>`,
+      `<template><div class="rounded-[var(--bkms-radius-md)]" /></template>`,
       'theme/prefer-radius-class',
     );
     expect(msg.messageId).toBe('bannedStep');
-    expect(msg.suggestions).toHaveLength(4);
+    expect(msg.suggestions).toHaveLength(7);
   });
 
-  it('CSS 里直连档位变量也报', () => {
-    const code = `<template><div /></template>\n<style>\n.a { border-radius: var(--bkms-radius-6); }\n</style>`;
+  it('CSS 里直连尺度档变量也报', () => {
+    const code = `<template><div /></template>\n<style>\n.a { border-radius: var(--bkms-radius-md); }\n</style>`;
     const [msg] = verifyRule(code, 'theme/prefer-radius-class');
     expect(msg.messageId).toBe('bannedVar');
   });
 
-  it.each(['rounded-card', 'rounded-full', 'rounded-none', 'rounded-t-control'])('%s 放行', cls => {
+  it('形状档 var() 与形状档类都合法', () => {
+    for (const cls of ['rounded-bkms-none', 'rounded-bkms-full', 'rounded-[var(--bkms-radius-none)]']) {
+      expect(verifyRule(`<template><div class="${cls}" /></template>`, 'theme/prefer-radius-class')).toEqual([]);
+    }
+    const cssCode = `<template><div /></template>\n<style>\n.a { border-radius: var(--bkms-radius-full); }\n</style>`;
+    expect(verifyRule(cssCode, 'theme/prefer-radius-class')).toEqual([]);
+  });
+
+  it.each(['rounded-bkms-card', 'rounded-t-bkms-control'])('%s 放行', cls => {
     expect(verifyRule(`<template><div class="${cls}" /></template>`, 'theme/prefer-radius-class')).toEqual([]);
   });
 
-  it('script 里的档位类也报，只报不修', () => {
-    const code = `const s = 'rounded-bkms-6';`;
+  it('script 里的尺度档类也报，只报不修', () => {
+    const code = `const s = 'rounded-bkms-md';`;
     const [msg] = verifyRule(code, 'theme/prefer-radius-class', 'ts');
     expect(msg.messageId).toBe('bannedStep');
     expect(msg.fix).toBeUndefined();
@@ -969,18 +1198,117 @@ describe('rule: prefer-radius-class', () => {
   });
 
   it('不存在的档位（rounded-bkms-99）不当档位，也不给候选', () => {
-    expect(verifyRule(`<template><div class="rounded-bkms-99" /></template>`, 'theme/prefer-radius-class')).toEqual(
-      [],
-    );
+    expect(verifyRule(`<template><div class="rounded-bkms-99" /></template>`, 'theme/prefer-radius-class')).toEqual([]);
   });
 
   it('script 里的 var() 任意值文案不带「class 内」', () => {
-    const [msg] = verifyRule(
-      `const s = 'rounded-[var(--bkms-radius-card)]';`,
-      'theme/prefer-radius-class',
-      'ts',
-    );
+    const [msg] = verifyRule(`const s = 'rounded-[var(--bkms-radius-card)]';`, 'theme/prefer-radius-class', 'ts');
     expect(msg.messageId).toBe('unregistered');
     expect(msg.message).not.toContain('class 内');
+  });
+});
+
+describe('rule: no-stacked-radius', () => {
+  // uno 的类名顺序不等于 CSS 顺序，同角两个来源谁赢取决于生成顺序
+  it('同角叠加上报，指向后出现的类', () => {
+    const code = `<template><div class="rounded-bkms-card rounded-tl-bkms-card" /></template>`;
+    const [msg] = verifyRule(code, 'theme/no-stacked-radius');
+    expect(msg.messageId).toBe('stacked');
+    expect(msg.message).toContain('rounded-tl-bkms-card');
+    expect(msg.message).toContain('rounded-bkms-card');
+  });
+
+  it('整体 + 方向、方向 + 方向只要同角就报', () => {
+    expect(
+      verifyRule(
+        `<template><div class="rounded-bkms-card rounded-t-bkms-none" /></template>`,
+        'theme/no-stacked-radius',
+      ),
+    ).toHaveLength(1);
+    expect(
+      verifyRule(
+        `<template><div class="rounded-tl-bkms-card rounded-t-bkms-none" /></template>`,
+        'theme/no-stacked-radius',
+      ),
+    ).toHaveLength(1);
+  });
+
+  it('不同方向的边不冲突', () => {
+    const code = `<template><div class="rounded-t-bkms-card rounded-b-bkms-card" /></template>`;
+    expect(verifyRule(code, 'theme/no-stacked-radius')).toEqual([]);
+  });
+
+  // hover: 作用于另一个状态，静止态只有一个来源
+  it('变体前缀不算叠加', () => {
+    const code = `<template><div class="rounded-bkms-base hover:rounded-bkms-card" /></template>`;
+    expect(verifyRule(code, 'theme/no-stacked-radius')).toEqual([]);
+  });
+
+  it('uno 内置刻度参与叠加判定', () => {
+    const code = `<template><div class="rounded-lg rounded-bkms-card" /></template>`;
+    expect(verifyRule(code, 'theme/no-stacked-radius')).toHaveLength(1);
+  });
+
+  it('非 class 语境不扫，避免把文案当类名', () => {
+    expect(
+      verifyRule(
+        `<template><div title="rounded-bkms-card rounded-tl-bkms-card" /></template>`,
+        'theme/no-stacked-radius',
+      ),
+    ).toEqual([]);
+  });
+
+  it('@apply 里的叠加同样上报', () => {
+    const code = `<template><div /></template>\n<style>\n.a { @apply rounded-bkms-card rounded-tl-bkms-card; }\n</style>`;
+    const [msg] = verifyRule(code, 'theme/no-stacked-radius');
+    expect(msg.messageId).toBe('stacked');
+  });
+
+  // 留哪个取决于设计意图，两条建议各删一个，删完不留双空格
+  it('叠加给两条建议：各删一个', () => {
+    const code = `<template><div class="rounded-bkms-card rounded-tl-bkms-card" /></template>`;
+    const [msg] = verifyRule(code, 'theme/no-stacked-radius');
+    expect(msg.suggestions.map(s => s.data.value)).toEqual(['rounded-tl-bkms-card', 'rounded-bkms-card']);
+    expect(applySuggestion(code, msg.suggestions[0])).toBe(`<template><div class="rounded-bkms-card" /></template>`);
+    expect(applySuggestion(code, msg.suggestions[1])).toBe(`<template><div class="rounded-tl-bkms-card" /></template>`);
+  });
+
+  it('@apply 里删类不吃掉指令后的空格', () => {
+    const code = `<template><div /></template>\n<style>\n.a { @apply rounded-bkms-card rounded-tl-bkms-card; }\n</style>`;
+    const [msg] = verifyRule(code, 'theme/no-stacked-radius');
+    expect(applySuggestion(code, msg.suggestions[0])).toContain('@apply rounded-bkms-card;');
+  });
+
+  // 绑定的类名是一串独立 Literal，逐字面量判定看不到彼此，必须在属性层看整段表达式
+  it(':class 数组里跨项叠加上报', () => {
+    const code = `<template><div :class="['rounded-bkms-card', 'rounded-tl-bkms-card']" /></template>`;
+    const [msg] = verifyRule(code, 'theme/no-stacked-radius');
+    expect(msg.messageId).toBe('stacked');
+    expect(msg.message).toContain('rounded-tl-bkms-card');
+  });
+
+  it(':class 对象写法同样上报', () => {
+    const code = `<template><div :class="{ 'rounded-bkms-card': ok, 'rounded-t-bkms-none': ok }" /></template>`;
+    expect(verifyRule(code, 'theme/no-stacked-radius')).toHaveLength(1);
+  });
+
+  it(':class 单个字符串仍按文本判定', () => {
+    const code = `<template><div :class="'rounded-bkms-card rounded-tl-bkms-card'" /></template>`;
+    expect(verifyRule(code, 'theme/no-stacked-radius')).toHaveLength(1);
+  });
+
+  it(':class 绑定里同名类重复与不同角不报', () => {
+    expect(
+      verifyRule(
+        `<template><div :class="['rounded-bkms-card', 'rounded-bkms-card']" /></template>`,
+        'theme/no-stacked-radius',
+      ),
+    ).toEqual([]);
+    expect(
+      verifyRule(
+        `<template><div :class="['rounded-t-bkms-card', 'rounded-b-bkms-card']" /></template>`,
+        'theme/no-stacked-radius',
+      ),
+    ).toEqual([]);
   });
 });

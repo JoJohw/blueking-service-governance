@@ -25,7 +25,7 @@
         content: item.disabledTip,
         disabled: !item.disabled || !item.disabledTip,
       }"
-      class="flex items-center gap-[12px] px-[16px] py-[12px] rounded-[4px] border transition-all duration-200"
+      class="flex items-center gap-[12px] px-[16px] py-[12px] rounded-bkms-control border transition-all duration-200"
       :class="[
         item.disabled
           ? 'bkms-line-default bkms-bg-subtle cursor-not-allowed opacity-60'
@@ -36,12 +36,12 @@
       @click="handleSelect(item)"
     >
       <div
-        class="mt-[2px] w-[16px] h-[16px] rounded-full border-[1px] shrink-0 flex items-center justify-center transition-all duration-200"
+        class="mt-[2px] w-[16px] h-[16px] rounded-bkms-full border-[1px] shrink-0 flex items-center justify-center transition-all duration-200"
         :class="[modelValue === item.value ? 'bkms-line-active' : 'bkms-line-default']"
       >
         <div
           v-if="modelValue === item.value"
-          class="w-[8px] h-[8px] rounded-full bg-bkms-brand-2"
+          class="w-[8px] h-[8px] rounded-bkms-full bg-bkms-brand-2"
         />
       </div>
       <div class="flex-1 min-w-0">

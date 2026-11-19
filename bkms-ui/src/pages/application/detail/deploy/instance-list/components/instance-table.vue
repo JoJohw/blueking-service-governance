@@ -1292,6 +1292,7 @@
       border-top: 1px solid var(--bkms-line-default);
     }
   }
+
   .env-header {
     border: 1px solid var(--bkms-line-default);
     border-top: none;
@@ -1332,16 +1333,19 @@
 
     :deep(.bk-table) {
       border: none;
-      border-radius: 0;
+      border-radius: var(--bkms-radius-none);
     }
+
     :deep(.bk-table-head) {
       th {
         background-color: var(--bkms-neutral-8);
       }
     }
+
     :deep(.bk-vxe-table-pagination-wrapper) {
       padding: 5px 16px;
     }
+
     :deep([class~='vxe-table--body-prepend-wrapper']) {
       border: none;
     }

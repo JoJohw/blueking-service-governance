@@ -75,7 +75,9 @@
     padding: 8px 0 8px 16px;
     background: var(--bkms-neutral-1);
     border-left: 4px solid;
-    border-radius: 0 0 2px 2px;
+    border-radius: var(--bkms-radius-base);
+    border-start-start-radius: var(--bkms-radius-none);
+    border-start-end-radius: var(--bkms-radius-none);
 
     i {
       font-size: 12px;

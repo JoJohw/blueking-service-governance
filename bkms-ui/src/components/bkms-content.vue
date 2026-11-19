@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="w-full bkms-content rounded-[2px] overflow-visible">
+  <div class="w-full bkms-content rounded-bkms-base overflow-visible">
     <div
       :class="[
         'flex items-center justify-between bkms-bg-page h-[32px] px-[16px] bkms-content-title',

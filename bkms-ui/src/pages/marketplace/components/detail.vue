@@ -145,7 +145,7 @@
                   average
                   :class="[
                     'version-content w-full px-[8px] bkms-line-default',
-                    'border-[1px] rounded-[2px] h-[32px] cursor-pointer',
+                    'border-[1px] rounded-bkms-base h-[32px] cursor-pointer',
                     currentVersion.version === item.version ? 'version-active' : '',
                   ]"
                   @click="handleChangeVersion(item)"
@@ -213,7 +213,7 @@
                       </PopConfirm>
                       <div
                         v-bk-tooltips="$t(`引用数: ${item.referenceCount}`)"
-                        class="reference-count ml-[5px] leading-[16px] min-w-[23px] text-center rounded-[8px] bg-bkms-neutral-6 text-[12px] bkms-text-secondary"
+                        class="reference-count ml-[5px] leading-[16px] min-w-[23px] text-center rounded-bkms-tag bg-bkms-neutral-6 text-[12px] bkms-text-secondary"
                       >
                         {{ item.referenceCount }}
                       </div>

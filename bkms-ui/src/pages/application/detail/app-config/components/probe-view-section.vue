@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="probe-view-section border bkms-line-light rounded-[8px] flex-1 min-w-0 overflow-hidden">
+  <div class="probe-view-section border bkms-line-light rounded-bkms-card flex-1 min-w-0 overflow-hidden">
     <!-- 卡片标题行 -->
     <div class="card-header flex items-center gap-[10px] h-[32px] px-[12px] border-b border-b-bkms-neutral-6">
       <div class="flex items-center gap-[6px]">

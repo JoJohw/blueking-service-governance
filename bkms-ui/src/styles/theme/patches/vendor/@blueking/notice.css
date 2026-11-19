@@ -21,6 +21,7 @@
   color: var(--bkms-text-body);
   background-color: var(--bkms-bg-warning);
   border-color: var(--bkms-line-input);
+  border-radius: var(--bkms-radius-card);
 }
 
 .bkms-themed .bk-notice-component-alert .alert-num {

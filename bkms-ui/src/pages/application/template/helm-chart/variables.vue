@@ -94,7 +94,7 @@
                 {{ $t('部署时自动将镜像凭证写入 Secret，需在 values 中引用方可拉取镜像') }}
               </span>
             </template>
-            <div class="mt-[10px] w-full overflow-hidden bkms-bg-card border bkms-line-default rounded-[2px]">
+            <div class="mt-[10px] w-full overflow-hidden bkms-bg-card border bkms-line-default rounded-bkms-card">
               <div
                 class="h-[28px] px-[12px] text-[12px] flex items-center justify-between bkms-bg-page border-b border-b-bkms-neutral-5"
               >

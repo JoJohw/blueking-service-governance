@@ -24,7 +24,7 @@
     :model="formData"
   >
     <ToggleCard
-      class="bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+      class="bkms-bg-card rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
       :name="$t('启动配置')"
       type="normal"
     >
@@ -52,7 +52,7 @@
     </ToggleCard>
     <ToggleCard
       :class="[
-        'bkms-bg-card rounded-[2px] overflow-hidden shadow-[0_2px_4px_0_var(--bkms-shadow-card)] mt-[16px] min-h-0',
+        'bkms-bg-card rounded-bkms-card overflow-hidden shadow-[0_2px_4px_0_var(--bkms-shadow-card)] mt-[16px] min-h-0',
         { 'flex-1 h-full': isYamlCardExpanded },
       ]"
       content-class="h-full px-[24px] pb-[24px] flex flex-col"

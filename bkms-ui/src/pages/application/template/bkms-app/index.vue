@@ -51,7 +51,7 @@
         class="w-full max-w-[1400px] p-[20px]"
       >
         <ToggleCard
-          class="bkms-bg-card rounded-[2px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+          class="bkms-bg-card rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
           :name="$t('应用模板')"
           type="normal"
         >
@@ -63,7 +63,7 @@
               padding-right: clamp(24px, calc((100vw - 910px) / 2), 245px);
             "
           >
-            <div class="flex items-center rounded-[2px] bkms-bg-page px-[16px] py-[12px]">
+            <div class="flex items-center rounded-bkms-base bkms-bg-page px-[16px] py-[12px]">
               <span class="template-summary-icon">
                 <TypeIcon
                   :framework="framework"

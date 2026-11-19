@@ -19,7 +19,7 @@
 <template>
   <div
     v-if="pendingRedeployGroups.length"
-    class="pending-redeploy-panel mb-[16px] overflow-hidden rounded-[2px] border border-bkms-warning-4"
+    class="pending-redeploy-panel mb-[16px] overflow-hidden rounded-bkms-card border border-bkms-warning-4"
   >
     <div
       class="flex cursor-pointer items-center justify-between bkms-bg-warning-soft px-[16px] py-[8px]"
@@ -31,7 +31,7 @@
           {{ $t('北极星配置待重新部署生效') }}
         </span>
         <span
-          class="ml-[8px] shrink-0 rounded-[2px] bg-bkms-warning-5 px-[8px] py-[1px] text-[12px] leading-[18px] text-bkms-warning-1"
+          class="ml-[8px] shrink-0 rounded-bkms-tag bg-bkms-warning-5 px-[8px] py-[1px] text-[12px] leading-[18px] text-bkms-warning-1"
         >
           <i18n-t keypath="涉及 {0} 个环境">
             <span>{{ pendingRedeployEnvCount }}</span>
@@ -62,9 +62,7 @@
       v-if="isExpanded"
       class="bkms-bg-card px-[16px] pb-[4px]"
     >
-      <div
-        class="pending-redeploy-grid border-b border-b-bkms-warning-6 py-[8px] text-[12px] bkms-text-secondary"
-      >
+      <div class="pending-redeploy-grid border-b border-b-bkms-warning-6 py-[8px] text-[12px] bkms-text-secondary">
         <span>{{ $t('待部署环境') }}</span>
         <span>{{ $t('北极星服务名') }}</span>
         <span>{{ $t('修改内容') }}</span>
@@ -118,9 +116,7 @@
                     {{ formatRedeployValue(change.oldValue) }}
                     <span class="mx-[4px] text-bkms-navy-5">→</span>
                   </template>
-                  <span class="font-medium bkms-text-title">{{
-                    formatRedeployValue(change.newValue)
-                  }}</span>
+                  <span class="font-medium bkms-text-title">{{ formatRedeployValue(change.newValue) }}</span>
                 </div>
               </template>
               <span v-else>

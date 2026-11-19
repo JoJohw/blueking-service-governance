@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div :class="['leading-[22px] text-[12px] rounded-[2px] border-[1px] px-[5px] w-fit', theme]">
+  <div :class="['leading-[22px] text-[12px] rounded-bkms-tag border-[1px] px-[5px] w-fit', theme]">
     <slot></slot>
   </div>
 </template>

@@ -21,7 +21,7 @@
     <div class="min-w-[1366px] max-w-[1600px] w-full mt-[24px]">
       <div class="flex items-start justify-end info-panel">
         <div class="flex items-center h-[80px] w-[400px]">
-          <div class="flex-1 h-full rounded-tl-lg rounded-lg relative flex flex-col">
+          <div class="flex-1 h-full rounded-bkms-card relative flex flex-col">
             <div class="relative flex-1 flex items-center justify-around bkms-text-inverse">
               <div
                 v-for="item in enabledSpaceStatisticsList"
@@ -56,7 +56,7 @@
           </FlexRow>
           <Layout.table class="mt-[10px]" />
         </template>
-        <div class="rounded-lg p-[24px] bkms-bg-card shadow-md">
+        <div class="rounded-bkms-card p-[24px] bkms-bg-card shadow-md">
           <FlexRow>
             <template #left>
               <Button

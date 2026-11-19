@@ -51,12 +51,8 @@
         <div
           v-for="item in options"
           :key="item.value"
-          class="cursor-pointer rounded-[4px] border border-solid px-[16px] py-[14px]"
-          :class="
-            action === item.value
-              ? 'bkms-line-active bkms-bg-brand-soft'
-              : 'bkms-line-default'
-          "
+          class="cursor-pointer rounded-bkms-overlay border border-solid px-[16px] py-[14px]"
+          :class="action === item.value ? 'bkms-line-active bkms-bg-brand-soft' : 'bkms-line-default'"
           @click="action = item.value"
         >
           <Radio :label="item.value">
@@ -69,7 +65,7 @@
       </Radio.Group>
     </template>
 
-    <div class="rounded-[2px] bkms-bg-page px-[16px] py-[12px]">
+    <div class="rounded-bkms-overlay bkms-bg-page px-[16px] py-[12px]">
       <div class="flex min-w-0 items-center text-[12px] leading-[20px]">
         <span class="shrink-0">{{ $t('北极星服务名') }}：</span>
         <span class="truncate">{{ namespace }} / {{ serviceName }}</span>

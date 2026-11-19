@@ -126,9 +126,7 @@
             <template #default="{ row }">
               <template v-if="row.action === 'overwrite'">
                 <div class="leading-[20px]">{{ row.value || '--' }}</div>
-                <div class="bkms-text-secondary leading-[20px]">
-                  {{ $t('原值') }}：{{ row.originalValue || '--' }}
-                </div>
+                <div class="bkms-text-secondary leading-[20px]">{{ $t('原值') }}：{{ row.originalValue || '--' }}</div>
               </template>
               <template v-else>{{ row.value || '--' }}</template>
             </template>
@@ -374,16 +372,16 @@
     margin-right: 4px;
     background-clip: padding-box;
     border: 2px solid;
-    border-radius: 50%;
+    border-radius: var(--bkms-radius-full);
   }
 
   .env-var-action-icon-new {
     background-color: var(--bkms-success-2);
-    border-color: rgb(44 175 94 / 20%);
+    border-color: color-mix(in srgb, var(--bkms-success-2) 20%, transparent);
   }
 
   .env-var-action-icon-overwrite {
     background-color: var(--bkms-warning-2);
-    border-color: rgb(245 149 0 / 20%);
+    border-color: color-mix(in srgb, var(--bkms-warning-2) 20%, transparent);
   }
 </style>

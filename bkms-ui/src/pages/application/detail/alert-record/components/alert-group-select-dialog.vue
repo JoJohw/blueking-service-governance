@@ -58,9 +58,7 @@
               overflow-mode="popover"
             >
               <template #default="{ item }">
-                <span
-                  class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-bkms-neutral-6 cursor-default"
-                >
+                <span class="flex items-center gap-[4px] rounded-bkms-overlay px-[8px] bg-bkms-neutral-6 cursor-default">
                   <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
                   {{ item.display_name || item.id || '--' }}
                 </span>

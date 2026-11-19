@@ -41,7 +41,7 @@
         </strong>
         <strong class="font-bold bkms-text-title">{{ $t('手动修改下列环境的文件内容') }}</strong>
       </i18n-t>
-      <div class="overflow-hidden rounded-[2px] border border-solid bkms-line-light">
+      <div class="overflow-hidden rounded-bkms-overlay border border-solid bkms-line-light">
         <div class="bg-bkms-neutral-6 px-[16px] py-[6px] bkms-text-title">
           {{ $t('涉及 {0} 个环境', [affectedEnvs.length]) }}
         </div>

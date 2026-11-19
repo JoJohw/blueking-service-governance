@@ -31,7 +31,7 @@
         <span class="bkms-text-title">{{ laneName }}</span>
       </p>
     </div>
-    <div class="px-[16px] py-[12px] bkms-bg-subtle rounded-[2px] text-[14px]">
+    <div class="px-[16px] py-[12px] bkms-bg-subtle rounded-bkms-card text-[14px]">
       <p>{{ t('移除后将无法恢复，请谨慎操作') }}</p>
     </div>
   </div>

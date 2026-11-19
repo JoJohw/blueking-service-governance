@@ -18,12 +18,12 @@
 
 <template>
   <div
-    class="flex items-center justify-center mx-[100px] my-[24px] rounded-[8px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)] min-h-[calc(100vh-150px)]"
+    class="flex items-center justify-center mx-[100px] my-[24px] rounded-bkms-card bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)] min-h-[calc(100vh-150px)]"
   >
     <div class="flex flex-col items-center">
       <img
         alt="home"
-        class="w-[80px] h-[80px] mb-[16px] rounded-[20px]"
+        class="w-[80px] h-[80px] mb-[16px] rounded-bkms-tile"
         src="@/assets/home-platform-logo.png"
       />
 
@@ -36,11 +36,11 @@
         <div
           v-for="feature in features"
           :key="feature.title"
-          class="bg-[color-mix(in_srgb,var(--bkms-bg-card)_40%,transparent)] rounded-[16px] p-[24px] shadow-[0_8px_32px_0_var(--bkms-shadow-card)] hover:shadow-[0_4px_12px_0_var(--bkms-shadow-hover)] transition-shadow duration-200"
+          class="bg-[color-mix(in_srgb,var(--bkms-bg-card)_40%,transparent)] rounded-bkms-card p-[24px] shadow-[0_8px_32px_0_var(--bkms-shadow-card)] hover:shadow-[0_4px_12px_0_var(--bkms-shadow-hover)] transition-shadow duration-200"
         >
           <!-- 特性图标预留位 -->
           <div
-            class="w-[44px] h-[44px] rounded-[10px] flex items-center justify-center mb-[12px]"
+            class="w-[44px] h-[44px] rounded-bkms-base flex items-center justify-center mb-[12px]"
             :style="{ background: feature.bgGradient }"
           >
             <i

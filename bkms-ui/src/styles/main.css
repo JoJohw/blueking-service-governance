@@ -32,7 +32,6 @@ body,
   font-size: 12px;
 }
 
-/* 弹窗、抽屉或页面等大场景用 8px；下拉框、穿梭框等小场景为 6px，见 overrides.css */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

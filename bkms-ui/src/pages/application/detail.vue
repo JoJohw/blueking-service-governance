@@ -67,7 +67,7 @@
       >
         <template #trigger>
           <div
-            class="flex items-center justify-between bg-bkms-neutral-6 overflow-hidden group bkms-text-body h-full text-[14px] cursor-pointer rounded-[2px] hover:bg-bkms-neutral-6"
+            class="flex items-center justify-between bg-bkms-neutral-6 overflow-hidden group bkms-text-body h-full text-[14px] cursor-pointer rounded-bkms-base hover:bg-bkms-neutral-6"
           >
             <div class="flex items-center min-w-[43px] overflow-hidden">
               <TypeIcon
@@ -402,7 +402,7 @@
 
   :global(.application-selector-popover.bk-popover.bk-pop2-content.bk-select-popover) {
     overflow: hidden;
-    border-radius: 6px;
+    border-radius: var(--bkms-radius-base);
   }
 
   .application-selector-option {

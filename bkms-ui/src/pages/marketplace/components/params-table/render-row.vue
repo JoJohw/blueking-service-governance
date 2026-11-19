@@ -65,7 +65,7 @@
         :width="400"
       >
         <div
-          class="flex items-center px-[8px] rounded-[2px] cursor-pointer bkms-bg-card"
+          class="flex items-center px-[8px] rounded-bkms-card cursor-pointer bkms-bg-card"
           :style="{ height: '30px', lineHeight: '28px' }"
         >
           <span

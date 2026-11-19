@@ -25,9 +25,7 @@
         :trigger-back="leaveEnvVarsPage"
       >
         <span class="mx-[8px] h-[20px] w-[1px] bkms-bg-title"></span>
-        <span class="text-[16px] leading-[24px] bkms-text-secondary"
-          >{{ $t('特性环境') }}：{{ envVarsPageTitle }}</span
-        >
+        <span class="text-[16px] leading-[24px] bkms-text-secondary">{{ $t('特性环境') }}：{{ envVarsPageTitle }}</span>
       </MsHeader>
       <div
         v-bkloading="{ loading: loading && !envVarsTargetRow }"
@@ -59,9 +57,7 @@
         :trigger-back="() => emit('back')"
       >
         <span class="mx-[8px] h-[20px] w-[1px] bkms-bg-title"></span>
-        <span class="text-[16px] leading-[24px] bkms-text-secondary">{{
-          $t('共 {0} 个', [list.length])
-        }}</span>
+        <span class="text-[16px] leading-[24px] bkms-text-secondary">{{ $t('共 {0} 个', [list.length]) }}</span>
       </MsHeader>
 
       <div class="flex-1 min-h-0 p-[24px] flex flex-col gap-[16px] overflow-hidden">
@@ -88,9 +84,7 @@
             :placeholder="$t('搜索环境展示名称')"
           >
             <template #suffix>
-              <Search
-                class="text-[16px] bkms-text-secondary mr-[6px] mt-[2px] hover:bkms-text-brand"
-              />
+              <Search class="text-[16px] bkms-text-secondary mr-[6px] mt-[2px] hover:bkms-text-brand" />
             </template>
           </Input>
         </div>
@@ -280,7 +274,7 @@
           </span>
         </div>
       </template>
-      <div class="mb-[16px] px-[16px] py-[12px] bkms-bg-subtle rounded-[2px]">
+      <div class="mb-[16px] px-[16px] py-[12px] bkms-bg-subtle rounded-bkms-base">
         {{ $t('将永久删除特性环境及其命名空间，并清理应用配置 / 北极星 / 组件中的引用。') }}
       </div>
       <i18n-t keypath="该操作不可恢复，请输入特性环境命名空间：{0} 进行确认">
@@ -362,7 +356,7 @@
           <span>&nbsp;{{ $t('个') }}</span>
         </div>
       </div>
-      <div class="mb-[16px] px-[16px] py-[12px] bkms-bg-subtle rounded-[2px] text-[14px] leading-[24px]">
+      <div class="mb-[16px] px-[16px] py-[12px] bkms-bg-subtle rounded-bkms-base text-[14px] leading-[24px]">
         {{ $t('将移除当前环境下的全部运行实例，服务将不可访问。特性环境本身会保留，之后仍可再次「部署」到该环境。') }}
       </div>
       <template #footer>

@@ -37,7 +37,7 @@
       <template #trigger>
         <div
           :class="[
-            'px-[12px] flex items-center justify-between group bkms-text-body border-[1px] h-full text-[14px] cursor-pointer rounded-[2px]',
+            'px-[12px] flex items-center justify-between group bkms-text-body border-[1px] h-full text-[14px] cursor-pointer rounded-bkms-base',
             isStatusPopoverShow
               ? 'bkms-bg-card bkms-line-active'
               : 'bg-bkms-neutral-6 border-[transparent] hover:bg-bkms-neutral-6',
@@ -53,10 +53,7 @@
             </span>
           </div>
           <AngleDownFill
-            :class="[
-              'text-bkms-navy-5 group-hover:bkms-text-secondary',
-              isStatusPopoverShow ? '' : 'rotate-180',
-            ]"
+            :class="['text-bkms-navy-5 group-hover:bkms-text-secondary', isStatusPopoverShow ? '' : 'rotate-180']"
           />
         </div>
       </template>
@@ -127,7 +124,7 @@
           </template>
           <template #right>
             <span
-              class="bg-bkms-neutral-6 px-[8px] py-[2px] rounded-[2px]"
+              class="bg-bkms-neutral-6 px-[8px] py-[2px] rounded-bkms-base"
               :class="{
                 '!bkms-bg-active !bkms-text-brand': visibleResourceKinds.includes(resource.kind),
               }"

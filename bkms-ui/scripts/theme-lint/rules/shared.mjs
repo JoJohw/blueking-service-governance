@@ -65,8 +65,12 @@ export function* classTokens(text, base) {
  *   check(node, text, helpers)      每条字面量（template 的 VLiteral、script 的 Literal）
  *   checkStyle(block, helpers)      .vue 的 <style> 块（block = { text, start }）
  *   checkCss(node, helpers)         独立 .css 的 Declaration 节点
+ *   checkBinding(node, text, helpers)  :class / v-bind:class 绑定的整段表达式文本
+ *
+ * checkBinding 是可选的：绑定里的类名是一串互不相干的 Literal，逐字面量判定看不到
+ * 「同一元素上的多个类」，需要整段表达式的规则（如圆角叠加）才挂。
  */
-export function createThemeRule({ meta, check, checkStyle, checkCss }) {
+export function createThemeRule({ meta, check, checkStyle, checkCss, checkBinding }) {
   return {
     meta,
     create(context) {
@@ -86,7 +90,22 @@ export function createThemeRule({ meta, check, checkStyle, checkCss }) {
         };
       }
 
-      const visitors = { ...withTemplate(context, templateVisitors(onLiteral), scriptVisitor) };
+      const templateVisitor = { ...templateVisitors(onLiteral) };
+      if (checkBinding) {
+        // 静态 class 已由 VLiteral 覆盖，这里只接 :class 绑定，避免同一处检查两遍
+        templateVisitor.VAttribute = node => {
+          const key = node.key;
+          const isClassBinding =
+            key?.type === 'VDirectiveKey' &&
+            key.argument?.type === 'VIdentifier' &&
+            key.argument.name === 'class' &&
+            node.value?.type === 'VExpressionContainer';
+          if (!isClassBinding) return;
+          checkBinding(node, helpers.sourceCode.getText(node.value), helpers);
+        };
+      }
+
+      const visitors = { ...withTemplate(context, templateVisitor, scriptVisitor) };
       if (checkCss) visitors.Declaration = node => checkCss(node, helpers);
       return visitors;
     },
@@ -159,8 +178,14 @@ export function normalizeArbitrary(inner) {
 
 /** style 对象里的属性名（script 的 { color: '#fff' }） */
 export function propertyNameOf(node) {
-  const p = node.parent;
-  if (p?.type === 'Property' && p.value === node && !p.computed) {
+  // 值套了三元 / 逻辑运算时，node 的 parent 不是 Property，要沿表达式上溯再取键名
+  let value = node;
+  let p = value.parent;
+  while (p?.type === 'ConditionalExpression' || p?.type === 'LogicalExpression') {
+    value = p;
+    p = p.parent;
+  }
+  if (p?.type === 'Property' && p.value === value && !p.computed) {
     return p.key.name ?? p.key.value ?? null;
   }
   return null;
@@ -196,11 +221,12 @@ function makeRuleHelpers(context) {
     /**
      * 多个候选 → 多条 suggestion，IDE 灯泡里逐条点选。
      * 同值不同场景（圆角 control/card/overlay 都是 6px）时不设默认项：替人定就是引入漂移。
+     * labelOf 决定灯泡文案里的替换目标：候选是 token 对象时直接插值只会显示 [object Object]。
      */
-    suggest(candidates, messageId, buildFix) {
+    suggest(candidates, messageId, buildFix, labelOf = c => (typeof c === 'string' ? c : (c?.label ?? c?.name ?? ''))) {
       return candidates.map(candidate => ({
         messageId,
-        data: { target: candidate },
+        data: { target: labelOf(candidate) },
         fix: buildFix(candidate),
       }));
     },

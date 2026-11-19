@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="chart-card-item flex flex-col bkms-bg-card rounded-[4px] h-[180px]">
+  <div class="chart-card-item flex flex-col bkms-bg-card rounded-bkms-card h-[180px]">
     <!-- 头部 -->
     <div class="flex items-center justify-between px-[16px] py-[12px]">
       <slot name="title">
@@ -508,6 +508,6 @@
     flex-shrink: 0;
     width: 12px;
     height: 4px;
-    border-radius: 2px;
+    border-radius: var(--bkms-radius-card);
   }
 </style>

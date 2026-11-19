@@ -39,6 +39,7 @@
 .bkms-themed .bk-user-selector .tags-container {
   background-color: var(--bkms-bg-card);
   border-color: var(--bkms-line-input);
+  border-radius: var(--bkms-radius-field);
 }
 
 .bkms-themed .bk-user-selector.is-disabled {
@@ -47,6 +48,10 @@
 
 /* 标签状态：包内 scoped 样式写死 #e1ecff / #feebea / #fedddc，浅色下与令牌等值，深色下需靠令牌翻转；
    库内选择器形如 .user-tag.active[data-v-xxx]，多一层 .bk-user-selector 才能压过 */
+.bkms-themed .bk-user-selector .user-tag {
+  border-radius: var(--bkms-radius-tag);
+}
+
 .bkms-themed .bk-user-selector .user-tag.active {
   background-color: var(--bkms-brand-6);
   border-color: var(--bkms-brand-2);

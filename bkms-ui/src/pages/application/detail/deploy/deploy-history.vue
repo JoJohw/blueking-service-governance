@@ -23,7 +23,7 @@
       class="min-h-0 flex-1 overflow-hidden p-[16px]"
     >
       <div
-        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+        class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-bkms-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
       >
         <div
           ref="headerRef"
@@ -81,7 +81,7 @@
             >
               <template #default="{ row }">
                 <span
-                  class="rounded-[2px] px-[8px] py-[2px] text-[12px]"
+                  class="rounded-bkms-tag px-[8px] py-[2px] text-[12px]"
                   :class="isSourceBuild(row) ? 'bkms-bg-active bkms-text-brand' : 'bg-bkms-neutral-6 bkms-text-body'"
                 >
                   {{ isSourceBuild(row) ? $t('源码构建') : $t('已构建镜像') }}

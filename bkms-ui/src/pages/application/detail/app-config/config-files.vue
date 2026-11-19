@@ -247,7 +247,7 @@
                         </Button>
                         <div
                           v-show="showAdvancedFileSettings"
-                          class="mt-[8px] rounded-[2px] bkms-bg-page px-[16px] py-[12px]"
+                          class="mt-[8px] rounded-bkms-base bkms-bg-page px-[16px] py-[12px]"
                         >
                           <div class="mb-[10px] text-[12px] font-bold bkms-text-title">
                             {{ $t('环境文件生效方式') }}
@@ -260,7 +260,7 @@
                             <Radio
                               v-for="option in envContentStrategyOptions"
                               :key="option.value"
-                              class="env-strategy-option !m-0 !h-auto !flex w-full items-center whitespace-normal rounded-[2px] border border-solid px-[16px] py-[8px]"
+                              class="env-strategy-option !m-0 !h-auto !flex w-full items-center whitespace-normal rounded-bkms-base border border-solid px-[16px] py-[8px]"
                               :class="
                                 fileInfoFormData.envContentStrategy === option.value
                                   ? 'bkms-line-active bkms-bg-brand-soft'
@@ -463,13 +463,13 @@
                                   #tools
                                 >
                                   <div
-                                    class="mr-[8px] inline-flex h-[24px] items-stretch rounded-[2px] border border-bkms-neutral-2 border-solid bg-transparent"
+                                    class="mr-[8px] inline-flex h-[24px] items-stretch rounded-bkms-base border border-bkms-neutral-2 border-solid bg-transparent"
                                   >
                                     <button
                                       v-for="item in contentViewOptions"
                                       :key="item.value"
                                       :aria-pressed="contentView === item.value"
-                                      class="inline-flex h-full appearance-none items-center justify-center gap-[4px] whitespace-nowrap rounded-none border-0 border-solid bg-transparent px-[8px] text-[12px] leading-[22px] bkms-text-secondary outline-offset-[-1px] cursor-pointer focus-visible:outline focus-visible:outline-[1px] focus-visible:outline-bkms-brand-2"
+                                      class="inline-flex h-full appearance-none items-center justify-center gap-[4px] whitespace-nowrap rounded-bkms-none border-0 border-solid bg-transparent px-[8px] text-[12px] leading-[22px] bkms-text-secondary outline-offset-[-1px] cursor-pointer focus-visible:outline focus-visible:outline-[1px] focus-visible:outline-bkms-brand-2"
                                       :class="[
                                         item.divider ? 'border-r border-r-bkms-neutral-2' : '',
                                         contentView === item.value

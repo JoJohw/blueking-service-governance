@@ -26,7 +26,7 @@
     <span class="flex items-center h-[32px] cursor-pointer select-none">
       <span
         v-bk-tooltips="t('自动刷新设置')"
-        class="flex items-center px-[4px] py-[2px] rounded-[2px] hover:bkms-bg-brand-soft hover:bkms-text-brand"
+        class="flex items-center px-[4px] py-[2px] rounded-bkms-field hover:bkms-bg-brand-soft hover:bkms-text-brand"
       >
         <i class="bkms-icon bkms-icon-auto-refresh-line"></i>
         <span :class="['text-[12px] pl-[4px]', textActive ? 'bkms-text-brand' : '']">{{ triggerText }}</span>
@@ -41,7 +41,7 @@
       <i
         v-bk-tooltips="t('刷新')"
         :class="[
-          'bkms-icon bkms-icon-refresh cursor-pointer bkms-text-body px-[4px] py-[2px] hover:bkms-bg-brand-soft hover:bkms-text-brand rounded-[2px]',
+          'bkms-icon bkms-icon-refresh cursor-pointer bkms-text-body px-[4px] py-[2px] hover:bkms-bg-brand-soft hover:bkms-text-brand rounded-bkms-field',
         ]"
         @click.stop="handleRefresh"
         @mousedown.stop

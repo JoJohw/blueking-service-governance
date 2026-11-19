@@ -248,7 +248,7 @@
     justify-content: center;
     width: 20px;
     height: 22px;
-    border-radius: 50%;
+    border-radius: var(--bkms-radius-full);
     background-color: var(--bkms-neutral-6);
     color: var(--bkms-neutral-2);
     font-size: 14px;

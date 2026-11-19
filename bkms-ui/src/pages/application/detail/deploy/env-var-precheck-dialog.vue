@@ -34,7 +34,7 @@
     <!-- 资源规格不一致 -->
     <div
       v-if="hasResourceBlocker"
-      class="overflow-hidden rounded-[2px] border border-bkms-danger-4"
+      class="overflow-hidden rounded-bkms-overlay border border-bkms-danger-4"
       :class="{ 'mb-[16px]': hasMissingRequiredClusterAddons || hasUndefinedVars }"
     >
       <div
@@ -43,9 +43,7 @@
       >
         <div class="flex items-center">
           <i class="bkms-icon bkms-icon-close-circle-shape text-[14px] text-bkms-danger-2" />
-          <span class="mx-[8px] text-base font-bold text-bkms-danger-2">{{
-            $t('联邦集群资源规格不一致')
-          }}</span>
+          <span class="mx-[8px] text-base font-bold text-bkms-danger-2">{{ $t('联邦集群资源规格不一致') }}</span>
         </div>
         <AngleDown
           class="text-[22px] bkms-text-secondary transition-transform duration-200"
@@ -101,7 +99,7 @@
     <!-- 环境组件缺失 -->
     <div
       v-if="hasMissingRequiredClusterAddons"
-      class="overflow-hidden rounded-[2px] border border-bkms-danger-4"
+      class="overflow-hidden rounded-bkms-overlay border border-bkms-danger-4"
       :class="{ 'mb-[16px]': hasUndefinedVars }"
     >
       <div
@@ -111,7 +109,7 @@
         <div class="flex items-center">
           <i class="bkms-icon bkms-icon-close-circle-shape text-[14px] text-bkms-danger-2" />
           <span class="mx-[8px] text-base font-bold text-bkms-danger-2">{{ $t('缺少必选集群组件') }}</span>
-          <span class="rounded-[2px] bg-bkms-danger-5 px-[8px] py-[2px] text-[12px] text-bkms-danger-2">
+          <span class="rounded-bkms-tag bg-bkms-danger-5 px-[8px] py-[2px] text-[12px] text-bkms-danger-2">
             <i18n-t keypath="{0} 个组件">
               <span class="pl-[2px]">{{ missingRequiredClusterAddons.length }}</span>
             </i18n-t>
@@ -147,7 +145,7 @@
             <span
               v-for="(name, index) in clusterAddonNames"
               :key="`${name}:${index}`"
-              class="rounded-[2px] bg-bkms-neutral-6 px-[16px] py-[4px] text-[14px] leading-[24px] bkms-text-body"
+              class="rounded-bkms-overlay bg-bkms-neutral-6 px-[16px] py-[4px] text-[14px] leading-[24px] bkms-text-body"
             >
               {{ name }}
             </span>
@@ -159,7 +157,7 @@
     <!-- 环境变量未定义 -->
     <div
       v-if="hasUndefinedVars"
-      class="rounded-[2px] border border-bkms-warning-4 bkms-bg-warning-soft px-[12px]"
+      class="rounded-bkms-overlay border border-bkms-warning-4 bkms-bg-warning-soft px-[12px]"
     >
       <div
         class="flex cursor-pointer items-center justify-between py-[8px]"
@@ -168,9 +166,7 @@
         <div class="flex items-center">
           <i class="bkms-icon bkms-icon-triangle-warning text-[12px] text-bkms-warning-2" />
           <span class="mx-[8px] text-base font-bold text-bkms-warning-2">{{ $t('环境变量未定义') }}</span>
-          <span
-            class="rounded-[2px] bg-bkms-warning-5 px-[8px] py-[2px] text-[12px] text-bkms-warning-1"
-          >
+          <span class="rounded-bkms-tag bg-bkms-warning-5 px-[8px] py-[2px] text-[12px] text-bkms-warning-1">
             <i18n-t keypath="{0} 个变量">
               <span class="pl-[2px]">{{ envVarRows.length }}</span>
             </i18n-t>
@@ -232,7 +228,7 @@
                 >
                   <template #default="{ item }: { item: DisplaySource }">
                     <span
-                      class="max-w-full break-all rounded-[2px] px-[6px] py-[2px] text-[12px] leading-[18px]"
+                      class="max-w-full break-all rounded-bkms-overlay px-[6px] py-[2px] text-[12px] leading-[18px]"
                       :class="item.className"
                     >
                       {{ item.text }}
@@ -243,7 +239,7 @@
                       <span
                         v-for="source in items"
                         :key="source.id"
-                        class="break-all rounded-[2px] px-[6px] py-[2px] text-[12px] leading-[18px]"
+                        class="break-all rounded-bkms-overlay px-[6px] py-[2px] text-[12px] leading-[18px]"
                         :class="source.className"
                       >
                         {{ source.text }}

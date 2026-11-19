@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-card flex min-h-0 flex-col gap-[16px]">
+  <div class="rounded-bkms-card flex min-h-0 flex-col gap-[16px]">
     <!-- 顶部工具栏 -->
     <div
       ref="headerRef"
@@ -135,7 +135,7 @@
                   delay: 300,
                   disabled: !getUserGroupUsers(item).length,
                 }"
-                class="flex items-center gap-[4px] rounded-[2px] px-[8px] bg-bkms-neutral-6 cursor-default"
+                class="flex items-center gap-[4px] rounded-bkms-base px-[8px] bg-bkms-neutral-6 cursor-default"
               >
                 <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
                 {{ userGroupMap.get(String(item))?.name || item }}

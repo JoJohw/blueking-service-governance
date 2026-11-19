@@ -19,7 +19,7 @@
 <template>
   <div
     :class="[
-      'p-[12px] border bkms-line-default rounded-[2px] bkms-text-body hover:bkms-bg-brand-soft hover:bkms-line-active group',
+      'p-[12px] border bkms-line-default rounded-bkms-base bkms-text-body hover:bkms-bg-brand-soft hover:bkms-line-active group',
       { 'bkms-bg-subtle bkms-line-default': disabled },
       active ? '!bkms-line-active' : 'border-bkms-navy-5',
     ]"

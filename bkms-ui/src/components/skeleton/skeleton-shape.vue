@@ -41,9 +41,10 @@
 
   const { type, width, height, loading } = toRefs(props);
   const theme: 'gray' | 'white' = inject('theme', 'white');
+  // circle 要靠调用方传等宽高：full 在非方形元素上会被钳成胶囊，圆角不会报错也不会变形提示
   const defaultShapeClass: Record<SkeletonShape, string[]> = {
-    circle: ['rounded-full'],
-    rect: ['rounded'],
+    circle: ['rounded-bkms-full'],
+    rect: ['rounded-bkms-base'],
   };
   const classes = computed(() => [...defaultShapeClass[type.value]]);
 

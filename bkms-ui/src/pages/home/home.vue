@@ -80,11 +80,11 @@
 
             <!-- 顶部问候栏 -->
             <div
-              class="flex items-center justify-between p-[16px] mb-[24px] rounded-[8px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+              class="flex items-center justify-between p-[16px] mb-[24px] rounded-bkms-card bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
             >
               <div class="flex items-center">
                 <div
-                  class="w-[60px] h-[60px] rounded-[12px] bkms-bg-brand-soft flex items-center justify-center mr-[16px]"
+                  class="w-[60px] h-[60px] rounded-bkms-base bkms-bg-brand-soft flex items-center justify-center mr-[16px]"
                 >
                   <Coffee class="w-[28px] h-[28px] animate-bounce-coffee" />
                 </div>
@@ -128,7 +128,7 @@
               <div
                 v-for="(space, spaceIndex) in overviewList"
                 :key="space.id"
-                class="bkms-bg-card rounded-[8px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)] overflow-hidden"
+                class="bkms-bg-card rounded-bkms-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)] overflow-hidden"
               >
                 <!-- 卡片头部 -->
                 <div class="flex items-center justify-between p-[16px]">
@@ -137,7 +137,7 @@
                     @click="handleChangeSpace(space)"
                   >
                     <div
-                      class="w-[40px] h-[40px] rounded-[8px] flex items-center justify-center bkms-text-inverse text-[18px] font-bold mr-[12px] shrink-0"
+                      class="w-[40px] h-[40px] rounded-bkms-base flex items-center justify-center bkms-text-inverse text-[18px] font-bold mr-[12px] shrink-0"
                       :style="{ backgroundColor: getSpaceColor(spaceIndex) }"
                     >
                       {{ getFirstChar(space?.displayName ?? '') }}

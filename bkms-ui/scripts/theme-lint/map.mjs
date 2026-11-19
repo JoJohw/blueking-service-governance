@@ -82,19 +82,28 @@ const RADIUS_SOURCE = readTokenFile('radius.css');
 /** 只认 @layer 标记内的声明：语义档写在标记外时 uno 不会注册，lint 也就不能建议它 */
 const radiusLayerBlocks = layer => RADIUS_SOURCE.match(new RegExp(`@layer ${layer}[\\s\\S]*?@endgroup`, 'g')) || [];
 
-/** 档位：名字即像素值，只被语义层引用 */
-const RADIUS_SCALE = radiusLayerBlocks('scale').flatMap(block =>
-  [...block.matchAll(/--bkms-radius-(\d+)\s*:/g)].map(m => ({ name: `--bkms-radius-${m[1]}`, px: Number(m[1]) })),
+const SHAPE_LABELS = new Set(['none', 'full']);
+
+/** 档位层：尺度 hairline/xs/sm/md/lg/xl 与形状 none/full 共用一组 @group，按 label 分流 */
+const RADIUS_TOKENS = radiusLayerBlocks('scale').flatMap(block =>
+  [...block.matchAll(/--bkms-radius-([a-z][a-z0-9-]*)\s*:\s*([^;]+);/g)].map(([, label, value]) => ({
+    label,
+    name: `--bkms-radius-${label}`,
+    px: Number(/^(\d+(?:\.\d+)?)px$/.exec(value.trim())?.[1] ?? Number.NaN),
+    shape: SHAPE_LABELS.has(label),
+  })),
 );
+const RADIUS_SCALE = RADIUS_TOKENS.filter(t => !t.shape && Number.isFinite(t.px));
+const RADIUS_SHAPE = RADIUS_TOKENS.filter(t => t.shape);
 
 /**
- * 语义档：px 来自它引用的档位（`--bkms-radius-control: var(--bkms-radius-6)`）。
- * 同值一对多是常态——6px 有 control/card/overlay/tab 四个，值相同不代表场景相同，
- * 所以 lint 只给候选、不替人挑语义。
+ * 语义档：px 来自它引用的尺度档（`--bkms-radius-control: var(--bkms-radius-md)`）。
+ * 同值一对多是常态——md 档有 base/field/control/card/overlay/tab/menu 七个，值相同不代表场景相同，
+ * 所以 lint 只给候选、不替人挑语义；base 是通用基准，无场景归属时兜底。
  */
 const RADIUS_SEMANTIC = radiusLayerBlocks('semantic')
   .flatMap(block =>
-    [...block.matchAll(/--bkms-radius-([a-z][a-z0-9-]*)\s*:\s*var\(\s*(--bkms-radius-\d+)\s*\)/g)].map(
+    [...block.matchAll(/--bkms-radius-([a-z][a-z0-9-]*)\s*:\s*var\(\s*(--bkms-radius-[a-z][a-z0-9-]*)\s*\)/g)].map(
       ([, label, ref]) => ({
         label,
         name: `--bkms-radius-${label}`,

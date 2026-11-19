@@ -25,7 +25,7 @@
       placement,
     }"
     :class="[
-      'flex items-center justify-center rounded-sm',
+      'flex items-center justify-center rounded-bkms-control',
       sizeMap[size],
       fontSizeMap[fontSize as keyof typeof fontSizeMap],
       clickable ? 'cursor-pointer' : '',

@@ -30,7 +30,7 @@
     <!-- 版本规则 -->
     <div
       v-if="enabled"
-      class="mt-[8px] p-[16px] bkms-bg-page rounded-[2px]"
+      class="mt-[8px] p-[16px] bkms-bg-page rounded-bkms-base"
     >
       <div class="flex">
         <div class="w-[90px] text-align-right pr-[22px] text-[14px] bkms-text-body">

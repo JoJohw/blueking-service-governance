@@ -260,7 +260,7 @@
             <!-- 按环境类型：多选 -->
             <div
               v-if="formModel.scopeType === 'env_type'"
-              class="flex items-center px-[12px] bkms-bg-page rounded-[2px]"
+              class="flex items-center px-[12px] bkms-bg-page rounded-bkms-base"
             >
               <Checkbox.Group v-model="formModel.envTypes">
                 <Checkbox
