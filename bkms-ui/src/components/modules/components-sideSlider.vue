@@ -618,6 +618,7 @@
   }
 
   type IProps = {
+    appEnvList?: EnvOutput[];
     btnLoading?: boolean; // 按钮加载状态
     data?: ComponentOutputObj & { scoped?: { envs: string[]; type: ScopedType } };
     disabledFn?: (item: ComponentDefOutputObj) => boolean;
@@ -683,7 +684,8 @@
 
   const { focusOnErrorField } = useFocusOnErrorField();
 
-  const { envList, getAppEnvList, handleGetEnvList } = useEnvManager();
+  const { envList: fetchedEnvList, getAppEnvList, handleGetEnvList } = useEnvManager();
+  const envList = computed(() => props.appEnvList ?? fetchedEnvList.value);
   const envTypes = ref([
     {
       label: t('开发环境'),
@@ -979,7 +981,9 @@
     } as UnSupportCategoryParams).catch(() => []);
   }
 
-  const envNameMap = ref<Record<string, EnvOutput>>({});
+  const envNameMap = computed<Record<string, EnvOutput>>(() =>
+    Object.fromEntries(envList.value.flatMap(env => (env.name ? [[env.name, env]] : []))),
+  );
 
   function getDynamicInputValue(value: unknown): DynamicInputValue {
     if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
@@ -1169,24 +1173,17 @@
   onBeforeMount(async () => {
     await handleGetInstance();
     if (props.moduleType === 'app') {
-      await getAppEnvList(appDetailStore.appID);
+      if (!props.appEnvList) await getAppEnvList(appDetailStore.appID);
     } else {
       await handleGetEnvList();
     }
     await getComponentInstanceList();
-    const tempEnvNameMap: Record<string, EnvOutput> = {};
-    envList.value.forEach(item => {
-      if (item.name) {
-        tempEnvNameMap[item.name] = item;
-      }
-    });
-    envNameMap.value = tempEnvNameMap;
   });
 
   watch(
     () => appDetailStore.appID,
     appID => {
-      if (props.moduleType === 'app') {
+      if (props.moduleType === 'app' && !props.appEnvList) {
         getAppEnvList(appID);
       }
     },

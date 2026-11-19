@@ -205,21 +205,21 @@
                             v-if="groupEnvs(row?.deployedEnvs ?? []).length"
                             :data="groupEnvs(row?.deployedEnvs ?? [])"
                           >
-                            <template #default="{ item: env }">
+                            <template #default="{ item: env }: { item: GroupedEnv }">
                               <Popover
-                                :disabled="!getGroupedEnvNames(env).length"
+                                :disabled="!env.envs.some(item => item.displayName || item.name)"
                                 :popover-delay="[100, 0]"
                                 theme="popover-dark-translucent"
                                 trigger="hover"
                               >
-                                <Tag :class="['mr-[4px]', envTypeTagClassMap[getGroupedEnvType(env)]]">
-                                  {{ getGroupedEnvLabel(env) }}（{{ getGroupedEnvCount(env) }}）
+                                <Tag :class="['mr-[4px]', env.tagClass]">
+                                  {{ env.label }}（{{ env.envs.length }}）
                                 </Tag>
                                 <template #content>
                                   <div class="flex flex-col gap-[6px]">
                                     <div
-                                      v-for="item in getGroupedEnvEnvs(env)"
-                                      :key="item.id"
+                                      v-for="item in env.envs"
+                                      :key="`${item.id}:${item.trafficLaneName ?? ''}`"
                                       class="flex items-center gap-[6px]"
                                     >
                                       <ColorIcon
@@ -230,7 +230,7 @@
                                         "
                                         :size="12"
                                       />
-                                      <span>{{ item.displayName }}</span>
+                                      <span>{{ item.displayName || item.name }}</span>
                                       <span class="bkms-text-secondary">
                                         （{{
                                           row.type && item?.deployStatus
@@ -310,16 +310,12 @@
   import TeamSpace from './team-space.vue';
   import Coffee from '@/assets/coffee.svg';
 
-  import type { AppDeployedEnvOutputObj, AppInfoOutputObj } from '~/@types/v1/app';
-  import type { WorkspaceWithAppsOutputObj } from '~/@types/v1/workspace';
+  import type { AppDeployedEnvOutputObj, AppInfoOutputObj, WorkspaceWithAppsOutputObj } from '~/@types/v1/workspace';
 
-  /** groupEnvs 返回的分组环境对象 */
   interface GroupedEnv {
-    count: number;
     envs: AppDeployedEnvOutputObj[];
     label: string;
-    names: string[];
-    type: string;
+    tagClass: string;
   }
 
   const router = useRouter();
@@ -346,57 +342,29 @@
     'var(--bkms-danger-2)',
   ];
 
-  function getGroupedEnvCount(item: unknown): number {
-    return isGroupedEnv(item) ? item.count : 0;
-  }
-
-  function getGroupedEnvEnvs(item: unknown): AppDeployedEnvOutputObj[] {
-    return isGroupedEnv(item) ? item.envs : [];
-  }
-
-  function getGroupedEnvLabel(item: unknown): string {
-    return isGroupedEnv(item) ? item.label : '';
-  }
-
-  /** 安全获取 GroupedEnv 的属性 */
-  function getGroupedEnvNames(item: unknown): string[] {
-    return isGroupedEnv(item) ? item.names : [];
-  }
-
-  function getGroupedEnvType(item: unknown): string {
-    return isGroupedEnv(item) ? item.type : '';
-  }
-
-  // 按 type 分组统计环境数量
   function groupEnvs(envs: AppDeployedEnvOutputObj[]): GroupedEnv[] {
-    if (!envs?.length) return [];
-    const countMap: Record<string, number> = {};
-    const envMap: Record<string, AppDeployedEnvOutputObj[]> = {};
-    envs.forEach(env => {
-      if (!env.type) return;
-      countMap[env.type] = (countMap[env.type] ?? 0) + 1;
-      (envMap[env.type] ??= []).push(env);
-    });
-    return Object.entries(countMap).map(([type, count]) => ({
-      count,
+    const standardGroups: Record<string, AppDeployedEnvOutputObj[]> = {};
+    const featureEnvs: AppDeployedEnvOutputObj[] = [];
+    for (const env of envs) {
+      if (env.kind === 'feature') {
+        featureEnvs.push(env);
+      } else if (env.type) {
+        (standardGroups[env.type] ??= []).push(env);
+      }
+    }
+    const groups = Object.entries(standardGroups).map(([type, envs]) => ({
+      envs,
       label: envTypeMap[type]?.name ?? type,
-      names: (envMap[type] ?? []).map(e => e.displayName).filter((name): name is string => !!name),
-      envs: envMap[type] ?? [],
-      type,
+      tagClass: envTypeTagClassMap[type],
     }));
-  }
-
-  /** 类型守卫：检查 unknown 对象是否为 GroupedEnv */
-  function isGroupedEnv(item: unknown): item is GroupedEnv {
-    return (
-      typeof item === 'object' &&
-      item !== null &&
-      'count' in item &&
-      'envs' in item &&
-      'label' in item &&
-      'names' in item &&
-      'type' in item
-    );
+    if (featureEnvs.length) {
+      groups.push({
+        envs: featureEnvs,
+        label: window.i18n.t('特性'),
+        tagClass: 'bg-bkms-cyan-6 text-bkms-cyan-2',
+      });
+    }
+    return groups;
   }
 
   // 概览列表（含应用）

@@ -38,6 +38,7 @@ echarts.use([
 
 import { getUser } from '~/api/modules/user';
 import { initTheme } from '~/composables/use-theme';
+import { scopeIconSpriteIds } from '~/fonts/icon-sprite';
 import { registerMonitorChartApi } from '~/pages/application/detail/deploy/monitor-chart-bridge.js';
 import { useUserStore } from '~/stores/user';
 
@@ -58,6 +59,12 @@ document.body.classList.add('bkms-themed');
 // 多主题：主题名挂到 html[data-theme]，具体色值在 src/styles/theme/themes/ 覆盖色阶。
 // index.html 的首帧脚本已按 localStorage 预置同名属性，此处只做一次兜底同步。
 initTheme();
+
+// iconcool sprite 里带 Figma 直出的裸 id（a/b/c/d），会顶掉页面内 svg 的 url(#a)，导致渐变类图标
+// 渲染空白（coffee.svg 即此原因）；这里把 sprite 内部 id 收敛到私有命名空间，详见 icon-sprite.ts。
+if (!scopeIconSpriteIds()) {
+  document.addEventListener('DOMContentLoaded', () => scopeIconSpriteIds(), { once: true });
+}
 
 import type { UserModule } from './types.ts';
 

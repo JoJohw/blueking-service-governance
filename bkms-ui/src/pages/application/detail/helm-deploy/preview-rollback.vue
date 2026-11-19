@@ -36,7 +36,7 @@
           <div class="text-[14px] bkms-text-secondary">{{ appName }}</div>
           <div class="flex items-center">
             <div class="text-[14px] bkms-text-secondary">{{ $t('环境') }}：</div>
-            <div class="text-[14px] bkms-text-secondary">{{ envName }}</div>
+            <div class="text-[14px] bkms-text-secondary">{{ envDisplayName || envName }}</div>
           </div>
         </div>
       </div>
@@ -119,6 +119,7 @@
   interface Props {
     appName?: string;
     deployID?: string;
+    envDisplayName?: string;
     envName?: string;
     trafficLaneName?: string;
   }
