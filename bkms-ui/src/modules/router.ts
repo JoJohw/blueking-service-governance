@@ -318,6 +318,25 @@ const routes = setupLayouts([
       layout: 'empty',
     },
   },
+  // 设计工具：外层 iframe 隔离 mock，内层 palette（颜色/圆角/可视化/组件预览）跑主应用上下文。
+  {
+    path: '/__designer',
+    name: 'designer',
+    component: () => import('~/pages/designer/designer-shell.vue'),
+    meta: {
+      layout: 'empty',
+    },
+  },
+  {
+    path: '/__designer-frame',
+    name: 'designerFrame',
+    component: () => import('~/pages/designer/palette.vue'),
+    meta: {
+      layout: 'empty',
+    },
+    // frame 只允许在 iframe 内加载，顶层直接访问时回到外壳，保证 mock 隔离边界。
+    beforeEnter: () => (window.self === window.top ? { name: 'designer' } : true),
+  },
   { path: '/:pathMatch(.*)*', name: '404', component: NotFound },
 ]);
 

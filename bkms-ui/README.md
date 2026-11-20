@@ -48,7 +48,7 @@
 | `pnpm stylelint`      | 检查 CSS、Less 和 Vue 样式                |
 | `pnpm test:unit`      | 运行 Vitest 单元测试                      |
 | `pnpm gen:api:v1`     | 根据服务端 Swagger 定义生成 v1 API 与类型 |
-| `pnpm theme:designer` | 启动主题色板工具（端口 5300），查看与比对主题色值 |
+| `pnpm theme:designer` | 启动主题色板独立预览（端口 5300），查看与比对主题色值 |
 
 具体开发约定统一维护在[编码规范](./docs/CODING_STANDARDS.md)中，API 路径参数使用 `{var}` 格式；自动生成的 `src/api/modules/v1/` 与 `src/@types/v1/` 文件不要手工修改。
 

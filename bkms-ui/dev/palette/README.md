@@ -1,12 +1,14 @@
 # BKMS 主题色板
 
-一个查看、检索和比对 BKMS 主题令牌的小工具。左侧顶部的分段控件切换「颜色 / 圆角 / 可视化」三个视图，数据直接解析自主题 token 源文件，点击任意卡片复制实际值（色值 / 半径 / 阴影效果），卡片上的 `var()` 按钮复制 CSS 引用。
+一个查看、检索和比对 BKMS 主题令牌的小工具。分段控件切换「颜色 / 圆角 / 可视化 / 组件预览」四个视图：前三者解析主题 token 源文件；组件预览在独立 iframe 中 mock 业务接口，不污染主应用运行时。
+
+工具保留两种运行方式：独立预览（`pnpm theme:designer`，组件预览视图会提示需在主应用打开），以及内嵌在主应用的 `/#/__designer`（组件预览可用）。
 
 功能演进见[更新记录](./CHANGELOG.md)。
 
 ## 启动
 
-在仓库根目录运行：
+独立预览在仓库根目录运行：
 
 ```bash
 pnpm theme:designer
@@ -17,6 +19,8 @@ pnpm theme:designer
 ```bash
 npx vite build --config dev/palette/vite.config.ts
 ```
+
+内嵌预览随主应用启动（`pnpm dev`），打开 `/#/__designer`。
 
 ## 主要功能
 
@@ -84,7 +88,7 @@ npx vite build --config dev/palette/vite.config.ts
 
 - `/** 用途 */` 仍是单条 token 的说明（原有格式）。兼容与容错：旧格式 `/* 组名（组描述） */` 继续按分组解析；声明同行尾注释 `--x: #fff; /* 用途 */` 挂到该 token；非 @tag 多行块注释兜底为组描述；未知 @tag 忽略不报错。
 - 色差使用 CIEDE2000（ΔE00）。色值建议的贴近阈值为 **6**；颜色搜索的容错阈值为 **3**。
-- 工具自身的界面配色定义在 `src/shell.css`，是一组固定值，不随主题 token 变化；色块与预览展示的颜色仍取自 token 真源。
+- 工具自身的界面配色定义在 `src/styles/shell.css`，是一组固定值，不随主题 token 变化；色块与预览展示的颜色仍取自 token 真源。
 
 需要修改主题 token 时，用 AI IDE 走 `theme-designer` skill（`.agents/skills/theme-designer/`，CodeBuddy 下为 `.codebuddy/skills/theme-designer/`），它负责定位真源、改对层级；本工具只用于改完后的预览与对比。
 
@@ -92,10 +96,29 @@ npx vite build --config dev/palette/vite.config.ts
 
 ```
 src/
-├─ App.vue                     # 页面编排：导航、分组列表、搜索、专注、复制提示
+├─ App.vue                     # 页面编排：侧栏、视图切换、专注、复制提示
 ├─ main.ts                     # 入口
-├─ shell.css                   # 工具界面固定配色
+├─ router/
+│  └─ index.ts                 # hash 路由，四个视图页
+├─ config/
+│  ├─ index.ts                 # 各视图标题/描述/分组/搜索分块配置（带类型约束）
+│  └─ components.ts            # 组件预览导航项（来自 component-catalog 生成清单）
+├─ styles/
+│  ├─ main.css                 # 主布局样式
+│  └─ shell.css                # 工具界面固定配色
+├─ pages/                      # 各视图页
+│  ├─ ColorPage.vue
+│  ├─ RadiusPage.vue
+│  ├─ VizPage.vue
+│  ├─ TokenPage.vue
+│  └─ ComponentPage.vue
 ├─ components/
+│  ├─ PaletteSidebar.vue       # 左侧主导航
+│  ├─ PaletteAside.vue         # 右侧抽屉容器
+│  ├─ ViewTabs.vue             # 视图切换
+│  ├─ ComponentSort.vue        # 组件按使用次数排序
+│  ├─ AdvisorFab.vue           # 色值建议悬浮入口
+│  ├─ Toast.vue                # 复制等轻提示
 │  ├─ SectionPanel.vue         # 分组容器与专注模式
 │  ├─ SearchBar.vue            # 顶部搜索框（受控输入，不认识视图）
 │  ├─ SearchResults.vue        # 搜索结果（只渲染 blocks，不认识视图）
@@ -103,6 +126,12 @@ src/
 │  ├─ TokenCell.vue            # 卡片内容：形态由 previews 规则决定，分区只定尺寸
 │  ├─ ColorAdvisor.vue         # 色值建议面板
 │  └─ previews/                # 按 token 类别选预览组件（文字/线条/背景/阴影/色块兜底）
+│     ├─ index.ts              # token 类别 → 预览组件映射
+│     ├─ TextPreview.vue
+│     ├─ LinePreview.vue
+│     ├─ BackgroundPreview.vue
+│     ├─ ShadowPreview.vue
+│     ├─ SwatchPreview.vue
 │     ├─ VizPreview.vue        # viz 语义仿制小样（线条/面/状态/文字/图表/选中态/分类色）
 │     ├─ vizSamples.ts         # viz 前缀 → 小样标识
 │     ├─ RadiusPreview.vue     # 圆角语义仿制小样

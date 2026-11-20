@@ -27,3 +27,6 @@ scripts/theme-lint/reports/*
 # lint 缓存
 .stylelintcache
 .eslintcache
+
+# 组件预览自动生成清单（gen-component-preview.mjs 可重建，类型声明 component-catalog.generated.d.ts 需保留）
+src/pages/designer/component-catalog.generated.js

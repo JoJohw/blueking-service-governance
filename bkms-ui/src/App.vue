@@ -17,7 +17,12 @@
 -->
 
 <template>
-  <div class="flex flex-col h-full flex-nowrap">
+  <!-- 设计工具 iframe：跳过全局导航与通知条，避免双层 header -->
+  <RouterView v-if="isDesignerFrame" />
+  <div
+    v-else
+    class="flex flex-col h-full flex-nowrap"
+  >
     <NoticeComponent
       :api-url="bkNoticeApiUrl"
       @show-alert-change="handleShowAlertChange"
@@ -171,9 +176,14 @@
   const { platformConfig, getPlatformInfo } = usePlatform();
   const appName = computed(() => platformConfig.i18n.productName);
 
-  // 首页和平台管理不展示空间选择器及空间导航
+  const isDesignerFrame = computed(() => route?.name === 'designerFrame');
+  // 首页、平台管理和设计工具不展示空间选择器及空间导航
   const isGlobalRoute = computed(
-    () => route?.name === 'home' || route?.name === 'spaceList' || route.meta.menuId === 'PLATFORM',
+    () =>
+      route?.name === 'home' ||
+      route?.name === 'spaceList' ||
+      route?.name === 'designer' ||
+      route.meta.menuId === 'PLATFORM',
   );
   // // 用户相关配置列表(等待产品确认)
   const userConfigList = computed<IConfig[]>(() => {

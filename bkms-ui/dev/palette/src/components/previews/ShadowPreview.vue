@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-  import { resolved, type Token } from '../../util/tokens';
+  import { type Token, resolved } from '../../util/tokens';
 
   defineProps<{ token: Token }>();
 </script>

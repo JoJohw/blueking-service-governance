@@ -19,101 +19,42 @@
 <template>
   <div
     class="palette"
-    :class="{ 'is-focus': isFocus, 'is-searching': isSearching }"
+    :class="{ 'is-focus': isFocus, 'is-searching': isSearching, 'is-component': viewMode === 'component' }"
   >
-    <aside class="palette-aside">
-      <header class="palette-head">
-        <h1>{{ viewTitle }}</h1>
-        <p v-if="viewMode === 'color'">源自 <code>color.css</code>。点色块复制色值，悬停可复制 <code>var()</code>。</p>
-        <p v-else-if="viewMode === 'radius'">
-          源自 <code>radius.css</code>。点卡片复制半径，悬停可复制 <code>var()</code>。
-        </p>
-        <p v-else>源自 <code>viz.css</code>。按语义看小样，点卡片复制色值，悬停可复制 <code>var()</code>。</p>
-      </header>
-
-      <nav class="view-tabs">
-        <button
-          v-for="tab in viewTabs"
-          :key="tab.value"
-          :class="{ 'is-active': viewMode === tab.value }"
-          type="button"
-          @click="switchView(tab.value)"
-        >
-          {{ tab.label }}
-        </button>
-      </nav>
-
-      <nav class="palette-nav">
-        <template v-if="viewMode === 'color'">
-          <p class="nav-label">色阶</p>
-          <a
-            v-for="group in rampGroups"
-            :key="`nav-${group.id}`"
-            :class="{ 'is-active': activeId === group.id }"
-            href="javascript:void(0)"
-            @click="scrollTo(group.id)"
-          >
-            {{ group.label }}
-          </a>
-          <p class="nav-label">语义层</p>
-          <a
-            v-for="group in allSemanticGroups"
-            :key="`nav-sem-${group.id}`"
-            :class="{ 'is-active': activeId === group.id }"
-            href="javascript:void(0)"
-            @click="scrollTo(group.id)"
-          >
-            {{ group.label }}
-          </a>
-        </template>
-        <template v-else-if="viewMode === 'radius'">
-          <p class="nav-label">档位</p>
-          <a
-            v-for="group in radiusScaleGroups"
-            :key="`nav-rad-${group.id}`"
-            :class="{ 'is-active': activeId === group.id }"
-            href="javascript:void(0)"
-            @click="scrollTo(group.id)"
-          >
-            {{ group.label }}
-          </a>
-          <p class="nav-label">语义</p>
-          <a
-            v-for="group in radiusSemanticGroups"
-            :key="`nav-rad-sem-${group.id}`"
-            :class="{ 'is-active': activeId === group.id }"
-            href="javascript:void(0)"
-            @click="scrollTo(group.id)"
-          >
-            {{ group.label }}
-          </a>
-        </template>
-        <template v-else>
-          <p class="nav-label">语义场景</p>
-          <a
-            v-for="group in vizGroups"
-            :key="`nav-viz-${group.id}`"
-            :class="{ 'is-active': activeId === group.id }"
-            href="javascript:void(0)"
-            @click="scrollTo(group.id)"
-          >
-            {{ group.label }}
-          </a>
-        </template>
-      </nav>
-    </aside>
-
-    <SearchBar
-      v-if="!isFocus"
-      v-model="searchQuery"
-      :compact="isSearching"
-      :placeholder="searchPlaceholder"
-    />
+    <PaletteAside
+      :active-id="sidebarActiveId"
+      :collapsed="isFocus || isSearching"
+      :description="sidebarDescription"
+      :sections="sidebarSections"
+      :title="viewTitle"
+      @navigate="navigate"
+    >
+      <template #section-tool="{ section }">
+        <ComponentSort
+          v-if="viewMode === 'component' && section.label === '业务组件'"
+          v-model="componentSort"
+        />
+      </template>
+    </PaletteAside>
 
     <main
       ref="mainRef"
       class="palette-main"
     >
+      <div class="palette-toolbar">
+        <ViewTabs
+          :active="viewMode"
+          :tabs="viewTabs"
+          @change="switchView"
+        />
+        <SearchBar
+          v-if="!isFocus && viewMode !== 'component'"
+          v-model="searchQuery"
+          :compact="isSearching"
+          :placeholder="searchPlaceholder"
+        />
+      </div>
+
       <SearchResults
         v-if="isSearching"
         :blocks="searchBlocks"
@@ -122,300 +63,122 @@
         @copy="copy"
       />
 
-      <TransitionGroup
-        v-else-if="viewMode === 'color'"
-        class="section-list"
-        name="section"
-        tag="div"
+      <RouterView
+        v-if="hasPaletteRouter && !isSearching"
+        v-slot="{ Component }"
       >
-        <SectionPanel
-          v-for="group in visibleRampGroups"
-          :id="group.id"
-          :key="group.id"
-          :count="group.tokens.length"
-          :focus="isFocus"
-          :note="group.note"
-          :title="group.label"
+        <component
+          :is="Component"
+          :focus-id="focusId"
+          @copy="copy"
+          @toggle-focus="toggleFocus"
         >
-          <template #tools>
-            <button
-              class="focus-toggle"
-              type="button"
-              @click="toggleFocus(group.id)"
-            >
-              {{ focusId === group.id ? '退出专注' : '专注模式' }}
-            </button>
+          <template #component-preview>
+            <slot name="component-preview" />
           </template>
-          <TransitionGroup
-            class="ramp"
-            :class="{ 'ramp-grid': isFocus }"
-            name="card"
-            tag="div"
-          >
-            <TokenCell
-              v-for="token in group.tokens"
-              :key="token.name"
-              :token="token"
-              variant="ramp"
-              @copy="copy"
-            />
-          </TransitionGroup>
-        </SectionPanel>
-
-        <SectionPanel
-          v-for="group in visibleSemanticGroups"
-          :id="group.id"
-          :key="group.id"
-          :count="group.tokens.length"
-          :focus="isFocus"
-          :note="group.note"
-          :title="group.label"
-        >
-          <template #tools>
-            <button
-              class="focus-toggle"
-              type="button"
-              @click="toggleFocus(group.id)"
-            >
-              {{ focusId === group.id ? '退出专注' : '专注模式' }}
-            </button>
-          </template>
-          <TransitionGroup
-            class="ramp"
-            :class="{ 'ramp-grid': isFocus }"
-            name="card"
-            tag="div"
-          >
-            <TokenCell
-              v-for="token in group.tokens"
-              :key="token.name"
-              :token="token"
-              variant="semantic"
-              @copy="copy"
-            />
-          </TransitionGroup>
-        </SectionPanel>
-      </TransitionGroup>
-
-      <TransitionGroup
-        v-else-if="viewMode === 'radius'"
-        class="section-list"
-        name="section"
-        tag="div"
+        </component>
+      </RouterView>
+      <component
+        :is="fallbackPage"
+        v-else-if="!isSearching"
+        :focus-id="focusId"
+        @copy="copy"
+        @toggle-focus="toggleFocus"
       >
-        <SectionPanel
-          v-for="group in visibleRadiusGroups"
-          :id="group.id"
-          :key="group.id"
-          :count="group.tokens.length"
-          :focus="isFocus"
-          :note="group.note"
-          :title="group.label"
-        >
-          <template #tools>
-            <button
-              class="focus-toggle"
-              type="button"
-              @click="toggleFocus(group.id)"
-            >
-              {{ focusId === group.id ? '退出专注' : '专注模式' }}
-            </button>
-          </template>
-          <TransitionGroup
-            class="ramp"
-            :class="{ 'ramp-grid': isFocus }"
-            name="card"
-            tag="div"
-          >
-            <TokenCell
-              v-for="token in group.tokens"
-              :key="token.name"
-              :token="token"
-              variant="semantic"
-              @copy="copy"
-            />
-          </TransitionGroup>
-        </SectionPanel>
-      </TransitionGroup>
-
-      <TransitionGroup
-        v-else
-        class="section-list"
-        name="section"
-        tag="div"
-      >
-        <SectionPanel
-          v-for="group in visibleVizGroups"
-          :id="group.id"
-          :key="group.id"
-          :count="group.tokens.length"
-          :focus="isFocus"
-          :note="group.note"
-          :title="group.label"
-        >
-          <template #tools>
-            <button
-              class="focus-toggle"
-              type="button"
-              @click="toggleFocus(group.id)"
-            >
-              {{ focusId === group.id ? '退出专注' : '专注模式' }}
-            </button>
-          </template>
-          <TransitionGroup
-            class="ramp"
-            :class="{ 'ramp-grid': isFocus }"
-            name="card"
-            tag="div"
-          >
-            <TokenCell
-              v-for="token in group.tokens"
-              :key="token.name"
-              :token="token"
-              variant="semantic"
-              @copy="copy"
-            />
-          </TransitionGroup>
-        </SectionPanel>
-      </TransitionGroup>
+        <template #component-preview>
+          <slot name="component-preview" />
+        </template>
+      </component>
     </main>
 
-    <Transition name="toast">
-      <div
-        v-if="copied"
-        class="toast"
-        role="status"
-      >
-        <span class="toast-icon">✓</span>
-        <span>
-          已复制 <code>{{ copied }}</code>
-        </span>
-      </div>
-    </Transition>
+    <Toast :text="copied" />
 
-    <button
-      ref="fabRef"
-      class="advisor-fab"
-      :class="{ 'is-open': advisorOpen, 'is-dragging': fabDragging }"
-      :style="{ transform: `translate(${fabPos.x}px, ${fabPos.y}px)` }"
-      :title="advisorOpen ? '关闭色值建议' : '色值建议'"
-      type="button"
-      @click="onFabClick"
-      @pointercancel="onFabUp"
-      @pointerdown="onFabDown"
-      @pointermove="onFabMove"
-      @pointerup="onFabUp"
-    >
-      <span class="fab-icon">✦</span>
-      <span class="fab-label">色值建议</span>
-    </button>
-
-    <ColorAdvisor
-      :anchor="fabPos"
-      :open="advisorOpen"
-      @copy="copy"
-      @update:open="advisorOpen = $event"
-    />
+    <AdvisorFab @copy="copy" />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+  import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue';
 
-  import ColorAdvisor from './components/ColorAdvisor.vue';
+  import { useRoute, useRouter } from 'vue-router';
+
+  import AdvisorFab from './components/AdvisorFab.vue';
+  import ComponentSort from './components/ComponentSort.vue';
+  import PaletteAside from './components/PaletteAside.vue';
   import SearchBar from './components/SearchBar.vue';
   import SearchResults from './components/SearchResults.vue';
-  import SectionPanel from './components/SectionPanel.vue';
-  import TokenCell from './components/TokenCell.vue';
-  import { type SearchBlock, searchTokens } from './util/search';
+  import Toast from './components/Toast.vue';
+  import ViewTabs from './components/ViewTabs.vue';
+  import { viewConfig, viewTabs } from './config';
+  import { type ComponentSortMode, componentNavItems, sortByUsage } from './config/components';
+  import ColorPage from './pages/ColorPage.vue';
+  import ComponentPage from './pages/ComponentPage.vue';
+  import RadiusPage from './pages/RadiusPage.vue';
+  import VizPage from './pages/VizPage.vue';
+  import { type PaletteView, paletteViews } from './router';
+  import { searchTokens } from './util/search';
   import { allSemanticGroups, radiusGroups, rampGroups, vizGroups } from './util/tokens';
-  import { useDrag } from './util/useDrag';
 
-  const viewTabs = [
-    { label: '颜色', value: 'color' as const },
-    { label: '圆角', value: 'radius' as const },
-    { label: '可视化', value: 'viz' as const },
-  ];
-  const viewMode = ref<'color' | 'radius' | 'viz'>('color');
-  const viewTitle = computed(() =>
-    viewMode.value === 'color' ? 'BKMS 主题色板' : viewMode.value === 'radius' ? 'BKMS 圆角令牌' : 'BKMS 可视化字典',
-  );
-  const radiusScaleGroups = computed(() => radiusGroups.filter(group => group.layer === 'scale'));
-  const radiusSemanticGroups = computed(() => radiusGroups.filter(group => group.layer === 'semantic'));
+  import './styles/main.css';
+  import './styles/shell.css';
+
+  const route = useRoute();
+  const router = useRouter();
+  const slots = useSlots();
+  const hasPaletteRouter = !!router && paletteViews.every(view => router.hasRoute(view));
+  const localView = ref<PaletteView>('color');
+
+  const viewMode = computed<PaletteView>(() => {
+    if (hasPaletteRouter && route && paletteViews.includes(route.name as PaletteView)) {
+      return route.name as PaletteView;
+    }
+    const view = route?.query.view;
+    return typeof view === 'string' && paletteViews.includes(view as PaletteView)
+      ? (view as PaletteView)
+      : localView.value;
+  });
+  const modulePages = {
+    color: ColorPage,
+    radius: RadiusPage,
+    viz: VizPage,
+    component: ComponentPage,
+  };
+  const fallbackPage = computed(() => modulePages[viewMode.value]);
+  const activeConfig = computed(() => viewConfig[viewMode.value]);
+  const viewTitle = computed(() => activeConfig.value.title);
+  const sidebarDescription = computed(() => activeConfig.value.description);
+  const componentSort = ref<ComponentSortMode>('default');
+  const sidebarSections = computed(() => {
+    if (viewMode.value === 'component' && !slots['component-preview']) return [];
+    if (viewMode.value !== 'component') return activeConfig.value.sections;
+    return activeConfig.value.sections.map(section => ({
+      ...section,
+      groups: sortByUsage(section.groups, componentSort.value),
+    }));
+  });
 
   const activeId = ref('');
+
+  const componentIds = componentNavItems.map(item => item.id);
+  const componentId = computed(() => {
+    const query = route?.query.component;
+    if (typeof query === 'string' && componentIds.includes(query)) return query;
+    return componentIds[0] ?? '';
+  });
+  const sidebarActiveId = computed(() => (viewMode.value === 'component' ? componentId.value : activeId.value));
+
   const mainRef = ref<HTMLElement | null>(null);
-  const allGroups = computed(() =>
-    viewMode.value === 'color'
-      ? [...rampGroups, ...allSemanticGroups]
-      : viewMode.value === 'radius'
-        ? radiusGroups
-        : vizGroups,
-  );
+  const allGroups = computed(() => activeConfig.value.groups);
   const sectionIds = computed(() => allGroups.value.map(group => group.id));
   let clickLockId = '';
 
   const copied = ref('');
-  const advisorOpen = ref(false);
   const searchQuery = ref('');
   const isSearching = computed(() => searchQuery.value.trim().length > 0);
   const searchHits = computed(() => searchTokens(allGroups.value, searchQuery.value));
-  const searchBlocks = computed<SearchBlock[]>(() => {
-    const hits = searchHits.value;
-    const buckets = new Map<string, SearchBlock>();
-    const push = (key: string, title: string, variant: SearchBlock['variant'], list: SearchBlock['hits']) => {
-      if (list.length) buckets.set(key, { key, title, variant, hits: list });
-    };
-    if (viewMode.value === 'color') {
-      push(
-        'ramp',
-        '色阶',
-        'ramp',
-        hits.filter(hit => hit.group.layer === 'scale'),
-      );
-      push(
-        'semantic',
-        '语义层',
-        'semantic',
-        hits.filter(hit => hit.group.layer === 'semantic'),
-      );
-    } else if (viewMode.value === 'radius') {
-      push(
-        'rad-scale',
-        '档位',
-        'semantic',
-        hits.filter(hit => hit.group.layer === 'scale'),
-      );
-      push(
-        'rad-semantic',
-        '圆角语义',
-        'semantic',
-        hits.filter(hit => hit.group.layer === 'semantic'),
-      );
-    } else {
-      for (const hit of hits) {
-        const block: SearchBlock = buckets.get(hit.group.id) ?? {
-          key: hit.group.id,
-          title: hit.group.label,
-          variant: 'semantic',
-          hits: [],
-        };
-        block.hits.push(hit);
-        buckets.set(block.key, block);
-      }
-    }
-    return [...buckets.values()];
-  });
-  const searchPlaceholder = computed(() =>
-    viewMode.value === 'radius'
-      ? '搜索档位 / 用途 / 分组，或输入半径值（如 6px）'
-      : '搜索 token 名 / 用途 / 分组，或输入颜色值（hex / rgb / hsl）',
-  );
-  const searchEmptyHint = computed(() =>
-    viewMode.value === 'radius'
-      ? '换个关键字，或试试档位名 / 半径值（如 6px）'
-      : '换个关键字，或试试 hex / rgb() / hsl() 颜色值',
-  );
+  const searchBlocks = computed(() => activeConfig.value.buildSearchBlocks(searchHits.value));
+  const searchPlaceholder = computed(() => activeConfig.value.searchPlaceholder);
+  const searchEmptyHint = computed(() => activeConfig.value.searchEmptyHint);
   let copyTimer = 0;
 
   function copy(text: string): void {
@@ -427,83 +190,9 @@
     }, 1400);
   }
 
-  const fabRef = ref<HTMLElement | null>(null);
-  const {
-    pos: fabPos,
-    dragging: fabDragging,
-    moved: fabMoved,
-    onPointerDown: onFabDown,
-    onPointerMove: onFabMove,
-    onPointerUp: onFabUp,
-  } = useDrag({ ignoreButtons: false, target: fabRef });
-
-  function onFabClick(): void {
-    if (fabMoved.value) {
-      fabMoved.value = false;
-      return;
-    }
-    advisorOpen.value = !advisorOpen.value;
-  }
-
   const focusId = ref<null | string>(null);
   const isFocus = computed(() => focusId.value !== null);
   let scrollBeforeFocus = 0;
-  const visibleRampGroups = computed(() =>
-    focusId.value ? rampGroups.filter(group => group.id === focusId.value) : rampGroups,
-  );
-  const visibleSemanticGroups = computed(() =>
-    focusId.value ? allSemanticGroups.filter(group => group.id === focusId.value) : allSemanticGroups,
-  );
-  const visibleRadiusGroups = computed(() =>
-    focusId.value ? radiusGroups.filter(group => group.id === focusId.value) : radiusGroups,
-  );
-  const visibleVizGroups = computed(() =>
-    focusId.value ? vizGroups.filter(group => group.id === focusId.value) : vizGroups,
-  );
-
-  /** ?focus= 链接可跨视图打开，命中圆角分组时切到圆角视图 */
-  function readFocus(): void {
-    const label = new URLSearchParams(window.location.search).get('focus');
-    if (!label) return;
-    const group = [...rampGroups, ...allSemanticGroups, ...radiusGroups, ...vizGroups].find(
-      item => item.label === label,
-    );
-    if (!group) return;
-    if (radiusGroups.includes(group)) viewMode.value = 'radius';
-    else if (vizGroups.includes(group)) viewMode.value = 'viz';
-    focusId.value = group.id;
-  }
-
-  function switchView(mode: 'color' | 'radius' | 'viz'): void {
-    if (viewMode.value === mode) return;
-    viewMode.value = mode;
-    searchQuery.value = '';
-    focusId.value = null;
-    const url = new URL(window.location.href);
-    url.searchParams.delete('focus');
-    window.history.replaceState(null, '', url);
-    nextTick(() => {
-      if (mainRef.value) mainRef.value.scrollTop = 0;
-      activeId.value = computeActive();
-    });
-  }
-
-  function toggleFocus(id: string): void {
-    searchQuery.value = '';
-    if (!isFocus.value) scrollBeforeFocus = mainRef.value?.scrollTop ?? 0;
-    focusId.value = focusId.value === id ? null : id;
-    const group = allGroups.value.find(item => item.id === focusId.value);
-    const url = new URL(window.location.href);
-    if (group) url.searchParams.set('focus', group.label);
-    else url.searchParams.delete('focus');
-    window.history.replaceState(null, '', url);
-    nextTick(() => {
-      if (!isFocus.value && mainRef.value) mainRef.value.scrollTop = scrollBeforeFocus;
-      activeId.value = computeActive();
-    });
-  }
-
-  readFocus();
 
   /** 取顶部距容器上沿最近的分组；已到底部时取末尾分组（末尾分组无法滚到上沿） */
   function computeActive(): string {
@@ -527,6 +216,14 @@
     return best;
   }
 
+  function navigate(id: string): void {
+    if (viewMode.value === 'component') {
+      router.replace({ query: { ...route.query, component: id } });
+      return;
+    }
+    scrollTo(id);
+  }
+
   function onScroll(): void {
     if (!clickLockId) activeId.value = computeActive();
   }
@@ -535,6 +232,27 @@
     if (!clickLockId) return;
     clickLockId = '';
     activeId.value = computeActive();
+  }
+
+  if (router) router.isReady().then(readFocus);
+  else readFocus();
+
+  function readFocus(): void {
+    const label = route?.query.focus;
+    if (typeof label !== 'string' || !label) return;
+    const group = [...rampGroups, ...allSemanticGroups, ...radiusGroups, ...vizGroups].find(
+      item => item.label === label,
+    );
+    if (!group) return;
+    const name: PaletteView = radiusGroups.includes(group) ? 'radius' : vizGroups.includes(group) ? 'viz' : 'color';
+    if (hasPaletteRouter && router) {
+      if (name !== viewMode.value) router.replace({ name, query: route.query });
+    } else if (router) {
+      router.replace({ query: { ...route.query, view: name } });
+    } else {
+      localView.value = name;
+    }
+    focusId.value = group.id;
   }
 
   function scrollTo(id: string): void {
@@ -546,15 +264,53 @@
     container.scrollTo({ top: target.offsetTop - container.offsetTop, behavior: 'smooth' });
   }
 
+  async function switchView(mode: PaletteView): Promise<void> {
+    if (viewMode.value === mode) return;
+    searchQuery.value = '';
+    focusId.value = null;
+    if (hasPaletteRouter && router) await router.push({ name: mode, query: {} });
+    else if (router) await router.replace({ query: { view: mode } });
+    else localView.value = mode;
+    await nextTick();
+    if (mainRef.value) mainRef.value.scrollTop = 0;
+    activeId.value = computeActive();
+  }
+
+  function toggleFocus(id: string): void {
+    searchQuery.value = '';
+    if (!isFocus.value) scrollBeforeFocus = mainRef.value?.scrollTop ?? 0;
+    focusId.value = focusId.value === id ? null : id;
+    const group = allGroups.value.find(item => item.id === focusId.value);
+    if (router) {
+      const query = { ...route.query };
+      if (group) query.focus = group.label;
+      else delete query.focus;
+      router.replace({ query });
+    }
+    nextTick(() => {
+      if (!isFocus.value && mainRef.value) mainRef.value.scrollTop = scrollBeforeFocus;
+      activeId.value = computeActive();
+    });
+  }
+
+  watch(
+    () => [route?.query.view, route?.query.focus, route?.query.component],
+    () => {
+      if (hasPaletteRouter || window.parent === window) return;
+      window.parent.postMessage(
+        {
+          type: 'palette-query-sync',
+          view: typeof route?.query.view === 'string' ? route.query.view : null,
+          focus: typeof route?.query.focus === 'string' ? route.query.focus : null,
+          component: typeof route?.query.component === 'string' ? route.query.component : null,
+        },
+        window.location.origin,
+      );
+    },
+  );
+
   onMounted(() => {
     activeId.value = computeActive();
-    const fab = fabRef.value;
-    if (fab) {
-      fabPos.value = {
-        x: Math.max(12, window.innerWidth - fab.offsetWidth - 24),
-        y: Math.max(12, window.innerHeight - fab.offsetHeight - 24),
-      };
-    }
     mainRef.value?.addEventListener('scroll', onScroll, { passive: true });
     mainRef.value?.addEventListener('wheel', onUserScroll, { passive: true });
     mainRef.value?.addEventListener('touchmove', onUserScroll, { passive: true });
@@ -567,313 +323,3 @@
     mainRef.value?.removeEventListener('touchmove', onUserScroll);
   });
 </script>
-
-<style scoped>
-  .palette {
-    --preview-h: 170px;
-    --swatch-h: 100px;
-
-    display: flex;
-    align-items: flex-start;
-    min-height: 100vh;
-    font:
-      13px/1.6 -apple-system,
-      'Segoe UI',
-      sans-serif;
-    color: var(--pal-text-body);
-  }
-
-  .palette.is-focus {
-    --preview-h: 240px;
-    --swatch-h: 150px;
-  }
-
-  code {
-    font-family: ui-monospace, Menlo, Consolas, monospace;
-  }
-
-  .palette-aside {
-    position: sticky;
-    top: 0;
-    box-sizing: border-box;
-    flex: none;
-    width: 220px;
-    height: 100vh;
-    padding: 28px 16px;
-    overflow: hidden auto;
-    background: var(--pal-bg-head);
-    border-right: 1px solid var(--pal-line);
-    transition:
-      width 0.3s ease,
-      padding 0.3s ease;
-  }
-
-  .is-focus .palette-aside,
-  .is-searching .palette-aside {
-    width: 0;
-    padding-right: 0;
-    padding-left: 0;
-    border-right: none;
-  }
-
-  .palette-main {
-    position: relative;
-    box-sizing: border-box;
-    flex: 1;
-    min-width: 0;
-    height: 100vh;
-    padding: 0 32px 80px;
-    overflow-y: scroll;
-    scrollbar-gutter: stable;
-  }
-
-  .section-list {
-    padding-top: 72px;
-  }
-
-  .palette-head h1 {
-    margin: 0 0 6px;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--pal-text-title);
-  }
-
-  .palette-head p {
-    margin: 0;
-    line-height: 1.5;
-    color: var(--pal-text-body);
-  }
-
-  .view-tabs {
-    display: flex;
-    gap: 2px;
-    padding: 3px;
-    margin-top: 16px;
-    background: var(--pal-bg-subtle);
-    border: 1px solid var(--pal-line);
-    border-radius: 999px;
-  }
-
-  .view-tabs button {
-    flex: 1;
-    padding: 5px 0;
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--pal-text-body);
-    cursor: pointer;
-    background: none;
-    border: none;
-    border-radius: 999px;
-    transition: all 0.2s ease;
-  }
-
-  .view-tabs button:hover {
-    color: var(--pal-text-title);
-  }
-
-  .view-tabs button.is-active {
-    color: var(--pal-brand);
-    background: var(--pal-bg-card);
-    box-shadow: 0 1px 3px var(--pal-shadow-popover);
-  }
-
-  .advisor-fab {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 40;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    padding: 7px 18px 7px 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--pal-text-inverse);
-    touch-action: none;
-    cursor: grab;
-    user-select: none;
-    background: var(--pal-brand);
-    border: none;
-    border-radius: 26px;
-    box-shadow: var(--pal-shadow-popover);
-    transition:
-      transform 0.2s ease,
-      background 0.2s ease;
-  }
-
-  .advisor-fab:hover,
-  .advisor-fab.is-open {
-    background: var(--pal-brand-deep);
-  }
-
-  .advisor-fab.is-dragging {
-    cursor: grabbing;
-    opacity: 0.9;
-    transition: none;
-  }
-
-  .fab-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    font-size: 17px;
-    line-height: 1;
-    color: var(--pal-brand);
-    background: var(--pal-text-inverse);
-    border-radius: 50%;
-  }
-
-  .fab-label {
-    color: var(--pal-text-inverse);
-  }
-
-  .palette-nav {
-    display: flex;
-    flex-direction: column;
-    margin-top: 20px;
-  }
-
-  .nav-label {
-    padding: 0 12px 6px;
-    margin: 24px 0 8px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--pal-text-title);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 1px solid var(--pal-line);
-  }
-
-  .palette-nav a {
-    padding: 12px;
-    font-size: 14px;
-    color: var(--pal-text-body);
-    text-decoration: none;
-    border-left: 2px solid transparent;
-    border-radius: 0 3px 3px 0;
-  }
-
-  .palette-nav a:hover {
-    background: var(--pal-bg-hover);
-  }
-
-  .palette-nav a.is-active {
-    font-weight: 600;
-    color: var(--pal-brand);
-    background: var(--pal-bg-active);
-    border-left-color: var(--pal-brand);
-  }
-
-  .ramp {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-  }
-
-  .ramp-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .ramp-grid > :deep(.token-card-wrap) {
-    width: auto;
-  }
-
-  .focus-toggle {
-    padding: 5px 14px;
-    font-size: 13px;
-    color: var(--pal-brand);
-    cursor: pointer;
-    background: var(--pal-bg-card);
-    border: 1px solid var(--pal-brand);
-    border-radius: 4px;
-  }
-
-  .focus-toggle:hover {
-    background: var(--pal-bg-active);
-  }
-
-  .section-move,
-  .section-enter-active,
-  .section-leave-active {
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s ease;
-  }
-
-  .section-enter-from,
-  .section-leave-to {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-
-  .section-leave-active {
-    position: absolute;
-  }
-
-  .card-move {
-    transition: transform 0.35s ease;
-  }
-
-  .card-enter-active,
-  .card-leave-active {
-    transition: opacity 0.3s ease;
-  }
-
-  .card-enter-from,
-  .card-leave-to {
-    opacity: 0;
-  }
-
-  .toast {
-    position: fixed;
-    top: 24px;
-    right: 36px;
-    z-index: 60;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    min-width: 280px;
-    max-width: 80vw;
-    padding: 10px 18px;
-    font-size: 14px;
-    color: var(--pal-text-title);
-    background: var(--pal-bg-card);
-    border: 1px solid var(--pal-line);
-    border-radius: 6px;
-    box-shadow: 0 4px 16px var(--pal-shadow-popover);
-  }
-
-  .toast-icon {
-    display: flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    font-size: 13px;
-    color: var(--pal-text-inverse);
-    background: var(--pal-success);
-    border-radius: 50%;
-  }
-
-  .toast code {
-    color: var(--pal-brand);
-  }
-
-  .toast-enter-active,
-  .toast-leave-active {
-    transition:
-      opacity 0.2s ease,
-      margin-top 0.2s ease;
-  }
-
-  .toast-enter-from,
-  .toast-leave-to {
-    margin-top: -12px;
-    opacity: 0;
-  }
-</style>

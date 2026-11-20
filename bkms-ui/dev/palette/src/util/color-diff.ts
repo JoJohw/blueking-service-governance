@@ -183,10 +183,7 @@ export function normalizeHex(input: string): null | string {
     const s = Number.parseFloat(parts[1]);
     const l = Number.parseFloat(parts[2]);
     if (![h, s, l].every(Number.isFinite)) return null;
-    return flattenAlpha(
-      toHex(hslToRgb(h, Number.parseFloat(s) / 100, Number.parseFloat(l) / 100)),
-      parseAlpha(parts[3]),
-    );
+    return flattenAlpha(toHex(hslToRgb(h, s / 100, l / 100)), parseAlpha(parts[3]));
   }
   const channels = parts.slice(0, 3).map(part => {
     const num = part.endsWith('%') ? (Number.parseFloat(part) / 100) * 255 : Number(part);

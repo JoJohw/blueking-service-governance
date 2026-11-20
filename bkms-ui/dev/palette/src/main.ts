@@ -18,9 +18,10 @@
 
 import { createApp } from 'vue';
 import App from './App.vue';
-import './shell.css';
+import router from './router';
+import './styles/shell.css';
 import '../../../src/styles/theme/tokens/color.css';
 import '../../../src/styles/theme/tokens/radius.css';
 import '../../../src/styles/theme/tokens/viz.css';
 
-createApp(App).mount('#app');
+createApp(App).use(router).mount('#app');

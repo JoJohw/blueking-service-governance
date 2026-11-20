@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-  defineProps<{ id: string; title: string; count: number; note?: string; focus?: boolean }>();
+  defineProps<{ count: number; focus?: boolean; id: string; note?: string; title: string }>();
 </script>
 
 <style scoped>
@@ -56,7 +56,7 @@
     box-sizing: border-box;
     padding: 14px 20px 22px;
     margin: 0 -20px;
-    scroll-margin-top: 12px;
+    scroll-margin-top: 76px;
     border-radius: 6px;
     transition: background 0.2s ease;
   }
@@ -75,7 +75,7 @@
 
   .section.is-focus .section-header {
     position: sticky;
-    top: 0;
+    top: 68px;
     z-index: 2;
     padding: 12px 0;
     margin-top: -14px;
