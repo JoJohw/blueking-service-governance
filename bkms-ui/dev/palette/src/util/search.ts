@@ -19,17 +19,17 @@
 import { deltaE, normalizeHex } from './color-diff';
 import { type Group, type Token, resolved } from './tokens';
 
-export interface SearchHit {
-  group: Group;
-  token: Token;
-}
-
 /** 结果分块的呈现描述，由调用方按视图组装，搜索层与展示组件都只消费 */
 export interface SearchBlock {
+  hits: SearchHit[];
   key: string;
   title: string;
   variant: 'ramp' | 'semantic';
-  hits: SearchHit[];
+}
+
+export interface SearchHit {
+  group: Group;
+  token: Token;
 }
 
 /**

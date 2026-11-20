@@ -32,6 +32,16 @@ export const componentNavItems: ComponentNavItem[] = componentCatalog.map(entry 
 
 export type ComponentSortMode = 'asc' | 'default' | 'desc';
 
+/**
+ * 按关键词过滤组件：展示名与完整 id 都参与匹配，忽略大小写与首尾空白。
+ * 空查询返回空数组，避免「搜索态展示全部」被误认为结果。
+ */
+export function matchComponents(items: ComponentNavItem[], input: string): ComponentNavItem[] {
+  const query = input.trim().toLowerCase();
+  if (!query) return [];
+  return items.filter(item => item.label.toLowerCase().includes(query) || item.id.toLowerCase().includes(query));
+}
+
 export function sortByUsage<T extends { usage?: number }>(items: T[], mode: ComponentSortMode): T[] {
   if (mode === 'default') return items;
   const sorted = [...items];

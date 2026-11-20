@@ -16,26 +16,21 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-import { onBeforeUnmount, onMounted, ref, type Ref } from 'vue';
+import { type Ref, onBeforeUnmount, onMounted, ref } from 'vue';
 
 interface DragOptions {
-  /** 被拖动元素的 ref，用于测量尺寸做边界约束 */
-  target: Ref<HTMLElement | null>;
   /** 是否忽略 button 上的按下（避免与按钮点击冲突）；拖动目标本身是 button 时传 false */
   ignoreButtons?: boolean;
   /** 距视口边缘的最小留白 */
   margin?: number;
   /** 松手时靠近边缘多少像素内自动吸附，传 0 关闭吸附 */
   snap?: number;
+  /** 被拖动元素的 ref，用于测量尺寸做边界约束 */
+  target: Ref<HTMLElement | null>;
 }
 
 /** 指针拖动：边界约束 + 松手磁吸，返回位置 ref 与需绑到可拖动元素上的事件处理器 */
-export function useDrag({
-  target,
-  ignoreButtons = true,
-  margin = 12,
-  snap = 32,
-}: DragOptions) {
+export function useDrag({ target, ignoreButtons = true, margin = 12, snap = 32 }: DragOptions) {
   const pos = ref({ x: 0, y: 0 });
   const dragging = ref(false);
   const moved = ref(false);

@@ -18,7 +18,7 @@
 
 import { createRouter, createWebHashHistory } from 'vue-router';
 
-export type PaletteView = 'color' | 'radius' | 'viz' | 'component';
+export type PaletteView = 'color' | 'component' | 'radius' | 'viz';
 
 export const paletteViews: PaletteView[] = ['color', 'radius', 'viz', 'component'];
 

@@ -43,10 +43,6 @@
 
 <style scoped>
   .view-tabs {
-    position: fixed;
-    top: 18px;
-    left: 296px;
-    z-index: 45;
     box-sizing: border-box;
     display: flex;
     flex: 0 0 auto;

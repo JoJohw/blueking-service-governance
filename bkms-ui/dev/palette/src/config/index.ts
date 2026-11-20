@@ -17,50 +17,39 @@
  */
 
 import { type PaletteView, paletteViews } from '../router';
-import type { SearchBlock, SearchHit } from '../util/search';
 import { type Group, type TokenLayer, allSemanticGroups, radiusGroups, rampGroups, vizGroups } from '../util/tokens';
-
 import { componentNavItems } from './components';
+
+import type { SearchBlock, SearchHit } from '../util/search';
+
+export type SidebarItem = Pick<Group, 'id' | 'label'> & { usage?: number };
+
+export interface SidebarSection {
+  groups: SidebarItem[];
+  label: string;
+}
+
+export interface ViewConfig {
+  description: string;
+  groups: Group[];
+  label: string;
+  searchEmptyHint: string;
+  searchPlaceholder: string;
+  sections: SidebarSection[];
+  title: string;
+  buildSearchBlocks: (hits: SearchHit[]) => SearchBlock[];
+}
 
 export interface ViewTab {
   label: string;
   value: PaletteView;
 }
 
-export type SidebarItem = Pick<Group, 'id' | 'label'> & { usage?: number };
-
-export interface SidebarSection {
-  label: string;
-  groups: SidebarItem[];
-}
-
-export interface ViewConfig {
-  label: string;
-  title: string;
-  description: string;
-  searchPlaceholder: string;
-  searchEmptyHint: string;
-  groups: Group[];
-  sections: SidebarSection[];
-  buildSearchBlocks: (hits: SearchHit[]) => SearchBlock[];
-}
-
 interface LayerBlockDef {
   key: string;
+  layer: TokenLayer;
   title: string;
   variant: SearchBlock['variant'];
-  layer: TokenLayer;
-}
-
-function byLayer(defs: LayerBlockDef[]): (hits: SearchHit[]) => SearchBlock[] {
-  return hits => defs
-    .map(({ key, title, variant, layer }) => ({
-      key,
-      title,
-      variant,
-      hits: hits.filter(hit => hit.group.layer === layer),
-    }))
-    .filter(block => block.hits.length > 0);
 }
 
 function byGroup(hits: SearchHit[]): SearchBlock[] {
@@ -78,6 +67,18 @@ function byGroup(hits: SearchHit[]): SearchBlock[] {
   return [...buckets.values()];
 }
 
+function byLayer(defs: LayerBlockDef[]): (hits: SearchHit[]) => SearchBlock[] {
+  return hits =>
+    defs
+      .map(({ key, title, variant, layer }) => ({
+        key,
+        title,
+        variant,
+        hits: hits.filter(hit => hit.group.layer === layer),
+      }))
+      .filter(block => block.hits.length > 0);
+}
+
 const radiusScaleGroups = radiusGroups.filter(group => group.layer === 'scale');
 const radiusSemanticGroups = radiusGroups.filter(group => group.layer === 'semantic');
 
@@ -85,7 +86,7 @@ export const viewConfig: Record<PaletteView, ViewConfig> = {
   color: {
     label: '颜色',
     title: 'BKMS 主题色板',
-    description: '源自 <code>color.css</code>。点色块复制色值，悬停可复制 <code>var()</code>。',
+    description: '源自 color.css。点色块复制色值，悬停可复制 var()。',
     searchPlaceholder: '搜索 token 名 / 用途 / 分组，或输入颜色值（hex / rgb / hsl）',
     searchEmptyHint: '换个关键字，或试试 hex / rgb() / hsl() 颜色值',
     groups: [...rampGroups, ...allSemanticGroups],
@@ -101,7 +102,7 @@ export const viewConfig: Record<PaletteView, ViewConfig> = {
   radius: {
     label: '圆角',
     title: 'BKMS 圆角令牌',
-    description: '源自 <code>radius.css</code>。点卡片复制半径，悬停可复制 <code>var()</code>。',
+    description: '源自 radius.css。点卡片复制半径，悬停可复制 var()。',
     searchPlaceholder: '搜索档位 / 用途 / 分组，或输入半径值（如 6px）',
     searchEmptyHint: '换个关键字，或试试档位名 / 半径值（如 6px）',
     groups: radiusGroups,
@@ -117,7 +118,7 @@ export const viewConfig: Record<PaletteView, ViewConfig> = {
   viz: {
     label: '可视化',
     title: 'BKMS 可视化字典',
-    description: '源自 <code>viz.css</code>。按语义看小样，点卡片复制色值，悬停可复制 <code>var()</code>。',
+    description: '源自 viz.css。按语义看小样，点卡片复制色值，悬停可复制 var()。',
     searchPlaceholder: '搜索 token 名 / 用途 / 分组，或输入颜色值（hex / rgb / hsl）',
     searchEmptyHint: '换个关键字，或试试 hex / rgb() / hsl() 颜色值',
     groups: vizGroups,
@@ -128,8 +129,8 @@ export const viewConfig: Record<PaletteView, ViewConfig> = {
     label: '组件预览',
     title: 'BKMS 组件预览',
     description: '在独立上下文中预览业务组件，mock 不会污染主应用。',
-    searchPlaceholder: '',
-    searchEmptyHint: '',
+    searchPlaceholder: '搜索组件名，如 content / table',
+    searchEmptyHint: '换个关键字，或清空搜索查看全部组件',
     groups: [],
     sections: [{ label: '业务组件', groups: componentNavItems }],
     buildSearchBlocks: () => [],

@@ -153,4 +153,16 @@ export default [
       'theme/no-stacked-radius': 'off',
     },
   },
+  // dev/palette 是独立工具，不在根 tsconfig 的 include 范围内，类型感知解析会报
+  // "was not found by the project service"；改用它自己的 tsconfig 提供类型信息
+  {
+    files: ['dev/palette/**/*.{ts,mts,cts,tsx}'],
+    languageOptions: {
+      parserOptions: {
+        projectService: false,
+        project: ['./dev/palette/tsconfig.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
 ];

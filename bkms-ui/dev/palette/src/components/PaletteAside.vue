@@ -22,6 +22,7 @@
     :class="{ 'is-collapsed': collapsed }"
   >
     <PaletteSidebar
+      ref="sidebarRef"
       :active-id="activeId"
       :description="description"
       :sections="sections"
@@ -39,6 +40,8 @@
 </template>
 
 <script setup lang="ts">
+  import { ref } from 'vue';
+
   import PaletteSidebar from './PaletteSidebar.vue';
 
   import type { SidebarSection } from '../config';
@@ -52,19 +55,27 @@
   }>();
 
   const emit = defineEmits<{ navigate: [id: string] }>();
+
+  const sidebarRef = ref<InstanceType<typeof PaletteSidebar> | null>(null);
+
+  /** 透传侧栏的条目定位能力，供上层在搜索结果跳转后同步滚动 */
+  defineExpose({ scrollToItem: (id: string) => sidebarRef.value?.scrollToItem(id) });
 </script>
 
 <style scoped>
+  /* 侧栏本身不滚动：标题区固定，仅内部列表 .palette-nav 滚动 */
   .palette-aside {
     position: sticky;
     top: 0;
     z-index: 2;
     box-sizing: border-box;
+    display: flex;
     flex: none;
+    flex-direction: column;
     width: 280px;
     height: 100%;
     padding: 28px 16px;
-    overflow: hidden auto;
+    overflow: hidden;
     background: var(--pal-bg-head);
     border-right: 1px solid var(--pal-line);
     transition:
@@ -77,5 +88,13 @@
     padding-right: 0;
     padding-left: 0;
     border-right: none;
+  }
+
+  /* 折叠时保持内容宽度（= 展开态内容宽 280 - 16 * 2）：
+     宽度归零会让列表文字整体折行，条目高度剧变，
+     既造成展开瞬间的抖动，也会让跳转定位算错 */
+  .palette-aside.is-collapsed :deep(.palette-head),
+  .palette-aside.is-collapsed :deep(.palette-nav) {
+    min-width: calc(280px - 16px * 2);
   }
 </style>

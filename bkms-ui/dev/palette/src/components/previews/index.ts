@@ -18,7 +18,6 @@
 
 import type { Component } from 'vue';
 
-import type { Token } from '../../util/tokens';
 import BackgroundPreview from './BackgroundPreview.vue';
 import LinePreview from './LinePreview.vue';
 import RadiusPreview from './RadiusPreview.vue';
@@ -27,9 +26,11 @@ import SwatchPreview from './SwatchPreview.vue';
 import TextPreview from './TextPreview.vue';
 import VizPreview from './VizPreview.vue';
 
+import type { Token } from '../../util/tokens';
+
 interface PreviewRule {
-  match: (token: Token) => boolean;
   component: Component;
+  match: (token: Token) => boolean;
 }
 
 /**

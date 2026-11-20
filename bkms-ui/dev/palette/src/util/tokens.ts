@@ -20,10 +20,14 @@ import colorRaw from '../../../../src/styles/theme/tokens/color.css?raw';
 import radiusRaw from '../../../../src/styles/theme/tokens/radius.css?raw';
 import vizRaw from '../../../../src/styles/theme/tokens/viz.css?raw';
 
-export type TokenKind = 'color' | 'shadow' | 'radius' | 'viz';
-/** 令牌层：色阶原子 / 语义引用。由 token 文件里的 @layer 标记决定，不再靠文件名区分 */
-export type TokenLayer = 'scale' | 'semantic';
-
+export interface Group {
+  id: string;
+  /** 分组名（@group 的值，直接作为展示标题） */
+  label: string;
+  layer: TokenLayer;
+  note: string;
+  tokens: Token[];
+}
 export interface Token {
   group: string;
   kind: TokenKind;
@@ -33,13 +37,14 @@ export interface Token {
   value: string;
 }
 
-export interface Group {
-  id: string;
-  /** 分组名（@group 的值，直接作为展示标题） */
-  label: string;
-  note: string;
-  layer: TokenLayer;
-  tokens: Token[];
+export type TokenKind = 'color' | 'radius' | 'shadow' | 'viz';
+
+/** 令牌层：色阶原子 / 语义引用。由 token 文件里的 @layer 标记决定，不再靠文件名区分 */
+export type TokenLayer = 'scale' | 'semantic';
+
+interface Directive {
+  name: string;
+  value: string;
 }
 
 interface ParsedCss {
@@ -47,55 +52,12 @@ interface ParsedCss {
   tokens: Token[];
 }
 
-interface Directive {
-  name: string;
-  value: string;
-}
-
-/** 块注释拆成 @tag 指令与普通文本：非 @tag 行续写到上一条指令的值（支持多行 @note） */
-function splitDirectives(raw: string): { tags: Directive[]; text: string } {
-  const tags: Directive[] = [];
-  let text = '';
-  let current: Directive | null = null;
-  for (const line of raw.split('\n')) {
-    const content = line.replace(/^\s*\*+\s?/, '').trim();
-    if (!content) continue;
-    const tag = /^@([a-z-]+)(?:\s+([\s\S]*))?$/i.exec(content);
-    if (tag) {
-      current = { name: tag[1].toLowerCase(), value: (tag[2] ?? '').trim() };
-      tags.push(current);
-      continue;
-    }
-    if (current) current.value = `${current.value} ${content}`.trim();
-    else text = `${text} ${content}`.trim();
-  }
-  return { tags, text };
-}
-
-/**
- * 解析 CSS，注释约定（CSS 不识别 @tag，本工具自行解析）：
- * - 组标记块：\/**
- *     @group brand            分组名，开组（同时也是展示标题）
- *     @layer scale            所属层：scale（色阶原子）| semantic（语义引用），必填
- *     @note 描述文字           分组描述，可多行续写（@description 同义）
- *   *\/
- * - 闭组标识：\/* @endgroup *\/
- * - 变量说明：\/** 用途 *\/ 作为下一条变量的 note（原有格式）
- * - 分组只认 @group：普通单行注释一律当备注，不会隐式建组
- * - 容错：组外声明归入「未分组」；声明同行尾注释挂到该 token 的 note；非 @tag 多行块注释兜底为组描述
- */
-/** @layer 是色阶区/语义区的唯一依据：缺失或拼错会让该组无处归位，直接报错而不是静默丢组 */
-function toLayer(label: string, raw: string): TokenLayer {
-  if (raw === 'scale' || raw === 'semantic') return raw;
-  throw new Error(`[palette] 分组「${label}」的 @layer 必须是 scale 或 semantic，当前为：${raw || '(缺失)'}`);
-}
-
-export function parse(css: string, prefix: string, kindOverride: TokenKind | null = null): ParsedCss {
+export function parse(css: string, prefix: string, kindOverride: null | TokenKind = null): ParsedCss {
   const tokens: Token[] = [];
   const groups: Group[] = [];
   let group: Group | null = null;
   let note = '';
-  let lastToken: Token | null = null;
+  let lastToken: null | Token = null;
 
   const addGroup = (name: string, groupNote: string, layer: TokenLayer): Group => {
     group = { id: `${prefix}-${groups.length + 1}`, label: name, note: groupNote, layer, tokens: [] };
@@ -164,7 +126,7 @@ export function parse(css: string, prefix: string, kindOverride: TokenKind | nul
     note = '';
   }
 
-  let block: string[] | null = null;
+  let block: null | string[] = null;
   let blockJsdoc = false;
   for (const line of css.split('\n')) {
     if (block) {
@@ -197,6 +159,44 @@ export function parse(css: string, prefix: string, kindOverride: TokenKind | nul
     if (rest) handleDecl(rest);
   }
   return { tokens, groups: groups.filter(group => group.tokens.length > 0) };
+}
+
+/** 块注释拆成 @tag 指令与普通文本：非 @tag 行续写到上一条指令的值（支持多行 @note） */
+function splitDirectives(raw: string): { tags: Directive[]; text: string } {
+  const tags: Directive[] = [];
+  let text = '';
+  let current: Directive | null = null;
+  for (const line of raw.split('\n')) {
+    const content = line.replace(/^\s*\*+\s?/, '').trim();
+    if (!content) continue;
+    const tag = /^@([a-z-]+)(?:\s+([\s\S]*))?$/i.exec(content);
+    if (tag) {
+      current = { name: tag[1].toLowerCase(), value: (tag[2] ?? '').trim() };
+      tags.push(current);
+      continue;
+    }
+    if (current) current.value = `${current.value} ${content}`.trim();
+    else text = `${text} ${content}`.trim();
+  }
+  return { tags, text };
+}
+
+/**
+ * 解析 CSS，注释约定（CSS 不识别 @tag，本工具自行解析）：
+ * - 组标记块：\/**
+ *     @group brand            分组名，开组（同时也是展示标题）
+ *     @layer scale            所属层：scale（色阶原子）| semantic（语义引用），必填
+ *     @note 描述文字           分组描述，可多行续写（@description 同义）
+ *   *\/
+ * - 闭组标识：\/* @endgroup *\/
+ * - 变量说明：\/** 用途 *\/ 作为下一条变量的 note（原有格式）
+ * - 分组只认 @group：普通单行注释一律当备注，不会隐式建组
+ * - 容错：组外声明归入「未分组」；声明同行尾注释挂到该 token 的 note；非 @tag 多行块注释兜底为组描述
+ */
+/** @layer 是色阶区/语义区的唯一依据：缺失或拼错会让该组无处归位，直接报错而不是静默丢组 */
+function toLayer(label: string, raw: string): TokenLayer {
+  if (raw === 'scale' || raw === 'semantic') return raw;
+  throw new Error(`[palette] 分组「${label}」的 @layer 必须是 scale 或 semantic，当前为：${raw || '(缺失)'}`);
 }
 
 const colorFile = parse(colorRaw, 'ramp');

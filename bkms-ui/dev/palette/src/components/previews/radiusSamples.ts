@@ -48,7 +48,7 @@ const radiusSampleMap: Record<string, RadiusSample> = {
  * @param name 令牌名，如 `--bkms-radius-field`
  * @returns 命中的小样标识；尺度档令牌（`--bkms-radius-md` 等）与未知语义返回 null
  */
-export function radiusSampleOf(name: string): RadiusSample | null {
+export function radiusSampleOf(name: string): null | RadiusSample {
   const key = /^--bkms-radius-(.+)$/.exec(name)?.[1];
   if (!key) return null;
   return radiusSampleMap[key] ?? null;

@@ -17,10 +17,7 @@
 -->
 
 <template>
-  <div
-    class="search-bar"
-    :class="{ 'is-compact': compact }"
-  >
+  <div class="search-bar">
     <span class="search-icon">⌕</span>
     <input
       aria-label="搜索令牌"
@@ -44,33 +41,32 @@
 </template>
 
 <script setup lang="ts">
-  defineProps<{ compact?: boolean; modelValue: string; placeholder?: string }>();
+  defineProps<{ modelValue: string; placeholder?: string }>();
   const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
 </script>
 
 <style scoped>
+  /* 窄屏退回工具栏的 flex 布局，此时由剩余空间决定宽度 */
+  @media (width <= 1253px) {
+    .search-bar {
+      flex: 1 1 auto;
+      width: auto;
+    }
+  }
+
+  /* 位于工具栏网格的中间列，宽度由列决定，因此中心与工具栏中心重合 */
   .search-bar {
-    position: fixed;
-    top: 18px;
-    left: calc(50% + 110px);
-    z-index: 45;
     box-sizing: border-box;
     display: flex;
     gap: 8px;
     align-items: center;
-    width: min(680px, 64vw);
+    width: 100%;
+    min-width: 0;
     padding: 12px 18px;
     background: var(--pal-bg-card);
     border: 1px solid var(--pal-line);
     border-radius: 24px;
     box-shadow: 0 4px 16px var(--pal-shadow-popover);
-    transform: translateX(-50%);
-    transition: left 0.3s ease;
-  }
-
-  /* 侧栏因搜索收起后回到视口居中 */
-  .search-bar.is-compact {
-    left: 50%;
   }
 
   .search-icon {

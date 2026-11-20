@@ -20,8 +20,8 @@
  * CIEDE2000 色差计算，按 ISO/CIE 标准公式实现，供色值建议工具（theme-lint / dev/palette）使用。
  */
 
-function srgbToLinear(value: number): number {
-  return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+function labOf(hex: string): [number, number, number] {
+  return xyzToLab(rgbToXyz(hex));
 }
 
 function rgbToXyz(hex: string): [number, number, number] {
@@ -35,6 +35,10 @@ function rgbToXyz(hex: string): [number, number, number] {
   ];
 }
 
+function srgbToLinear(value: number): number {
+  return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+}
+
 function xyzToLab([x, y, z]: [number, number, number]): [number, number, number] {
   const f = (t: number) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
   const fx = f(x);
@@ -43,30 +47,7 @@ function xyzToLab([x, y, z]: [number, number, number]): [number, number, number]
   return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
 }
 
-function labOf(hex: string): [number, number, number] {
-  return xyzToLab(rgbToXyz(hex));
-}
-
 const DEG = 180 / Math.PI;
-
-function hueDeg(a: number, b: number): number {
-  if (a === 0 && b === 0) return 0;
-  const deg = Math.atan2(b, a) * DEG;
-  return deg >= 0 ? deg : deg + 360;
-}
-
-function deltaHue(h1: number, h2: number, c1: number, c2: number): number {
-  if (c1 * c2 === 0) return 0;
-  const diff = h2 - h1;
-  if (Math.abs(diff) <= 180) return diff;
-  return diff > 180 ? diff - 360 : diff + 360;
-}
-
-function meanHue(h1: number, h2: number, c1: number, c2: number): number {
-  if (c1 * c2 === 0) return h1 + h2;
-  if (Math.abs(h1 - h2) <= 180) return (h1 + h2) / 2;
-  return h1 + h2 < 360 ? (h1 + h2 + 360) / 2 : (h1 + h2 - 360) / 2;
-}
 
 /** 两色 CIEDE2000 色差（ΔE00），相同颜色返回 0；入参经 normalizeHex 展开短写，无法解析返回 NaN */
 export function deltaE(hexA: string, hexB: string): number {
@@ -111,54 +92,7 @@ export function deltaE(hexA: string, hexB: string): number {
   const sh = 1 + 0.015 * cBarP * t;
   const rt = -Math.sin((2 * dTheta) / DEG) * rc;
 
-  return Math.sqrt(
-    (dLp / sl) ** 2 +
-      (dCp / sc) ** 2 +
-      (dHp / sh) ** 2 +
-      rt * (dCp / sc) * (dHp / sh),
-  );
-}
-
-function toHex(channels: number[]): string {
-  return `#${channels
-    .map(channel => Math.round(Math.min(255, Math.max(0, channel))).toString(16).padStart(2, '0'))
-    .join('')
-    .toUpperCase()}`;
-}
-
-function hslToRgb(h: number, s: number, l: number): number[] {
-  const sat = Math.min(1, Math.max(0, s));
-  const lig = Math.min(1, Math.max(0, l));
-  const c = (1 - Math.abs(2 * lig - 1)) * sat;
-  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-  const m = lig - c / 2;
-  const sector = Math.floor(((h % 360) + 360) % 360 / 60);
-  const table = [
-    [c, x, 0],
-    [x, c, 0],
-    [0, c, x],
-    [0, x, c],
-    [x, 0, c],
-    [c, 0, x],
-  ];
-  return table[sector].map(channel => (channel + m) * 255);
-}
-
-/** alpha 合成到白底：阴影只靠 alpha 区分，截断 alpha 会让色差恒为 0 */
-function flattenAlpha(hex6: string, alpha: number): string {
-  if (!(alpha >= 0 && alpha < 1)) return hex6;
-  const channels = [0, 1, 2].map(index => {
-    const channel = Number.parseInt(hex6.slice(1 + index * 2, 3 + index * 2), 16);
-    return channel * alpha + 255 * (1 - alpha);
-  });
-  return toHex(channels);
-}
-
-function parseAlpha(part: string | undefined): number {
-  if (!part) return 1;
-  const value = Number.parseFloat(part);
-  if (!Number.isFinite(value)) return 1;
-  return part.endsWith('%') ? value / 100 : value;
+  return Math.sqrt((dLp / sl) ** 2 + (dCp / sc) ** 2 + (dHp / sh) ** 2 + rt * (dCp / sc) * (dHp / sh));
 }
 
 /** 归一化输入：hex / rgb() / rgba() / hsl() / hsla() → 大写 6 位 hex（带 alpha 的合成到白底）；无法识别返回 null */
@@ -191,4 +125,69 @@ export function normalizeHex(input: string): null | string {
   });
   if (channels.some(Number.isNaN)) return null;
   return flattenAlpha(toHex(channels), parseAlpha(parts[3]));
+}
+
+function deltaHue(h1: number, h2: number, c1: number, c2: number): number {
+  if (c1 * c2 === 0) return 0;
+  const diff = h2 - h1;
+  if (Math.abs(diff) <= 180) return diff;
+  return diff > 180 ? diff - 360 : diff + 360;
+}
+
+/** alpha 合成到白底：阴影只靠 alpha 区分，截断 alpha 会让色差恒为 0 */
+function flattenAlpha(hex6: string, alpha: number): string {
+  if (!(alpha >= 0 && alpha < 1)) return hex6;
+  const channels = [0, 1, 2].map(index => {
+    const channel = Number.parseInt(hex6.slice(1 + index * 2, 3 + index * 2), 16);
+    return channel * alpha + 255 * (1 - alpha);
+  });
+  return toHex(channels);
+}
+
+function hslToRgb(h: number, s: number, l: number): number[] {
+  const sat = Math.min(1, Math.max(0, s));
+  const lig = Math.min(1, Math.max(0, l));
+  const c = (1 - Math.abs(2 * lig - 1)) * sat;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = lig - c / 2;
+  const sector = Math.floor((((h % 360) + 360) % 360) / 60);
+  const table = [
+    [c, x, 0],
+    [x, c, 0],
+    [0, c, x],
+    [0, x, c],
+    [x, 0, c],
+    [c, 0, x],
+  ];
+  return table[sector].map(channel => (channel + m) * 255);
+}
+
+function hueDeg(a: number, b: number): number {
+  if (a === 0 && b === 0) return 0;
+  const deg = Math.atan2(b, a) * DEG;
+  return deg >= 0 ? deg : deg + 360;
+}
+
+function meanHue(h1: number, h2: number, c1: number, c2: number): number {
+  if (c1 * c2 === 0) return h1 + h2;
+  if (Math.abs(h1 - h2) <= 180) return (h1 + h2) / 2;
+  return h1 + h2 < 360 ? (h1 + h2 + 360) / 2 : (h1 + h2 - 360) / 2;
+}
+
+function parseAlpha(part: string | undefined): number {
+  if (!part) return 1;
+  const value = Number.parseFloat(part);
+  if (!Number.isFinite(value)) return 1;
+  return part.endsWith('%') ? value / 100 : value;
+}
+
+function toHex(channels: number[]): string {
+  return `#${channels
+    .map(channel =>
+      Math.round(Math.min(255, Math.max(0, channel)))
+        .toString(16)
+        .padStart(2, '0'),
+    )
+    .join('')
+    .toUpperCase()}`;
 }

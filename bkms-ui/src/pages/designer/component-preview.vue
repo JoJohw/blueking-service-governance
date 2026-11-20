@@ -232,6 +232,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
+    padding: 16px;
     font:
       13px/1.6 -apple-system,
       'Segoe UI',
@@ -239,11 +240,15 @@
     color: #1f2937;
   }
 
+  /* 占满可用空间，仅用最大尺寸兜住超宽/超高屏幕；
+     此前固定 50% × 50%，小屏下画布被压到几十像素，卡片内容互相挤压 */
   .preview-layout {
     box-sizing: border-box;
     display: flex;
-    width: 50%;
-    height: 50%;
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    max-height: 800px;
   }
 
   .preview-stage {
@@ -323,6 +328,12 @@
   .preview-canvas-split {
     gap: 16px;
     align-items: stretch;
+    overflow-x: auto;
+  }
+
+  /* 并排展示时给卡片兜底最小宽度：窄屏下宁可横向滚动，也不把组件压到无法阅读 */
+  .preview-canvas-split > :deep(*) {
+    min-width: 280px;
   }
 
   .empty-hint {

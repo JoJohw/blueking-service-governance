@@ -39,15 +39,15 @@ const prefixRules: [RegExp, VizSample][] = [
 /** 8 色分类色带，顺序与 viz.css 的 series 档一致 */
 export const VIZ_SERIES_NAMES = Array.from({ length: 8 }, (_, index) => `--bkms-viz-series-${index + 1}`);
 
+/** 分类色在 viz.css 里标了 @viz-locked：任何主题下都不漂移 */
+export function isVizLocked(name: string): boolean {
+  return /^--bkms-viz-series-\d+$/.test(name);
+}
+
 /**
  * 取可视化令牌的语义小样标识。
  * @param name 令牌名，如 `--bkms-viz-status-healthy`
  */
-export function vizSampleOf(name: string): VizSample | null {
+export function vizSampleOf(name: string): null | VizSample {
   return prefixRules.find(([re]) => re.test(name))?.[1] ?? null;
-}
-
-/** 分类色在 viz.css 里标了 @viz-locked：任何主题下都不漂移 */
-export function isVizLocked(name: string): boolean {
-  return /^--bkms-viz-series-\d+$/.test(name);
 }

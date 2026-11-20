@@ -19,11 +19,17 @@
 <template>
   <div
     class="palette"
-    :class="{ 'is-focus': isFocus, 'is-searching': isSearching, 'is-component': viewMode === 'component' }"
+    :class="{
+      'is-aside-collapsed': isAsideCollapsed,
+      'is-component': viewMode === 'component',
+      'is-focus': isFocus,
+      'is-searching': isSearching,
+    }"
   >
     <PaletteAside
+      ref="asideRef"
       :active-id="sidebarActiveId"
-      :collapsed="isFocus || isSearching"
+      :collapsed="isAsideCollapsed"
       :description="sidebarDescription"
       :sections="sidebarSections"
       :title="viewTitle"
@@ -48,19 +54,26 @@
           @change="switchView"
         />
         <SearchBar
-          v-if="!isFocus && viewMode !== 'component'"
+          v-if="!isFocus"
           v-model="searchQuery"
-          :compact="isSearching"
           :placeholder="searchPlaceholder"
         />
       </div>
 
       <SearchResults
-        v-if="isSearching"
+        v-if="isSearching && viewMode !== 'component'"
         :blocks="searchBlocks"
         :empty-hint="searchEmptyHint"
         @clear="searchQuery = ''"
         @copy="copy"
+      />
+
+      <ComponentSearchResults
+        v-if="isSearching && viewMode === 'component'"
+        :empty-hint="searchEmptyHint"
+        :hits="componentSearchHits"
+        @clear="searchQuery = ''"
+        @select="selectComponent"
       />
 
       <RouterView
@@ -103,6 +116,7 @@
   import { useRoute, useRouter } from 'vue-router';
 
   import AdvisorFab from './components/AdvisorFab.vue';
+  import ComponentSearchResults from './components/ComponentSearchResults.vue';
   import ComponentSort from './components/ComponentSort.vue';
   import PaletteAside from './components/PaletteAside.vue';
   import SearchBar from './components/SearchBar.vue';
@@ -110,7 +124,7 @@
   import Toast from './components/Toast.vue';
   import ViewTabs from './components/ViewTabs.vue';
   import { viewConfig, viewTabs } from './config';
-  import { type ComponentSortMode, componentNavItems, sortByUsage } from './config/components';
+  import { type ComponentSortMode, componentNavItems, matchComponents, sortByUsage } from './config/components';
   import ColorPage from './pages/ColorPage.vue';
   import ComponentPage from './pages/ComponentPage.vue';
   import RadiusPage from './pages/RadiusPage.vue';
@@ -147,6 +161,9 @@
   const activeConfig = computed(() => viewConfig[viewMode.value]);
   const viewTitle = computed(() => activeConfig.value.title);
   const sidebarDescription = computed(() => activeConfig.value.description);
+  const asideRef = ref<InstanceType<typeof PaletteAside> | null>(null);
+  const searchQuery = ref('');
+  const isSearching = computed(() => searchQuery.value.trim().length > 0);
   const componentSort = ref<ComponentSortMode>('default');
   const sidebarSections = computed(() => {
     if (viewMode.value === 'component' && !slots['component-preview']) return [];
@@ -156,6 +173,11 @@
       groups: sortByUsage(section.groups, componentSort.value),
     }));
   });
+
+  /** 组件预览没有 token 概念，按组件 id / 名称匹配，结果由独立结果页渲染 */
+  const componentSearchHits = computed(() =>
+    sortByUsage(matchComponents(componentNavItems, searchQuery.value), componentSort.value),
+  );
 
   const activeId = ref('');
 
@@ -173,13 +195,12 @@
   let clickLockId = '';
 
   const copied = ref('');
-  const searchQuery = ref('');
-  const isSearching = computed(() => searchQuery.value.trim().length > 0);
   const searchHits = computed(() => searchTokens(allGroups.value, searchQuery.value));
   const searchBlocks = computed(() => activeConfig.value.buildSearchBlocks(searchHits.value));
   const searchPlaceholder = computed(() => activeConfig.value.searchPlaceholder);
   const searchEmptyHint = computed(() => activeConfig.value.searchEmptyHint);
   let copyTimer = 0;
+  let scrollTimer = 0;
 
   function copy(text: string): void {
     navigator.clipboard?.writeText(text).catch(() => {});
@@ -192,6 +213,8 @@
 
   const focusId = ref<null | string>(null);
   const isFocus = computed(() => focusId.value !== null);
+  /** 聚焦或搜索时收起侧栏，主区域全屏展示结果，各视图行为一致 */
+  const isAsideCollapsed = computed(() => isFocus.value || isSearching.value);
   let scrollBeforeFocus = 0;
 
   /** 取顶部距容器上沿最近的分组；已到底部时取末尾分组（末尾分组无法滚到上沿） */
@@ -234,9 +257,6 @@
     activeId.value = computeActive();
   }
 
-  if (router) router.isReady().then(readFocus);
-  else readFocus();
-
   function readFocus(): void {
     const label = route?.query.focus;
     if (typeof label !== 'string' || !label) return;
@@ -255,6 +275,9 @@
     focusId.value = group.id;
   }
 
+  if (router) router.isReady().then(readFocus);
+  else readFocus();
+
   function scrollTo(id: string): void {
     const container = mainRef.value;
     const target = document.getElementById(id);
@@ -262,6 +285,16 @@
     clickLockId = id;
     activeId.value = id;
     container.scrollTo({ top: target.offsetTop - container.offsetTop, behavior: 'smooth' });
+  }
+
+  /** 组件搜索结果点击：切到该组件、退出搜索态，并让侧栏同步滚到该项 */
+  async function selectComponent(id: string): Promise<void> {
+    navigate(id);
+    searchQuery.value = '';
+    await nextTick();
+    // 侧栏展开有 0.3s 过渡，须等布局稳定后再定位，否则可用高度仍在变化，滚动量会算偏
+    window.clearTimeout(scrollTimer);
+    scrollTimer = window.setTimeout(() => asideRef.value?.scrollToItem(id), 320);
   }
 
   async function switchView(mode: PaletteView): Promise<void> {
@@ -318,6 +351,7 @@
 
   onBeforeUnmount(() => {
     window.clearTimeout(copyTimer);
+    window.clearTimeout(scrollTimer);
     mainRef.value?.removeEventListener('scroll', onScroll);
     mainRef.value?.removeEventListener('wheel', onUserScroll);
     mainRef.value?.removeEventListener('touchmove', onUserScroll);
