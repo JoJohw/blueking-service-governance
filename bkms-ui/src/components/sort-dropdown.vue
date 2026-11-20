@@ -102,7 +102,14 @@
         :class="{ 'is-open': isOpen }"
       >
         <span class="inline-flex items-center min-w-0">
-          <span class="mr-[8px]">{{ currentOption?.label }}</span>
+          <span class="mr-[8px]">
+            <slot
+              :label="currentOption?.label"
+              name="option-label"
+              :option="currentOption"
+              >{{ currentOption?.label }}</slot
+            >
+          </span>
           <span
             class="bkms-sort-tag bkms-sort-trigger-tag"
             @click.stop="toggleOrder(modelValue)"

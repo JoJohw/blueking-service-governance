@@ -126,44 +126,21 @@
             </div>
           </Select>
         </div>
-        <div class="monitor-ranking flex flex-wrap items-center max-w-full gap-y-[8px]">
-          <div class="flex items-center">
-            <span class="monitor-ranking-label">
-              {{ $t('排序') }}
-              <i
-                v-bk-tooltips="rankingTooltip"
-                :aria-label="rankingTooltip"
-                class="bkms-icon bkms-icon-help-document bkms-text-secondary ml-[4px]"
-                role="img"
-              />
-            </span>
-            <Select
-              v-model="rankBy"
-              class="monitor-ranking-metric flex-shrink-0"
-              :clearable="false"
-            >
-              <Select.Option
-                v-for="column in rankColumns"
-                :id="column.key"
-                :key="column.key"
-                :name="t(column.metricLabel)"
-              />
-            </Select>
-          </div>
-          <Select
-            v-model="rankType"
-            class="monitor-ranking-direction flex-shrink-0"
-            :clearable="false"
+        <div class="monitor-ranking flex flex-wrap items-center max-w-full gap-x-[8px] gap-y-[8px]">
+          <SortDropdown
+            v-model="rankBy"
+            v-model:order="rankOrder"
+            :options="rankSortOptions"
           >
-            <Select.Option
-              id="top"
-              :name="$t('降序')"
-            />
-            <Select.Option
-              id="bottom"
-              :name="$t('升序')"
-            />
-          </Select>
+            <template #option-label="{ label, option }">
+              <UnderLineTips
+                :aria-label="option ? getRankingTooltip(option.value) : ''"
+                :description="option ? getRankingTooltip(option.value) : ''"
+              >
+                {{ label }}
+              </UnderLineTips>
+            </template>
+          </SortDropdown>
           <div class="flex items-center">
             <span class="monitor-ranking-label">Limit</span>
             <!-- 数字步进按钮通过 change 提交，即使输入框未获得焦点。 -->
@@ -416,6 +393,8 @@
   import { ceil, debounce } from 'lodash-es';
   import { useI18n } from 'vue-i18n';
   import IntervalSelector from '~/components/interval-selector.vue';
+  import SortDropdown from '~/components/sort-dropdown.vue';
+  import UnderLineTips from '~/components/under-line-tips.vue';
   import useInterval from '~/composables/use-interval';
   import {
     fetchRankedMonitorInstances,
@@ -438,6 +417,7 @@
   import type { DateValue } from '@blueking/date-picker';
   import type { Dayjs } from 'dayjs';
   import type { TimeSeriesItem } from '~/@types/v1/bkintegrations-bkmonitor';
+  import type { ISortOption, SortOrder } from '~/components/sort-dropdown.vue';
 
   import '@blueking/date-picker/vue3/vue3.css';
 
@@ -627,24 +607,36 @@
   ] as const;
   const rankBy = ref<MonitorRankBy>(DEFAULT_RANK_BY);
   const rankType = ref<'bottom' | 'top'>('top');
+  const rankSortOptions: ISortOption<MonitorRankBy>[] = rankColumns.map(column => ({
+    label: t(column.metricLabel),
+    value: column.key,
+    ascName: t('升序'),
+    descName: t('降序'),
+  }));
+  const rankOrder = computed<SortOrder>({
+    get: () => (rankType.value === 'top' ? 'desc' : 'asc'),
+    set: order => {
+      rankType.value = order === 'desc' ? 'top' : 'bottom';
+    },
+  });
   const methodOptions = ['sum', 'max', 'min', 'count', 'avg'] as const;
   const method = ref<(typeof methodOptions)[number]>('sum');
   const rankDirectionLabel = computed(() => t(rankType.value === 'top' ? '降序' : '升序'));
   const rankingColumnTooltip = computed(() => t('排名值为所选时段内 {0} 汇聚结果的均值', [method.value.toUpperCase()]));
-  const rankingTooltip = computed(() => {
-    const metric = rankColumns.find(column => column.key === rankBy.value);
-    return t('所有图表按「{0}」的 {1} 汇聚结果在所选时段内的均值{2}，取前 {3} 个实例', [
-      t(metric?.metricLabel ?? 'CPU 使用率'),
-      method.value.toUpperCase(),
-      rankDirectionLabel.value,
-      committedLimit.value,
-    ]);
-  });
-
   interface TreeNodeData {
     children?: TreeNodeData[];
     id: string;
     name: string;
+  }
+
+  function getRankingTooltip(metric: MonitorRankBy) {
+    const column = rankColumns.find(column => column.key === metric);
+    return t('所有图表按「{0}」的 {1} 汇聚结果在所选时段内的均值{2}，取前 {3} 个实例', [
+      t(column?.metricLabel ?? 'CPU 使用率'),
+      method.value.toUpperCase(),
+      rankDirectionLabel.value,
+      committedLimit.value,
+    ]);
   }
 
   function sortByColumn(key: MonitorRankBy) {
@@ -1176,14 +1168,6 @@
     border-color: var(--bkms-navy-5);
 
     @apply flex h-[32px] shrink-0 items-center whitespace-nowrap b b-r-0 px-[6px] text-[12px];
-  }
-
-  .monitor-ranking-metric {
-    width: 128px;
-  }
-
-  .monitor-ranking-direction {
-    width: 112px;
   }
 
   .monitor-ranking-limit {
