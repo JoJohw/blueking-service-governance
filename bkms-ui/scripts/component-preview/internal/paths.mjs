@@ -25,7 +25,12 @@ const MODULE_ROOT = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(MODULE_ROOT, '../../..');
 export const SRC_DIR = path.join(ROOT, 'src');
 export const COMPONENTS_DIR = path.join(SRC_DIR, 'components');
-export const OUTPUT = path.join(SRC_DIR, 'pages/designer/component-catalog.generated.js');
+/** 生成产物统一目录：目录内文件默认忽略，只有同名 d.ts（手工维护的类型声明）入库 */
+export const GENERATED_DIR = path.join(SRC_DIR, 'pages/designer/generated');
+export const OUTPUT = path.join(GENERATED_DIR, 'component-catalog.js');
+export const API_MODULES_DIR = path.join(SRC_DIR, 'api/modules');
+/** 接口 mock 样例产物：预览环境按 url 模板命中后返回，代替原先一律返回 [] */
+export const API_MOCK_OUTPUT = path.join(GENERATED_DIR, 'api-mock.json');
 export const CACHE = path.join(ROOT, 'node_modules/.cache/component-preview-cache.json');
 /** 生成器目录（internal 的上一层）：缓存签名要覆盖 internal/ 与配置文件的 mtime */
 export const MODULE_DIR = path.resolve(MODULE_ROOT, '..');

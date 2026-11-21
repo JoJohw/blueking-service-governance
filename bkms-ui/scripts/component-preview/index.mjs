@@ -25,23 +25,27 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { collectApiMocks, walk, writeApiMock } from './internal/api-mock.mjs';
 import { readCache, signatureOf, writeCache } from './internal/cache.mjs';
 import { buildCatalog, collectUsageSources, writeCatalog } from './internal/catalog.mjs';
-import { OUTPUT, ROOT } from './internal/paths.mjs';
+import { API_MOCK_OUTPUT, API_MODULES_DIR, OUTPUT, ROOT } from './internal/paths.mjs';
 
 function main() {
   try {
     const usageSources = collectUsageSources();
-    const signature = signatureOf(usageSources.map(source => source.file));
+    const apiModules = walk(API_MODULES_DIR).filter(file => file.endsWith('.ts'));
+    const signature = signatureOf([...usageSources.map(source => source.file), ...apiModules]);
     const cached = readCache();
-    if (cached === signature && fs.existsSync(OUTPUT)) {
+    if (cached === signature && fs.existsSync(OUTPUT) && fs.existsSync(API_MOCK_OUTPUT)) {
       console.log('[component-preview] 无变更，跳过生成');
       return;
     }
     const catalog = buildCatalog(usageSources);
     writeCatalog(catalog);
+    const mockCount = writeApiMock(collectApiMocks(API_MODULES_DIR), API_MOCK_OUTPUT);
     writeCache(signature);
     console.log(`[component-preview] 已生成 ${catalog.length} 个组件条目 -> ${path.relative(ROOT, OUTPUT)}`);
+    console.log(`[component-preview] 已生成 ${mockCount} 条接口样例 -> ${path.relative(ROOT, API_MOCK_OUTPUT)}`);
   } catch (error) {
     console.error(
       `[component-preview] 生成失败，写入空清单: ${error instanceof Error ? error.message : String(error)}`,
@@ -51,6 +55,12 @@ function main() {
       writeCatalog([]);
     } catch {
       // 连空清单都写不出时，保持上一次产物不动，避免破坏构建
+    }
+    try {
+      // 样例表同样不入库，缺失会让 preview 里的 JSON import 直接编译失败，必须留一份空表兜底
+      writeApiMock([], API_MOCK_OUTPUT);
+    } catch {
+      // 写入空表也失败时，只能依赖上一次产物
     }
   }
 }

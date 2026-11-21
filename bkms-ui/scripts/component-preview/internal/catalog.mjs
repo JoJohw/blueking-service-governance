@@ -24,10 +24,21 @@ import path from 'node:path';
 
 import { CONFIG } from '../component-preview.config.mjs';
 import { COMPONENTS_DIR, OUTPUT, SCRIPT_NAME, SRC_DIR } from './paths.mjs';
-import { generatePlaceholder } from './props.mjs';
+import { analyzeProps } from './props.mjs';
 import { extractFallbackSlots, extractSlots, findVisibilityProp, needsFormContext } from './slots.mjs';
 
-const { ignoreIds, minUsageToInclude, placeholders, usageExcept, warning } = CONFIG;
+const { ignoreIds, minUsageToInclude, placeholders, plugins = [], usageExcept, warning } = CONFIG;
+const families = new Map(
+  plugins
+    .filter(plugin => plugin.componentFamily)
+    .map(plugin => [plugin.componentFamily.entry, plugin.componentFamily]),
+);
+const slotSamples = new Map(
+  plugins.flatMap(plugin => Object.entries(plugin.slotSamples ?? {})),
+);
+const propOverrides = new Map(
+  plugins.flatMap(plugin => Object.entries(plugin.propOverrides ?? {})),
+);
 
 /**
  * 遍历 components 目录生成清单。单个组件解析失败只跳过它，不中断整批生成。
@@ -49,14 +60,31 @@ export function buildCatalog(usageSources) {
     try {
       const { descriptor } = parse(source);
       if (!descriptor.scriptSetup) continue;
-      const props = generatePlaceholder(descriptor.scriptSetup.content, file);
+      // 普通 <script> 里的接口/别名也可能被 defineProps 引用（如 sort-dropdown 的 SortOrder），
+      // 和 setup 一起解析；generic 属性里的类型参数名交给 props 推导成可读占位。
+      const propScripts = [descriptor.script?.content, descriptor.scriptSetup.content].filter(Boolean).join('\n');
+      const { props: analyzedProps } = analyzeProps(propScripts, file, String(descriptor.scriptSetup.attrs.generic ?? ''));
+      const props = { ...analyzedProps, ...(propOverrides.get(rel) ?? {}) };
+      // 弹层类组件（Dialog/Sideslider）默认收起，由预览页给一个按钮按需打开，
+      // 这里只记录控制显隐的 prop 名；不再把它的值强行改成 true，否则一关就再也打不开。
       const visibilityProp = findVisibilityProp(descriptor);
-      if (visibilityProp && typeof props[visibilityProp] === 'boolean') props[visibilityProp] = true;
+      const overlayProp = visibilityProp && typeof props[visibilityProp] === 'boolean' ? visibilityProp : null;
       const slots = extractSlots(descriptor);
       const fallbackSlots = extractFallbackSlots(descriptor);
       const needsForm = needsFormContext(descriptor);
       const warnings = analyzeWarnings(source);
-      catalog.push({ id: rel, props, slots, fallbackSlots, needsForm, warnings, usage });
+      catalog.push({
+        id: rel,
+        props,
+        visibilityProp: overlayProp,
+        slots,
+        fallbackSlots,
+        needsForm,
+        warnings,
+        usage,
+        ...(families.has(rel) ? { family: families.get(rel) } : {}),
+        ...(slotSamples.has(rel) ? { slotSamples: slotSamples.get(rel) } : {}),
+      });
     } catch (error) {
       console.warn(`[component-preview] 跳过 ${rel}: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -124,6 +152,7 @@ function countUsages(id, sources) {
 
 function serialize(value, indent = 0) {
   if (value === placeholders.fn) return "() => ''";
+  if (typeof value === 'function') return value.toString();
   if (typeof value === 'string') return JSON.stringify(value);
   if (typeof value === 'number' || typeof value === 'boolean' || value === null) return String(value);
   if (Array.isArray(value)) return `[${value.map(item => serialize(item, indent + 2)).join(', ')}]`;

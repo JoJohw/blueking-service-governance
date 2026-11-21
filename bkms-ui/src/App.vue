@@ -176,7 +176,10 @@
   const { platformConfig, getPlatformInfo } = usePlatform();
   const appName = computed(() => platformConfig.i18n.productName);
 
-  const isDesignerFrame = computed(() => route?.name === 'designerFrame');
+  // iframe 首次加载时 route.name 尚未 resolve，先按 router history 的同步位置判断，避免全局 header 一闪而过。
+  // 用 history.location 而非 window.location.hash：SSR/memory history 下同样可用，语义也跟路由一致。
+  const isDesignerFrameLocation = () => /^\/__designer-frame(?:[/?]|$)/.test(router.options.history.location);
+  const isDesignerFrame = computed(() => isDesignerFrameLocation() || route?.name === 'designerFrame');
   // 首页、平台管理和设计工具不展示空间选择器及空间导航
   const isGlobalRoute = computed(
     () =>

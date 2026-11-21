@@ -28,5 +28,7 @@ scripts/theme-lint/reports/*
 .stylelintcache
 .eslintcache
 
-# 组件预览自动生成清单（gen-component-preview.mjs 可重建，类型声明 component-catalog.generated.d.ts 需保留）
-src/pages/designer/component-catalog.generated.js
+# 组件预览自动生成产物（scripts/component-preview 可重建）；目录内只有同名类型声明需入库
+src/pages/designer/generated/*
+!src/pages/designer/generated/component-catalog.d.ts
+!src/pages/designer/generated/api-mock.json.d.ts

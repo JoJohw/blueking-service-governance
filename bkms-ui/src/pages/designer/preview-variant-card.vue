@@ -18,7 +18,7 @@
 
 <template>
   <div
-    class="box-border flex flex-1 flex-col min-w-[0] bkms-bg-card border-[1px] border-bkms-line-default rounded-[8px] overflow-hidden"
+    class="box-border flex flex-1 flex-col min-w-[0] bkms-bg-card border-[1px] border-bkms-line-default rounded-bkms-card overflow-hidden"
   >
     <div
       v-if="title"
@@ -26,7 +26,7 @@
     >
       {{ title }}
     </div>
-    <div class="flex h-[400px] flex-col items-center justify-center overflow-auto p-[16px]">
+    <div class="flex flex-1 flex-col items-center justify-center min-h-[200px] overflow-auto p-[16px]">
       <slot />
     </div>
   </div>
