@@ -49,7 +49,15 @@
         :title="group.id"
         @click="emit('navigate', group.id)"
       >
-        <span class="nav-item-label">{{ group.label }}</span>
+        <span class="nav-item-main">
+          <span class="nav-item-label">{{ group.label }}</span>
+          <span
+            v-if="group.directory"
+            class="nav-item-dir"
+          >
+            {{ group.directory }}
+          </span>
+        </span>
         <span
           v-if="group.usage !== undefined"
           class="nav-usage-tag"
@@ -179,9 +187,27 @@
     border-left-color: var(--pal-brand);
   }
 
+  /* 主名 + 目录两行：index 这类同名条目靠目录区分 */
+  .nav-item-main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
   .nav-item-label {
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nav-item-dir {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 11px;
+    line-height: 1.2;
+    color: var(--pal-text-muted, var(--pal-text-body));
     white-space: nowrap;
   }
 

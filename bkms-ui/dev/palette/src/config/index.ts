@@ -22,7 +22,7 @@ import { componentNavItems } from './components';
 
 import type { SearchBlock, SearchHit } from '../util/search';
 
-export type SidebarItem = Pick<Group, 'id' | 'label'> & { usage?: number };
+export type SidebarItem = Pick<Group, 'id' | 'label'> & { directory?: string; usage?: number };
 
 export interface SidebarSection {
   groups: SidebarItem[];

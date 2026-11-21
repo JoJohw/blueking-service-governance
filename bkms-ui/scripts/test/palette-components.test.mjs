@@ -19,14 +19,30 @@
 /** palette 组件搜索契约：展示名与完整 id 双字段匹配、忽略大小写、空查询不返回全部 */
 import { describe, expect, it } from 'vitest';
 
-import { matchComponents, sortByUsage } from '../../dev/palette/src/config/components.ts';
+import { displayDirectoryOf, matchComponents, sortByUsage } from '../../dev/palette/src/config/components.ts';
 
 const items = [
-  { id: 'bkms-content', label: 'content', usage: 17 },
-  { id: 'bkms-table', label: 'table', usage: 4 },
-  { id: 'bkms/legacy/card-radio', label: 'card-radio', usage: 9 },
-  { id: 'user-selector', label: 'user-selector', usage: 0 },
+  { directory: '', id: 'bkms-content', label: 'content', usage: 17 },
+  { directory: '', id: 'bkms-table', label: 'table', usage: 4 },
+  { directory: 'bkms/legacy', id: 'bkms/legacy/card-radio', label: 'card-radio', usage: 9 },
+  { directory: '', id: 'user-selector', label: 'user-selector', usage: 0 },
 ];
+
+describe('palette 组件目录提取', () => {
+  it('多级 id 取最后一段之前的目录', () => {
+    expect(displayDirectoryOf('editable-variable-table/index')).toBe('editable-variable-table');
+    expect(displayDirectoryOf('a/b/c')).toBe('a/b');
+  });
+
+  it('目录末段与组件名相同时剔除，避免菜单出现两行相同文字', () => {
+    expect(displayDirectoryOf('skeleton/skeleton')).toBe('');
+    expect(displayDirectoryOf('a/b/b')).toBe('a');
+  });
+
+  it('无目录的 id 返回空串', () => {
+    expect(displayDirectoryOf('bkms-content')).toBe('');
+  });
+});
 
 describe('palette 组件搜索', () => {
   it('空查询与纯空白不返回结果', () => {

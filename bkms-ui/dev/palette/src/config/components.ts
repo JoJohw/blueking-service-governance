@@ -19,12 +19,28 @@
 import { componentCatalog } from '../../../../src/pages/designer/component-catalog.generated';
 
 export interface ComponentNavItem {
+  /** 组件所在目录（多级 id 去掉最后一段），菜单据此区分 index 这类同名条目 */
+  directory: string;
   id: string;
   label: string;
   usage: number;
 }
 
+/**
+ * 菜单里需要展示的目录：`a/b/c` → `a/b`，无目录时为空串。
+ * 目录末段与组件名相同时（如 `skeleton/skeleton`）视为冗余并去掉，
+ * 否则菜单会出现两行完全相同的文字。
+ */
+export function displayDirectoryOf(id: string): string {
+  const separator = id.lastIndexOf('/');
+  if (separator === -1) return '';
+  const segments = id.slice(0, separator).split('/');
+  if (segments[segments.length - 1] === id.slice(separator + 1)) segments.pop();
+  return segments.join('/');
+}
+
 export const componentNavItems: ComponentNavItem[] = componentCatalog.map(entry => ({
+  directory: displayDirectoryOf(entry.id),
   id: entry.id,
   label: entry.id.split('/').pop() ?? entry.id,
   usage: entry.usage,
