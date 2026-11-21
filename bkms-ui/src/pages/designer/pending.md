@@ -29,7 +29,6 @@
 - skeleton/skeleton
 - sort-dropdown
 - startup-command-input
-- status-dot-icon
 - status-icon
 - tab-header
 - tab
@@ -48,7 +47,6 @@
 | edit-block | 空 | 内容型组件依赖 slot / 文本 props |
 | env-vars-import-sideslider | 空 | 初始 `isShow=false` + `render-directive="if"`，DOM 不生成 |
 | modules/components-sideSlider | 空 | Sideslider 初始 `visible=false`，DOM 不生成 |
-| status-dot-icon | 空（小圆点） | `colorMap` 只认 `normal`/`abnormal`，占位 `icon` 落到无匹配 symbol 的分支 |
 
 ## 备注
 

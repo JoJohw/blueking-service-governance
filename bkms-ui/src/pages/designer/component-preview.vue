@@ -79,7 +79,7 @@
           v-else
           class="empty-hint"
         >
-          暂无组件，运行 node scripts/gen-component-preview.mjs 生成清单
+          暂无组件，运行 node scripts/component-preview/index.mjs 生成清单
         </p>
       </div>
     </div>

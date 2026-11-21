@@ -5,8 +5,8 @@
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
   "scripts": {
-    "build": "node scripts/gen-component-preview.mjs && node --max-old-space-size=8192 node_modules/vite/bin/vite.js build",
-    "dev": "node scripts/gen-component-preview.mjs && vite --mode development",
+    "build": "node scripts/component-preview/index.mjs && node --max-old-space-size=8192 node_modules/vite/bin/vite.js build",
+    "dev": "node scripts/component-preview/index.mjs && vite --mode development",
     "gen:api:v1": "node scripts/gen-api-v1.js",
     "prepare": "cd ../.. && husky apps/ui/.husky",
     "preview": "vite preview",
@@ -20,7 +20,7 @@
     "sizecheck": "npx vite-bundle-visualizer",
     "lint": "eslint . --ext .js,.ts,.vue",
     "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
-    "theme:designer": "node scripts/gen-component-preview.mjs && vite --config dev/palette/vite.config.ts",
+    "theme:designer": "node scripts/component-preview/index.mjs && vite --config dev/palette/vite.config.ts",
     "theme:report": "node scripts/theme-lint/report.mjs",
     "format": "prettier --write .",
     "stylelint": "stylelint \"src/**/*.{css,scss,vue}\"",
