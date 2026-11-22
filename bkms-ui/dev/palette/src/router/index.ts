@@ -20,12 +20,12 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 
 export type PaletteView = 'color' | 'component' | 'radius' | 'viz';
 
-export const paletteViews: PaletteView[] = ['color', 'radius', 'viz', 'component'];
+export const paletteViews: PaletteView[] = ['component', 'color', 'radius', 'viz'];
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
-    { path: '/', redirect: to => ({ name: 'color', query: to.query }) },
+    { path: '/', redirect: to => ({ name: 'component', query: to.query }) },
     { path: '/color', name: 'color', component: () => import('../pages/ColorPage.vue') },
     { path: '/radius', name: 'radius', component: () => import('../pages/RadiusPage.vue') },
     { path: '/viz', name: 'viz', component: () => import('../pages/VizPage.vue') },

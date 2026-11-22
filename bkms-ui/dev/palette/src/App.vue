@@ -133,6 +133,8 @@
   import { searchTokens } from './util/search';
   import { allSemanticGroups, radiusGroups, rampGroups, vizGroups } from './util/tokens';
 
+  import type { LocationQueryRaw } from 'vue-router';
+
   import './styles/main.css';
   import './styles/shell.css';
 
@@ -140,7 +142,7 @@
   const router = useRouter();
   const slots = useSlots();
   const hasPaletteRouter = !!router && paletteViews.every(view => router.hasRoute(view));
-  const localView = ref<PaletteView>('color');
+  const localView = ref<PaletteView>('component');
 
   const viewMode = computed<PaletteView>(() => {
     if (hasPaletteRouter && route && paletteViews.includes(route.name as PaletteView)) {
@@ -162,7 +164,8 @@
   const viewTitle = computed(() => activeConfig.value.title);
   const sidebarDescription = computed(() => activeConfig.value.description);
   const asideRef = ref<InstanceType<typeof PaletteAside> | null>(null);
-  const searchQuery = ref('');
+  /** 搜索词与 URL query 双向同步：刷新、复制链接都能复现当前结果 */
+  const searchQuery = ref(typeof route?.query.search === 'string' ? route.query.search : '');
   const isSearching = computed(() => searchQuery.value.trim().length > 0);
   const componentSort = ref<ComponentSortMode>('default');
   const sidebarSections = computed(() => {
@@ -278,20 +281,37 @@
   if (router) router.isReady().then(readFocus);
   else readFocus();
 
+  /**
+   * 点侧栏直接跳到目标分组，不做平滑滚动：
+   * 主区内容重（色板几屏高），平滑滚动要逐帧重绘新露出的区域，一屏的距离也会掉帧。
+   */
   function scrollTo(id: string): void {
     const container = mainRef.value;
     const target = document.getElementById(id);
     if (!container || !target) return;
     clickLockId = id;
     activeId.value = id;
-    container.scrollTo({ top: target.offsetTop - container.offsetTop, behavior: 'smooth' });
+    container.scrollTo({ top: target.offsetTop - container.offsetTop, behavior: 'auto' });
   }
 
-  /** 组件搜索结果点击：切到该组件、退出搜索态，并让侧栏同步滚到该项 */
+  /**
+   * 组件搜索结果点击：选中该组件、退出搜索态，并让侧栏同步滚到该项。
+   * query 的变更必须合并成一次 replace（选中组件 + 清掉 search），否则第二次 replace
+   * 基于旧 query 会把刚写入的 component 覆盖掉，表现为点了没反应。
+   */
   async function selectComponent(id: string): Promise<void> {
-    navigate(id);
-    searchQuery.value = '';
+    if (router && viewMode.value === 'component') {
+      isQuerySyncPaused = true;
+      searchQuery.value = '';
+      const query: LocationQueryRaw = { ...route?.query, component: id };
+      delete query.search;
+      router.replace({ query });
+    } else {
+      navigate(id);
+      searchQuery.value = '';
+    }
     await nextTick();
+    isQuerySyncPaused = false;
     // 侧栏展开有 0.3s 过渡，须等布局稳定后再定位，否则可用高度仍在变化，滚动量会算偏
     window.clearTimeout(scrollTimer);
     scrollTimer = window.setTimeout(() => asideRef.value?.scrollToItem(id), 320);
@@ -299,17 +319,25 @@
 
   async function switchView(mode: PaletteView): Promise<void> {
     if (viewMode.value === mode) return;
-    searchQuery.value = '';
-    focusId.value = null;
-    if (hasPaletteRouter && router) await router.push({ name: mode, query: {} });
-    else if (router) await router.replace({ query: { view: mode } });
-    else localView.value = mode;
+    // 清空搜索会触发 query 同步，它基于旧 route 构造、会把刚 push 的视图名覆盖回去，
+    // 表现为搜索态下点 Tab 切不过去，所以整个导航期间要挂起同步
+    isQuerySyncPaused = true;
+    try {
+      searchQuery.value = '';
+      focusId.value = null;
+      if (hasPaletteRouter && router) await router.push({ name: mode, query: {} });
+      else if (router) await router.replace({ query: { view: mode } });
+      else localView.value = mode;
+    } finally {
+      isQuerySyncPaused = false;
+    }
     await nextTick();
     if (mainRef.value) mainRef.value.scrollTop = 0;
     activeId.value = computeActive();
   }
 
   function toggleFocus(id: string): void {
+    isQuerySyncPaused = true;
     searchQuery.value = '';
     if (!isFocus.value) scrollBeforeFocus = mainRef.value?.scrollTop ?? 0;
     focusId.value = focusId.value === id ? null : id;
@@ -321,13 +349,40 @@
       router.replace({ query });
     }
     nextTick(() => {
+      isQuerySyncPaused = false;
       if (!isFocus.value && mainRef.value) mainRef.value.scrollTop = scrollBeforeFocus;
       activeId.value = computeActive();
     });
   }
 
+  /**
+   * 搜索结果跳转时由 selectComponent 一次性合并 query 变更，期间暂停这里的自动同步：
+   * 两次 router.replace 都基于同一份旧 route.query，后一次会把前一次写的 component 抹掉。
+   */
+  let isQuerySyncPaused = false;
+
+  /** 搜索词写进 query：4 个视图共用这一个词，切视图时 switchView 会清空并同步移除 */
+  watch(searchQuery, value => {
+    if (!router || isQuerySyncPaused) return;
+    const search = value.trim();
+    const query = { ...route?.query };
+    if (search) query.search = search;
+    else delete query.search;
+    router.replace({ query });
+  });
+
+  /** 反向同步：浏览器前进后退或外部改 URL 时回填输入框 */
   watch(
-    () => [route?.query.view, route?.query.focus, route?.query.component],
+    () => route?.query.search,
+    value => {
+      const next = typeof value === 'string' ? value : '';
+      // 正向写 URL 时 trim 过，这里比较也要 trim，否则尾随空格会被回填逻辑抹掉、打断输入
+      if (next !== searchQuery.value.trim()) searchQuery.value = next;
+    },
+  );
+
+  watch(
+    () => [route?.query.view, route?.query.focus, route?.query.component, route?.query.search],
     () => {
       if (hasPaletteRouter || window.parent === window) return;
       window.parent.postMessage(
@@ -336,6 +391,7 @@
           view: typeof route?.query.view === 'string' ? route.query.view : null,
           focus: typeof route?.query.focus === 'string' ? route.query.focus : null,
           component: typeof route?.query.component === 'string' ? route.query.component : null,
+          search: typeof route?.query.search === 'string' ? route.query.search : null,
         },
         window.location.origin,
       );

@@ -106,7 +106,11 @@
     if (!nav) return;
     const item = nav.querySelector<HTMLElement>(`[data-nav-id="${CSS.escape(id)}"]`);
     if (!item) return;
-    const stickyHeight = nav.querySelector<HTMLElement>('.nav-label')?.offsetHeight ?? 0;
+    // 非首个分组的标题带 12px padding-top，吸顶高度按目标所在分组自己的标题量
+    const stickyHeight =
+      item.closest('.nav-section')?.querySelector<HTMLElement>('.nav-label')?.offsetHeight ??
+      nav.querySelector<HTMLElement>('.nav-label')?.offsetHeight ??
+      0;
     const offset = item.getBoundingClientRect().top - nav.getBoundingClientRect().top;
     nav.scrollTo({ top: nav.scrollTop + offset - stickyHeight - 8, behavior });
   }
@@ -168,6 +172,12 @@
     letter-spacing: 1px;
     background: var(--pal-bg-head);
     border-bottom: 1px solid var(--pal-line);
+  }
+
+  /* 分组之间留出呼吸：用 padding-top 而不是 margin，sticky 标题自带背景，
+     margin 的透明缝隙会让滚动内容从缝隙里露出来；首个分组贴 nav 顶部，不需要额外间距 */
+  .nav-section + .nav-section .nav-label {
+    padding-top: 12px;
   }
 
   .palette-nav a {
