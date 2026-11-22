@@ -22,7 +22,15 @@ import { componentNavItems } from './components';
 
 import type { SearchBlock, SearchHit } from '../util/search';
 
-export type SidebarItem = Pick<Group, 'id' | 'label'> & { directory?: string; usage?: number };
+/** 侧栏条目除了 token 的 id/label，还会带组件预览特有的元信息 */
+export interface NavItemMeta {
+  directory?: string;
+  /** 组件插槽名，非空时菜单显示 slot tag */
+  slots?: string[];
+  usage?: number;
+}
+
+export type SidebarItem = NavItemMeta & Pick<Group, 'id' | 'label'>;
 
 export interface SidebarSection {
   groups: SidebarItem[];

@@ -72,6 +72,17 @@ describe('占位值：类型声明式组件', () => {
     expect(typeof props.onChange).toBe('symbol');
   });
 
+  it('defineModel 声明按泛型生成占位 prop', () => {
+    const booleanProps = analyzeProps(
+      "const isShow = defineModel<boolean>('isShow', { default: false });",
+      FAKE_FILE,
+    ).props;
+    const stringProps = analyzeProps("const value = defineModel<string>();", FAKE_FILE).props;
+    expect(booleanProps).toEqual({ isShow: false });
+    // v-model 字符串归一为空串，避免双向绑定组件把占位文本当真实值解析而递归
+    expect(stringProps).toEqual({ modelValue: '' });
+  });
+
   it('普通 import 的具名类型也能解析出占位', () => {
     const root = mkdtempSync(join(tmpdir(), 'bkms-props-'));
     try {

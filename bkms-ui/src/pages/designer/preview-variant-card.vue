@@ -26,7 +26,7 @@
     >
       {{ title }}
     </div>
-    <div class="flex flex-1 flex-col items-center justify-center min-h-[200px] overflow-auto p-[16px]">
+    <div class="flex flex-1 flex-col items-stretch justify-center min-h-[200px] overflow-auto p-[16px]">
       <slot />
     </div>
   </div>

@@ -25,20 +25,20 @@ export default {
   name: 'skeleton',
 
   componentFamily: {
-    entry: 'skeleton/skeleton',
+    entry: 'components/skeleton/skeleton',
     variants: [
       {
         label: '形状',
         nodes: [
-          { id: 'skeleton/skeleton-shape', props: { type: 'rect', width: 160, height: 16 } },
-          { id: 'skeleton/skeleton-shape', props: { type: 'circle', width: 48, height: 48 } },
+          { id: 'components/skeleton/skeleton-shape', props: { type: 'rect', width: 160, height: 16 } },
+          { id: 'components/skeleton/skeleton-shape', props: { type: 'circle', width: 48, height: 48 } },
         ],
       },
-      { label: '段落', nodes: [{ id: 'skeleton/skeleton-paragraph' }] },
-      { label: '表单项', nodes: [{ id: 'skeleton/skeleton-form-item' }] },
-      { label: '标签页', nodes: [{ id: 'skeleton/skeleton-tab' }] },
-      { label: '卡片', nodes: [{ id: 'skeleton/skeleton-card', props: { count: 3 } }] },
-      { label: '表格', nodes: [{ id: 'skeleton/skeleton-table', props: { rows: 6 } }] },
+      { label: '段落', nodes: [{ id: 'components/skeleton/skeleton-paragraph' }] },
+      { label: '表单项', nodes: [{ id: 'components/skeleton/skeleton-form-item' }] },
+      { label: '标签页', nodes: [{ id: 'components/skeleton/skeleton-tab' }] },
+      { label: '卡片', nodes: [{ id: 'components/skeleton/skeleton-card', props: { count: 3 } }] },
+      { label: '表格', nodes: [{ id: 'components/skeleton/skeleton-table', props: { rows: 6 } }] },
     ],
   },
 };

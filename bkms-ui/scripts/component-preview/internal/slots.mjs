@@ -24,13 +24,29 @@ import ts from 'typescript';
 export function extractFallbackSlots(descriptor) {
   const template = descriptor.template?.content ?? '';
   const result = [];
-  const tagRegex = /<slot\b([^>]*)>([\s\S]*?)<\/slot>/g;
+  // prettier 会把收尾标签折成 `</slot\n>`，所以闭合标签要允许尾随空白，否则这段 fallback 会被漏掉
+  const tagRegex = /<slot\b([^>]*)>([\s\S]*?)<\/slot\s*>/g;
   for (const match of template.matchAll(tagRegex)) {
     if (!match[2].trim()) continue;
     const named = match[1].match(/\bname\s*=\s*["']([^"']+)["']/);
     result.push(named ? named[1] : 'default');
   }
   return [...new Set(result)];
+}
+
+/**
+ * 识别「组件自带默认视觉」的 slot：模板里用 $slots.x 判断是否接管该区域。
+ * 这类 slot 一旦传内容就会切到另一个分支，把组件自带的插画/图标顶掉
+ * （如 table-exception 的 type：不传时 Exception 渲染空状态图，传了就只剩占位内容），
+ * 预览真实态不能塞占位块。
+ */
+export function extractGuardedSlots(descriptor) {
+  const template = descriptor.template?.content ?? '';
+  const result = new Set();
+  for (const match of template.matchAll(/\$slots\.(\w+)/g)) {
+    result.add(match[1]);
+  }
+  return [...result];
 }
 
 /** 识别 slot：模板里的 <slot> 标签 + defineSlots<T>() 类型成员两处来源 */
@@ -73,6 +89,11 @@ export function findVisibilityProp(descriptor) {
   if (!binding) return null;
   const script = descriptor.scriptSetup?.content ?? '';
   const boundName = binding.trim().split(/[.[]/)[0];
+  // defineModel 声明的 prop 名可能与变量名不同（如 visible = defineModel('isShow')），先映射回 prop 名
+  const modelAlias = script.match(
+    new RegExp(`(?:const|let)\\s+${boundName}\\s*=\\s*defineModel(?:\\s*<[^>]*>)?\\s*\\(\\s*['"]([\\w-]+)['"]`),
+  )?.[1];
+  if (modelAlias) return modelAlias;
   const traced = script.match(
     new RegExp(`(?:const|let)\\s+${boundName}\\s*=\\s*(?:ref|computed)\\s*\\(?[\\s\\S]{0,120}?props\\.(\\w+)`),
   );

@@ -177,7 +177,7 @@ export default {
   propOverrides: {
     // 通用 fn 占位 () => '' 传给 boolean prop 会被 Vue 转成 true，导致所有「选择」按钮禁用。
     // 预览里只禁用第二个部署组件，保留一个可选部署组件，同时留一张禁用态展示提示文案。
-    'modules/components-sideSlider': {
+    'components/modules/components-sideSlider': {
       disabledFn: item => item?.name === 'deployment',
     },
   },

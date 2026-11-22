@@ -58,12 +58,22 @@
             {{ group.directory }}
           </span>
         </span>
-        <span
-          v-if="group.usage !== undefined"
-          class="nav-usage-tag"
-          :title="`在项目中使用 ${group.usage} 处`"
-        >
-          {{ group.usage }}
+        <span class="nav-item-meta">
+          <!-- 有插槽的组件标出来：结构视图里才有「可替换区域」，菜单先给个提示 -->
+          <span
+            v-if="group.slots?.length"
+            class="nav-slot-tag"
+            :title="`支持插槽：${group.slots.join('、')}`"
+          >
+            slot
+          </span>
+          <span
+            v-if="group.usage !== undefined"
+            class="nav-usage-tag"
+            :title="`在项目中使用 ${group.usage} 处`"
+          >
+            {{ group.usage }}
+          </span>
         </span>
       </a>
     </div>
@@ -91,14 +101,14 @@
    * 顶部对齐并让出吸顶分组标题的高度，否则目标项会被标题盖住；
    * 目标靠近列表末尾时由浏览器自动收敛到底部。
    */
-  function scrollToItem(id: string): void {
+  function scrollToItem(id: string, behavior: ScrollBehavior = 'smooth'): void {
     const nav = navRef.value;
     if (!nav) return;
     const item = nav.querySelector<HTMLElement>(`[data-nav-id="${CSS.escape(id)}"]`);
     if (!item) return;
     const stickyHeight = nav.querySelector<HTMLElement>('.nav-label')?.offsetHeight ?? 0;
     const offset = item.getBoundingClientRect().top - nav.getBoundingClientRect().top;
-    nav.scrollTop += offset - stickyHeight - 8;
+    nav.scrollTo({ top: nav.scrollTop + offset - stickyHeight - 8, behavior });
   }
 
   defineExpose({ scrollToItem });
@@ -211,6 +221,14 @@
     white-space: nowrap;
   }
 
+  /* 右侧标签组：slot 与使用次数并排，主名过长时只挤压左侧文字 */
+  .nav-item-meta {
+    display: flex;
+    flex: none;
+    gap: 4px;
+    align-items: center;
+  }
+
   .nav-usage-tag {
     flex: none;
     min-width: 20px;
@@ -224,8 +242,23 @@
     border-radius: 9px;
   }
 
-  .palette-nav a.is-active .nav-usage-tag {
+  /* slot tag 用品牌色系，与中性的使用次数区分开 */
+  .nav-slot-tag {
+    flex: none;
+    padding: 0 6px;
+    font-size: 10px;
+    line-height: 18px;
     color: var(--pal-brand);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--pal-bg-brand-soft);
+    border: 1px solid var(--pal-line);
+    border-radius: 9px;
+  }
+
+  .palette-nav a.is-active .nav-usage-tag,
+  .palette-nav a.is-active .nav-slot-tag {
+    color: var(--pal-brand-deep);
     border-color: var(--pal-brand);
   }
 </style>

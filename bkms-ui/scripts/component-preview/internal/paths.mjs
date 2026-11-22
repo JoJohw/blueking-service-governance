@@ -24,7 +24,7 @@ const MODULE_ROOT = path.dirname(fileURLToPath(import.meta.url));
 
 export const ROOT = path.resolve(MODULE_ROOT, '../../..');
 export const SRC_DIR = path.join(ROOT, 'src');
-export const COMPONENTS_DIR = path.join(SRC_DIR, 'components');
+/** 组件扫描 glob 在 component-preview.config.mjs 的 componentGlobs 中配置 */
 /** 生成产物统一目录：目录内文件默认忽略，只有同名 d.ts（手工维护的类型声明）入库 */
 export const GENERATED_DIR = path.join(SRC_DIR, 'pages/designer/generated');
 export const OUTPUT = path.join(GENERATED_DIR, 'component-catalog.js');

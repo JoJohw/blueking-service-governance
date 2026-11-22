@@ -21,40 +21,130 @@
 import { parse } from '@vue/compiler-sfc';
 import fs from 'node:fs';
 import path from 'node:path';
+import picomatch from 'picomatch';
 
 import { CONFIG } from '../component-preview.config.mjs';
-import { COMPONENTS_DIR, OUTPUT, SCRIPT_NAME, SRC_DIR } from './paths.mjs';
+import { OUTPUT, ROOT, SCRIPT_NAME, SRC_DIR } from './paths.mjs';
 import { analyzeProps } from './props.mjs';
-import { extractFallbackSlots, extractSlots, findVisibilityProp, needsFormContext } from './slots.mjs';
+import {
+  extractFallbackSlots,
+  extractGuardedSlots,
+  extractSlots,
+  findVisibilityProp,
+  needsFormContext,
+} from './slots.mjs';
 
-const { ignoreIds, minUsageToInclude, placeholders, plugins = [], usageExcept, warning } = CONFIG;
+const {
+  componentGlobs,
+  componentIdBase = 'src',
+  // 默认与 CONFIG 的配置保持一致：id 不做任何省略，写名单时可直接照抄路径
+  componentIdStripPrefixes = [],
+  hideSlotStructure = new Set(),
+  ignoreIds,
+  minUsageToInclude,
+  placeholders,
+  plugins = [],
+  usageExcept,
+  warning,
+} = CONFIG;
+/** 组件 id 的基准目录与可省略前缀，规则见配置注释 */
+const ID_BASE_DIR = path.resolve(ROOT, componentIdBase);
+const componentMatchers = componentGlobs.map(pattern => {
+  const normalized = pattern.replace(/^\/+/, '');
+  return { pattern: normalized, match: picomatch(normalized) };
+});
 const families = new Map(
   plugins
     .filter(plugin => plugin.componentFamily)
     .map(plugin => [plugin.componentFamily.entry, plugin.componentFamily]),
 );
-const slotSamples = new Map(
-  plugins.flatMap(plugin => Object.entries(plugin.slotSamples ?? {})),
+const slotOverrides = new Map(
+  plugins.flatMap(plugin => Object.entries(plugin.slotOverrides ?? {})),
+);
+/**
+ * 插槽组合归一化：
+ * - 数组形式（历史写法）：原样使用，label 由插件自己写；
+ * - 对象形式 `{ base, extras }`：以 base 为基准，extras 里每个插槽单独叠加一次，
+ *   自动展开成 `base` + `base + extra` 若干组。
+ * 语义上「哪些插槽是核心、哪些是可选装饰」只有开发者知道，脚本没法从模板结构判断，
+ * 所以仍要声明一次 base，但不用再逐条列举组合。
+ *
+ * 自动展开的 label 必须给值：结构视图多卡并排时靠 label 区分，留空会让几块几乎一样的
+ * 占位卡无从分辨（preview-combo-label 是 v-if="combo.label"）。
+ */
+function normalizeSlotCombos(value) {
+  if (Array.isArray(value)) return value;
+  const base = value?.base ?? [];
+  const extras = value?.extras ?? [];
+  return [{ label: '基础', slots: base }, ...extras.map(extra => ({ label: `+${extra}`, slots: [...base, extra] }))];
+}
+
+const slotCombos = new Map(
+  plugins.flatMap(plugin =>
+    Object.entries(plugin.slotCombos ?? {}).map(([key, value]) => [key, normalizeSlotCombos(value)]),
+  ),
 );
 const propOverrides = new Map(
   plugins.flatMap(plugin => Object.entries(plugin.propOverrides ?? {})),
 );
+/**
+ * 真实态可切换的预览变体：同一组件在不同内容量 / props 下形态不同（如内容溢出与否决定 footer 位置），
+ * 单一样例只能体现一种。插件按 id 声明若干变体，预览页在标题栏给一组切换按钮。
+ */
+const previewVariants = new Map(
+  plugins.flatMap(plugin => Object.entries(plugin.previewVariants ?? {})),
+);
+const containerWidths = new Map(
+  plugins.flatMap(plugin => Object.entries(plugin.containerWidth ?? {})),
+);
+const fillHeights = new Set(plugins.flatMap(plugin => plugin.fillHeight ?? []));
+const fillWidths = new Set(plugins.flatMap(plugin => plugin.fillWidth ?? []));
+const heightProps = new Map(plugins.flatMap(plugin => Object.entries(plugin.heightProp ?? {})));
+
+/** 取 glob 里第一个通配符之前的字面量目录，作为 walk 起点 */
+function globBase(pattern) {
+  const segments = [];
+  for (const segment of pattern.split('/')) {
+    if (/[*?[\]{}()!]/.test(segment)) break;
+    segments.push(segment);
+  }
+  return path.resolve(ROOT, segments.join('/') || '.');
+}
+
+/** 按配置的 glob 收集 .vue；同一文件被多个模式命中时只保留一份 */
+function collectComponentFiles() {
+  const files = new Set();
+  for (const { pattern, match } of componentMatchers) {
+    const base = globBase(pattern);
+    if (!fs.existsSync(base)) {
+      console.warn(`[component-preview] 扫描路径不存在，已跳过: ${pattern}`);
+      continue;
+    }
+    for (const file of walk(base)) {
+      if (!file.endsWith('.vue')) continue;
+      if (match(toPosix(path.relative(ROOT, file)))) files.add(file);
+    }
+  }
+  return [...files];
+}
 
 /**
- * 遍历 components 目录生成清单。单个组件解析失败只跳过它，不中断整批生成。
+ * 遍历配置 glob 命中的组件生成清单。单个组件解析失败只跳过它，不中断整批生成。
  * @param {{ file: string, text: string }[]} usageSources 全项目引用源，用于统计使用次数
  */
 export function buildCatalog(usageSources) {
-  const files = walk(COMPONENTS_DIR);
+  const files = collectComponentFiles();
   const catalog = [];
+  const seenIds = new Set();
   for (const file of files) {
-    const rel = path
-      .relative(COMPONENTS_DIR, file)
-      .split(path.sep)
-      .join('/')
-      .replace(/\.vue$/, '');
+    const rel = componentIdOf(file);
+    if (seenIds.has(rel)) {
+      console.warn(`[component-preview] 组件 id 重复，已跳过: ${rel} (${file})`);
+      continue;
+    }
+    seenIds.add(rel);
     if (ignoreIds.has(rel)) continue;
-    const usage = countUsages(rel, usageSources);
+    const usage = countUsages(file, usageSources);
     if (!usageExcept.has(rel) && usage < minUsageToInclude) continue;
     const source = fs.readFileSync(file, 'utf8');
     try {
@@ -71,6 +161,7 @@ export function buildCatalog(usageSources) {
       const overlayProp = visibilityProp && typeof props[visibilityProp] === 'boolean' ? visibilityProp : null;
       const slots = extractSlots(descriptor);
       const fallbackSlots = extractFallbackSlots(descriptor);
+      const guardedSlots = extractGuardedSlots(descriptor);
       const needsForm = needsFormContext(descriptor);
       const warnings = analyzeWarnings(source);
       catalog.push({
@@ -79,11 +170,19 @@ export function buildCatalog(usageSources) {
         visibilityProp: overlayProp,
         slots,
         fallbackSlots,
+        guardedSlots,
         needsForm,
         warnings,
         usage,
         ...(families.has(rel) ? { family: families.get(rel) } : {}),
-        ...(slotSamples.has(rel) ? { slotSamples: slotSamples.get(rel) } : {}),
+        ...(slotOverrides.has(rel) ? { slotOverrides: slotOverrides.get(rel) } : {}),
+        ...(slotCombos.has(rel) ? { slotCombos: slotCombos.get(rel) } : {}),
+        ...(previewVariants.has(rel) ? { variants: previewVariants.get(rel) } : {}),
+        ...(containerWidths.has(rel) ? { containerWidth: containerWidths.get(rel) } : {}),
+        ...(fillHeights.has(rel) ? { fillHeight: true } : {}),
+        ...(fillWidths.has(rel) ? { fillWidth: true } : {}),
+        ...(heightProps.has(rel) ? { heightProp: heightProps.get(rel) } : {}),
+        ...(hideSlotStructure.has(rel) ? { hideSlotStructure: true } : {}),
       });
     } catch (error) {
       console.warn(`[component-preview] 跳过 ${rel}: ${error instanceof Error ? error.message : String(error)}`);
@@ -126,25 +225,41 @@ function analyzeWarnings(source) {
   return warning.patterns.some(match => match(source)) ? [warning.text] : [];
 }
 
+/** 组件 id 保持兼容：src/components 下的文件去掉 components/ 前缀，其他目录保留根相对路径 */
+function componentIdOf(file) {
+  let rel = toPosix(path.relative(ID_BASE_DIR, file));
+  if (rel.startsWith('../')) {
+    rel = toPosix(path.relative(ROOT, file));
+  } else {
+    const prefix = componentIdStripPrefixes.find(item => rel.startsWith(`${item}/`));
+    if (prefix) rel = rel.slice(prefix.length + 1);
+  }
+  return rel.replace(/\.vue$/, '');
+}
+
+function toPosix(value) {
+  return value.split(path.sep).join('/');
+}
+
 /**
  * 统计引用该组件的"不同文件数"而非引用次数——更符合"用到几次"的直觉。
  * 命中路径 import 或模板标签（PascalCase/kebab）即计一，类型导入和组件自身不计。
  */
-function countUsages(id, sources) {
-  const base = id
-    .split('/')
-    .pop()
-    .replace(/\.vue$/, '');
+function countUsages(file, sources) {
+  const base = path.basename(file, '.vue');
   const pascal = base
     .split(/[-_]/)
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join('');
-  const pathPattern = new RegExp(`components/${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.vue`);
+  let rel = toPosix(path.relative(SRC_DIR, file));
+  if (rel.startsWith('../')) rel = toPosix(path.relative(ROOT, file));
+  const escaped = rel.replace(/\.vue$/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pathPattern = new RegExp(`${escaped}\\.vue`);
   const tagPattern = new RegExp(`<(${pascal}|${base})\\b`);
   let count = 0;
-  for (const { file, text } of sources) {
-    if (file.startsWith(COMPONENTS_DIR) && path.basename(file, '.vue') === base) continue;
-    const code = text.replace(/^\s*import\s+type\b.*?;\s*$/gm, '');
+  for (const source of sources) {
+    if (source.file === file) continue;
+    const code = source.text.replace(/^\s*import\s+type\b.*?;\s*$/gm, '');
     if (pathPattern.test(code) || tagPattern.test(code)) count += 1;
   }
   return count;

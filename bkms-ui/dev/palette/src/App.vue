@@ -347,6 +347,12 @@
     mainRef.value?.addEventListener('scroll', onScroll, { passive: true });
     mainRef.value?.addEventListener('wheel', onUserScroll, { passive: true });
     mainRef.value?.addEventListener('touchmove', onUserScroll, { passive: true });
+    // 直接带 component 参数刷新时，左侧菜单要停在当前组件上；
+    // 侧栏展开有 0.3s 过渡，与搜索结果跳转一样等布局稳定后再定位
+    if (viewMode.value === 'component' && componentId.value) {
+      window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => asideRef.value?.scrollToItem(componentId.value), 320);
+    }
   });
 
   onBeforeUnmount(() => {

@@ -37,7 +37,11 @@ const GENERIC_TYPES = Symbol('generic-types');
 export function analyzeProps(scriptText, componentFile, generic = '') {
   const sourceFile = ts.createSourceFile('component.ts', scriptText, ts.ScriptTarget.Latest, true);
   const typeNode = findDefinePropsType(sourceFile);
-  if (!typeNode) return analyzeRuntimeProps(sourceFile);
+  const modelProps = extractDefineModelProps(sourceFile);
+  if (!typeNode) {
+    const { props } = analyzeRuntimeProps(sourceFile);
+    return { props: sanitizeModelProps({ ...props, ...modelProps }) };
+  }
   const decls = loadTypeDecls(sourceFile, componentFile);
   const genericNames = generic
     .split(',')
@@ -46,7 +50,38 @@ export function analyzeProps(scriptText, componentFile, generic = '') {
   decls.set(GENERIC_TYPES, new Set(genericNames));
   const value = resolveTypeNode(typeNode, decls, 0);
   const base = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
-  return { props: { ...base, ...extractDefaults(sourceFile) } };
+  return { props: sanitizeModelProps({ ...base, ...extractDefaults(sourceFile), ...modelProps }) };
+}
+
+/**
+ * v-model 值用「占位文本」当字符串会让组件把它当成真实业务值去解析/回填，
+ * 再经 update:modelValue 回写，形成无限递归（如 code-revision-field、image-mode-select）。
+ * 预览只需要空态，故把字符串类型的 modelValue 归一成空串。
+ */
+function sanitizeModelProps(props) {
+  if (props.modelValue === placeholders.string) {
+    return { ...props, modelValue: '' };
+  }
+  return props;
+}
+
+/**
+ * defineModel 在 Vue 3.4+ 会编译成 prop + emit，但静态推导看不到 defineProps。
+ * 这里把它声明的 prop 补成 false，弹层组件的「打开」按钮才能通过 visibilityProp 生效。
+ */
+function extractDefineModelProps(sourceFile) {
+  const result = {};
+  const visit = node => {
+    if (ts.isCallExpression(node) && node.expression.getText() === 'defineModel') {
+      const nameArg = node.arguments[0];
+      const name = nameArg && ts.isStringLiteralLike(nameArg) ? nameArg.text : 'modelValue';
+      const typeArg = node.typeArguments?.[0];
+      result[name] = typeArg ? resolveTypeNode(typeArg, new Map(), 0) : placeholders.string;
+    }
+    ts.forEachChild(node, visit);
+  };
+  ts.forEachChild(sourceFile, visit);
+  return result;
 }
 
 /**
@@ -397,6 +432,27 @@ function resolveMembers(members, decls, depth) {
 }
 
 /**
+ * 展开 interface 的完整成员：先沿 extends 链取父类型（父在前），再用自身成员覆盖。
+ * 早前只读 decl.members，继承来的字段全部丢失——例如 ConfigFileListItem extends ConfigFileDefView
+ * 时 mountedEnvNames 不在占位里，组件读 .length 直接抛错，只能靠插件手写样例绕过。
+ */
+function resolveInterface(decl, decls, depth) {
+  if (!decl || depth > maxDepth) return undefined;
+  const result = {};
+  for (const clause of decl.heritageClauses ?? []) {
+    for (const heritageType of clause.types) {
+      const parent = decls.get(heritageType.expression.getText());
+      if (!parent) continue;
+      const value = ts.isInterfaceDeclaration(parent)
+        ? resolveInterface(parent, decls, depth + 1)
+        : resolveTypeNode(parent, decls, depth + 1);
+      if (value && typeof value === 'object' && !Array.isArray(value)) Object.assign(result, value);
+    }
+  }
+  return Object.assign(result, resolveMembers(decl.members, decls, depth));
+}
+
+/**
  * 递归把 TS 类型节点转成占位数据。union 取第一个非空成员；
  * depth 超过 maxDepth 就放弃，防止自引用类型无限展开。
  */
@@ -429,6 +485,15 @@ function resolveTypeNode(node, decls, depth) {
     return node.elements.map(el => resolveTypeNode(el, decls, depth + 1) ?? {});
   }
   if (ts.isTypeLiteralNode(node)) return resolveMembers(node.members, decls, depth + 1);
+  // 交叉类型等价于合并成员，和 interface 的多继承同一套语义
+  if (ts.isIntersectionTypeNode(node)) {
+    const merged = {};
+    for (const type of node.types) {
+      const value = resolveTypeNode(type, decls, depth + 1);
+      if (value && typeof value === 'object' && !Array.isArray(value)) Object.assign(merged, value);
+    }
+    return merged;
+  }
   if (ts.isFunctionTypeNode(node) || ts.isConstructorTypeNode(node)) return placeholders.fn;
   if (ts.isTypeReferenceNode(node)) {
     if (['Array', 'ReadonlyArray'].includes(node.typeName.getText()) && node.typeArguments?.[0]) {
@@ -441,7 +506,7 @@ function resolveTypeNode(node, decls, depth) {
     const target = decls.get(typeName);
     if (!target) return {};
     return ts.isInterfaceDeclaration(target)
-      ? applyEnumOverrides(typeName, resolveMembers(target.members, decls, depth + 1))
+      ? applyEnumOverrides(typeName, resolveInterface(target, decls, depth + 1))
       : resolveTypeNode(target, decls, depth + 1);
   }
   if (ts.isTypeQueryNode(node)) return undefined;

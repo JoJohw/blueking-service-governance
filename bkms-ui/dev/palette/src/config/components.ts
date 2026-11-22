@@ -23,6 +23,8 @@ export interface ComponentNavItem {
   directory: string;
   id: string;
   label: string;
+  /** 组件声明的插槽名；非空表示支持插槽，菜单据此标 slot tag */
+  slots: string[];
   usage: number;
 }
 
@@ -43,6 +45,8 @@ export const componentNavItems: ComponentNavItem[] = componentCatalog.map(entry 
   directory: displayDirectoryOf(entry.id),
   id: entry.id,
   label: entry.id.split('/').pop() ?? entry.id,
+  // 插槽不由设计决定时菜单不标 SLOT，与预览里不展示「查看可替换结构」保持一致
+  slots: entry.hideSlotStructure ? [] : entry.slots,
   usage: entry.usage,
 }));
 

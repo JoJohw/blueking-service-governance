@@ -59,7 +59,9 @@
   const sidebarRef = ref<InstanceType<typeof PaletteSidebar> | null>(null);
 
   /** 透传侧栏的条目定位能力，供上层在搜索结果跳转后同步滚动 */
-  defineExpose({ scrollToItem: (id: string) => sidebarRef.value?.scrollToItem(id) });
+  defineExpose({
+    scrollToItem: (id: string, behavior?: ScrollBehavior) => sidebarRef.value?.scrollToItem(id, behavior),
+  });
 </script>
 
 <style scoped>
