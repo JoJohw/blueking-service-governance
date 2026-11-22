@@ -21,7 +21,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { CACHE, MODULE_DIR } from './paths.mjs';
+import { BASELINE, CACHE, MODULE_DIR } from './paths.mjs';
 
 export function readCache() {
   try {
@@ -38,7 +38,9 @@ export function readCache() {
  */
 export function signatureOf(files) {
   const scriptMtimes = collectModuleFiles(MODULE_DIR).map(file => `${file}:${fs.statSync(file).mtimeMs}`);
-  return [...scriptMtimes, ...files.map(file => `${file}:${fs.statSync(file).mtimeMs}`)].join('|');
+  // 基线 mtime 纳入签名：只提交基线、src 不变时也要触发重生成，否则 catalog 里的 status 会陈旧
+  const baselineMtime = fs.existsSync(BASELINE) ? [`${BASELINE}:${fs.statSync(BASELINE).mtimeMs}`] : [];
+  return [...scriptMtimes, ...baselineMtime, ...files.map(file => `${file}:${fs.statSync(file).mtimeMs}`)].join('|');
 }
 
 export function writeCache(signature) {

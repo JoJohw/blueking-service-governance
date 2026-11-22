@@ -58,9 +58,7 @@ const families = new Map(
     .filter(plugin => plugin.componentFamily)
     .map(plugin => [plugin.componentFamily.entry, plugin.componentFamily]),
 );
-const slotOverrides = new Map(
-  plugins.flatMap(plugin => Object.entries(plugin.slotOverrides ?? {})),
-);
+const slotOverrides = new Map(plugins.flatMap(plugin => Object.entries(plugin.slotOverrides ?? {})));
 /**
  * 插槽组合归一化：
  * - 数组形式（历史写法）：原样使用，label 由插件自己写；
@@ -84,49 +82,16 @@ const slotCombos = new Map(
     Object.entries(plugin.slotCombos ?? {}).map(([key, value]) => [key, normalizeSlotCombos(value)]),
   ),
 );
-const propOverrides = new Map(
-  plugins.flatMap(plugin => Object.entries(plugin.propOverrides ?? {})),
-);
+const propOverrides = new Map(plugins.flatMap(plugin => Object.entries(plugin.propOverrides ?? {})));
 /**
  * 真实态可切换的预览变体：同一组件在不同内容量 / props 下形态不同（如内容溢出与否决定 footer 位置），
  * 单一样例只能体现一种。插件按 id 声明若干变体，预览页在标题栏给一组切换按钮。
  */
-const previewVariants = new Map(
-  plugins.flatMap(plugin => Object.entries(plugin.previewVariants ?? {})),
-);
-const containerWidths = new Map(
-  plugins.flatMap(plugin => Object.entries(plugin.containerWidth ?? {})),
-);
+const previewVariants = new Map(plugins.flatMap(plugin => Object.entries(plugin.previewVariants ?? {})));
+const containerWidths = new Map(plugins.flatMap(plugin => Object.entries(plugin.containerWidth ?? {})));
 const fillHeights = new Set(plugins.flatMap(plugin => plugin.fillHeight ?? []));
 const fillWidths = new Set(plugins.flatMap(plugin => plugin.fillWidth ?? []));
 const heightProps = new Map(plugins.flatMap(plugin => Object.entries(plugin.heightProp ?? {})));
-
-/** 取 glob 里第一个通配符之前的字面量目录，作为 walk 起点 */
-function globBase(pattern) {
-  const segments = [];
-  for (const segment of pattern.split('/')) {
-    if (/[*?[\]{}()!]/.test(segment)) break;
-    segments.push(segment);
-  }
-  return path.resolve(ROOT, segments.join('/') || '.');
-}
-
-/** 按配置的 glob 收集 .vue；同一文件被多个模式命中时只保留一份 */
-function collectComponentFiles() {
-  const files = new Set();
-  for (const { pattern, match } of componentMatchers) {
-    const base = globBase(pattern);
-    if (!fs.existsSync(base)) {
-      console.warn(`[component-preview] 扫描路径不存在，已跳过: ${pattern}`);
-      continue;
-    }
-    for (const file of walk(base)) {
-      if (!file.endsWith('.vue')) continue;
-      if (match(toPosix(path.relative(ROOT, file)))) files.add(file);
-    }
-  }
-  return [...files];
-}
 
 /**
  * 遍历配置 glob 命中的组件生成清单。单个组件解析失败只跳过它，不中断整批生成。
@@ -153,7 +118,11 @@ export function buildCatalog(usageSources) {
       // 普通 <script> 里的接口/别名也可能被 defineProps 引用（如 sort-dropdown 的 SortOrder），
       // 和 setup 一起解析；generic 属性里的类型参数名交给 props 推导成可读占位。
       const propScripts = [descriptor.script?.content, descriptor.scriptSetup.content].filter(Boolean).join('\n');
-      const { props: analyzedProps } = analyzeProps(propScripts, file, String(descriptor.scriptSetup.attrs.generic ?? ''));
+      const { props: analyzedProps } = analyzeProps(
+        propScripts,
+        file,
+        String(descriptor.scriptSetup.attrs.generic ?? ''),
+      );
       const props = { ...analyzedProps, ...(propOverrides.get(rel) ?? {}) };
       // 弹层类组件（Dialog/Sideslider）默认收起，由预览页给一个按钮按需打开，
       // 这里只记录控制显隐的 prop 名；不再把它的值强行改成 true，否则一关就再也打不开。
@@ -166,6 +135,8 @@ export function buildCatalog(usageSources) {
       const warnings = analyzeWarnings(source);
       catalog.push({
         id: rel,
+        // 覆盖前推导 props：基线签名按它取（D5 口径），避免被 propOverrides 合并后的 props 污染；不写盘
+        analyzedProps,
         props,
         visibilityProp: overlayProp,
         slots,
@@ -215,7 +186,7 @@ export function collectUsageSources() {
 }
 
 export function writeCatalog(catalog) {
-  const body = `/* 自动生成，请勿手动修改；来源 ${SCRIPT_NAME} */\n\nexport const componentCatalog = ${serialize(catalog)};\n`;
+  const body = `/* 自动生成，请勿手动修改；来源 ${SCRIPT_NAME} */\n\nexport const componentCatalog = ${serialize(catalog.map(stripInternal))};\n`;
   fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
   fs.writeFileSync(OUTPUT, body);
 }
@@ -223,6 +194,23 @@ export function writeCatalog(catalog) {
 /** 静态预判组件展示风险；命中任一特征就统一打一条提示，不区分具体原因 */
 function analyzeWarnings(source) {
   return warning.patterns.some(match => match(source)) ? [warning.text] : [];
+}
+
+/** 按配置的 glob 收集 .vue；同一文件被多个模式命中时只保留一份 */
+function collectComponentFiles() {
+  const files = new Set();
+  for (const { pattern, match } of componentMatchers) {
+    const base = globBase(pattern);
+    if (!fs.existsSync(base)) {
+      console.warn(`[component-preview] 扫描路径不存在，已跳过: ${pattern}`);
+      continue;
+    }
+    for (const file of walk(base)) {
+      if (!file.endsWith('.vue')) continue;
+      if (match(toPosix(path.relative(ROOT, file)))) files.add(file);
+    }
+  }
+  return [...files];
 }
 
 /** 组件 id 保持兼容：src/components 下的文件去掉 components/ 前缀，其他目录保留根相对路径 */
@@ -235,10 +223,6 @@ function componentIdOf(file) {
     if (prefix) rel = rel.slice(prefix.length + 1);
   }
   return rel.replace(/\.vue$/, '');
-}
-
-function toPosix(value) {
-  return value.split(path.sep).join('/');
 }
 
 /**
@@ -265,6 +249,16 @@ function countUsages(file, sources) {
   return count;
 }
 
+/** 取 glob 里第一个通配符之前的字面量目录，作为 walk 起点 */
+function globBase(pattern) {
+  const segments = [];
+  for (const segment of pattern.split('/')) {
+    if (/[*?[\]{}()!]/.test(segment)) break;
+    segments.push(segment);
+  }
+  return path.resolve(ROOT, segments.join('/') || '.');
+}
+
 function serialize(value, indent = 0) {
   if (value === placeholders.fn) return "() => ''";
   if (typeof value === 'function') return value.toString();
@@ -280,6 +274,16 @@ function serialize(value, indent = 0) {
     return entries.length ? `{\n${entries.join(',\n')}\n${closePad}}` : '{}';
   }
   return 'undefined';
+}
+
+/** 去掉仅用于基线签名的内部字段（analyzedProps），避免污染产物与消费端类型 */
+function stripInternal(entry) {
+  const { analyzedProps, ...output } = entry;
+  return output;
+}
+
+function toPosix(value) {
+  return value.split(path.sep).join('/');
 }
 
 function walk(dir, out = []) {

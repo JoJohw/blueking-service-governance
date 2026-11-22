@@ -16,6 +16,7 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
+import { parse } from '@vue/compiler-sfc';
 /**
  * 预览插件的声明契约：插件全靠「按组件 id 打表」扩展预览行为，
  * id 或 slot 名写错既不会报错也不会提示，只会静默不生效（tab 插件曾把 id 写成裸组件名 `tab`，
@@ -25,16 +26,22 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-import { parse } from '@vue/compiler-sfc';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { CONFIG } from '../component-preview/component-preview.config.mjs';
 import { buildCatalog, collectUsageSources } from '../component-preview/internal/catalog.mjs';
 import { extractSlots } from '../component-preview/internal/slots.mjs';
+import tabPlugin from '../component-preview/plugins/tab.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const componentFile = id => path.join(ROOT, 'src', `${id}.vue`);
+
+/** slotCombos 有数组与 { base, extras } 两种写法，统一展开成若干组 slot 名 */
+function comboSlotNames(value) {
+  if (Array.isArray(value)) return value.flatMap(combo => combo.slots);
+  const base = value?.base ?? [];
+  return [base, ...(value?.extras ?? []).map(extra => [...base, extra])].flat();
+}
 
 /** 插件里「组件 id -> 配置」的表都在这里列出，新增扩展点时同步补一行 */
 function declaredIds() {
@@ -52,13 +59,6 @@ function declaredIds() {
     if (plugin.componentFamily) push('componentFamily', [plugin.componentFamily.entry]);
   }
   return rows;
-}
-
-/** slotCombos 有数组与 { base, extras } 两种写法，统一展开成若干组 slot 名 */
-function comboSlotNames(value) {
-  if (Array.isArray(value)) return value.flatMap(combo => combo.slots);
-  const base = value?.base ?? [];
-  return [base, ...(value?.extras ?? []).map(extra => [...base, extra])].flat();
 }
 
 /** 插件对各组件的 slot 声明，按来源分类，便于失败时定位 */
@@ -163,8 +163,20 @@ describe('清单生成的扩展点透传', () => {
       expect(entry, `清单里缺少 ${id}`).toBeTruthy();
       const labels = (entry.slotCombos ?? []).map(combo => combo.label);
       expect(labels.length, id).toBe(1 + (value.extras?.length ?? 0));
-      expect(labels.every(label => label.length > 0), id).toBe(true);
+      expect(
+        labels.every(label => label.length > 0),
+        id,
+      ).toBe(true);
       expect(new Set(labels).size, id).toBe(labels.length);
     }
+  });
+});
+
+describe('手写样例的跨字段引用', () => {
+  it('tab 的 active 指向 tabs 里真实存在的 name（样例侧静默失效守卫）', () => {
+    // 基线签名只盯「组件推导变了」，抓不到「手写样例本身被改坏」。
+    // 这类跨字段引用是可静态验证的：active 指向不存在的 name 会让预览里选中的 tab 落空。
+    const { active, tabs } = tabPlugin.propOverrides['components/tab'];
+    expect(tabs.map(tab => tab.name)).toContain(active);
   });
 });

@@ -31,6 +31,29 @@
                 :text="activeItem.id"
               />
             </div>
+            <!-- 相对组件基线的三态：stable 不展示；changed 橙 Tag、new 绿 Tag -->
+            <Tag
+              v-if="activeItem.status === 'new'"
+              v-bk-tooltips="{
+                content: '新增组件，请核对预览示例',
+                placement: 'top-start',
+              }"
+              class="preview-status-tag font-400 text-[10px] h-[20px] leading-[20px]"
+              theme="success"
+            >
+              新增
+            </Tag>
+            <Tag
+              v-else-if="activeItem.status === 'changed'"
+              v-bk-tooltips="{
+                content: '组件结构已变更，预览示例可能过期',
+                placement: 'top-start',
+              }"
+              class="preview-status-tag font-400 text-[10px] h-[20px] leading-[20px]"
+              theme="warning"
+            >
+              示例待更新
+            </Tag>
             <!-- 弹层类组件在展示区里看不到本体，先标出类型，避免被当成渲染失败 -->
             <Tag
               v-if="activeItem.visibilityProp"
@@ -198,6 +221,7 @@
       fillWidth: entry.fillWidth ?? false,
       heightProp: entry.heightProp,
       hideSlotStructure: entry.hideSlotStructure ?? false,
+      status: entry.status,
     }));
 
   const showSlotPlaceholders = ref(false);
@@ -383,7 +407,8 @@
     font-weight: 700;
   }
 
-  .preview-type-tag {
+  .preview-type-tag,
+  .preview-status-tag {
     flex: none;
   }
 
