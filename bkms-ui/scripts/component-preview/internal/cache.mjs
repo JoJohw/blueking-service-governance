@@ -9,18 +9,19 @@
  *
  * Unless required by applicable law or agreed to in writing, software distributed under
  * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- * either express or implied. See the License for the specific language governing permissions and
- * limitations under the License.
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
  *
  * We undertake not to change the open source license (MIT license) applicable
  * to the current version of the project delivered to anyone in the future.
  */
 
-/** 生成缓存：签名一致就跳过重算，避免每次 dev 启动都全量扫一遍 */
+/** 生成缓存：内容签名一致就跳过重算，避免每次 dev 启动都全量扫一遍 */
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
-import path from 'node:path';
 
+import { writeFileAtomic } from './atomic-write.mjs';
 import { BASELINE, CACHE, MODULE_DIR } from './paths.mjs';
 
 export function readCache() {
@@ -32,25 +33,31 @@ export function readCache() {
 }
 
 /**
- * 生成缓存签名：生成器所有模块 + 所有引用源的 mtime。
- * 生成器拆成多模块后必须整体纳入，否则改了 config/ 或某个模块不会触发重生成；
- * 纳入引用源是为了让业务代码里新增/删除组件引用后能触发重生成。
+ * 生成缓存签名：生成器所有模块 + 所有引用源 + 基线的「内容 hash」。
+ * 用内容而不是 mtime：CI checkout 会把 mtime 全部刷新（每次重算），而可复现构建
+ * 又可能归一化 mtime（内容变了却跳过生成），两头都不可靠。
+ * 文件路径本身也在签名里，所以新增/删除文件同样会触发重生成。
  */
 export function signatureOf(files) {
-  const scriptMtimes = collectModuleFiles(MODULE_DIR).map(file => `${file}:${fs.statSync(file).mtimeMs}`);
-  // 基线 mtime 纳入签名：只提交基线、src 不变时也要触发重生成，否则 catalog 里的 status 会陈旧
-  const baselineMtime = fs.existsSync(BASELINE) ? [`${BASELINE}:${fs.statSync(BASELINE).mtimeMs}`] : [];
-  return [...scriptMtimes, ...baselineMtime, ...files.map(file => `${file}:${fs.statSync(file).mtimeMs}`)].join('|');
+  const tracked = [...collectModuleFiles(MODULE_DIR), ...(fs.existsSync(BASELINE) ? [BASELINE] : []), ...files];
+  return tracked.map(file => `${file}:${contentHash(file)}`).join('|');
 }
 
 export function writeCache(signature) {
-  fs.mkdirSync(path.dirname(CACHE), { recursive: true });
-  fs.writeFileSync(CACHE, JSON.stringify(signature));
+  writeFileAtomic(CACHE, JSON.stringify(signature));
+}
+
+function contentHash(file) {
+  try {
+    return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex').slice(0, 16);
+  } catch {
+    return 'missing';
+  }
 }
 
 function collectModuleFiles(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
+    const full = `${dir}/${entry.name}`;
     if (entry.isDirectory()) collectModuleFiles(full, out);
     else if (entry.name.endsWith('.mjs')) out.push(full);
   }

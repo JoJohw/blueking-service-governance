@@ -40,6 +40,7 @@ import { getUser } from '~/api/modules/user';
 import { initTheme } from '~/composables/use-theme';
 import { scopeIconSpriteIds } from '~/fonts/icon-sprite';
 import { registerMonitorChartApi } from '~/pages/application/detail/deploy/monitor-chart-bridge.js';
+import { isDesignerFrameLocation } from '~/pages/designer/preview/designer-route';
 import { useUserStore } from '~/stores/user';
 
 import App from './App.vue';
@@ -78,7 +79,24 @@ import '~/styles/overrides.css';
 // theme/index.css 整包（令牌 + patches）只定义 --bkms-* 与选择器级兜底、无级联冲突，放 CSS 组末尾以满足 import 排序
 import '~/styles/theme/index.css';
 
-getUser({}, { needRes: true }).then(res => {
+/**
+ * 设计器 iframe 必须在挂载前装好请求打桩：getUser 与 App.vue 的 onBeforeMount 请求
+ * 都早于任何子组件 setup，装在预览页组件里已经来不及。动态 import 让 api-mock.json
+ * 只在 frame 里下载，业务首屏不含它；frame 也不再调用真实 getUser，避免 401 跳登录。
+ */
+// mount 成功后置 true，供 catch 判断：mount 之后的同步异常（如 setUserInfo）不应再把已渲染的应用根节点替换掉
+let mounted = false;
+
+async function bootstrap() {
+  let user: Parameters<ReturnType<typeof useUserStore>['setUserInfo']>[0] | undefined;
+  if (isDesignerFrameLocation()) {
+    const { isolateRequests } = await import('./pages/designer/preview/request-isolation');
+    // 丢弃 isolateRequests 返回的 restore：frame 整个生命周期都需要请求隔离（无真实 user / 后端上下文），
+    // 故意不还原，引用计数永不归零，组件内任何「卸载时还原」都不会真正卸掉打桩。
+    isolateRequests();
+  } else {
+    user = await getUser({}, { needRes: true });
+  }
   const app = createApp(App);
   // 安装modules下面所有模块
   Object.values(import.meta.glob<{ install: UserModule }>('./modules/*.ts', { eager: true })).forEach(i => {
@@ -86,7 +104,19 @@ getUser({}, { needRes: true }).then(res => {
   });
   registerMonitorChartApi(app);
   app.mount('#app');
-  useUserStore().setUserInfo(res);
+  mounted = true;
+  if (user) useUserStore().setUserInfo(user);
+}
+
+void bootstrap().catch((error: unknown) => {
+  console.error('[bootstrap] 应用启动失败:', error);
+  // 只处理 mount 之前的失败（动态 import / getUser / createApp / mount 抛错）：
+  // 此时白屏，把错误落到 #app 保留排查线索；mount 之后的异常不覆盖已渲染的应用根节点，仅记录日志。
+  if (mounted) return;
+  const root = document.getElementById('app');
+  if (root) {
+    root.textContent = `应用启动失败：${error instanceof Error ? error.message : String(error)}`;
+  }
 });
 
 console.log(

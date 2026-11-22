@@ -15,6 +15,9 @@
  * We undertake not to change the open source license (MIT license) applicable
  * to the current version of the project delivered to anyone in the future.
  */
+import { defineComponent, h } from 'vue';
+
+import { render } from '@testing-library/vue';
 import { describe, expect, it } from 'vitest';
 import { buildComponentMap, PREVIEW_ID_BASE, resolveComponentId } from '~/pages/designer/preview/catalog';
 
@@ -59,5 +62,33 @@ describe('组件模块表', () => {
       SRC_BASE,
     );
     expect([...map.keys()]).toEqual(['components/b']);
+  });
+});
+
+describe('组件模块表（按需加载）', () => {
+  it('glob loader 建立映射时不加载模块，渲染时才加载', async () => {
+    let loads = 0;
+    const lazy = defineComponent({
+      render: () => h('div', 'lazy-loaded'),
+    });
+    const map = buildComponentMap(
+      {
+        '../../components/a.vue': async () => {
+          loads += 1;
+          return { default: lazy };
+        },
+      },
+      SRC_BASE,
+    );
+    expect(loads).toBe(0);
+    const { findByText } = render(map.get('components/a')!);
+    expect(await findByText('lazy-loaded')).toBeInTheDocument();
+    expect(loads).toBe(1);
+  });
+
+  it('loader 没有默认导出时渲染出可读错误，而不是空白', async () => {
+    const map = buildComponentMap({ '../../components/a.vue': async () => ({}) }, SRC_BASE);
+    const { findByText } = render(map.get('components/a')!);
+    expect(await findByText(/没有默认导出/)).toBeInTheDocument();
   });
 });

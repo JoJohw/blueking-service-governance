@@ -24,6 +24,7 @@ import path from 'node:path';
 import picomatch from 'picomatch';
 
 import { CONFIG } from '../component-preview.config.mjs';
+import { writeFileAtomic } from './atomic-write.mjs';
 import { OUTPUT, ROOT, SCRIPT_NAME, SRC_DIR } from './paths.mjs';
 import { analyzeProps } from './props.mjs';
 import {
@@ -187,8 +188,7 @@ export function collectUsageSources() {
 
 export function writeCatalog(catalog) {
   const body = `/* 自动生成，请勿手动修改；来源 ${SCRIPT_NAME} */\n\nexport const componentCatalog = ${serialize(catalog.map(stripInternal))};\n`;
-  fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
-  fs.writeFileSync(OUTPUT, body);
+  writeFileAtomic(OUTPUT, body);
 }
 
 /** 静态预判组件展示风险；命中任一特征就统一打一条提示，不区分具体原因 */

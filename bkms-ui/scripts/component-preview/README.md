@@ -27,8 +27,8 @@
 1. **扫描**：按 `componentGlobs` 匹配 `.vue` 文件，过滤 `ignoreIds`、剔除引用数不足 `minUsageToInclude`（除非在 `usageExcept`）。
 2. **推导**：`internal/props.mjs` 从 `defineProps` / `defineModel` 类型声明推导占位值；`internal/slots.mjs` 提取 slot 结构。
 3. **插件叠加**：`plugins/*.mjs` 按固定扩展点（`propOverrides` / `slotOverrides` / `slotCombos` / `previewVariants` / `componentFamily` 等）覆写或增强推导结果。
-4. **组装 + 写盘**：`internal/catalog.mjs` 拼成条目（`id` / `props` / `slots` / `family` / `variants` / `usage` / `warnings` / `status`…），写 `component-catalog.js`；`internal/api-mock.mjs` 生成接口 mock。
-5. **缓存**：`internal/cache.mjs` 用「internal/ + 配置文件 + 全部引用源文件 + 基线文件」的 mtime 做签名，命中则跳过生成。
+4. **组装 + 写盘**：`internal/catalog.mjs` 拼成条目（`id` / `props` / `slots` / `family` / `variants` / `usage` / `warnings` / `status`…），写 `component-catalog.js`；`internal/api-mock.mjs` 生成接口 mock。两者都经 `internal/atomic-write.mjs` 先写临时文件再 rename，写一半失败不会留下半截产物。
+5. **缓存**：`internal/cache.mjs` 用「internal/ + 配置文件 + 全部引用源文件 + 基线文件」的**内容 hash** 做签名，命中则跳过生成（mtime 在 CI checkout / 可复现构建里都不可靠）。
 6. **基线 diff**：`internal/baseline.mjs` 算每个组件的样例签名，与 `component-baseline.json` 对比，得出 `new` / `changed` / `stable` 三态。
 
 ## 目录结构
@@ -44,7 +44,8 @@ scripts/component-preview/
 │   ├── slots.mjs                    slot 结构提取
 │   ├── catalog.mjs                  清单组装 + 写盘
 │   ├── api-mock.mjs                 接口 mock 样例生成
-│   ├── cache.mjs                    缓存签名（mtime 口径）
+│   ├── cache.mjs                    缓存签名（内容 hash 口径）
+│   ├── atomic-write.mjs             产物原子写入
 │   └── baseline.mjs                 基线签名 + 三态判定 + 完整性守卫
 └── plugins/                        业务域插件（手写特例，17 个）
 ```
@@ -94,6 +95,8 @@ scripts/component-preview/
 | `node scripts/component-preview/index.mjs --baseline --prune` | 清理 removed 条目（完整性守卫不通过会拒绝） |
 | `node scripts/component-preview/index.mjs --baseline --force --yes` | 非首次全量写回（清空所有待确认） |
 
+生成失败时**保留上一次产物**、以非零退出码中断 `build` / `dev` 的 `&&`；不再写空清单兜底，避免「构建成功但预览空白」。
+
 ## 基线与状态（new / changed / stable）
 
 基线 `component-baseline.json` 记录每个组件的**样例签名**——取**覆盖前** `analyzedProps` + slots 的 hash（与插件手写无关）。
@@ -113,7 +116,14 @@ scripts/component-preview/
 - `component-preview-baseline.test.mjs` —— 签名确定性、Symbol 哨兵、三态判定、removedIds、incomplete 阈值、完整性守卫三路降级、CLI 写回决策。
 - `component-preview-consumer.test.mjs` —— 消费端对齐护栏（`ComponentCatalogEntry` 全量 key − `NOT_PICKED` ⊆ `previewItems` pick）。
 - `component-preview-catalog.test.mjs` —— 清单 id 命中文件、slot 命中真实 slot、手写样例跨字段引用。
-- `component-preview-cli.test.mjs` —— CLI 参数解析与校验。
+- `component-preview-cli.test.mjs` —— CLI 参数解析与校验，以及「生成失败不写空清单」的源码契约。
+- `component-preview-cache.test.mjs` —— 内容 hash 签名（内容变必重算、mtime 变不重算）。
+- `component-preview-atomic-write.test.mjs` —— 原子写入与失败回滚。
+- `designer-bundle-budget.test.mjs` —— designer 入口静态依赖的体积预算（防 eager glob 回归）。
+
+`pnpm test:ci` 会依次跑生成器、业务单测、**本目录脚本测试**与 `--check`，CI（含 GitHub 单元测试流水线）同样覆盖；
+`vite.config.mts` 的 `designerBundleBudgetPlugin` 在构建时统计 designer 入口及其静态依赖的 gzip 体积，
+默认只告警，`BK_DESIGNER_BUNDLE_STRICT=1` 时超预算直接让构建失败。
 
 ## 已知局限与设计取舍
 

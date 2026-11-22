@@ -12,6 +12,7 @@
 | [API_GUIDE.md](./API_GUIDE.md)                           | API 请求层指南 — ConsoleFetch、拦截器、新增接口步骤                    |
 | [CODING_STANDARDS.md](./CODING_STANDARDS.md)             | 编码规范 — 命名、组件、License header、样式                            |
 | [ENV_VARIABLES.md](./ENV_VARIABLES.md)                   | 环境变量说明 — 构建时/运行时变量完整清单                               |
+| [PALETTE.md](./PALETTE.md)                               | Palette 架构与维护 — 分层、渲染/基建、扩展点、Skills、iframe 隔离边界  |
 
 ## 快速入口
 
@@ -19,6 +20,7 @@
 - **了解目录全貌** → [ARCHITECTURE.md](./ARCHITECTURE.md) + [architecture-diagram.html](./architecture-diagram.html)
 - **新增 API 接口** → [API_GUIDE.md](./API_GUIDE.md)
 - **新增页面/组件** → [CODING_STANDARDS.md](./CODING_STANDARDS.md)
+- **色板 / 组件预览** → [PALETTE.md](./PALETTE.md) + [dev/palette/README.md](../dev/palette/README.md)
 - **部署配置** → [ENV_VARIABLES.md](./ENV_VARIABLES.md) + 项目根 [DEPLOY.md](../DEPLOY.md)
 
 ## 相关文档

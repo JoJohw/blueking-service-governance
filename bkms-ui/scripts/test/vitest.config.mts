@@ -19,9 +19,10 @@
 /**
  * scripts/test 专用配置：仓库工具自身的测试，不含业务单测。
  *
- * scripts/theme-lint 等是自带的工具链而非业务代码，它们的用例故意不进主配置
- * （vite.config.mts 的 test.include 只收 test/**\/*.test.ts），因此 test:unit / test:ci
- * ——以及 GitHub 上的单元测试流水线——都不会跑到它们。统一用一条命令跑：
+ * scripts/theme-lint 等是自带的工具链而非业务代码，它们的用例不进主配置
+ * （vite.config.mts 的 test.include 只收 test/**\/*.test.ts），由单独的配置运行。
+ * pnpm test:ci 会在业务单测之后串上这条配置 + 生成器的 --check，
+ * 因此 CI（含 GitHub 单元测试流水线）同样会跑到它们。本地单独跑：
  *
  *   pnpm test:scripts
  *

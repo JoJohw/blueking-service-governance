@@ -30,6 +30,7 @@ import path from 'node:path';
 import ts from 'typescript';
 
 import { CONFIG } from '../component-preview.config.mjs';
+import { writeFileAtomic } from './atomic-write.mjs';
 import { loadTypeDecls, sampleOfTypeNode } from './props.mjs';
 
 const plugins = CONFIG.plugins ?? [];
@@ -70,8 +71,7 @@ export function walk(dir) {
 /** 写成 JSON：tsconfig 开了 resolveJsonModule，预览页直接 import，无需再维护一份类型声明 */
 export function writeApiMock(entries, outputFile) {
   const samples = Object.fromEntries(entries.map(entry => [entry.key, entry.sample]));
-  fs.mkdirSync(path.dirname(outputFile), { recursive: true });
-  fs.writeFileSync(outputFile, `${JSON.stringify(samples, null, 2)}\n`);
+  writeFileAtomic(outputFile, `${JSON.stringify(samples, null, 2)}\n`);
   return entries.length;
 }
 

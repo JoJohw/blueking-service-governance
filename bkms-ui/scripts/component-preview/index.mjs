@@ -112,6 +112,49 @@ export function parseArgs(argv) {
   return result;
 }
 
+/** 导出仅供测试注入 buildCatalog 抛错后断言「产物不变 + 非零退出」；CLI 正常入口走 main() */
+export function runBuild() {
+  try {
+    const usageSources = collectUsageSources();
+    const apiModules = walk(API_MODULES_DIR).filter(file => file.endsWith('.ts'));
+    const signature = signatureOf([...usageSources.map(source => source.file), ...apiModules]);
+    const cached = readCache();
+    if (cached === signature && fs.existsSync(OUTPUT) && fs.existsSync(API_MOCK_OUTPUT)) {
+      console.log('[component-preview] 无变更，跳过生成');
+      return;
+    }
+    const catalog = buildCatalog(usageSources);
+
+    // 基线读写隔离于主 try：基线异常只降级为 stable，不触发下方「写入空清单」
+    let result;
+    try {
+      result = computeStatus(catalog, readBaselineWithWarn(), sampleExtensionWhitelist());
+    } catch (error) {
+      console.warn(`[component-preview] 基线处理失败，跳过 status 标注: ${errorMessage(error)}`);
+      result = {
+        statuses: new Map(catalog.map(entry => [entry.id, 'stable'])),
+        removedIds: [],
+        infoIds: [],
+        incomplete: false,
+      };
+    }
+    for (const entry of catalog) entry.status = result.statuses.get(entry.id) ?? 'stable';
+
+    writeCatalog(catalog);
+    const mockCount = writeApiMock(collectApiMocks(API_MODULES_DIR), API_MOCK_OUTPUT);
+    writeCache(signature);
+    warnPending(result);
+
+    console.log(`[component-preview] 已生成 ${catalog.length} 个组件条目 -> ${path.relative(ROOT, OUTPUT)}`);
+    console.log(`[component-preview] 已生成 ${mockCount} 条接口样例 -> ${path.relative(ROOT, API_MOCK_OUTPUT)}`);
+  } catch (error) {
+    // 不写空清单兜底：产物是运行时硬依赖，降级成空数据只会让「构建成功但预览空白」更难排查。
+    // 保留上一次的完整产物，并用非零退出码让 build/dev 的 && 短路，避免带着半成品继续。
+    console.error(`[component-preview] 生成失败，保留上一次产物: ${errorMessage(error)}`);
+    process.exitCode = 1;
+  }
+}
+
 /** --check / --baseline 共用：全量扫描、只在内存 buildCatalog，绕缓存 */
 function buildCatalogInMemory() {
   return buildCatalog(collectUsageSources());
@@ -254,57 +297,6 @@ function runBaseline(args) {
   console.log(`[component-preview --baseline] 已写回 ${catalog.length} 个组件基线`);
 }
 
-function runBuild() {
-  try {
-    const usageSources = collectUsageSources();
-    const apiModules = walk(API_MODULES_DIR).filter(file => file.endsWith('.ts'));
-    const signature = signatureOf([...usageSources.map(source => source.file), ...apiModules]);
-    const cached = readCache();
-    if (cached === signature && fs.existsSync(OUTPUT) && fs.existsSync(API_MOCK_OUTPUT)) {
-      console.log('[component-preview] 无变更，跳过生成');
-      return;
-    }
-    const catalog = buildCatalog(usageSources);
-
-    // 基线读写隔离于主 try：基线异常只降级为 stable，不触发下方「写入空清单」
-    let result;
-    try {
-      result = computeStatus(catalog, readBaselineWithWarn(), sampleExtensionWhitelist());
-    } catch (error) {
-      console.warn(`[component-preview] 基线处理失败，跳过 status 标注: ${errorMessage(error)}`);
-      result = {
-        statuses: new Map(catalog.map(entry => [entry.id, 'stable'])),
-        removedIds: [],
-        infoIds: [],
-        incomplete: false,
-      };
-    }
-    for (const entry of catalog) entry.status = result.statuses.get(entry.id) ?? 'stable';
-
-    writeCatalog(catalog);
-    const mockCount = writeApiMock(collectApiMocks(API_MODULES_DIR), API_MOCK_OUTPUT);
-    writeCache(signature);
-    warnPending(result);
-
-    console.log(`[component-preview] 已生成 ${catalog.length} 个组件条目 -> ${path.relative(ROOT, OUTPUT)}`);
-    console.log(`[component-preview] 已生成 ${mockCount} 条接口样例 -> ${path.relative(ROOT, API_MOCK_OUTPUT)}`);
-  } catch (error) {
-    console.error(`[component-preview] 生成失败，写入空清单: ${errorMessage(error)}`);
-    process.exitCode = 1;
-    try {
-      writeCatalog([]);
-    } catch {
-      // 连空清单都写不出时，保持上一次产物不动，避免破坏构建
-    }
-    try {
-      // 样例表同样不入库，缺失会让 preview 里的 JSON import 直接编译失败，必须留一份空表兜底
-      writeApiMock([], API_MOCK_OUTPUT);
-    } catch {
-      // 写入空表也失败时，只能依赖上一次产物
-    }
-  }
-}
-
 /**
  * --check：只在内存 buildCatalog（不写 catalog / api-mock / 缓存 / 基线），
  * 打印 diff/status + removedIds + infoIds；incomplete 时只警告、不报错。
@@ -326,6 +318,8 @@ function runCheck() {
   if (pending.length) {
     console.log('待确认（new / changed）:');
     for (const [id, status] of pending) console.log(`  [${status}] ${id}`);
+    // --check 作为 test:ci 的最后一道护栏：变更样例未确认必须阻断 CI（文档口径「变更样例必须全绿」）
+    process.exitCode = 1;
   } else {
     console.log('无待确认组件');
   }

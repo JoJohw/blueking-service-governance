@@ -279,6 +279,11 @@
   });
 
   onBeforeMount(() => {
+    // 只有 iframe 跳过启动期请求：frame 的请求已由 main.ts 提前打桩，且无真实 user/角色。
+    // 外壳仍渲染完整 header（logo / 用户菜单），必须保留真实请求——onBeforeMount 只在 App
+    // 挂载时跑一次，若外壳也跳过，点 logo 或浏览器前进/后退回到业务页后，
+    // 平台配置 / 角色 / 工作空间列表就永远不会补发（标题不更新、hasPlatformRole 恒 false）。
+    if (isDesignerFrame.value) return;
     spaceStore.handleGetWorkspaceList();
     getPlatformInfo();
     userStore.getRoleInfo();

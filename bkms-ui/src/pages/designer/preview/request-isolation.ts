@@ -18,6 +18,7 @@
 import ConsoleFetch from '~/api/fetch';
 
 import apiMockSamples from '../generated/api-mock.json';
+import { installFetchGuard } from './fetch-guard';
 
 type RequestMethod = ConsoleFetch['request'];
 
@@ -34,12 +35,14 @@ const samples = apiMockSamples as Record<string, unknown>;
 
 const originalRequest: RequestMethod = ConsoleFetch.prototype.request;
 let isolateCount = 0;
+let restoreFetchGuard: (() => void) | null = null;
 
 /**
  * 预览环境把所有 API 请求改为返回本地样例：组件照常挂载、照常走自己的数据加载流程，
  * 但请求不会真正发出，避免缺上下文导致的 4xx/5xx 与全局错误提示。
  * 命中样例表就返回样例（克隆一份，防止组件改动污染下一次预览），未命中仍返回空数组兜底。
  * 引用计数保证嵌套调用时不会把已打桩函数当成 original，卸载顺序错乱也能还原。
+ * ConsoleFetch 之外再补一层 window.fetch 兜底：第三方库直接调原生 fetch 时不漏网。
  */
 export function isolateRequests(): () => void {
   if (isolateCount === 0) {
@@ -47,6 +50,7 @@ export function isolateRequests(): () => void {
       const sample = samples[`${method} ${url}`];
       return sample === undefined ? [] : structuredClone(sample);
     }) as unknown as RequestMethod;
+    restoreFetchGuard = installFetchGuard();
   }
   isolateCount += 1;
   let restored = false;
@@ -56,6 +60,8 @@ export function isolateRequests(): () => void {
     isolateCount -= 1;
     if (isolateCount === 0) {
       ConsoleFetch.prototype.request = originalRequest;
+      restoreFetchGuard?.();
+      restoreFetchGuard = null;
     }
   };
 }

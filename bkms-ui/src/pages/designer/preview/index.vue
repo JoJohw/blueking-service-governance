@@ -163,7 +163,6 @@
 
   import { componentCatalog } from '../generated/component-catalog';
   import { buildComponentMap, PREVIEW_ID_BASE } from './catalog';
-  import { isolateRequests } from './request-isolation';
   import SafeComponent from './safe-component';
   import { buildAllPlaceholderSlots, buildRealSlots } from './slot-render';
   import { useCanvasFit } from './use-canvas-fit';
@@ -171,9 +170,6 @@
   import { resolveActiveVariant, resolvePreviewTabs, resolveSlotOverrides, resolveVariantProps } from './variants';
 
   import type { ComponentCatalogEntry } from '../generated/component-catalog';
-
-  const restoreRequests = isolateRequests();
-  onBeforeUnmount(() => restoreRequests());
 
   /**
    * 预览 iframe 的 Pinia 与主应用隔离，这里给一个假的 appID，
@@ -184,12 +180,13 @@
   appDetailStore.updateAppID('__designer_preview__');
   onBeforeUnmount(() => appDetailStore.updateAppID(previousAppID));
 
-  // 静态 glob 覆盖 config 的 componentGlobs（src/**/components/**/*.vue）当前涉及的目录；
+  // 非 eager glob 覆盖 config 的 componentGlobs：每个 .vue 只生成 loader，
+  // 渲染到哪个组件才下载哪个 chunk（清单 44 个，glob 命中 210 个）。
   // Vite 要求字面量，无法直接复用配置，所以下面对「清单有、glob 没匹配到」的组件留了告警
   const componentMap = buildComponentMap(
     {
-      ...import.meta.glob<{ default: Component }>('../../../components/**/*.vue', { eager: true }),
-      ...import.meta.glob<{ default: Component }>('../../../pages/**/components/**/*.vue', { eager: true }),
+      ...import.meta.glob<{ default: Component }>('../../../components/**/*.vue'),
+      ...import.meta.glob<{ default: Component }>('../../../pages/**/components/**/*.vue'),
     },
     PREVIEW_ID_BASE,
   );

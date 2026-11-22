@@ -29,6 +29,7 @@ import VueDevTools from 'vite-plugin-vue-devtools';
 import Layouts from 'vite-plugin-vue-layouts';
 import SvgLoader from 'vite-svg-loader';
 
+import { designerBundleBudgetPlugin } from './scripts/designer-bundle-budget.mjs';
 import layerCss from './scripts/postcss-layer-css.mjs';
 
 export default ({ mode }: { mode: string }) => {
@@ -132,6 +133,7 @@ export default ({ mode }: { mode: string }) => {
     },
 
     plugins: [
+      designerBundleBudgetPlugin(),
       // https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue
       Vue(),
 

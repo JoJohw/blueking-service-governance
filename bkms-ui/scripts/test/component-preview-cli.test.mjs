@@ -21,9 +21,38 @@
  * 拼错 flag / --only 缺值 / --prune 不带 --baseline / --check 与 --baseline 互斥 等，
  * 这些以前都会落到日常生成，把 flag 静默吞掉。
  */
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { parseArgs } from '../component-preview/index.mjs';
+import { parseArgs, runBuild } from '../component-preview/index.mjs';
+
+// 注入 buildCatalog 抛错：验证「生成失败保留上次产物 + 非零退出」，而不是断言源码文本
+vi.mock('../component-preview/internal/catalog.mjs', async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    collectUsageSources: () => [],
+    buildCatalog: () => {
+      throw new Error('模拟解析失败');
+    },
+    writeCatalog: vi.fn(),
+  };
+});
+vi.mock('../component-preview/internal/cache.mjs', async importOriginal => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    readCache: () => null,
+    signatureOf: () => 'test-signature',
+    writeCache: vi.fn(),
+  };
+});
+
+const originalExitCode = process.exitCode;
+
+afterEach(() => {
+  process.exitCode = originalExitCode;
+  vi.clearAllMocks();
+});
 
 describe('parseArgs CLI 参数解析', () => {
   it('无参数返回默认 flags', () => {
@@ -105,5 +134,16 @@ describe('parseArgs CLI 参数解析', () => {
     expect(args.baseline).toBe(true);
     expect(args.force).toBe(true);
     expect(args.yes).toBe(true);
+  });
+});
+
+/** 生成失败时的产物策略：不写空清单、保留上次产物、以非零退出码中断（空清单兜底曾让「生成失败」伪装成「构建成功但预览空白」） */
+describe('生成失败时的产物策略', () => {
+  it('buildCatalog 抛错时不写产物并以非零退出码中断', async () => {
+    const { writeCatalog } = await import('../component-preview/internal/catalog.mjs');
+    process.exitCode = 0;
+    runBuild();
+    expect(writeCatalog).not.toHaveBeenCalled();
+    expect(process.exitCode).toBe(1);
   });
 });

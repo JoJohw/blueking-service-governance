@@ -25,6 +25,19 @@
 </template>
 
 <script setup lang="ts">
+  import { onBeforeUnmount } from 'vue';
+
+  import { useRouter } from 'vue-router';
+
   import Palette from '../../../dev/palette/src/App.vue';
+  import { isFrameRoute } from './preview/designer-route';
   import ComponentPreview from './preview/index.vue';
+
+  // frame 文档没有真实 user、启动期 store 未初始化且请求仍打桩，不能在本页跳业务路由。
+  // 守卫必须挂在 frame 路由组件（本组件）而非 preview/index.vue：后者只在 viewMode === 'component'
+  // 时才经 slot 渲染，外壳带 ?view=color 等进入时它根本不挂载，守卫会漏注册。
+  // 本组件覆盖 frame 全生命周期（无论当前是 color / radius / viz / component 视图），随卸载移除。
+  const router = useRouter();
+  const removeFrameGuard = router.beforeEach(to => isFrameRoute(to.name));
+  onBeforeUnmount(() => removeFrameGuard());
 </script>

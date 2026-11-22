@@ -13,7 +13,7 @@
 | `rules/radius.mjs` | 圆角维度三条规则                                                                 |
 | `report.mjs`       | 存量报表，只看不改（`pnpm theme:report`）                                        |
 
-测试在 `scripts/test/`，用 `pnpm test:scripts` 单独跑，不进 `test:unit` / `test:ci`。
+测试在 `scripts/test/`，用 `pnpm test:scripts` 单独跑，不进 `test:unit`，但已串进 `test:ci`（`test:ci` 会在业务单测后跑这条脚本配置）。
 
 ## 令牌从哪来
 

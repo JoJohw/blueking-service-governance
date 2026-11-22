@@ -32,7 +32,7 @@ export const API_MODULES_DIR = path.join(SRC_DIR, 'api/modules');
 /** 接口 mock 样例产物：预览环境按 url 模板命中后返回，代替原先一律返回 [] */
 export const API_MOCK_OUTPUT = path.join(GENERATED_DIR, 'api-mock.json');
 export const CACHE = path.join(ROOT, 'node_modules/.cache/component-preview-cache.json');
-/** 生成器目录（internal 的上一层）：缓存签名要覆盖 internal/ 与配置文件的 mtime */
+/** 生成器目录（internal 的上一层）：缓存签名覆盖 internal/ 与配置文件的「内容 hash」（见 cache.mjs） */
 export const MODULE_DIR = path.resolve(MODULE_ROOT, '..');
 /** 组件基线文件：入 git，记录每个组件的 sampleSignature，用于 diff 出 new/changed/stable */
 export const BASELINE = path.join(MODULE_DIR, 'component-baseline.json');
