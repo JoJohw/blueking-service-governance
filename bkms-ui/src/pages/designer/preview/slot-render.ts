@@ -101,22 +101,25 @@ export function buildRealSlots(
       if (kind === 'skip') return [];
       if (kind === 'sample') {
         const override = overrides?.[name];
-        return override && 'sample' in override ? [[name, () => renderSlotSample(override.sample)]] : [];
+        return override && 'sample' in override
+          ? [[name, () => renderSlotSample(override.sample, override.inline)]]
+          : [];
       }
-      return [[name, () => renderFillerBlock(index)]];
+      const override = overrides?.[name];
+      return [[name, () => renderFillerBlock(index, override && 'inline' in override && override.inline)]];
     }),
   );
 }
 
-/** 真实态中性填充块：只撑尺寸，不表达「可替换」语义 */
-function renderFillerBlock(index: number) {
+/** 真实态中性填充块：只撑尺寸，不表达「可替换」语义；inline 时按内容自适应、不占满宽度 */
+function renderFillerBlock(index: number, inline?: boolean) {
   return h(
     'div',
     {
       title: `内容 ${index + 1}`,
       style: {
         ...placeholderBlockBase,
-        display: 'flex',
+        display: inline ? 'inline-flex' : 'flex',
         minHeight: '20px',
         borderRadius: 'var(--bkms-radius-tag)',
         background: 'var(--bkms-neutral-2)',
@@ -125,6 +128,11 @@ function renderFillerBlock(index: number) {
     },
     [renderPlaceholderText(`内容 ${index + 1}`)],
   );
+}
+
+/** inline 纯文本样例：不套任何盒子，让宿主的行盒、字体与边框（如虚线下划线）自然呈现 */
+function renderInlineSampleText(text: string) {
+  return h('span', { style: { whiteSpace: 'nowrap' } }, text);
 }
 
 /** 长文案（如 `可替换区域<slot: default>`）在窄容器里省略，完整内容留在 title 里 */
@@ -163,8 +171,22 @@ function renderSlotPlaceholder(name: string, index: number) {
   );
 }
 
-function renderSlotSample(sample: SlotSample) {
+/**
+ * inline：插槽在宿主里是内联位置时，外层不能再用 width:100% 的块级容器，否则会把宿主布局挤成分行。
+ * 宿主常是依赖行盒的 inline 元素（如 under-line-tips 的虚线下划线画在行盒底边、tab-header 的
+ * title-extra 与标题同行）：任何高于行盒的块级/inline-flex 内容都会向下超出、盖住宿主自身的视觉。
+ * 所以纯文本样例直接渲染成 inline 文本（沿用宿主字体样式），只有 repeat/row 样例才退回 inline-flex 包裹。
+ */
+function renderSlotSample(sample: SlotSample, inline?: boolean) {
   const items = Array.isArray(sample) ? sample : [sample];
+  const isPlainText = (item: (typeof items)[number]): item is { text: string } =>
+    !('row' in item) && !('repeat' in item);
+  if (inline && items.every(isPlainText)) {
+    const texts = items.map(item => renderInlineSampleText(item.text));
+    return texts.length > 1
+      ? h('span', { style: { display: 'inline-flex', alignItems: 'baseline', gap: '8px', maxWidth: '100%' } }, texts)
+      : texts[0];
+  }
   const blocks = items.flatMap(item => {
     if ('row' in item) {
       return [
@@ -187,5 +209,7 @@ function renderSlotSample(sample: SlotSample) {
         )
       : [h('div', { style: sampleBlockStyle }, item.text)];
   });
+  if (inline)
+    return h('div', { style: { display: 'inline-flex', alignItems: 'center', gap: '8px', maxWidth: '100%' } }, blocks);
   return h('div', { style: { display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' } }, blocks);
 }

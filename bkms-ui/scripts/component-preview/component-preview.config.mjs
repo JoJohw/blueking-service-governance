@@ -28,6 +28,7 @@ import scrollLayout from './plugins/scroll-layout.mjs';
 import sensitiveValueInput from './plugins/sensitive-value-input.mjs';
 import skeleton from './plugins/skeleton.mjs';
 import sortDropdown from './plugins/sort-dropdown.mjs';
+import tabHeader from './plugins/tab-header.mjs';
 import tab from './plugins/tab.mjs';
 import tableException from './plugins/table-exception.mjs';
 import toggleCard from './plugins/toggle-card.mjs';
@@ -201,10 +202,7 @@ export const CONFIG = {
      * - useRouter()：预览页跑在真实路由里，router 可用
      * - group-hover + opacity-0：预览页已有 opacity:1 补丁
      */
-    patterns: [
-      source => /<iframe\b/.test(source),
-      source => /route\.params/.test(source),
-    ],
+    patterns: [source => /<iframe\b/.test(source), source => /route\.params/.test(source)],
   },
   /**
    * 各类型的占位值。string 用可读文案而非空串，避免预览里出现空白；
@@ -245,6 +243,7 @@ export const CONFIG = {
     sortDropdown,
     tableException,
     tab,
+    tabHeader,
     toggleCard,
     underLineTips,
   ],

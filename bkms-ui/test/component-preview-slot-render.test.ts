@@ -83,4 +83,19 @@ describe('真实态的插槽内容', () => {
     expect(wrapper.text()).toBe('内容 1');
     expect(wrapper.find('div').attributes('title')).toBe('内容 1');
   });
+
+  it('inline 声明保留填充块，但外层用 inline-flex 内联显示', () => {
+    const slots = buildRealSlots(['default'], [], [], { default: { inline: true } });
+    const wrapper = renderSlot(slots, 'default');
+    expect(wrapper.text()).toBe('内容 1');
+    expect(wrapper.html()).toContain('display: inline-flex');
+  });
+
+  it('inline 纯文本样例渲染成 inline 文本，不套高于行盒的容器', () => {
+    const slots = buildRealSlots(['default'], [], [], { default: { inline: true, sample: { text: '下划线文本' } } });
+    const wrapper = renderSlot(slots, 'default');
+    expect(wrapper.text()).toBe('下划线文本');
+    expect(wrapper.html()).toContain('white-space: nowrap');
+    expect(wrapper.html()).not.toContain('min-height');
+  });
 });

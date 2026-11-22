@@ -19,6 +19,8 @@
 /**
  * UnderLineTips 预览插件：default 是带下划线的提示文本，无 fallback。
  * 真实态给文字样例，结构视图显示占位块，切换才有区别。
+ * 宿主是带 border-bottom 虚线的 inline span，inline 元素的 border 不参与行盒高度、
+ * 画在内容区底边：块级 slot 内容会压在边框上把下划线盖掉，所以声明 inline 样例。
  */
 export default {
   name: 'components/under-line-tips',
@@ -31,7 +33,7 @@ export default {
 
   slotOverrides: {
     'components/under-line-tips': {
-      default: { sample: { text: '带下划线的提示文字' } },
+      default: { inline: true, sample: { text: '带下划线的提示文字' } },
     },
   },
 };

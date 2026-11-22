@@ -47,6 +47,8 @@ export interface ComponentCatalogEntry {
     string,
     | { omit: true }
     | {
+        /** 插槽在宿主里是内联位置时置 true：纯文本样例渲染成 inline 文本，避免块级内容盖住宿主自己的行盒视觉（如下划线、同行布局） */
+        inline?: boolean;
         sample:
           | { text: string }
           | { repeat: number; text?: string }
@@ -56,6 +58,10 @@ export interface ComponentCatalogEntry {
               | { repeat: number; text?: string }
               | { row: true; repeat: number; text?: string; width?: number }
             )[];
+      }
+    | {
+        /** 插槽在宿主里是内联位置时置 true，保留默认中性填充块但外层用 inline-flex、按内容自适应 */
+        inline: true;
       }
   >;
   /** 插件声明的可替换区域结构搭配：设计师视角下按搭配分卡展示 slot 结构 */
