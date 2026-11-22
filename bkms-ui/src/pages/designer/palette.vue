@@ -26,5 +26,5 @@
 
 <script setup lang="ts">
   import Palette from '../../../dev/palette/src/App.vue';
-  import ComponentPreview from './component-preview.vue';
+  import ComponentPreview from './preview/index.vue';
 </script>

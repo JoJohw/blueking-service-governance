@@ -17,7 +17,7 @@
 
 import ConsoleFetch from '~/api/fetch';
 
-import apiMockSamples from './generated/api-mock.json';
+import apiMockSamples from '../generated/api-mock.json';
 
 type RequestMethod = ConsoleFetch['request'];
 

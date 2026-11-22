@@ -22,7 +22,7 @@
  * 抽成纯函数是为了能单测：这些规则决定「标题栏出现哪些按钮」「当前变体的 slot 样例如何与条目合并」，
  * 写错只会表现为预览里少个按钮或样例不生效，界面上不报错，靠肉眼回归代价高。
  */
-import type { ComponentCatalogEntry } from './generated/component-catalog';
+import type { ComponentCatalogEntry } from '../generated/component-catalog';
 
 export type PreviewVariant = NonNullable<ComponentCatalogEntry['variants']>[number];
 export type RealSlotKind = 'filler' | 'sample' | 'skip';

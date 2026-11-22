@@ -24,7 +24,7 @@ import {
   resolveRealSlotKind,
   resolveSlotOverrides,
   resolveVariantProps,
-} from '~/pages/designer/preview-variants';
+} from '~/pages/designer/preview/variants';
 
 /**
  * 预览变体的选择与合并规则：写错只表现为「标题栏少个按钮」或「样例不生效」，
