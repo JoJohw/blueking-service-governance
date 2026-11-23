@@ -65,7 +65,7 @@ src/styles/theme/
 - **stylelint**：`patches/**`（bkui-theme / lib / ua-fill 三域）豁免形态类规则（`no-descending-specificity` / `no-duplicate-selectors` / `selector-class-pattern` / `selector-pseudo-element-colon-notation` / `selector-attribute-quotes` / `order/properties-order`）；`overrides.css` 是手写层，只豁免同一批形态类规则，圆角多值（`declaration-property-value-disallowed-list`）照常生效；`color-no-hex` 全局启用排在存量清零之后。
 - **漂移自检**：`check-overrides.mjs` 校验每条选择器仍存在于 bkui dist css 且原 hex 仍在，库升级后必跑。解析前需先剥文件头注释（首条规则 prelude 混有注释）。
 - **工具链**：`pnpm theme:report`（lint 报告 + viz 待补档）、`node scripts/theme-codemod/scripts/check-lib.mjs`（第三方包变量/选择器漂移）、`pnpm theme:designer`（palette 预览）。
-- **生成器（单源）**：`gen-overrides.mjs` 抽取 bkui dist 中「prop 非 `--` 且 value 含 hex」的 declaration；映射真源是**既往产物**——重跑前扫 `patches/bkui-theme/*.css` 的「令牌 + 行尾原值注释」建 hex→token 索引，未收录值按原值占位进 `reports/gen-summary.md`。每次重跑清掉 `patches/bkui-theme/` 下非白名单产物（`variables.css`、`radius.css` 保留），不删目录。`gen-radius-overrides.mjs` 按 `config/radius-components.json` 白名单从 `dist/style.css` 复刻 `border-radius` 规则生成 `radius.css`（多值统一成整体语义 + 逻辑角清零，`!important` 原样保留），组件族给默认 token，`rules[].match` 按选择器正则对后代换档（椭圆角标 `full`、1px 细条 `indicator`、标签 `tag`、浮层 `overlay`）；每次重跑同步产出 `reports/radius-summary.md` 台账（原值 → token），产物同样受 `check-overrides.mjs` 校验；生成器共享的事实性白名单在 `config/overrides.mjs`。
+- **生成器（单源）**：`gen-overrides/color.mjs` 抽取 bkui dist 中「prop 非 `--` 且 value 含 hex」的 declaration；映射真源是**既往产物**——重跑前扫 `patches/bkui-theme/*.css` 的「令牌 + 行尾原值注释」建 hex→token 索引，未收录值按原值占位进 `reports/gen-summary.md`。每次重跑清掉 `patches/bkui-theme/` 下非白名单产物（`variables.css`、`radius.css` 保留），不删目录。`gen-overrides/radius.mjs` 按 `config/radius-components.json` 白名单从 `dist/style.css` 复刻 `border-radius` 规则生成 `radius.css`（多值统一成整体语义 + 逻辑角清零，`!important` 原样保留），组件族给默认 token，`rules[].match` 按选择器正则对后代换档（椭圆角标 `full`、1px 细条 `indicator`、标签 `tag`、浮层 `overlay`）；每次重跑同步产出 `reports/radius-summary.md` 台账（原值 → token），产物同样受 `check-overrides.mjs` 校验；生成器共享的事实性白名单在 `config/overrides.mjs`。
 - **纪律**：进 `patches/` 前先试 bridge；patches 内禁止裸 hex（原值只进注释）。
 
 ## 七、非颜色 token 与 UnoCSS
@@ -105,7 +105,7 @@ src/styles/theme/
 | `tokens/radius.css` | 8 个档位（尺度 6 + 形状 2）+ 11 个语义档（`--bkms-radius-*`） |
 | `tokens/viz.css` | 33 个令牌，独立实色，见 `THIRD-PARTY-THEME.md` |
 | `patches/bkui-theme/` | 43 个 CSS（41 组件域 + `index.css` + `variables.css`） |
-| `patches/lib/` | 12 个 CSS（10 覆写 + 2 `index.css`），9 个库 |
+| `patches/lib/` | 14 个 CSS（12 覆写 + 2 `index.css`），9 个库 |
 | `patches/ua-fill/` | 2 个 CSS（`form-control.css` + `index.css`） |
 | 业务层 hex 残留 | 6 位 hex 32 处（另 1 处在 `custom-image-push-guide.vue` 注释里；历史基线约 2000 处 / 350+ 文件） |
 | theme-lint | 7 条规则 / 3 个规则模块（颜色 / 圆角 / shared） |

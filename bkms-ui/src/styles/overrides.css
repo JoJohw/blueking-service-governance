@@ -127,6 +127,13 @@
 
 /* ══════════ bkui：form 控件（tab / button / textarea / search-select）══════════ */
 
+/* bk-select-tag 的 .input() mixin 自带 overflow:hidden，单选 Select 的 bk-input 没有，
+   prefix 的直角背景会溢出圆角，与 tag 形态观感不一致。
+   组件库原生 2px 圆角下不明显，radius 令牌把 bk-input 提到 6px 后暴露 */
+.bk-input {
+  overflow: hidden;
+}
+
 .bk-tab-content {
   padding: 18px 24px !important;
 }
@@ -142,6 +149,12 @@
 /* SearchSelect 选中项过多时容器空间不足不换行 */
 .bk-search-select-container .search-container-input {
   min-width: fit-content;
+}
+
+/* #prefix slot 不渲染组件自带的 .bk-select--prefix-area，而 .has-prefix 又清掉 tag 的左内边距，
+   多选 tag Select 的 10px 间距因此丢失；prefix prop 自带 10px margin，需排除避免双倍间距 */
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag.has-prefix:not(:has(.bk-select--prefix-area)) .bk-select-tag-wrapper {
+  padding-inline: 10px;
 }
 
 /* ══════════ bkui：dialog / modal ══════════ */

@@ -63,10 +63,6 @@
     >
       <div class="flex flex-wrap items-center gap-x-[16px] gap-y-[8px]">
         <div class="monitor-instance-selector flex items-center min-w-0">
-          <span
-            class="flex-shrink-0 whitespace-nowrap bkms-bg-subtle h-[32px] leading-[30px] bkms-text-body text-[12px] px-[6px] b b-r-0 border-bkms-navy-5"
-            >{{ $t('实例名称') }}</span
-          >
           <Select
             ref="selectRef"
             v-model="selectedInstance"
@@ -83,6 +79,9 @@
             @tag-remove="handleRemoveTag"
             @toggle="handleSelectBlur"
           >
+            <template #prefix>
+              <span class="bkms-prefix-label">{{ $t('实例名称') }}</span>
+            </template>
             <div
               class="px-[12px] py-[6px]"
               @click.stop
@@ -142,7 +141,6 @@
             </template>
           </SortDropdown>
           <div class="flex items-center">
-            <span class="monitor-ranking-label">Limit</span>
             <!-- 数字步进按钮通过 change 提交，即使输入框未获得焦点。 -->
             <Input
               v-model="limitDraft"
@@ -155,7 +153,11 @@
               @blur="commitLimit"
               @change="commitLimit"
               @enter="commitLimit"
-            />
+            >
+              <template #prefix>
+                <span class="bkms-prefix-label">Limit</span>
+              </template>
+            </Input>
           </div>
         </div>
       </div>
@@ -167,9 +169,7 @@
           :clearable="false"
         >
           <template #prefix>
-            <span class="bkms-bg-subtle leading-[32px] bkms-text-body text-[12px] px-[6px] b-r border-r-bkms-navy-5">{{
-              $t('汇聚周期')
-            }}</span>
+            <span class="bkms-prefix-label">{{ $t('汇聚周期') }}</span>
           </template>
           <Select.Option
             v-for="option in convergenceOptions"
@@ -184,9 +184,7 @@
           :clearable="false"
         >
           <template #prefix>
-            <span class="bkms-bg-subtle leading-[32px] bkms-text-body text-[12px] px-[6px] b-r border-r-bkms-navy-5">{{
-              $t('汇聚方法')
-            }}</span>
+            <span class="bkms-prefix-label">{{ $t('汇聚方法') }}</span>
           </template>
           <Select.Option
             v-for="option in methodOptions"
@@ -1162,16 +1160,8 @@
     flex: 1 1 320px;
   }
 
-  .monitor-ranking-label {
-    color: var(--bkms-text-body);
-    background-color: var(--bkms-neutral-8);
-    border-color: var(--bkms-navy-5);
-
-    @apply flex h-[32px] shrink-0 items-center whitespace-nowrap b b-r-0 px-[6px] text-[12px];
-  }
-
   .monitor-ranking-limit {
-    width: 88px;
+    width: 132px;
   }
 
   .monitor-rank-header {

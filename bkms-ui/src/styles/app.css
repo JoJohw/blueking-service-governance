@@ -71,6 +71,20 @@
   background-color: var(--bkms-neutral-5);
 }
 
+/* 输入/选择控件 prefix 槽内的标签：灰底 + 右侧分隔线，形态与颜色一并收编 */
+.bkms-prefix-label {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 32px;
+  padding: 0 6px;
+  font-size: 12px;
+  color: var(--bkms-text-body);
+  white-space: nowrap;
+  background-color: var(--bkms-bg-subtle);
+  border-right: 1px solid var(--bkms-navy-5);
+}
+
 /* ────────────── 通用工具类 ────────────── */
 
 .bkms-cursor-element {

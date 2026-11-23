@@ -62,3 +62,69 @@
 .bkms-themed .title-wrapper .chart-title {
   color: var(--bkms-text-title);
 }
+
+/* ── 原生 2px/3px/4px 圆角 → 语义令牌 ── */
+
+/* field：检索输入框 / 标签输入 / 选择器容器 */
+.bkms-themed .vue3_retrieval-filter__qs-selector-component-wrap,
+.bkms-themed .vue3_retrieval__value-tag-input-component,
+.bkms-themed .vue3_retrieval__value-tag-selector-component .value-tag-selector-component-wrap,
+.bkms-themed .vue3_resident-setting__setting-kv-selector-component .component-main,
+.bkms-themed .vue3_retrieval-filter__component .retrieval-filter__component-main {
+  border-radius: var(--bkms-radius-field);
+}
+
+/* tag：KV 标签 / 检索标签 / 告警标签 / 时区标签类小块 */
+.bkms-themed .vue3_retrieval-filter__kv-tag-component .retrieval-filter__kv-tag-component-wrap,
+.bkms-themed .alarm-dispatch-component-dialog .alarm-dispatch .form-item .label .tags .tag {
+  border-radius: var(--bkms-radius-tag);
+}
+
+/* overlay：浮层 / 面板 / tooltip 内容块 */
+.bkms-themed .monitor-chart-tooltips,
+.bkms-themed .tippy-tooltip.common-monitor-theme,
+.bkms-themed .child-list-popover,
+.bkms-themed .group-select-panel,
+.bkms-themed .auto-input-theme .tips-list-wrap {
+  border-radius: var(--bkms-radius-overlay);
+}
+
+/* card：面状容器 / 配置块 / 编辑区 */
+.bkms-themed .chart-menu,
+.bkms-themed .vue3_retrieval-filter__resident-setting-transfer-component,
+.bkms-themed .alarm-confirm-dialog .info-content,
+.bkms-themed .transfer-component__dimension {
+  border-radius: var(--bkms-radius-card);
+}
+
+/* control：可点按钮 / 操作件 / 拖拽把手 */
+.bkms-themed .vue3_retrieval-filter__qs-selector-options-component .wrap-left .options-wrap .option-item .subtitle-text,
+.bkms-themed .vue3_retrieval-filter__qs-selector-component-wrap .qs-operate-wrap .operate-btn,
+.bkms-themed .vue3_retrieval-filter__ui-selector-component .add-btn,
+.bkms-themed .vue3_retrieval-filter__ui-selector-component .kv-placeholder .hover-btn-wrap .operate-btn,
+.bkms-themed .quick-alarm-shield-event .stratrgy-item .item-content .column-content .reset,
+.bkms-themed .explore-chart .base-chart-container .chart-restore,
+.bkms-themed .bk-monitor-drag,
+.bkms-themed .bk-monitor-drag-simple {
+  border-radius: var(--bkms-radius-control);
+}
+
+/* base：无法明确归类的元素（图标 / 描述 / 提示 / 标题区间 / 列表项等） */
+.bkms-themed .vue3_retrieval-filter__qs-selector-options-component .wrap-left .key-help .desc-item .desc-item-icon,
+.bkms-themed .vue3_retrieval-filter__qs-selector-options-component .wrap-left .key-help .desc-item .desc-item-box,
+.bkms-themed .vue3_retrieval-filter__resident-setting-transfer-component .component-top .component-top-left .content-wrap,
+.bkms-themed .vue3_retrieval-filter__resident-setting-transfer-component .component-top .component-top-right .content-wrap,
+.bkms-themed .time-consuming-component.default,
+.bkms-themed .vue3_retrieval-filter__kv-tag-component .retrieval-filter__kv-tag-component-wrap .btn-wrap .hide-btn,
+.bkms-themed .vue3_retrieval-filter__ui-selector-options-component .component-top .component-top-left .options-wrap,
+.bkms-themed .vue3_retrieval-filter__ui-selector-options-component .component-bottom .desc-item .desc-item-icon,
+.bkms-themed .vue3_retrieval-filter__ui-selector-options-component .component-bottom .desc-item .desc-item-box,
+.bkms-themed .alarm-dispatch-component-dialog .alarm-dispatch .tips,
+.bkms-themed .quick-alarm-shield-event .stratrgy-item .item-content,
+.bkms-themed .http-editor-wrap .http-header-wrap .http-header-main .tab-select-wrap .tab-item-wrap .tab-label-wrap,
+.bkms-themed .monitor-chart-tooltips .tooltips-content-item .item-value,
+.bkms-themed .title-wrapper .chart-title .main-title .title-interval,
+.bkms-themed .bk-scroll-home .bk-min-nav-slide,
+.bkms-themed .promql-editor {
+  border-radius: var(--bkms-radius-base);
+}

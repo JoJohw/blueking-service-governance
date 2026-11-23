@@ -17,7 +17,7 @@
  */
 
 /**
- * CSS 文本解析工具：gen-overrides.mjs 与 check-overrides.mjs 共用。
+ * CSS 文本解析工具：gen-overrides/color.mjs 与 check-overrides.mjs 共用。
  * 两侧对选择器拆分与块解析的口径必须一致，否则产物与自检会各说各话，故抽到同一处。
  */
 

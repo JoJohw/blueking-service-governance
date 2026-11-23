@@ -15,7 +15,7 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-/* bkui 圆角覆写 — 由 gen-radius-overrides.mjs 生成，重跑整体覆盖；圆角令牌真源在 tokens/radius.css */
+/* bkui 圆角覆写 — 由 gen-overrides/radius.mjs 生成，重跑整体覆盖；圆角令牌真源在 tokens/radius.css */
 
 /* 字面量版源：dist/style.css —— 圆角选择器逐字复刻，供 check-overrides.mjs 用字面量索引校验 */
 
@@ -24,13 +24,17 @@
   border-radius: var(--bkms-radius-tag);
 }
 
-/* ── input → field ── */
+/* ── input → field（另含 none 分派，逐条见台账） ── */
 .bkms-themed .bk-input {
   border-radius: var(--bkms-radius-field);
 }
 
 .bkms-themed .bk-input--text {
   border-radius: var(--bkms-radius-field);
+}
+
+.bkms-themed .bk-input.is-simplicity {
+  border-radius: var(--bkms-radius-none);
 }
 
 /* ── textarea → field ── */
@@ -42,13 +46,17 @@
   border-radius: var(--bkms-radius-field);
 }
 
-/* ── select → field（另含 tag 分派，逐条见台账） ── */
+/* ── select → field（另含 none 分派，逐条见台账） ── */
 .bkms-themed .bk-select .bk-select-trigger .bk-select-tag {
-  border-radius: var(--bkms-radius-tag);
+  border-radius: var(--bkms-radius-field);
 }
 
 .bkms-themed .bk-select .bk-select-trigger .bk-select-tag-input {
   border-radius: var(--bkms-radius-field);
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-simplicity {
+  border-radius: var(--bkms-radius-none);
 }
 
 /* ── search-select → field（另含 tag 分派，逐条见台账） ── */

@@ -39,7 +39,9 @@ const VIZ_CSS = 'src/styles/theme/tokens/viz.css';
 const LIB_CSS = {
   '@blueking/bk-table.css': VXE_CSS,
   '@blueking/date-picker.css': 'node_modules/@blueking/date-picker/vue3/vue3.css',
+  '@blueking/date-picker-radius.css': 'node_modules/@blueking/date-picker/vue3/vue3.css',
   '@blueking/ediatable.css': 'node_modules/@blueking/ediatable/vue3/vue3.css',
+  '@blueking/ediatable-radius.css': 'node_modules/@blueking/ediatable/vue3/vue3.css',
   '@blueking/monitor.css': 'node_modules/@blueking/monitor-vue3-components/index.css',
   '@blueking/notice.css': 'node_modules/@blueking/notice-component/dist/style.css',
   '@blueking/task-log.css': 'node_modules/@blueking/task-log/vue3/vue3.css',
@@ -53,7 +55,9 @@ const LIB_CSS = {
 const KEY_SELECTORS = {
   '@blueking/bk-table.css': ['.bk-vxe-table', '.bk-vxe-table-setting-column-btn'],
   '@blueking/date-picker.css': ['.panel-wrapper', '.date-panel', '.common-date-list .list-item'],
+  '@blueking/date-picker-radius.css': ['.panel-wrapper', '.date-wrapper .date-input .date-picker'],
   '@blueking/ediatable.css': ['.bk-ediatable', '.bk-ediatable-head-column'],
+  '@blueking/ediatable-radius.css': ['.bk-ediatable table'],
   '@blueking/monitor.css': ['.common-legend', '.monitor-chart-tooltips', '.chart-menu'],
   '@blueking/notice.css': ['.bk-notice-component-alert'],
   '@blueking/task-log.css': ['.log-item', '.bk-popper'],

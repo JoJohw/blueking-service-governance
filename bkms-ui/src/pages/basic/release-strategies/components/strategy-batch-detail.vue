@@ -42,11 +42,6 @@
               : 'border-bkms-navy-5 hover:border-bkms-neutral-3 focus-within:border-bkms-brand-2'
           "
         >
-          <span
-            class="flex shrink-0 items-center whitespace-nowrap border-r border-r-bkms-navy-5 bg-bkms-neutral-8 px-[12px] text-[12px] leading-[20px] text-bkms-neutral-2"
-          >
-            {{ t('累计更新副本数') }}
-          </span>
           <Input
             class="target-value"
             data-testid="target-value"
@@ -56,7 +51,11 @@
             :model-value="batch.targetValue"
             type="number"
             @update:model-value="handleTargetChange"
-          />
+          >
+            <template #prefix>
+              <span class="bkms-prefix-label">{{ t('累计更新副本数') }}</span>
+            </template>
+          </Input>
           <Select
             class="target-unit"
             :clearable="false"
@@ -338,7 +337,7 @@
   /* 三段视为一个控件：边框与圆角只由外层容器承载，内部控件去边框、去圆角 */
   .target-value {
     flex-shrink: 0;
-    width: 120px;
+    width: 228px;
   }
 
   .target-unit {

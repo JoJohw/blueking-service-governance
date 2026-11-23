@@ -23,19 +23,19 @@
  * 形状件（椭圆角标、1px 细条）与语义不同的后代（标签、浮层）靠它，不必拆组件族。
  * 产物带「字面量版源」段标记，check-overrides.mjs 会用字面量索引校验选择器漂移；
  * 索引键依赖选择器逐字复刻，故不合并规则、不改写形状值。本脚本只写自身产物与台账。
- * 用法：node scripts/theme-codemod/scripts/gen-radius-overrides.mjs
+ * 用法：node scripts/theme-codemod/scripts/gen-overrides/radius.mjs
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { collectBlocks, splitSelectorList } from './lib/css-blocks.mjs';
+import { collectBlocks, splitSelectorList } from '../lib/css-blocks.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '../../..');
-const CONFIG = path.join(__dirname, 'config/radius-components.json');
+const ROOT = path.resolve(__dirname, '../../../..');
+const CONFIG = path.join(__dirname, '../config/radius-components.json');
 const OUTPUT = path.join(ROOT, 'src/styles/theme/patches/bkui-theme/radius.css');
-const REPORTS = path.join(__dirname, '../reports');
+const REPORTS = path.join(__dirname, '../../reports');
 const SUMMARY = path.join(REPORTS, 'radius-summary.md');
 
 const LICENSE_LINES = `/*
@@ -185,14 +185,17 @@ for (const rule of rawRules) {
 }
 
 for (const comp of cfg.components) {
-  for (const selector of comp.selectors ?? []) {
+  for (const entry of comp.selectors ?? []) {
+    // 字符串用组件默认 token；对象形式可为单条补白指定别的档（如 simplicity 走 none）
+    const selector = typeof entry === 'string' ? entry : entry.selector;
+    const token = typeof entry === 'string' ? comp.token : (entry.token ?? comp.token);
     const key = `::${selector}`;
     buckets.get(comp.kebab).set(key, {
       selector,
       media: null,
-      value: `var(--bkms-radius-${comp.token})`,
+      value: `var(--bkms-radius-${token})`,
       raw: null,
-      token: comp.token,
+      token,
     });
   }
 }
@@ -200,7 +203,7 @@ for (const comp of cfg.components) {
 const lines = [
   ...LICENSE_LINES,
   '',
-  '/* bkui 圆角覆写 — 由 gen-radius-overrides.mjs 生成，重跑整体覆盖；圆角令牌真源在 tokens/radius.css */',
+  '/* bkui 圆角覆写 — 由 gen-overrides/radius.mjs 生成，重跑整体覆盖；圆角令牌真源在 tokens/radius.css */',
   '',
   SECTION_MARKER,
 ];
@@ -244,7 +247,7 @@ const cell = value => String(value ?? '').replace(/\|/g, '\\|');
 const summary = [
   '# 圆角覆写台账',
   '',
-  '由 `gen-radius-overrides.mjs` 生成，重跑整体覆盖。组件族与选择器分派在 `scripts/config/radius-components.json`，令牌真源在 `tokens/radius.css`。',
+  '由 `gen-overrides/radius.mjs` 生成，重跑整体覆盖。组件族与选择器分派在 `config/radius-components.json`，令牌真源在 `tokens/radius.css`。',
   '',
   `- 组件族：${cfg.components.length}`,
   `- 覆写规则：${rows.length}（按选择器分派 ${dispatched} 条）`,

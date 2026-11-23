@@ -1,0 +1,57 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
+
+/*
+ * date-picker 原生 2px 圆角 → 语义令牌。
+ * date-picker.css 是 gen-overrides/color.mjs 产物（只扫 hex），圆角手写在独立文件，重跑不会被清。
+ * 滚动条 thumb 的 20px 形状值不覆写（归 --bkms-radius-scroll，main.css 已统一处理）。
+ */
+
+/* field：日期输入框 / 格式化容器 */
+.bkms-themed .date-wrapper .date-input .date-picker,
+.bkms-themed .date-wrapper .date-input .date-picker-start,
+.bkms-themed .date-wrapper .date-input .date-picker-end,
+.bkms-themed .date-format-wrapper,
+.bkms-themed .baseline-custom-option .specific-date-input {
+  border-radius: var(--bkms-radius-field);
+}
+
+/* tag：日期格子 / 时区标签 / UTC 选项 / 收藏项 / 日期图标 / 内容块 */
+.bkms-themed .date-panel-main .date-content .date-grid-item.is-today,
+.bkms-themed .date-panel-main .date-content .date-grid-item.is-selected,
+.bkms-themed .panel-wrapper .time-zone-panel .time-zone-tag,
+.bkms-themed .bk-timezone-picker-option .option-utc,
+.bkms-themed .common-date-list .list-item[data-v-ed496942],
+.bkms-themed .common-favorite,
+.bkms-themed .__bk_date_picker__ .date-icon,
+.bkms-themed .__bk_date_picker__ .date-content,
+.bkms-themed .__date-tooltips__ .date-tooltips-diff {
+  border-radius: var(--bkms-radius-tag);
+}
+
+/* overlay：面板外框 / 浮层 */
+.bkms-themed .panel-wrapper,
+.bkms-themed .baseline-custom-option .specific-date-panel,
+.bkms-themed .__bk_date_picker__ {
+  border-radius: var(--bkms-radius-overlay);
+}
+
+/* base：specific-date 容器（无法明确归类，兜底） */
+.bkms-themed .baseline-custom-option .specific-date {
+  border-radius: var(--bkms-radius-base);
+}

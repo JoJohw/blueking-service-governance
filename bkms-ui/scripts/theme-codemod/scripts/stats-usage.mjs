@@ -20,7 +20,7 @@
  * 统计 bkui-vue 组件在项目中的使用情况（双形态：具名 import + 模板 bk- 标签）。
  * 产出：
  *   - reports/usage-report.md  使用统计报告（人工查阅）
- *   - reports/usage.json       在用组件清单（gen-overrides.mjs 的过滤白名单）
+ *   - reports/usage.json       在用组件清单（gen-overrides/color.mjs 的过滤白名单）
  *
  * 用法：node scripts/theme-codemod/scripts/stats-usage.mjs
  */

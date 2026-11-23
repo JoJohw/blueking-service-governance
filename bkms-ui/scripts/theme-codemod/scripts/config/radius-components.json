@@ -4,13 +4,18 @@
   "shapeMinPx": 20,
   "components": [
     { "kebab": "tag", "prefixes": ["tag"], "selectors": [".bk-tag"], "token": "tag" },
-    { "kebab": "input", "prefixes": ["input"], "token": "field" },
+    {
+      "kebab": "input",
+      "prefixes": ["input"],
+      "token": "field",
+      "selectors": [{ "selector": ".bk-input.is-simplicity", "token": "none" }]
+    },
     { "kebab": "textarea", "prefixes": ["textarea"], "token": "field" },
     {
       "kebab": "select",
       "prefixes": ["select"],
       "token": "field",
-      "rules": [{ "match": "bk-select-tag(?!-input)", "token": "tag" }]
+      "selectors": [{ "selector": ".bk-select .bk-select-trigger .bk-select-tag.is-simplicity", "token": "none" }]
     },
     {
       "kebab": "search-select",

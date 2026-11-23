@@ -70,7 +70,7 @@ const distIndex = buildDistIndex(DIST_FILE);
 const literalDistIndex = buildDistIndex(LITERAL_DIST_FILE);
 
 // 扫描 patches：每组件文件含两段——标记行之前为变量版段（对 style.variable.css 校验），
-// 之后为字面量段（对 dist/style.css 校验）；标记串与 gen-overrides.mjs 须同步
+// 之后为字面量段（对 dist/style.css 校验）；标记串与 gen-overrides/color.mjs 须同步
 const LITERAL_SECTION_MARKER = '/* 字面量版源：dist/style.css';
 
 const patchFiles = fs.existsSync(PATCHES_DIR) ? fs.readdirSync(PATCHES_DIR).filter(f => f.endsWith('.css')) : [];

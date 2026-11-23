@@ -16,7 +16,7 @@
  * to the current version of the project delivered to anyone in the future.
  */
 /**
- * bkui 覆写生成器（gen-overrides.mjs）的组件族白名单。
+ * bkui 覆写生成器（gen-overrides/color.mjs）的组件族白名单。
  * 只放「按组件库事实增补」的归属与别名；算法参数留在生成器里。
  */
 

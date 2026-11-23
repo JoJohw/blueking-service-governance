@@ -38,3 +38,22 @@
   background-color: var(--bkms-bg-card);
   border-color: var(--bkms-line-input);
 }
+
+/* 原生 2px 圆角 → 语义令牌 */
+
+/* tag：日志高亮小块 */
+.bkms-themed [data-v-4b21228d] .log-highlight,
+.bkms-themed [data-v-00899f2c] .log-highlight {
+  border-radius: var(--bkms-radius-tag);
+}
+
+/* overlay：日志浮层 */
+.bkms-themed .bk-popper {
+  border-radius: var(--bkms-radius-overlay);
+}
+
+/* field：日志搜索框（TaskLog 内部用原生 input + rounded-sm 工具类，不走 bk-input 通用覆写） */
+.bkms-themed .h-\[24px\].w-\[360px\].rounded-sm,
+.bkms-themed .h-\[24px\].w-\[360px\].rounded-sm > input {
+  border-radius: var(--bkms-radius-field);
+}

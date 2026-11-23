@@ -35,32 +35,32 @@
  *     手写业务补丁在 src/styles/overrides.css，生成器不触碰）
  *   - reports/gen-summary.md（生成摘要 + 未归属规则 + 未收录 hex 待确认清单）
  *
- * 用法：node scripts/theme-codemod/scripts/gen-overrides.mjs
+ * 用法：node scripts/theme-codemod/scripts/gen-overrides/color.mjs
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { EXTRA_OWNERS, PREFIX_ALIAS } from './config/overrides.mjs';
-import { collectBlocks, splitSelectorList } from './lib/css-blocks.mjs';
+import { EXTRA_OWNERS, PREFIX_ALIAS } from '../config/overrides.mjs';
+import { collectBlocks, splitSelectorList } from '../lib/css-blocks.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '../../..');
+const ROOT = path.resolve(__dirname, '../../../..');
 const DIST = path.join(ROOT, 'node_modules/bkui-vue/dist');
 const PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme');
-const REPORTS = path.join(__dirname, '../reports');
+const REPORTS = path.join(__dirname, '../../reports');
 
 const readJson = f => JSON.parse(fs.readFileSync(path.join(__dirname, f), 'utf8'));
 
 // 防御性检测：usage.json 是白名单基线（stats-usage.mjs 的产物），缺失时引导生成而非抛裸 ENOENT
-const USAGE_PATH = path.join(__dirname, '../reports/usage.json');
+const USAGE_PATH = path.join(__dirname, '../../reports/usage.json');
 if (!fs.existsSync(USAGE_PATH)) {
   console.error(
     '[gen-overrides] 缺少白名单基线 reports/usage.json，请先执行：node scripts/theme-codemod/scripts/stats-usage.mjs',
   );
   process.exit(1);
 }
-const usage = readJson('../reports/usage.json');
+const usage = readJson('../../reports/usage.json');
 
 // 令牌定义值索引：8 位源 hex 若与令牌值完全一致，直接 var() 引用（令牌自带 alpha 时 color-mix 会二次衰减）。
 // 色阶、语义、阴影同在 color.css，漏读会让 8 位精确命中失效
@@ -473,14 +473,6 @@ function inheritNarrowBorder(prop, r, oldBucket) {
   return { prop: narrow, value: colors[0] };
 }
 
-/** rgba(r,g,b,a) → #rrggbbaa：让颜色函数也能命中 8 位令牌（阴影组）与既有 hex 映射 */
-function rgbaToHex8(value) {
-  return value.replace(/rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)/g, (_, r, g, b, a) => {
-    const hex = n => Number(n).toString(16).padStart(2, '0');
-    return `#${hex(r)}${hex(g)}${hex(b)}${hex(Math.round(Number(a) * 255))}`;
-  });
-}
-
 // 同名组件一文件两段：变量版段在前、字面量段在后——字面量源选择器可能更具体，
 // 同 specificity 下后者胜，后置即压制
 for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].sort((a, b) => a.localeCompare(b))) {
@@ -490,7 +482,7 @@ for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].
   const lines = [
     ...LICENSE_LINES,
     '',
-    `/* bkui ${name} 覆写 — 由 gen-overrides.mjs 生成，重跑会整体覆盖本文件 */`,
+    `/* bkui ${name} 覆写 — 由 gen-overrides/color.mjs 生成，重跑会整体覆盖本文件 */`,
     '',
     '/* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */',
     '',
@@ -576,95 +568,6 @@ for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].
   }
 }
 
-// ---------- 3b. 第三方包整包覆写 ----------
-/**
- * 第三方包整包生成：这类库的选择器没有 .bk- 前缀族可供分组件，整包归属一个文件；
- * 与 bkui-theme 共用同一套 hex→令牌映射与级联保护，避免手写几十条规则后静默失效。
- * 目录约定：@blueking/* 的包输出到 patches/lib/@blueking/，其余第三方库与 lib/index.css 平级。
- * 清理：本域与手写覆写（bk-table / vxe / monitor / notice / task-log / user-selector / highlight / markdown）混放，
- * 不能像 bkui-theme 那样整目录清理；从 LIB_SOURCES 摘掉一个库后，须手工删除对应产物文件及 index.css 里的 import。
- */
-const LIB_DIR = path.join(ROOT, 'src/styles/theme/patches/lib');
-const LIB_SOURCES = [
-  {
-    file: 'node_modules/@blueking/date-picker/vue3/vue3.css',
-    out: '@blueking/date-picker.css',
-    name: 'DatePicker（@blueking/date-picker）',
-  },
-  {
-    file: 'node_modules/@blueking/ediatable/vue3/vue3.css',
-    out: '@blueking/ediatable.css',
-    name: 'Ediatable（@blueking/ediatable）',
-  },
-];
-
-/** lib 专属豁免：ediatable 打包了 tippy 提示层（.tippy-*），那是第三方 tooltip 的全局主题，
- * 非组件设计面；在本作用域里覆写会波及全站 tooltip，故跳过 */
-const LIB_SKIP_SELECTOR_RE = /\btippy-/;
-const libStats = [];
-
-for (const source of LIB_SOURCES) {
-  const rawRules = [];
-  // 库内注释（如 stylelint-disable 指令）混在选择器与声明之间会污染产物，先整体剥掉
-  const sourceCss = fs.readFileSync(path.join(ROOT, source.file), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
-  collectBlocks(sourceCss, null, rawRules);
-  const bucket = new Map();
-  let pendingHexes = 0;
-  for (const rule of rawRules) {
-    if (SKIP_SELECTOR_RE.test(rule.selector) || LIB_SKIP_SELECTOR_RE.test(rule.selector)) continue;
-    const decls = [];
-    let hasHexDecl = false;
-    for (const piece of rule.body.split(';')) {
-      const idx = piece.indexOf(':');
-      if (idx === -1) continue;
-      const prop = piece.slice(0, idx).trim();
-      const value = rgbaToHex8(piece.slice(idx + 1).trim());
-      if (!prop || prop.startsWith('--')) continue;
-      const hasHex = value.includes('#') && /#[0-9a-fA-F]{3,8}\b/.test(value);
-      if (hasHex) hasHexDecl = true;
-      decls.push({ prop, value, hasHex, raw: !hasHex && COLOR_PROPS.has(prop) });
-    }
-    if (!hasHexDecl) continue;
-    const key = `${rule.media ?? ''}::${rule.selector}`;
-    if (!bucket.has(key)) bucket.set(key, { selector: rule.selector, media: rule.media, decls: new Map() });
-    const entry = bucket.get(key);
-    for (const d of decls.filter(x => x.hasHex || x.raw)) {
-      const r = d.raw
-        ? { value: d.value.replace(/currentColor/g, 'currentcolor'), comment: '原值保留', pendingHexes: [] }
-        : rewriteValue(d.value, d.prop);
-      if (!r) continue;
-      entry.decls.set(d.prop, r); // 后出现的同名 prop 覆盖（与级联一致）
-      pendingHexes += r.pendingHexes.length;
-    }
-  }
-
-  const lines = [
-    ...LICENSE_LINES,
-    '',
-    `/* ${source.name} 覆写 — 由 gen-overrides.mjs 生成（LIB_SOURCES），重跑会整体覆盖本文件 */`,
-    '',
-    '/* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */',
-    '',
-  ];
-  let rules = 0;
-  for (const { selector, media, decls } of bucket.values()) {
-    if (decls.size === 0) continue;
-    const pad = media ? '  ' : '';
-    if (media) lines.push(`${media} {`);
-    lines.push(`${pad}${scopeSelector(selector, pad)} {`);
-    for (const [prop, r] of decls) lines.push(`${pad}  ${prop}: ${r.value}; /* ${r.comment} */`);
-    lines.push(`${pad}}`);
-    if (media) lines.push('}');
-    lines.push('');
-    rules++;
-  }
-
-  const outPath = path.join(LIB_DIR, source.out);
-  fs.mkdirSync(path.dirname(outPath), { recursive: true });
-  fs.writeFileSync(outPath, `${lines.join('\n').trimEnd()}\n`);
-  libStats.push({ file: source.out, rules, pendingHexes });
-}
-
 // 域内聚合入口：每个 patches 子目录一个 index.css，theme/index.css 只引各域这一个文件
 function writeDomainIndex(dir, files, header) {
   fs.writeFileSync(path.join(dir, 'index.css'), [...header, ...files.map(f => `@import './${f}';`), ''].join('\n'));
@@ -675,7 +578,7 @@ writeDomainIndex(
   [
     ...LICENSE_LINES,
     '',
-    '/* bkui 覆写清单 — 由 gen-overrides.mjs 生成，重跑整体覆盖；variables.css 手工桥接不在此列，radius.css 由 gen-radius-overrides.mjs 产出并随清单引入 */',
+    '/* bkui 覆写清单 — 由 gen-overrides/color.mjs 生成，重跑整体覆盖；variables.css 手工桥接不在此列，radius.css 由 gen-overrides/radius.mjs 产出并随清单引入 */',
     '',
   ],
 );
@@ -693,13 +596,6 @@ const summary = [
   `- 字面量段（dist/style.css）：${literalRules} 条 / ${literalDecls} 声明（并入 bkui-theme/ 组件文件，${perComponent.filter(p => p.litRules > 0).length} 个组件含字面量段；未归属 ${literalUnassigned} 条不计入台账）`,
   `- 未归属规则（选择器无白名单组件前缀）：${unassigned.length} 条`,
   `- 未收录 hex（既对不上既有映射、也不在令牌值）：${unknownHexes.size} 种`,
-  `- lib 整包覆写：${libStats.length} 个包 / ${libStats.reduce((n, v) => n + v.rules, 0)} 条规则（待拍板 hex ${libStats.reduce((n, v) => n + v.pendingHexes, 0)} 处）`,
-  '',
-  '## lib 整包产出（LIB_SOURCES）',
-  '',
-  '| 文件 | 规则数 | 待拍板 hex |',
-  '| --- | --- | --- |',
-  ...libStats.map(v => `| patches/lib/${v.file} | ${v.rules} | ${v.pendingHexes} |`),
   '',
   '## 按组件产出',
   '',
