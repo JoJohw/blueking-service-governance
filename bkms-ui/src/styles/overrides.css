@@ -43,12 +43,28 @@
 
 /* ══════════ bkui：左侧菜单 ══════════ */
 
+.bkms-themed .nav-slider-list {
+  margin: 0 8px;
+  container-type: inline-size;
+}
+
 /* 对齐 design-visual（圆角留边、hover/选中渐变底、选中图标渐变字） */
 .bkms-themed .bk-menu {
-  /* width:auto 抵消 bk-menu 内部的 width:100%，否则 margin 0 8px 会让圆角块向右溢出菜单 */
+  /* 撑满容器宽（而非 bkui 写死的 260px），两种状态下高亮块两侧留边都在、圆角完整；
+     去掉宽度过渡，否则 hover 收回时菜单宽度缓动、图标列已撑满会把图标甩出可视区 */
+  width: 100%;
+  transition: none;
+
   .bk-menu-item {
     width: auto;
-    margin: 0 8px;
+    transition: none;
+
+    /* 折叠态图标列撑满容器，图标自然居中（展开态保留 60px 列宽对齐文字） */
+    @container (max-width: 60px) {
+      .item-icon {
+        flex: 0 0 100%;
+      }
+    }
 
     &:hover {
       background-image: linear-gradient(
