@@ -39,7 +39,7 @@
       >
         <div
           v-bkloading="{ loading: isUpdateLoading }"
-          class="w-full px-[24px] py-[18px] bkms-bg-page border-[1px] border-solid bkms-line-light"
+          class="w-full px-[24px] py-[18px] bkms-bg-page border-[1px] border-solid bkms-line-light rounded-bkms-card"
         >
           <ComponentLabel :label="langMap.label.baseInfo">
             <div class="grid grid-cols-3 px-[20px]">
@@ -114,7 +114,7 @@
           class="grow flex overflow-y-hidden"
         >
           <ComponentLabel
-            class="scrollbar-stable w-[210px] overflow-y-auto pl-[24px] pr-[18px] py-[16px] bkms-bg-subtle border-[1px] border-solid bkms-line-light"
+            class="scrollbar-stable w-[210px] overflow-y-auto pl-[24px] pr-[18px] py-[16px] bkms-bg-subtle border-[1px] border-solid bkms-line-light rounded-bkms-card"
             :label="langMap.label.componentVersion"
           >
             <div class="flex flex-col gap-[8px]">

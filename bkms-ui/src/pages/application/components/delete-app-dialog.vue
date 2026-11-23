@@ -34,7 +34,7 @@
         </span>
       </div>
     </template>
-    <div class="bkms-bg-page mb-[10px] py-[12px] px-[14px] text-[12px]">
+    <div class="bkms-bg-page rounded-bkms-card mb-[10px] py-[12px] px-[14px] text-[12px]">
       {{ $t('删除应用后，所有相关的配置、部署信息和操作记录将永久丢失') }}
     </div>
     <i18n-t

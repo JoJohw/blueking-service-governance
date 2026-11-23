@@ -101,7 +101,7 @@
             {{ $t('复制') }}
           </Button>
         </div>
-        <div class="bkms-bg-page mt-[6px] px-[12px] ml-[28px] py-[16px]">
+        <div class="bkms-bg-page rounded-bkms-card mt-[6px] px-[12px] ml-[28px] py-[16px]">
           <pre
             v-bk-xss-html="highlightedLoginCommand"
             class="push-guide-mono push-guide-pre m-0 whitespace-pre-wrap break-all"
@@ -123,7 +123,7 @@
             {{ $t('复制') }}
           </Button>
         </div>
-        <div class="bkms-bg-page mt-[6px] px-[12px] ml-[28px] py-[16px]">
+        <div class="bkms-bg-page rounded-bkms-card mt-[6px] px-[12px] ml-[28px] py-[16px]">
           <pre
             v-bk-xss-html="highlightedPushCommand"
             class="push-guide-mono push-guide-pre m-0 whitespace-pre-wrap break-all"

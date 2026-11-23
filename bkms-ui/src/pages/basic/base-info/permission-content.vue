@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="py-[12px] px-[16px] bkms-bg-page">
+  <div class="py-[12px] px-[16px] bkms-bg-page rounded-bkms-card">
     <div class="bkms-text-title font-bold text-[12px] mb-[4px]">{{ $t('权限内容') }}</div>
     <ul v-if="value !== 'admin'">
       <li

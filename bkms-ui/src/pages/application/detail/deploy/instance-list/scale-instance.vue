@@ -746,7 +746,7 @@
       content: h(
         'div',
         {
-          class: 'bkms-bg-page px-[16px] py-[12px] text-left leading-[24px] bkms-text-body',
+          class: 'bkms-bg-page rounded-bkms-card px-[16px] py-[12px] text-left leading-[24px] bkms-text-body',
         },
         [
           t('当前环境对应集群未安装 General-Pod-Autoscaler 组件。请先在'),
@@ -779,7 +779,7 @@
     return new Promise<boolean>(resolve => {
       InfoBox({
         title: isManual ? t('确认切换为手动调节') : t('确认切换为自动调节'),
-        content: h('div', { class: 'bkms-bg-page px-[16px] py-[12px] text-left leading-[22px]' }, [
+        content: h('div', { class: 'bkms-bg-page rounded-bkms-card px-[16px] py-[12px] text-left leading-[22px]' }, [
           h('div', { class: 'mb-[4px]' }, [isManual ? t('切换为手动调节后：') : t('切换为自动调节后：')]),
           h('ul', { class: 'list-disc pl-[18px]' }, [
             h('li', [

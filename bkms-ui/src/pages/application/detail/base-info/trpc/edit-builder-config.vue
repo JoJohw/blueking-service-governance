@@ -270,7 +270,7 @@
           >
             <div
               v-bkloading="{ loading: paramsLoading }"
-              class="bkms-bg-page px-[24px] pt-[16px]"
+              class="bkms-bg-page rounded-bkms-card px-[24px] pt-[16px]"
             >
               <PipelineParamsForm
                 ref="pipelineParamsRef"

@@ -27,7 +27,7 @@
   >
     <template #footer>
       <div
-        class="flex items-center mt-[14px] pl-[24px] bkms-bg-card h-[48px] border border-bkms-neutral-6"
+        class="flex items-center mt-[14px] pl-[24px] bkms-bg-card h-[48px] border border-bkms-neutral-6 rounded-bkms-field"
       >
         <Button
           v-bk-tooltips="{

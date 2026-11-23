@@ -18,7 +18,7 @@
 
 <template>
   <div
-    class="flex items-center border-[1px] border-bkms-navy-5 border-solid h-[32px] leading-[32px] bkms-text-body bkms-bg-card min-w-[160px]"
+    class="flex items-center border-[1px] border-bkms-navy-5 border-solid h-[32px] leading-[32px] bkms-text-body bkms-bg-card min-w-[160px] overflow-hidden rounded-bkms-field"
   >
     <div
       class="text-center bkms-bg-subtle text-center h-full border-r-[1px] border-solid border-r-bkms-navy-5"

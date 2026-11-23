@@ -268,7 +268,7 @@
               <div class="mb-[24px]">
                 <span class="inline-block mb-[2px] mt-[10px] font-bold">{{ $t('等价构建命令（示意）') }}</span>
                 <div
-                  class="equivalent-build-command bkms-bg-page p-[16px] leading-[20px] bkms-text-body overflow-x-auto"
+                  class="equivalent-build-command bkms-bg-page rounded-bkms-card p-[16px] leading-[20px] bkms-text-body overflow-x-auto"
                 >
                   <pre
                     v-bk-xss-html="highlightedBuildCommand"

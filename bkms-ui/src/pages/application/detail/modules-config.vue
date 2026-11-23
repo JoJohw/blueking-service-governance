@@ -634,7 +634,9 @@
     }
     const instances = selections.value.map(item => h('div', { class: ['px-[16px] leading-[32px]'] }, [`${item.name}`]));
     return h('div', [
-      h('div', { class: 'bkms-bg-page py-[12px] px-[16px]' }, [t('删除后，将不可恢复，请谨慎操作！')]),
+      h('div', { class: 'bkms-bg-page rounded-bkms-card py-[12px] px-[16px]' }, [
+        t('删除后，将不可恢复，请谨慎操作！'),
+      ]),
       h(
         'div',
         {

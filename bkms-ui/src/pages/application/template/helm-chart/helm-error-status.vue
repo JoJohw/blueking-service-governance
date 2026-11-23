@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="border-[1px] bkms-line-default max-h-[300px] bkms-bg-card">
+  <div class="border-[1px] bkms-line-default max-h-[300px] bkms-bg-card rounded-bkms-card">
     <div class="flex items-center h-[48px] text-[12px] bkms-text-body px-[24px] border-b-[1px] border-b-bkms-neutral-5">
       <span class="font-bold">{{ $t('校验结果') }}</span>
       <span

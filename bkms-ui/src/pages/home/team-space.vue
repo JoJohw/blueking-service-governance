@@ -158,7 +158,7 @@
           <template #current>
             <div
               v-if="repositoryType !== 'system'"
-              class="bkms-bg-page w-full p-[12px] py-[24px] text-[12px] my-[8px]"
+              class="bkms-bg-page rounded-bkms-card w-full p-[12px] py-[24px] text-[12px] my-[8px]"
             >
               <div class="flex items-center whitespace-nowrap mb-[24px] custom-form-item form-item-has-tips">
                 <Form.FormItem

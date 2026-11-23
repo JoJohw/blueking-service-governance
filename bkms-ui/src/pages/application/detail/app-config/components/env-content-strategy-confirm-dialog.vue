@@ -32,7 +32,7 @@
   >
     <div class="text-[14px] leading-[22px] bkms-text-body">
       <i18n-t
-        class="mb-[16px] bkms-bg-page px-[16px] py-[12px]"
+        class="mb-[16px] bkms-bg-page rounded-bkms-card px-[16px] py-[12px]"
         keypath="切换后，这些环境的文件内容{0}。请在切换后{1}。"
         tag="div"
       >

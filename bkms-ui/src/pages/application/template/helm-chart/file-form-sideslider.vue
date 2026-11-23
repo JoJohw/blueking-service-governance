@@ -78,7 +78,7 @@
         <!-- 覆盖层 - 基础 values -->
         <Form.FormItem
           v-if="formData.fileType === 'overlay'"
-          class="bkms-bg-page px-[24px] py-[16px]"
+          class="bkms-bg-page rounded-bkms-card px-[24px] py-[16px]"
           :label="$t('基础 values')"
           property="baseAppConfigFileId"
           required

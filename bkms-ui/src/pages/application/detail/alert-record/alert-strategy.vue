@@ -493,7 +493,9 @@
       footerAlign: 'center',
       content: h('div', { class: 'text-left' }, [
         h('div', [t('策略名称: {name}', { name: row.displayName || row.id })]),
-        h('div', { class: 'mt-[14px] bkms-bg-page py-[12px] px-[16px]' }, [t('删除后，将不可恢复，请谨慎操作！')]),
+        h('div', { class: 'mt-[14px] bkms-bg-page rounded-bkms-card py-[12px] px-[16px]' }, [
+          t('删除后，将不可恢复，请谨慎操作！'),
+        ]),
       ]),
       confirmButtonTheme: 'danger',
       confirmText: t('删除'),

@@ -34,7 +34,7 @@
     </Button.ButtonGroup>
     <!-- 平台推荐镜像 -->
     <template v-if="imageMode === 'platform'">
-      <div class="bkms-bg-page mt-[16px] p-[16px]">
+      <div class="bkms-bg-page rounded-bkms-card mt-[16px] p-[16px]">
         <div class="flex gap-[6px] items-start">
           <Form.FormItem
             class="flex-grow-2 !mb-0"

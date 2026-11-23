@@ -841,7 +841,7 @@
   /** 删除分支 1 弹窗内容：提示先置空可用环境，且不展示去部署操作。 */
   function renderClearScopeInfoBoxContent(row: PolarisConfigOutputObj, scopeEnvs: DeployedEnv[]) {
     return h('div', { class: 'text-[14px] leading-[22px] bkms-text-body' }, [
-      h('div', { class: 'mb-[16px] bkms-bg-page p-[12px]' }, [
+      h('div', { class: 'mb-[16px] bkms-bg-page rounded-bkms-card p-[12px]' }, [
         h('div', { class: 'mb-[12px]' }, [
           t('北极星 {0} 已关联以下环境，需要按以下顺序完成后才能删除：', [row.polarisName || '--']),
         ]),
@@ -882,7 +882,9 @@
 
     return h('div', [
       serviceName,
-      h('div', { class: 'bkms-bg-page px-[16px] py-[12px] text-[14px] leading-[22px]' }, [description]),
+      h('div', { class: 'bkms-bg-page rounded-bkms-card px-[16px] py-[12px] text-[14px] leading-[22px]' }, [
+        description,
+      ]),
     ]);
   }
 

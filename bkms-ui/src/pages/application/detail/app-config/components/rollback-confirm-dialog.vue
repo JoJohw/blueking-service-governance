@@ -40,7 +40,7 @@
     </div>
 
     <!-- 版本信息 -->
-    <div class="bkms-bg-page mb-[16px] py-[12px] px-[16px] text-[12px]">
+    <div class="bkms-bg-page rounded-bkms-card mb-[16px] py-[12px] px-[16px] text-[12px]">
       <ul class="list-disc pl-[20px] leading-[20px]">
         <li>
           <span class="bkms-text-body">{{ $t('回滚到') }}：</span>

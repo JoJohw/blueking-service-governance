@@ -59,7 +59,7 @@
         </ul>
       </Alert>
 
-      <div class="bkms-bg-page p-[12px]">
+      <div class="bkms-bg-page rounded-bkms-card p-[12px]">
         <p>
           {{ $t('关闭后，仍需') }}&nbsp;
           <Button

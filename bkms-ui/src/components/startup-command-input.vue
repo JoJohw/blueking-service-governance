@@ -49,7 +49,7 @@
     <div
       v-else
       class="grid grid-cols-2 gap-x-[24px]"
-      :class="{ 'bkms-bg-page p-[16px] py-[12px]': execBackground }"
+      :class="{ 'bkms-bg-page rounded-bkms-card p-[16px] py-[12px]': execBackground }"
     >
       <div class="min-w-0">
         <div class="mb-[8px] text-[12px] leading-[22px] bkms-text-body">{{ $t('启动命令') }}</div>

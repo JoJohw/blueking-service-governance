@@ -53,7 +53,7 @@
         {{ $t('当前使用应用默认配置，未配置环境级变量。可直接部署，也可先调整配置。') }}
       </p>
       <div
-        class="mb-[28px] w-full max-w-[480px] bkms-bg-page px-[16px] py-[12px] text-left text-[14px] leading-[22px]"
+        class="mb-[28px] w-full max-w-[480px] bkms-bg-page rounded-bkms-card px-[16px] py-[12px] text-left text-[14px] leading-[22px]"
       >
         <div>
           <span class="bkms-text-body">{{ $t('环境展示名称') }}：</span>

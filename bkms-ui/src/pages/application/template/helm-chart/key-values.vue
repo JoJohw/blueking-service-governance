@@ -40,7 +40,7 @@
     <div
       :class="[
         'size-[32px] flex justify-center items-center bkms-text-secondary text-[12px]',
-        'border-1 border-bkms-navy-5 mx-[8px] radius-[2px]',
+        'border-1 border-bkms-navy-5 mx-[8px] rounded-bkms-field',
       ]"
     >
       =

@@ -186,7 +186,7 @@
   >
     <div class="text-[12px]">
       <p>{{ $t('端口池名称') }}：{{ deleteTarget?.name }}</p>
-      <div class="bkms-bg-page mt-[10px] py-[12px] px-[14px]">
+      <div class="bkms-bg-page rounded-bkms-card mt-[10px] py-[12px] px-[14px]">
         {{ $t('端口池删除后数据不可恢复，请确认') }}
       </div>
     </div>

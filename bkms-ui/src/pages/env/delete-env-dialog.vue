@@ -35,7 +35,7 @@
         </span>
       </div>
     </template>
-    <div class="bkms-bg-page mb-[10px] py-[12px] px-[14px] text-[12px]">
+    <div class="bkms-bg-page rounded-bkms-card mb-[10px] py-[12px] px-[14px] text-[12px]">
       {{ $t('删除环境后，所有配置、环境变量和操作记录将永久删除') }}
     </div>
     <i18n-t

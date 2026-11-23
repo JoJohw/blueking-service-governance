@@ -55,7 +55,11 @@ const LIB_CSS = {
 const KEY_SELECTORS = {
   '@blueking/bk-table.css': ['.bk-vxe-table', '.bk-vxe-table-setting-column-btn'],
   '@blueking/date-picker.css': ['.panel-wrapper', '.date-panel', '.common-date-list .list-item'],
-  '@blueking/date-picker-radius.css': ['.panel-wrapper', '.date-wrapper .date-input .date-picker'],
+  '@blueking/date-picker-radius.css': [
+    '.panel-wrapper',
+    '.date-wrapper .date-input .date-picker',
+    '__bk-date-picker-popover__',
+  ],
   '@blueking/ediatable.css': ['.bk-ediatable', '.bk-ediatable-head-column'],
   '@blueking/ediatable-radius.css': ['.bk-ediatable table'],
   '@blueking/monitor.css': ['.common-legend', '.monitor-chart-tooltips', '.chart-menu'],

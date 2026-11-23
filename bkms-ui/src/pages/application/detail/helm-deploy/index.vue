@@ -39,7 +39,7 @@
           />
           <div
             v-if="deployHistoryList.length"
-            class="flex items-center border border-bkms-navy-5 bkms-bg-card"
+            class="flex items-center border border-bkms-navy-5 bkms-bg-card rounded-bkms-field"
           >
             <span class="px-[8px] py-[6px] border-r border-r-bkms-navy-5">{{ $t('部署状态') }}</span>
             <StatusIcon

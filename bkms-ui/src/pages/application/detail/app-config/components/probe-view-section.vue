@@ -143,7 +143,7 @@
               <!-- 探针描述 -->
               <div
                 v-if="description"
-                class="description p-[12px] mt-[8px] bkms-bg-page text-align-left"
+                class="description p-[12px] mt-[8px] bkms-bg-page rounded-bkms-card text-align-left"
               >
                 {{ description }}
               </div>

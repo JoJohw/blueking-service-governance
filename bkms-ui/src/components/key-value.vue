@@ -64,7 +64,7 @@
           <div
             :class="[
               'size-[30px] flex justify-center items-center bkms-text-secondary text-[12px]',
-              'border-1 bkms-line-input mx-[8px] radius-[2px] shrink-0',
+              'border-1 bkms-line-input mx-[8px] rounded-bkms-field shrink-0',
             ]"
           >
             =

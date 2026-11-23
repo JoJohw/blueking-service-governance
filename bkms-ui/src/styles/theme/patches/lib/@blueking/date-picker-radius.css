@@ -17,9 +17,8 @@
  */
 
 /*
- * date-picker 原生 2px 圆角 → 语义令牌。
- * date-picker.css 是 gen-overrides/color.mjs 产物（只扫 hex），圆角手写在独立文件，重跑不会被清。
- * 滚动条 thumb 的 20px 形状值不覆写（归 --bkms-radius-scroll，main.css 已统一处理）。
+ * date-picker 原生 2px 圆角 → 语义令牌（手写，不参与生成器重跑）。
+ * 颜色覆写见 date-picker.css；滚动条 thumb 的 20px 形状值不覆写（归 --bkms-radius-scroll，main.css 已统一处理）。
  */
 
 /* field：日期输入框 / 格式化容器 */
@@ -31,7 +30,26 @@
   border-radius: var(--bkms-radius-field);
 }
 
-/* tag：日期格子 / 时区标签 / UTC 选项 / 收藏项 / 日期图标 / 内容块 */
+/* 时间范围框用负 margin 紧贴成一组，原生分角直角被 .bk-input 通用圆角覆盖；连接处保持直角，仅整组外侧圆角 */
+.bkms-themed .recent-picker .baseline-picker-select .bk-input {
+  border-radius: var(--bkms-radius-field) 0 0 var(--bkms-radius-field);
+}
+
+/* recent-input 默认（未来 tab）是组首保留左圆角；最近 tab 前有 baseline-picker 时是中间框，四角全直 */
+.bkms-themed .recent-picker .recent-input {
+  border-radius: var(--bkms-radius-field) 0 0 var(--bkms-radius-field);
+}
+
+.bkms-themed .recent-picker .baseline-picker ~ .recent-input {
+  border-radius: 0;
+}
+
+.bkms-themed .recent-picker .recent-unit .bk-input {
+  border-radius: 0 var(--bkms-radius-field) var(--bkms-radius-field) 0;
+}
+
+/* tag：日期格子 / 时区标签 / UTC 选项 / 收藏项 / 日期图标 / 内容块 / 常用时间·最近使用标题 */
+.bkms-themed .date-title .date-title-item,
 .bkms-themed .date-panel-main .date-content .date-grid-item.is-today,
 .bkms-themed .date-panel-main .date-content .date-grid-item.is-selected,
 .bkms-themed .panel-wrapper .time-zone-panel .time-zone-tag,
@@ -46,9 +64,21 @@
 
 /* overlay：面板外框 / 浮层 */
 .bkms-themed .panel-wrapper,
+.bkms-themed .date-panel,
 .bkms-themed .baseline-custom-option .specific-date-panel,
 .bkms-themed .__bk_date_picker__ {
   border-radius: var(--bkms-radius-overlay);
+}
+
+/* bkui popover 外框的圆角覆写在 bkui-theme/radius.css，dev 下按需加载的 less 可能后加载盖掉它；
+ * 时间格式转换浮层（ext-cls __bk-date-picker-popover__）在 lib 域（后加载）再锁一次 */
+.bkms-themed .bk-popover.bk-pop2-content.__bk-date-picker-popover__ {
+  border-radius: var(--bkms-radius-overlay);
+}
+
+/* .content-table 白底方角铺满 wrapper，会盖住圆角，裁剪后才看得到 */
+.bkms-themed .__bk-date-picker-popover__ .date-format-wrapper {
+  overflow: hidden;
 }
 
 /* base：specific-date 容器（无法明确归类，兜底） */

@@ -33,9 +33,7 @@
         </span>
       </div>
     </template>
-    <div
-      class="bkms-bg-page mb-[10px] py-[12px] px-[14px] text-[14px] leading-[22px] bkms-text-body"
-    >
+    <div class="bkms-bg-page rounded-bkms-card mb-[10px] py-[12px] px-[14px] text-[14px] leading-[22px] bkms-text-body">
       <i18n-t keypath="删除需要具备写权限的凭证。跳转到：{0} 配置凭证后重试。">
         <Button
           text

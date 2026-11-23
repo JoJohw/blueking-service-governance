@@ -68,7 +68,9 @@ export function renderDeleteInfoBoxContent(selectedInstances: AppInstanceOutputO
   if (selectedInstances.length === 1) {
     return h('div', [
       h('div', { class: 'py-[12px]' }, [t('实例: {0}', [`${selectedInstances[0]?.id} (${selectedInstances[0]?.ip})`])]),
-      h('div', { class: 'bkms-bg-page py-[12px] px-[16px]' }, [t('此操作将删除该实例，并调整实例数')]),
+      h('div', { class: 'bkms-bg-page rounded-bkms-card py-[12px] px-[16px]' }, [
+        t('此操作将删除该实例，并调整实例数'),
+      ]),
     ]);
   }
 
@@ -77,7 +79,9 @@ export function renderDeleteInfoBoxContent(selectedInstances: AppInstanceOutputO
   );
 
   return h('div', [
-    h('div', { class: 'bkms-bg-page py-[12px] px-[16px]' }, [t('此操作将删除以下实例，并调整实例数')]),
+    h('div', { class: 'bkms-bg-page rounded-bkms-card py-[12px] px-[16px]' }, [
+      t('此操作将删除以下实例，并调整实例数'),
+    ]),
     h(
       'div',
       {

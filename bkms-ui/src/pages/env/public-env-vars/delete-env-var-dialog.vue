@@ -36,7 +36,7 @@
     </template>
 
     <!-- 变量信息 -->
-    <div class="bkms-bg-page mb-[16px] py-[12px] px-[16px] text-[12px]">
+    <div class="bkms-bg-page rounded-bkms-card mb-[16px] py-[12px] px-[16px] text-[12px]">
       <ul class="list-disc line-height-[20px] font-normal">
         <li>
           <span class="bkms-text-secondary">{{ $t('变量名') }}：</span>

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="bkms-bg-page px-[24px] py-[16px]">
+  <div class="bkms-bg-page rounded-bkms-card px-[24px] py-[16px]">
     <Loading :loading="isLoading">
       <Form
         ref="formRef"

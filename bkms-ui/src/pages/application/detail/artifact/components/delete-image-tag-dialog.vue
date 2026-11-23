@@ -37,13 +37,13 @@
     <div v-bkloading="{ loading: isLoadingUsages }">
       <div
         v-if="!hasUsages"
-        class="bkms-bg-page mb-[16px] py-[12px] px-[16px] text-[14px] bkms-text-body"
+        class="bkms-bg-page rounded-bkms-card mb-[16px] py-[12px] px-[16px] text-[14px] bkms-text-body"
       >
         {{ t('当前各环境生效部署都没有使用该镜像 Tag。但删除后无法恢复，之后也不能再部署或回滚到这个 Tag。') }}
       </div>
       <div
         v-else
-        class="bkms-bg-page mb-[16px] py-[12px] px-[16px] text-[14px] bkms-text-body font-medium"
+        class="bkms-bg-page rounded-bkms-card mb-[16px] py-[12px] px-[16px] text-[14px] bkms-text-body font-medium"
       >
         <i18n-t
           keypath="该镜像 Tag ({0}) 目前正被以下环境使用，{1}，请谨慎确认是否删除"

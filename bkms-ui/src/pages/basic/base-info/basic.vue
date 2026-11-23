@@ -699,7 +699,7 @@
         h('div', t('成员：{0}', [row.username])),
         h(
           'p',
-          { class: 'mt-[16px] px-[16px] py-[12px] bkms-bg-page' },
+          { class: 'mt-[16px] px-[16px] py-[12px] bkms-bg-page rounded-bkms-card' },
           t('删除后该用户将失去此空间的所有权限，请谨慎操作'),
         ),
       ]),

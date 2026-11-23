@@ -104,7 +104,7 @@
         </Radio.Group>
         <div
           v-if="apmMode === 'bindExist'"
-          class="bkms-bg-page px-[16px] py-[12px] mt-[24px]"
+          class="bkms-bg-page rounded-bkms-card px-[16px] py-[12px] mt-[24px]"
         >
           <Form.FormItem
             class="mb-[0]"

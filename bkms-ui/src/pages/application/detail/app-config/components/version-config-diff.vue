@@ -18,7 +18,7 @@
 
 <template>
   <section class="text-[12px] border border-solid bkms-line-default">
-    <div class="px-[16px] py-[10px] bkms-bg-page">
+    <div class="px-[16px] py-[10px] bkms-bg-page rounded-bkms-card">
       <span class="font-bold">{{ $t('配置差异') }}</span>
       <span class="ml-[8px] bkms-text-secondary">{{ $t('仅展示发生变化的配置项') }}</span>
     </div>

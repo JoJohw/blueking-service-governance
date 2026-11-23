@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="bkms-bg-page mt-[16px] p-[16px]">
+  <div class="bkms-bg-page rounded-bkms-card mt-[16px] p-[16px]">
     <Alert
       class="mb-[12px]"
       theme="warning"
