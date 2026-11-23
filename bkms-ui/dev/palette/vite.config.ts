@@ -25,6 +25,11 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   root: dir,
   plugins: [Vue()],
+  resolve: {
+    alias: {
+      '@root': path.resolve(dir, '../..'),
+    },
+  },
   server: {
     port: 5300,
     fs: { allow: [path.resolve(dir, '../..')] },

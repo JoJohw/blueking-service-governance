@@ -16,9 +16,9 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-import colorRaw from '../../../../src/styles/theme/tokens/color.css?raw';
-import radiusRaw from '../../../../src/styles/theme/tokens/radius.css?raw';
-import vizRaw from '../../../../src/styles/theme/tokens/viz.css?raw';
+import colorRaw from '@root/src/styles/theme/tokens/color.css?raw';
+import radiusRaw from '@root/src/styles/theme/tokens/radius.css?raw';
+import vizRaw from '@root/src/styles/theme/tokens/viz.css?raw';
 
 export interface Group {
   id: string;

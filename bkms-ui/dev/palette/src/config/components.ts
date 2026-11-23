@@ -16,7 +16,7 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-import { componentCatalog } from '../../../../src/pages/designer/generated/component-catalog';
+import { componentCatalog } from '@root/src/pages/designer/generated/component-catalog';
 
 export interface ComponentNavItem {
   /** 组件所在目录（多级 id 去掉最后一段），菜单据此区分 index 这类同名条目 */

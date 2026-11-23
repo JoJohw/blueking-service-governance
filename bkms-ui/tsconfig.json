@@ -8,7 +8,8 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["src/*"],
+      "@root/*": ["./*"]
     },
     "resolveJsonModule": true,
     "types": [
