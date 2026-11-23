@@ -22,6 +22,7 @@ import { APP_FRAMEWORKS } from '~/common/app-types';
 import CustomRouterComponent from '~/components/custom-router-component.vue';
 import Forbidden from '~/pages/app/403.vue';
 import NotFound from '~/pages/app/404.vue';
+import ExceptionPreview from '~/pages/app/exception-preview.vue';
 import Application from '~/pages/application/application.vue';
 import createApplication from '~/pages/application/create.vue';
 import detail from '~/pages/application/detail.vue';
@@ -314,6 +315,15 @@ const routes = setupLayouts([
     path: '/403',
     name: '403',
     component: Forbidden,
+    meta: {
+      layout: 'empty',
+    },
+  },
+  // Exception Soft 3D Brand 颜色走查（本地预览，不进导航）
+  {
+    path: '/exception-preview',
+    name: 'exceptionPreview',
+    component: ExceptionPreview,
     meta: {
       layout: 'empty',
     },

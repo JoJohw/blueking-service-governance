@@ -22,7 +22,7 @@
 
 .bkms-themed .bk-popover.bk-pop2-content.bk-select-popover {
   border: 1px solid var(--disable-color); /* 原值保留 */
-  box-shadow: 0 2px 6px var(--bkms-shadow-hover); /* 原 #0000001a */
+  box-shadow: 0 2px 6px var(--bkms-shadow-popover); /* 原 #0000001a */
 }
 
 .bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-empty {
@@ -76,17 +76,18 @@
 
 .bkms-themed .bk-popover.bk-pop2-content {
   color: var(--bkms-text-inverse); /* 原 #fff */
-  background: var(--bkms-navy-2); /* 原 #26323d */
+  /* AIdev Tooltip：黑 80%（mask），不用遗留 navy-2 / 原 #26323d；尖角裁剪见 ua-fill/popover.css */
+  background: var(--bkms-mask);
 }
 
 .bkms-themed .bk-popover.bk-pop2-content .bk-pop2-arrow {
-  background: var(--bkms-navy-1); /* 原 #333 */
+  background: var(--bkms-mask);
 }
 
 .bkms-themed .bk-popover.bk-pop2-content[data-theme^=light] {
   color: var(--bkms-text-body); /* 原 #26323d */
   background-color: var(--bkms-neutral-10); /* 原 #fff */
-  box-shadow: 0 0 6px var(--bkms-neutral-5); /* 原 #dcdee5 */
+  box-shadow: 0 2px 6px var(--bkms-shadow-popover); /* 原 #dcdee5 */
   border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
@@ -116,7 +117,7 @@
 
 .bkms-themed .bk-popover.bk-pop2-content.bk-table-head-filter {
   background-color: var(--bkms-neutral-10); /* 原 #fff */
-  box-shadow: 0 3px 6px var(--bkms-shadow-hover); /* 原 #0000001a */
+  box-shadow: 0 3px 6px var(--bkms-shadow-popover); /* 原 #0000001a */
 }
 
 .bkms-themed .bk-popover.bk-pop2-content.bk-table-head-filter .content-list .content-items .list-item {
@@ -159,12 +160,12 @@
 }
 
 .bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-option.is-hover {
-  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+  background-color: var(--select-hover-color); /* 原 #f5f7fa → neutral-7 */
 }
 
 .bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-option.is-multiple.is-hover,
 .bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-option.is-multiple:hover {
-  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+  background-color: var(--select-hover-color); /* 原 #f5f7fa → neutral-7 */
 }
 
 .bkms-themed .bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-search-wrapper {

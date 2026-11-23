@@ -45,68 +45,70 @@
         </Button>
       </Alert>
 
-      <div class="mb-[16px] flex flex-wrap gap-[12px] justify-between">
-        <div class="flex gap-[8px]">
-          <Button
-            theme="primary"
-            @click="handleAddVariable"
+      <div class="rounded-bkms-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+        <div class="mb-[16px] flex flex-wrap gap-[12px] justify-between">
+          <div class="flex gap-[8px]">
+            <Button
+              theme="primary"
+              @click="handleAddVariable"
+            >
+              <Plus
+                :height="24"
+                :width="24"
+              />
+              {{ $t('自定义变量') }}
+            </Button>
+            <Button
+              class="bkms-bg-card"
+              @click="showImportSlider = true"
+            >
+              <i class="bkms-icon bkms-icon-daoru mr-[6px] bkms-text-secondary"></i>
+              {{ $t('导入') }}
+            </Button>
+            <Button
+              class="bkms-bg-card"
+              :loading="isExporting"
+              @click="handleExport"
+            >
+              <i class="bkms-icon bkms-icon-daochu mr-[6px] bkms-text-secondary"></i>
+              {{ $t('导出') }}
+            </Button>
+            <Button
+              v-if="!hidePublicEnvVars"
+              outline
+              theme="primary"
+              @click="showPublicEnvVarsSlider = true"
+            >
+              <i class="bkms-icon bkms-icon-variable mr-[6px] text-[14px]"></i>
+              {{ $t('公共环境变量') }}
+            </Button>
+          </div>
+          <Input
+            v-model.trim="searchKeyword"
+            class="w-[430px] max-w-full bkms-bg-card"
+            clearable
+            :placeholder="$t('搜索变量名、变量值、描述')"
           >
-            <Plus
-              :height="24"
-              :width="24"
-            />
-            {{ $t('自定义变量') }}
-          </Button>
-          <Button
-            class="bkms-bg-card"
-            @click="showImportSlider = true"
-          >
-            <i class="bkms-icon bkms-icon-daoru mr-[6px] bkms-text-secondary"></i>
-            {{ $t('导入') }}
-          </Button>
-          <Button
-            class="bkms-bg-card"
-            :loading="isExporting"
-            @click="handleExport"
-          >
-            <i class="bkms-icon bkms-icon-daochu mr-[6px] bkms-text-secondary"></i>
-            {{ $t('导出') }}
-          </Button>
-          <Button
-            v-if="!hidePublicEnvVars"
-            outline
-            theme="primary"
-            @click="showPublicEnvVarsSlider = true"
-          >
-            <i class="bkms-icon bkms-icon-variable mr-[6px] text-[14px]"></i>
-            {{ $t('公共环境变量') }}
-          </Button>
+            <template #suffix>
+              <Search
+                class="text-[16px] bkms-text-secondary mr-[6px] mt-[2px] hover:bkms-text-brand"
+              />
+            </template>
+          </Input>
         </div>
-        <Input
-          v-model.trim="searchKeyword"
-          class="w-[430px] max-w-full bkms-bg-card"
-          clearable
-          :placeholder="$t('搜索变量名、变量值、描述')"
-        >
-          <template #suffix>
-            <Search
-              class="text-[16px] bkms-text-secondary mr-[6px] mt-[2px] hover:bkms-text-brand"
-            />
-          </template>
-        </Input>
-      </div>
 
-      <!-- 变量管理-可编辑 -->
-      <EditableVariableTable
-        ref="editableTableRef"
-        :disable-key-edit="true"
-        :list="filteredList"
-        :search-keyword="searchKeyword"
-        @add="handleAddItem"
-        @clear="searchKeyword = ''"
-        @delete="handleDeleteItem"
-        @edit="handleEditItem"
-      />
+        <!-- 变量管理-可编辑 -->
+        <EditableVariableTable
+          ref="editableTableRef"
+          :disable-key-edit="true"
+          :list="filteredList"
+          :search-keyword="searchKeyword"
+          @add="handleAddItem"
+          @clear="searchKeyword = ''"
+          @delete="handleDeleteItem"
+          @edit="handleEditItem"
+        />
+      </div>
 
       <!-- 环境变量侧栏 -->
       <EnvBgVarsSideslider

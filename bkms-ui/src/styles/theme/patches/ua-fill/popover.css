@@ -1,0 +1,58 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
+
+/*
+ * Figma AIdev Tooltips（115965-125925）：深色底黑 80%（--bkms-mask），尖角同色。
+ * 半透明底 + 旋转尖角若重叠会叠色发深；用 clip-path 只保留探出气泡外的那一角。
+ * 防 gen-overrides 冲掉。
+ */
+
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) {
+  background: var(--bkms-mask);
+}
+
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) .bk-pop2-arrow {
+  background: var(--bkms-mask);
+  border-color: transparent;
+}
+
+/*
+ * data-arrow = placement（不是尖角所在边）：
+ * - top：气泡在上，尖在下朝下 → 保留方块右下角（旋成朝下尖）
+ * - bottom：气泡在下，尖在上朝上 → 保留左上角
+ * - left：尖朝右 → 右上角；right：尖朝左 → 左下角
+ */
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) .bk-pop2-arrow[data-arrow='top'],
+.popover-dark-translucent .bk-pop2-arrow[data-arrow='top'] {
+  clip-path: polygon(0% 100%, 100% 0%, 100% 100%);
+}
+
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) .bk-pop2-arrow[data-arrow='bottom'],
+.popover-dark-translucent .bk-pop2-arrow[data-arrow='bottom'] {
+  clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
+}
+
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) .bk-pop2-arrow[data-arrow='left'],
+.popover-dark-translucent .bk-pop2-arrow[data-arrow='left'] {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%);
+}
+
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) .bk-pop2-arrow[data-arrow='right'],
+.popover-dark-translucent .bk-pop2-arrow[data-arrow='right'] {
+  clip-path: polygon(0% 0%, 0% 100%, 100% 100%);
+}

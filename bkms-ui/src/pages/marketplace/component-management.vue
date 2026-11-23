@@ -132,7 +132,7 @@
       </template>
       <template v-if="currentStep === 2">
         <div class="h-[calc(100vh-100px)] flex flex-col gap-[16px] overflow-y-auto px-[24px] py-[18px]">
-          <div class="bkms-bg-page text-bkms-neutral-1 font-bold text-[14px] px-[16px] py-[6px]">
+          <div class="bkms-bg-page bkms-text-title font-bold text-[14px] px-[16px] py-[6px] rounded-bkms-card">
             {{ $t('试运行结果预览') }}
           </div>
           <PatchPreviewCard

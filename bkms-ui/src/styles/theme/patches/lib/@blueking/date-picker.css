@@ -80,7 +80,7 @@
 .bkms-themed .date-panel {
   background: var(--bkms-neutral-10); /* 原 #fff */
   border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
-  box-shadow: 0 2px 6px 0 var(--bkms-shadow-hover); /* 原 #0000001a */
+  box-shadow: 0 2px 6px 0 var(--bkms-shadow-popover); /* 原 #0000001a */
 }
 
 .bkms-themed .date-panel-title {
@@ -173,7 +173,7 @@
 .bkms-themed .date-format-wrapper {
   background: var(--bkms-neutral-10); /* 原 #fff */
   border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
-  box-shadow: 0 2px 6px 0 var(--bkms-shadow-hover); /* 原 #0000001a */
+  box-shadow: 0 2px 6px 0 var(--bkms-shadow-popover); /* 原 #0000001a */
 }
 
 .bkms-themed .date-format-wrapper .content-table {
@@ -242,7 +242,7 @@
 .bkms-themed .panel-wrapper {
   background: var(--bkms-neutral-10); /* 原 #fff */
   border: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
-  box-shadow: 0 2px 6px 0 var(--bkms-shadow-hover); /* 原 #0000001a */
+  box-shadow: 0 2px 6px 0 var(--bkms-shadow-popover); /* 原 #0000001a */
 }
 
 .bkms-themed .panel-wrapper .date-pick-tab {

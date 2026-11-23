@@ -9,14 +9,12 @@
     {
       "kebab": "select",
       "prefixes": ["select"],
-      "token": "field",
-      "rules": [{ "match": "bk-select-tag(?!-input)", "token": "tag" }]
+      "token": "field"
     },
     {
       "kebab": "search-select",
       "prefixes": ["search-select"],
-      "token": "field",
-      "rules": [{ "match": "search-container-selected", "token": "tag" }]
+      "token": "field"
     },
     {
       "kebab": "tag-input",

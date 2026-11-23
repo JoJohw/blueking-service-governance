@@ -22,12 +22,11 @@
 
 .bkms-themed .bk-alert {
   color: var(--bkms-neutral-2); /* 原 #63656e */
-  border: var(--border-width-base) var(--border-style-base); /* 原值保留 */
+  border: none; /* Figma Alert 无描边，只保留语义底色 */
 }
 
 .bkms-themed .bk-alert-info {
-  background-color: var(--bkms-brand-7); /* 原 #f0f8ff */
-  border-color: var(--bkms-brand-5); /* 原 #c5daff */
+  background-color: var(--bkms-bg-active); /* 原 #f0f8ff */
 }
 
 .bkms-themed .bk-alert-info .bk-alert-icon-info {
@@ -35,8 +34,7 @@
 }
 
 .bkms-themed .bk-alert-success {
-  background-color: var(--bkms-success-7); /* 原 #f2fff4 */
-  border-color: var(--bkms-success-4); /* 原 #94f5a4 */
+  background-color: var(--bkms-bg-success); /* 原 #f2fff4 */
 }
 
 .bkms-themed .bk-alert-success .bk-alert-icon-info {
@@ -44,8 +42,7 @@
 }
 
 .bkms-themed .bk-alert-warning {
-  background-color: var(--bkms-warning-7); /* 原 #fff4e2 */
-  border-color: var(--bkms-warning-5); /* 原 #ffdfac */
+  background-color: var(--bkms-bg-warning); /* 原 #fff4e2 */
 }
 
 .bkms-themed .bk-alert-warning .bk-alert-icon-info {
@@ -53,8 +50,7 @@
 }
 
 .bkms-themed .bk-alert-danger {
-  background-color: var(--bkms-danger-6); /* 原 #ffeded */
-  border-color: var(--bkms-danger-5); /* 原 #ffd2d2 */
+  background-color: var(--bkms-bg-danger); /* 原 #ffeded */
 }
 
 .bkms-themed .bk-alert-danger .bk-alert-icon-info {
@@ -62,8 +58,7 @@
 }
 
 .bkms-themed .bk-alert-error {
-  background-color: var(--bkms-danger-6); /* 原 #ffeded */
-  border-color: var(--bkms-danger-5); /* 原 #ffd2d2 */
+  background-color: var(--bkms-bg-danger); /* 原 #ffeded */
 }
 
 .bkms-themed .bk-alert-error .bk-alert-icon-info {

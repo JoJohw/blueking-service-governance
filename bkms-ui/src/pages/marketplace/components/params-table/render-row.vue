@@ -71,7 +71,7 @@
           <span
             :class="[
               'flex-1 text-[12px] px-[8px] overflow-hidden text-ellipsis whitespace-nowrap',
-              mapDisplayText ? 'bkms-text-body' : 'text-bkms-navy-5',
+              mapDisplayText ? 'bkms-text-body' : 'text-bkms-neutral-4',
             ]"
           >
             {{ mapDisplayText || t('请配置键值对') }}
@@ -110,17 +110,17 @@
       <div class="flex items-center gap-x-[18px] px-[16px]">
         <i
           v-bk-tooltips="$t('克隆')"
-          class="bkms-icon bkms-icon-clone cursor-pointer text-[16px] text-bkms-navy-5 hover:bkms-text-secondary"
+          class="bkms-icon bkms-icon-clone cursor-pointer text-[16px] text-bkms-neutral-4 hover:bkms-text-secondary"
           @click="emit('copy')"
         />
         <i
           v-bk-tooltips="$t('新增')"
-          class="bkms-icon bkms-icon-plus-circle-shape cursor-pointer text-[16px] text-bkms-navy-5 hover:bkms-text-secondary"
+          class="bkms-icon bkms-icon-plus-circle-shape cursor-pointer text-[16px] text-bkms-neutral-4 hover:bkms-text-secondary"
           @click="emit('add')"
         />
         <i
           v-bk-tooltips="$t('删除')"
-          class="bkms-icon bkms-icon-minus-circle-shape cursor-pointer text-[16px] text-bkms-navy-5 hover:bkms-text-secondary"
+          class="bkms-icon bkms-icon-minus-circle-shape cursor-pointer text-[16px] text-bkms-neutral-4 hover:bkms-text-secondary"
           @click="emit('remove')"
         />
       </div>

@@ -68,7 +68,7 @@
         </ul>
       </template>
     </Alert>
-    <div class="flex p-[16px] bkms-bg-page text-[12px]">
+    <div class="flex rounded-bkms-card p-[16px] bkms-bg-page text-[12px]">
       <div class="flex flex-col gap-[6px] flex-1">
         <div class="text-[12px] bkms-text-secondary">{{ $t('当前环境') }}</div>
         <div class="flex items-center gap-[8px]">

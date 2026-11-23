@@ -169,12 +169,12 @@
         type="empty"
       >
         <template #title>
-          <div class="bkms-text-title text-[20px] leading-[28px]">
+          <div class="text-[20px] leading-[28px] font-medium">
             {{ $t('暂无可用的环境') }}
           </div>
         </template>
         <template #description>
-          <div class="bkms-text-body text-[14px] leading-[22px]">
+          <div class="text-[14px] leading-[22px]">
             {{ $t('环境必须先配置集群资源后才能部署应用') }}
           </div>
         </template>

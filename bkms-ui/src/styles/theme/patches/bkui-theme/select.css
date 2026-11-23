@@ -26,15 +26,15 @@
 }
 
 .bkms-themed .bk-select.is-disabled .bk-input--text {
-  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  background-color: var(--bkms-neutral-9); /* 原 #fafbfd */
 }
 
 .bkms-themed .bk-select .bk-select-trigger .bk-select-tag:not(.is-disabled,.is-simplicity):hover {
-  border-color: var(--bkms-neutral-3); /* 原 #979ba5 */
+  border-color: var(--bkms-line-hover); /* 原 #979ba5 */
 }
 
 .bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-disabled {
-  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  background-color: var(--bkms-neutral-9); /* 原 #fafbfd */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
@@ -57,7 +57,7 @@
 .bkms-themed .bk-select--prefix-area {
   color: var(--bkms-neutral-2); /* 原 #63656e */
   background-color: var(--select-hover-color); /* 原值保留 */
-  border-right: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  border-right: 1px solid var(--bkms-line-input); /* 原 #c4c6cc */
 }
 
 /* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
@@ -101,24 +101,24 @@
 .bkms-themed .bk-select .bk-select-trigger .bk-select-tag {
   color: var(--bkms-neutral-2); /* 原 #63656e */
   background-color: var(--bkms-neutral-10); /* 原 #fff */
-  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  border: 1px solid var(--bkms-line-input); /* 原 #c4c6cc */
   outline: none; /* 原值保留 */
 }
 
 .bkms-themed .bk-select .bk-select-trigger .bk-select-tag::placeholder {
-  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  color: var(--bkms-text-disabled); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-simplicity {
   background-color: transparent; /* 原值保留 */
   border-color: transparent; /* 原值保留 */
-  border-bottom-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  border-bottom-color: var(--bkms-line-input); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-simplicity:hover {
   background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
   border-color: transparent; /* 原值保留 */
-  border-bottom-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  border-bottom-color: var(--bkms-line-hover); /* 原 #c4c6cc */
   box-shadow: none; /* 原值保留 */
 }
 
@@ -130,5 +130,5 @@
 }
 
 .bkms-themed .bk-select .bk-select-trigger .bk-select-tag-input::placeholder {
-  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  color: var(--bkms-text-disabled); /* 原 #c4c6cc */
 }

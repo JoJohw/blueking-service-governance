@@ -28,8 +28,9 @@
   border-left: 2px solid var(--bkms-brand-2); /* 原 #3a84ff */
 }
 
+/* 线条和底色只属于吸底页脚。内容跟着走的页脚保持和正文同一块白底，不另画一条线 */
 .bkms-themed .bk-sideslider .bk-modal-footer.is-fixed .bk-sideslider-footer {
-  background: var(--bkms-neutral-8); /* 原 #fafbfd */
+  background: var(--bkms-bg-head); /* 原 #fafbfd */
   border-top: 1px solid var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 

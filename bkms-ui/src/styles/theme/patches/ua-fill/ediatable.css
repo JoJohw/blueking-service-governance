@@ -1,0 +1,51 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
+
+/*
+ * Ediatable 表格内控件：单元格输入/选择必须直角（不要 field 6px 圆角）。
+ * 操作/清空图标用 Neutral/4，不用遗留 navy-5（#C4C6CC）。
+ * 手写层，不参与 gen-overrides。
+ */
+
+.bkms-themed .bk-ediatable .bk-input,
+.bkms-themed .bk-ediatable .bk-input--text,
+.bkms-themed .bk-ediatable .bk-textarea,
+.bkms-themed .bk-ediatable .bk-textarea > textarea,
+.bkms-themed .bk-ediatable .bk-select .bk-select-trigger,
+.bkms-themed .bk-ediatable .bk-select .bk-select-trigger .bk-select-tag,
+.bkms-themed .bk-ediatable .bk-select .bk-select-trigger .bk-select-tag-input,
+.bkms-themed .bk-ediatable .bk-ediatable-input .input-box input,
+.bkms-themed .bk-ediatable .bk-ediatable-select,
+.bkms-themed .bk-ediatable .bk-ediatable-tag-input-wraper .bk-tag-input .bk-tag-input-trigger {
+  border-radius: var(--bkms-radius-none);
+}
+
+/* textarea placeholder：与 Input 一致走 Text/4，避免仍落 navy-5 */
+.bkms-themed .bk-textarea ::placeholder,
+.bkms-themed .bk-ediatable .bk-textarea ::placeholder,
+.bkms-themed .bk-ediatable .bk-ediatable-input textarea::placeholder {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-ediatable-input .clear-icon {
+  color: var(--bkms-neutral-4); /* 原 navy-5 #c4c6cc → Neutral/4 */
+}
+
+.bkms-themed .bk-ediatable-operation .action-btn {
+  color: var(--bkms-neutral-4); /* 原 navy-5 #c4c6cc → Neutral/4 */
+}

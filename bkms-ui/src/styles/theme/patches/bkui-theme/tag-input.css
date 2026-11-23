@@ -29,9 +29,17 @@
   border-color: var(--bkms-danger-2); /* 原 #ea3636 */
 }
 
+/* 悬停边是 Neutral/4，选择器比出错边更长，这里加长一截，出错时悬停仍保持 Danger/2 */
+.bkms-themed .bk-form-item.is-error .bk-input:hover,
+.bkms-themed .bk-form-item.is-error .bk-date-picker-rel .bk-date-picker-editor:hover,
+.bkms-themed .bk-form-item.is-error .bk-select .bk-select-trigger .bk-select-tag:hover,
+.bkms-themed .bk-form-item.is-error .bk-tag-input .bk-tag-input-trigger:hover {
+  border-color: var(--bkms-danger-2);
+}
+
 .bkms-themed .bk-tag-input .bk-tag-input-trigger.disabled {
-  background: var(--bkms-neutral-8); /* 原 #fafbfd */
-  border-color: var(--disable-color); /* 原值保留 */
+  background: var(--bkms-neutral-9); /* 原 #fafbfd */
+  border-color: var(--bkms-neutral-5); /* 原值保留 */
 }
 
 .bkms-themed .bk-tag-input .bk-tag-input-trigger .tag-list>li.tag-item {
@@ -82,7 +90,11 @@
 
 .bkms-themed .bk-tag-input .bk-tag-input-trigger {
   background: var(--bkms-neutral-10); /* 原 #fff */
-  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  border: 1px solid var(--bkms-line-input); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger:hover:not(.disabled):not(.active) {
+  border-color: var(--bkms-line-hover);
 }
 
 .bkms-themed .bk-tag-input .bk-tag-input-trigger.active {
@@ -90,7 +102,7 @@
 }
 
 .bkms-themed .bk-tag-input .bk-tag-input-trigger .placeholder {
-  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  color: var(--bkms-text-disabled); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-tag-input .bk-tag-input-trigger .clear-icon {

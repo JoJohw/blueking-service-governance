@@ -43,12 +43,20 @@
 
 /* ══════════ bkui：左侧菜单 ══════════ */
 
-/* 对齐 design-visual（圆角留边、hover/选中渐变底、选中图标渐变字） */
+/* 对齐 design-visual（圆角留边、hover/选中渐变底、选中图标渐变字）
+   收起宽 64：Navigation nav-width=64，菜单始终 width:100% 跟着轨道过渡。
+   图标列 48px + 左右 margin 8 = 64，收起时只裁切文字，图标不位移、不用 !important 打断过渡。 */
 .bkms-themed .bk-menu {
-  /* width:auto 抵消 bk-menu 内部的 width:100%，否则 margin 0 8px 会让圆角块向右溢出菜单 */
+  width: 100%;
+
   .bk-menu-item {
     width: auto;
     margin: 0 8px;
+    overflow: hidden;
+
+    .item-icon {
+      flex: 0 0 48px;
+    }
 
     &:hover {
       background-image: linear-gradient(
@@ -75,11 +83,28 @@
     }
   }
 
-  /* 菜单分组标题：对齐图标列。bkui 默认 18px 是按整宽菜单项（无留边）算的，
-     上面给菜单项加了 8px 圆角留边，图标列随之右移，标题需同步补 8px 才能保持与图标列的相对位置 */
-  .bk-menu-group .group-name {
-    margin: 0 18px 0 26px;
+  .bk-menu-submenu .submenu-header {
+    overflow: hidden;
+
+    .submenu-header-icon {
+      flex: 0 0 48px;
+    }
   }
+
+  /* 分组标题和图标同列：左右 margin 8 + 宽 48，文字居中。收起展开几何不变，不跳动 */
+  .bk-menu-group .group-name {
+    box-sizing: border-box;
+    width: 48px;
+    margin: 0 8px;
+    padding: 0;
+    justify-content: center;
+    overflow: hidden;
+    text-align: center;
+  }
+}
+
+.bk-navigation-wrapper .navigation-nav .nav-slider {
+  overflow: hidden;
 }
 
 /* ══════════ bkui：message / exception / popover ══════════ */
@@ -111,9 +136,15 @@
   border: none;
 }
 
-/* 半透明深色气泡：遮罩底走 --bkms-mask（token 内置 alpha） */
+/* 深色半透明主题：与默认深色 Tooltip 同用 mask；尖角裁剪走 ua-fill/popover.css */
 .popover-dark-translucent {
   background: var(--bkms-mask) !important;
+}
+
+.popover-dark-translucent .bk-pop2-arrow,
+.bk-popover.bk-pop2-content.popover-dark-translucent .bk-pop2-arrow {
+  background: var(--bkms-mask) !important;
+  border-color: transparent !important;
 }
 
 .no-padding-popover {
@@ -123,6 +154,49 @@
 .bk-popover.bk-pop2-content.no-border-popover,
 .bk-popover.bk-pop2-content.no-border-popover .bk-pop2-arrow {
   border: none !important;
+}
+
+/* ══════════ bkui：胶囊分段 Radio ══════════ */
+
+/* 规范「Tab-胶囊样式」：轨道 neutral-6，项圆角 6 已在 radius.css。
+   小（库默认胶囊）高 24、左右 12；大高 28、左右 16。
+   选中项白底，文字用标题色，不再用品牌蓝。项与项之间不画分隔线。
+   悬停比当前底深一档。选中是白底，hover 用 --bkms-bg-hover。
+   未选中透出轨道 neutral-6，hover 用深一档 neutral-5。
+   数量徽章：选中 brand 浅底 hover 用 --bkms-bg-active-hover。
+   未选中徽章用 neutral-7，比轨道浅一档，hover 再用 neutral-5。 */
+.bkms-themed .bk-radio-capsule .bk-radio-button:before {
+  display: none;
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button.is-checked .bk-radio-button-label {
+  color: var(--bkms-text-title);
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button.bk-radio-button-large .bk-radio-button-label {
+  height: 28px;
+  padding: 0 16px;
+  line-height: 28px;
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button:not(.is-disabled, .is-checked) .bkms-bg-card {
+  background-color: var(--bkms-neutral-7);
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button:not(.is-disabled, .is-checked):hover {
+  background-color: var(--bkms-neutral-5);
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button.is-checked:not(.is-disabled):hover {
+  background-color: var(--bkms-bg-hover);
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button:not(.is-disabled, .is-checked):hover .bkms-bg-card {
+  background-color: var(--bkms-neutral-5);
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button.is-checked:not(.is-disabled):hover .bkms-bg-active {
+  background-color: var(--bkms-bg-active-hover);
 }
 
 /* ══════════ bkui：form 控件（tab / button / textarea / search-select）══════════ */
@@ -144,7 +218,81 @@
   min-width: fit-content;
 }
 
+/* ══════════ bkui：Alert ══════════ */
+
+/* 规范信息条：Figma Alert 无描边，高由内容撑开，内边距上下 6、左右 8。
+   关闭按钮原来用负外边距抵消 8px 10px 的内边距，跟着改成 6px 8px。 */
+.bkms-themed .bk-alert {
+  box-sizing: border-box;
+  border: none;
+}
+
+.bkms-themed .bk-alert-wraper {
+  padding: 6px 8px;
+}
+
+.bkms-themed .bk-alert-close {
+  margin-top: -6px;
+  margin-right: -8px;
+}
+
+/* ══════════ bkui：Tag / Select 尺寸 ══════════ */
+
+/* Tag 中号（size 默认）方角：高 18、左右 8。
+   bkui 把默认 radius 2px 写进行内样式，类规则压不过，只对这一档用 important。
+   页面显式写了别的圆角（如 8px）的标签不动。小号高度仍是库的 16。 */
+.bkms-themed .bk-tag[style*='border-radius: 2px'] {
+  border-radius: var(--bkms-radius-tag) !important;
+}
+
+.bkms-themed .bk-tag.bk-tag--default {
+  height: 18px;
+  padding: 0 8px;
+  line-height: 16px;
+}
+
+.bkms-themed .bk-tag.bk-tag--default.bk-tag-closable {
+  padding: 0 4px 0 8px;
+}
+
+/* Select 线框中号水平内边距 8。右侧 28 留给箭头，只改左侧。 */
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag,
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag-input {
+  padding-left: 8px;
+}
+
 /* ══════════ bkui：dialog / modal ══════════ */
+
+/* 圆角在 radius.css 的 overlay 档。底栏是方块底色，裁进圆角，避免下角缺一块 */
+.bkms-themed .bk-modal-body {
+  overflow: hidden;
+}
+
+.bkms-themed .bk-dialog-footer,
+.bkms-themed .bk-sideslider .bk-sideslider-footer {
+  border-radius: var(--bkms-radius-overlay);
+  border-start-start-radius: var(--bkms-radius-none);
+  border-start-end-radius: var(--bkms-radius-none);
+}
+
+/* 下拉、日期面板同样裁进 overlay 圆角。箭头在面板外的气泡不要加 overflow */
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover,
+.bkms-themed .bk-dropdown-popover .bk-dropdown-menu,
+.bkms-themed .bk-date-picker-dropdown {
+  overflow: hidden;
+}
+
+/* 表单控件圆角只由外框承担，内层不再各画一圈 */
+.bkms-themed .bk-input,
+.bkms-themed .bk-textarea,
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag {
+  overflow: hidden;
+}
+
+.bkms-themed .bk-input .bk-input--text,
+.bkms-themed .bk-textarea > textarea {
+  border-radius: var(--bkms-radius-none);
+}
 
 .leave-confirm-box-index {
   .bk-modal-mask,
@@ -173,6 +321,8 @@
 
 .vxe-table--filter-wrapper {
   min-width: unset !important;
+  overflow: hidden;
+  border-radius: var(--bkms-radius-overlay);
 
   .vxe-checkbox--label {
     padding-left: 0;

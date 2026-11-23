@@ -30,7 +30,7 @@
               width="100%"
             />
           </div>
-          <div class="flex-1 px-[24px] py-[14px]">
+          <div class="flex-1 pl-[40px] pr-[24px] py-[14px]">
             <Layout.shape :width="200" />
             <Layout.shape
               class="mt-[16px]"
@@ -59,7 +59,7 @@
         <template #aside>
           <!-- 左侧树形菜单 -->
           <div class="flex-1 bkms-bg-page flex flex-col">
-            <div class="px-[16px] py-[12px]">
+            <div class="px-[24px] py-[12px]">
               <Radio.Group
                 v-model="viewMode"
                 class="w-full flex mb-[14px]"
@@ -98,7 +98,7 @@
               v-show="filteredTreeData.length !== 0"
               :class="[
                 'border-b-[1px] border-b-bkms-neutral-6',
-                'mx-[16px] flex items-center justify-between px-[8px] h-[36px] rounded-bkms-control cursor-pointer',
+                'mx-[24px] flex items-center justify-between px-[8px] h-[36px] rounded-bkms-control cursor-pointer',
                 selectedTreeNode === 'all' ? 'bkms-bg-active bkms-text-brand' : 'bkms-text-body',
                 { 'hover:bg-bkms-neutral-6': selectedTreeNode !== 'all' },
               ]"
@@ -118,7 +118,7 @@
                 >{{ componentList.length }}</span
               >
             </div>
-            <div class="flex-1 overflow-auto mt-[8px] mb-[16px] px-[16px] flex flex-col gap-[4px]">
+            <div class="flex-1 overflow-auto mt-[8px] mb-[16px] px-[24px] flex flex-col gap-[4px]">
               <div
                 v-for="item in filteredTreeData"
                 :key="item.id"
@@ -162,7 +162,8 @@
         </template>
         <template #main>
           <!-- 右侧内容区 -->
-          <div class="flex-1 flex flex-col overflow-hidden px-[24px] py-[14px] bkms-bg-card">
+          <!-- 折叠按钮宽 16px，贴在分栏线上并压进右侧。左 40px = 16 + 24，和左侧列表间隔都是 24px -->
+          <div class="flex-1 flex flex-col overflow-hidden pl-[40px] pr-[24px] py-[14px] bkms-bg-card">
             <!-- 标题和提示 -->
             <div class="flex items-center mb-[12px]">
               <h3 class="text-[16px] font-bold">

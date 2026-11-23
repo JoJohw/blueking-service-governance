@@ -1191,7 +1191,7 @@
 
 <style lang="postcss" scoped>
   :deep(.publish-nested-popover.bk-popover.bk-pop2-content .bk-pop2-arrow) {
-    background-color: var(--bkms-navy-2) !important;
+    background-color: var(--bkms-mask) !important;
   }
 
   .fail-reason-item :deep(> div:last-child) {
@@ -1215,8 +1215,9 @@
     }
   }
 
-  .is-disabled {
-    color: var(--bkms-navy-5);
+  /* 只约束下拉禁用项。裸写 .is-disabled 会落到 text Button 根节点，盖掉 Brand/失效规范色 */
+  :deep(.bk-dropdown-item.is-disabled) {
+    color: var(--bkms-text-disabled);
     cursor: not-allowed;
   }
 

@@ -37,7 +37,7 @@
 /* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
 
 .bkms-themed .bk-textarea ::placeholder {
-  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  color: var(--bkms-text-disabled); /* 原 #c4c6cc → Text/4 Neutral/4，与 Input placeholder 一致 */
 }
 
 .bkms-themed .bk-textarea.is-disabled,

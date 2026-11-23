@@ -239,22 +239,21 @@
               {{ $t('添加组件实例') }}
             </Button>
             <template v-else>
-              <Input
-                class="component-picker-input box-content"
-                disabled
-                :model-value="curComponent?.displayName || curComponent?.name || '--'"
-              >
-                <template #suffix>
-                  <Button
-                    class="component-picker-reselect !min-w-[60px] text-[12px]"
-                    :disabled="!!data"
-                    theme="primary"
-                    @click="handleReSelect"
-                  >
-                    {{ $t('重选') }}
-                  </Button>
-                </template>
-              </Input>
+              <div class="flex items-center gap-0">
+                <Input
+                  class="component-picker-input min-w-0 flex-1"
+                  disabled
+                  :model-value="curComponent?.displayName || curComponent?.name || '--'"
+                />
+                <Button
+                  class="component-picker-reselect -ms-px shrink-0 !min-w-[60px] text-[12px] !shadow-none"
+                  :disabled="!!data"
+                  theme="primary"
+                  @click="handleReSelect"
+                >
+                  {{ $t('重选') }}
+                </Button>
+              </div>
               <Radio.Group
                 v-if="moduleType === 'app'"
                 v-model="isUseInstance"
@@ -471,7 +470,7 @@
             </template>
           </template>
           <template v-if="currentStep === 2">
-            <div class="bkms-bg-page text-[313238] font-bold text-[14px] px-[16px] py-[6px]">
+            <div class="bkms-bg-page bkms-text-title font-bold text-[14px] px-[16px] py-[6px] rounded-bkms-card">
               {{ $t('试运行结果预览') }}
             </div>
             <PatchPreviewCard
@@ -1212,21 +1211,23 @@
     height: 160px;
   }
 
-  /* 组件名与「重选」拼成一条：外框 6px，衔接处直角 */
-  :deep(.component-picker-input.bk-input) {
-    border-radius: var(--bkms-radius-overlay);
-  }
-
-  :deep(.component-picker-reselect.bk-button) {
-    height: 100%;
-    border-radius: var(--bkms-radius-overlay) !important;
-    border-start-start-radius: var(--bkms-radius-none) !important;
-    border-end-start-radius: var(--bkms-radius-none) !important;
-  }
-
   /** 不预留滚动条位置，避免侧栏有类似padding的效果 */
   :deep(.bk-modal-content) {
     scrollbar-gutter: auto !important;
+  }
+
+  /* Input 关掉了属性继承，圆角必须打进内部 .bk-input / .bk-button */
+  :deep(.component-picker-input.bk-input) {
+    border-radius: var(--bkms-radius-field);
+    border-start-end-radius: var(--bkms-radius-none);
+    border-end-end-radius: var(--bkms-radius-none);
+  }
+
+  :deep(.component-picker-reselect.bk-button) {
+    position: relative;
+    border-radius: var(--bkms-radius-control);
+    border-start-start-radius: var(--bkms-radius-none);
+    border-end-start-radius: var(--bkms-radius-none);
   }
 
   :deep(.bk-form-item) {

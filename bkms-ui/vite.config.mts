@@ -30,6 +30,7 @@ import Layouts from 'vite-plugin-vue-layouts';
 import SvgLoader from 'vite-svg-loader';
 
 import layerCss from './scripts/postcss-layer-css.mjs';
+import exceptionRecolor from './scripts/vite-plugin-exception-recolor.mjs';
 
 export default ({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd(), 'BK_');
@@ -132,6 +133,9 @@ export default ({ mode }: { mode: string }) => {
     },
 
     plugins: [
+      // bkui Exception 插图灰阶 → Figma Soft 3D Brand 软蓝
+      exceptionRecolor(),
+
       // https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue
       Vue(),
 

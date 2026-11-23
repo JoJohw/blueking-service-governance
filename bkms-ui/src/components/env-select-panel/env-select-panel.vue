@@ -1155,7 +1155,8 @@
     padding: 0 8px 8px !important;
     border: none;
     border-radius: var(--bkms-radius-overlay) !important;
-    box-shadow: 0 2px 4px 0 var(--bkms-shadow-card) !important;
+    /* 跟浅色下拉同一档，不要用 shadow-card（太浅，看起来像没阴影） */
+    box-shadow: 0 2px 6px var(--bkms-shadow-popover) !important;
 
     .env-list-scroll {
       &::-webkit-scrollbar {

@@ -20,6 +20,7 @@
   <Navigation
     :class="['h-full', theme, { 'hide-title': !needTitle, 'no-header-page': !showDefaultHeader }]"
     :default-open="navigationDefaultOpen"
+    :nav-width="64"
     v-bind="$attrs"
     @toggle-click="navigationState.setOpen"
   >
@@ -38,6 +39,10 @@
             :fold-name="item.foldName"
             :name="item.name"
           >
+            <!-- 分组标题始终用 foldName，和图标同列居中，收起展开不换字、不跳动 -->
+            <template #name>
+              {{ item.foldName || item.name }}
+            </template>
             <Menu.Item
               v-for="child in item.children"
               :key="child.key"
