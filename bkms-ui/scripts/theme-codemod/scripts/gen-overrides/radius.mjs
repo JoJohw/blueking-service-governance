@@ -21,6 +21,8 @@
  *
  * 分派：组件族给默认 token，`rules[].match`（选择器正则）可对特定后代换档——
  * 形状件（椭圆角标、1px 细条）与语义不同的后代（标签、浮层）靠它，不必拆组件族。
+ * 分角：组件族开 `cornerRules` 后会额外识别只写 border-*-radius 四条分角声明（无 border-radius 简写）的
+ * 拼接控件规则——库用它给分段控件的组首/组尾留圆角，漏读就等于这些角永远停在库原生小值。
  * 产物带「字面量版源」段标记，check-overrides.mjs 会用字面量索引校验选择器漂移；
  * 索引键依赖选择器逐字复刻，故不合并规则、不改写形状值。本脚本只写自身产物与台账。
  * 用法：node scripts/theme-codemod/scripts/gen-overrides/radius.mjs
@@ -118,6 +120,30 @@ function rewriteRadius(raw, varName) {
   return changed ? out.join(' ') : null;
 }
 
+/** 物理分角属性 → 逻辑分角名（LTR：top-left 即 start-start） */
+const CORNER_PROPS = {
+  'border-top-left-radius': 'start-start',
+  'border-top-right-radius': 'start-end',
+  'border-bottom-right-radius': 'end-end',
+  'border-bottom-left-radius': 'end-start',
+};
+
+/** 分角声明逐条换令牌：0 与形状值（百分比 / ≥ SHAPE_MIN）原样保留，不生成覆写 */
+function cornerRadiusDecls(body, varName) {
+  const out = [];
+  for (const piece of body.split(';')) {
+    const idx = piece.indexOf(':');
+    if (idx === -1) continue;
+    const logical = CORNER_PROPS[piece.slice(0, idx).trim()];
+    if (!logical) continue;
+    const value = piece.slice(idx + 1).trim();
+    const m = /^(\d+(?:\.\d+)?)px$/.exec(value);
+    if (!m || Number(m[1]) === 0 || Number(m[1]) >= SHAPE_MIN) continue;
+    out.push({ logical, raw: value, decl: `border-${logical}-radius: ${varName};` });
+  }
+  return out;
+}
+
 const LOGICAL_CORNERS = [
   'border-start-start-radius',
   'border-start-end-radius',
@@ -172,16 +198,19 @@ for (const rule of rawRules) {
   if (SKIP_SELECTOR_RE.test(rule.selector)) continue;
   const comp = findOwner(rule.selector);
   if (!comp) continue;
-  const raw = radiusDecl(rule.body);
-  if (!raw) continue;
   const token = resolveToken(comp, rule.selector);
-  const value = rewriteRadius(raw, `var(--bkms-radius-${token})`);
-  if (!value) {
+  const varName = `var(--bkms-radius-${token})`;
+  const raw = radiusDecl(rule.body);
+  const corners = comp.cornerRules ? cornerRadiusDecls(rule.body, varName) : [];
+  if (!raw && corners.length === 0) continue;
+  const value = raw ? rewriteRadius(raw, varName) : null;
+  if (!value && corners.length === 0) {
     skipped += 1;
     continue;
   }
+  const origin = raw ?? corners.map(corner => corner.raw).join(' ');
   const key = `${rule.media ?? ''}::${rule.selector}`;
-  buckets.get(comp.kebab).set(key, { selector: rule.selector, media: rule.media, value, raw, token });
+  buckets.get(comp.kebab).set(key, { selector: rule.selector, media: rule.media, value, corners, raw: origin, token });
 }
 
 for (const comp of cfg.components) {
@@ -194,6 +223,7 @@ for (const comp of cfg.components) {
       selector,
       media: null,
       value: `var(--bkms-radius-${token})`,
+      corners: [],
       raw: null,
       token,
     });
@@ -224,8 +254,9 @@ for (const comp of cfg.components) {
     const pad = rule.media ? '  ' : '';
     if (rule.media) lines.push(`${rule.media} {`);
     lines.push(`${pad}${scopeSelector(rule.selector, pad)} {`);
-    const { decls, fallback } = toDeclarations(rule.value);
+    const { decls, fallback } = rule.value ? toDeclarations(rule.value) : { decls: [], fallback: false };
     if (fallback) fallbackRules.push(rule.selector);
+    for (const corner of rule.corners) decls.push(corner.decl);
     for (const decl of decls) lines.push(`${pad}  ${decl}`);
     lines.push(`${pad}}`);
     if (rule.media) lines.push('}');

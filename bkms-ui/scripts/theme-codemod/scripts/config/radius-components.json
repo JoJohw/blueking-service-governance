@@ -52,7 +52,7 @@
     },
     { "kebab": "time-picker", "prefixes": ["time-picker"], "token": "field" },
     { "kebab": "button", "prefixes": ["button"], "token": "control" },
-    { "kebab": "radio", "prefixes": ["radio"], "token": "control" },
+    { "kebab": "radio", "prefixes": ["radio"], "token": "control", "cornerRules": true },
     { "kebab": "pagination", "prefixes": ["pagination"], "token": "control" },
     { "kebab": "collapse", "prefixes": ["collapse"], "token": "control" },
     { "kebab": "upload", "prefixes": ["upload"], "token": "card" },

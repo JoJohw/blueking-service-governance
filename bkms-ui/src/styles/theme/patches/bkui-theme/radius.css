@@ -176,6 +176,18 @@
   border-radius: var(--bkms-radius-control);
 }
 
+.bkms-themed .bk-radio-tab .bk-radio-button:first-child .bk-radio-button-label,
+.bkms-themed .bk-radio-card .bk-radio-button:first-child .bk-radio-button-label {
+  border-end-start-radius: var(--bkms-radius-control);
+  border-start-start-radius: var(--bkms-radius-control);
+}
+
+.bkms-themed .bk-radio-tab .bk-radio-button:last-child .bk-radio-button-label,
+.bkms-themed .bk-radio-card .bk-radio-button:last-child .bk-radio-button-label {
+  border-start-end-radius: var(--bkms-radius-control);
+  border-end-end-radius: var(--bkms-radius-control);
+}
+
 /* ── pagination → control ── */
 .bkms-themed .bk-pagination-list-pre-batch,
 .bkms-themed .bk-pagination-list-next-batch,
