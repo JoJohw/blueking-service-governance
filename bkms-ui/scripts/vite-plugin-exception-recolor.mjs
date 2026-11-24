@@ -43,7 +43,8 @@ const SOFT_SCALE = [
 
 const DATA_URI_RE = /data:image\/svg\+xml;base64,([A-Za-z0-9+/=]+)/g;
 const HEX_RE = /#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})\b/g;
-const MAGICBOX_IN_SVG = /#C4C6CC|#979BA5|#DCDEE0|#DCDEE5|#E6E8EB/i;
+const MAGICBOX_IN_SVG =
+  /#C4C6CC|#979BA5|#DCDEE0|#DCDEE5|#E6E8EB|#D1D3D6|#D4D6D9|#E1E3E6|#E5E7EC|#E8EAED|#EBEDF0|#EDEFF2|#F0F2F5|#F2F4F7|#DDDEE0|#DCDDE0/i;
 
 /** @param {string} hex */
 function parseRgb(hex) {
@@ -103,22 +104,18 @@ function recolorSvg(svg) {
 }
 
 /**
- * base64 流里 MagicBox 灰阶的常见片段（对齐敏感，多写几个）：
- * C4C6CC / #C4C6CC / 979BA5 / DCDEE0 / DCDEE5
+ * 注意：不要用 base64 子串猜 MagicBox 色值——同一 hex 在不同字节对齐下片段不同，
+ * 会导致 500 / empty / search-empty 等 SVG 被整段跳过、仍显示灰阶。
+ * 一律 decode 后再用 MAGICBOX_IN_SVG / HEX 扫描判定。
  */
-const MAGICBOX_IN_B64 = /QzRDNkND|I0M0QzZDQw|OTc5QkE1|RENERUUw|RENERUU1|Izk3OUJBNQ/;
 
 /** @param {string} code */
 export function recolorCode(code) {
-  // 大 deps chunk 里大量无关 SVG；无 MagicBox 特征则整文件跳过
-  if (!MAGICBOX_IN_B64.test(code) && !/#C4C6CC|#979BA5/i.test(code)) {
+  if (!code.includes('data:image/svg+xml;base64,')) {
     return null;
   }
   let touched = false;
   const next = code.replace(DATA_URI_RE, (full, b64) => {
-    if (!MAGICBOX_IN_B64.test(b64)) {
-      return full;
-    }
     let raw;
     try {
       raw = Buffer.from(b64, 'base64').toString('utf8');
@@ -128,7 +125,8 @@ export function recolorCode(code) {
     if (!raw.includes('<svg') && !raw.includes('<SVG')) {
       return full;
     }
-    if (!MAGICBOX_IN_SVG.test(raw)) {
+    // 已换过 Soft 3D 的可再跑一遍（idempotent）；无 MagicBox 灰阶则跳过无关 SVG
+    if (!MAGICBOX_IN_SVG.test(raw) && !/#C4C6CC|#979BA5|#D1D3D6|#D4D6D9|#DCDEE0|#E1E3E6/i.test(raw)) {
       return full;
     }
     const { svg, changed } = recolorSvg(raw);
