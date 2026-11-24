@@ -25,7 +25,7 @@ import postcss from 'postcss';
  *   bkms-boost < bkms-reset < bkms-vendor < bkms-patches < 未分层样式（uno 工具类）
  *
  * !important 段的反序：越靠前的层越强，故 bkms-boost 在普通声明上最弱、在 !important 上最强，
- * 只用于收录「必须压过组件库 !important」的声明（见 patches/boost.css）。
+ * 只用于收录「必须压过组件库 !important」的声明（见 manual/boost.css）。
  * 覆写层因此仍压得住组件库原厂样式，业务侧工具类则不再需要 `!` 前缀。
  * 层名带 bkms- 前缀：层是同名即合并，避免与第三方库自带的 @layer 撞名。
  *
@@ -36,15 +36,17 @@ import postcss from 'postcss';
 // 顺序有语义：先命中先生效，@unocss/reset 必须排在 node_modules 之前，否则会被归进 bkms-vendor。
 // 不加 $ 锚定：Vite 传进来的 id 可能带 query（如 ?v=1），锚定会让 boost 静默降级进 bkms-patches
 const RULES = [
-  { layer: 'bkms-boost', test: /[\\/]patches[\\/]boost\.css/ },
+  // boost 必须排在 manual 通配之前：否则会掉进 bkms-patches，!important 从最强变最弱
+  { layer: 'bkms-boost', test: /[\\/]manual[\\/]boost\.css/ },
   { layer: 'bkms-reset', test: /[\\/]@unocss[\\/]reset[\\/]/ },
   { layer: 'bkms-vendor', test: /[\\/]node_modules[\\/]/ },
-  { layer: 'bkms-patches', test: /[\\/]src[\\/]styles[\\/]theme[\\/]patches[\\/]/ },
+  // 只匹配 generated / manual 两个所有权目录；tokens、themes、variables.css 必须保持无层
+  { layer: 'bkms-patches', test: /[\\/]src[\\/]styles[\\/]theme[\\/](generated|manual)[\\/]/ },
 ];
 
 const normalizePath = file => String(file || '').replaceAll('\\', '/');
 
-// 匹配不到即保持无层：uno 工具类、main.css、overrides.css 都走这条路，是有意为之
+// 匹配不到即保持无层：uno 工具类、main.css / app.css、tokens / themes / variables.css 都走这条路，是有意为之
 const pickLayer = file => RULES.find(rule => rule.test.test(normalizePath(file)))?.layer;
 
 export default function layerCss() {

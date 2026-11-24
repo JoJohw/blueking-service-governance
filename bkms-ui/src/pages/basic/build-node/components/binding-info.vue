@@ -23,7 +23,7 @@
     :row-config="{ isHover: true }"
   >
     <template #empty>
-      <div class="py-[16px] text-[14px] text-[#979ba5]">
+      <div class="py-[16px] text-[14px] bkms-text-secondary">
         {{ $t('未关联构建机，当前使用公共构建机') }}
       </div>
     </template>

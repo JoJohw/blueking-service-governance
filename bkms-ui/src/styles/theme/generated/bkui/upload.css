@@ -1,0 +1,166 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
+
+/* bkui Upload 覆写 — 由 gen-overrides/color.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值。重跑按「令牌 + 行尾原值注释」重建，手改无效 */
+
+.bkms-themed .bk-upload-trigger__picture-actions {
+  color: var(--bkms-text-inverse); /* 原 #fff */
+  background: color-mix(in srgb, var(--bkms-neutral-1) 45%, transparent); /* 原 #00000073 */
+}
+
+.bkms-themed .bk-upload-trigger--single-picture.bk-upload-trigger--uploading {
+  background: color-mix(in srgb, var(--bkms-neutral-1) 65%, transparent); /* 原 #000000a6 */
+}
+
+.bkms-themed .bk-upload-trigger--fail {
+  background: color-mix(in srgb, var(--bkms-danger-5) 40%, transparent); /* 原 #fedddc66 */
+  border-color: var(--bkms-danger-3); /* 原 #ff5656 */
+}
+
+.bkms-themed .bk-upload-trigger--disabled.bk-upload-trigger--draggable,
+.bkms-themed .bk-upload-trigger--disabled.bk-upload-trigger--picture {
+  background-color: var(--bkms-neutral-10); /* 原 #fff */
+  border-color: var(--disable-color); /* 原值保留 */
+}
+
+.bkms-themed .bk-upload-trigger--single-picture.bk-upload-trigger--fail.bk-upload-trigger--has-file:hover {
+  border-color: var(--bkms-danger-3); /* 原 #ff5656 */
+}
+
+.bkms-themed .bk-upload-list__item {
+  background: var(--bkms-neutral-10); /* 原 #fff */
+  border: 1px solid var(--light-gray); /* 原值保留 */
+}
+
+.bkms-themed .bk-upload-list__item--fail {
+  background: color-mix(in srgb, var(--bkms-danger-5) 40%, transparent); /* 原 #fedddc66 */
+  border-color: var(--bkms-danger-3); /* 原 #ff5656 */
+}
+
+.bkms-themed .bk-upload-list__item--fail .bk-upload-list__item-message {
+  color: var(--bkms-danger-3); /* 原 #ff5656 */
+}
+
+.bkms-themed .bk-upload-list__item--fail:hover {
+  border-color: var(--bkms-danger-3); /* 原 #ff5656 */
+}
+
+.bkms-themed .bk-upload-list__item-picture.bk-upload-list__item--uploading {
+  background: color-mix(in srgb, var(--bkms-neutral-1) 65%, transparent); /* 原 #000000a6 */
+}
+
+.bkms-themed .bk-upload-list__picture-item-actions {
+  color: var(--bkms-text-inverse); /* 原 #fff */
+  background: color-mix(in srgb, var(--bkms-neutral-1) 45%, transparent); /* 原 #00000073 */
+}
+
+/* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
+
+.bkms-themed .bk-upload__tip {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-upload--disabled .bk-upload__tip {
+  color: var(--bkms-neutral-4); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-trigger {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-upload-trigger__picture-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-trigger--draggable {
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border: 1px dashed var(--bkms-neutral-4); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-trigger--dragover {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-upload-trigger__draggable-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-trigger__draggable-upload-link {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-upload-trigger--picture {
+  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  border: 1px dashed var(--bkms-neutral-4); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-trigger--disabled.bk-upload-trigger {
+  color: var(--bkms-neutral-4); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__draggable-inner,
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__draggable-icon,
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__draggable-upload-link,
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__picture-inner,
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__picture-icon,
+.bkms-themed .bk-upload-trigger--disabled .bk-upload-trigger__picture-upload-link {
+  color: var(--bkms-neutral-4); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-trigger:not(.bk-upload-trigger--disabled):hover {
+  border-color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-upload-trigger:not(.bk-upload-trigger--disabled):hover .bk-upload-trigger__picture-icon,
+.bkms-themed .bk-upload-trigger:not(.bk-upload-trigger--disabled):hover .bk-upload-trigger__draggable-icon {
+  color: var(--bkms-brand-2); /* 原 #3a84ff */
+}
+
+.bkms-themed .bk-upload-trigger--single-picture.bk-upload-trigger--has-file:hover {
+  border-color: var(--bkms-neutral-4); /* 原 #c4c6cc */
+}
+
+.bkms-themed .bk-upload-list__item:hover {
+  border-color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-list__item-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-list__item-name {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-upload-list__item-speed {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-upload-list__item-del-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-list__item-retry-icon {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-upload-list__item--success .bk-upload-list__item-message {
+  color: var(--bkms-success-2); /* 原 #2dcb56 */
+}

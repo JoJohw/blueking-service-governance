@@ -14,7 +14,8 @@
     {
       "kebab": "select",
       "prefixes": ["select"],
-      "token": "field"
+      "token": "field",
+      "selectors": [{ "selector": ".bk-select .bk-select-trigger .bk-select-tag.is-simplicity", "token": "none" }]
     },
     {
       "kebab": "search-select",

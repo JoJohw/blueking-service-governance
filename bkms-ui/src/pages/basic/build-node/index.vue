@@ -48,7 +48,7 @@
               keypath="私有构建机需由 SRE 导入蓝盾项目 {0}（需预装 Docker），并在此关联到蓝鲸服务治理，关联后内置构建流水线将使用该构建机。"
             >
               <a
-                class="inline-flex items-center text-[#3a84ff]"
+                class="inline-flex items-center bkms-text-brand"
                 :href="bkciNodeListUrl"
                 rel="noopener noreferrer"
                 target="_blank"
@@ -59,7 +59,7 @@
             </i18n-t>
           </template>
         </Alert>
-        <div class="p-[16px] bg-[#fff] shadow-[0_2px_4px_0_#1919290d]">
+        <div class="p-[16px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
           <!-- 与其他列表页一致，主操作放在表格左上方 -->
           <div
             v-if="state?.editable"

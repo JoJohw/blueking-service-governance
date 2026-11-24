@@ -18,6 +18,6 @@
 
 /*
  * 变量桥接聚合入口：src/modules/bkui.ts 单点加载（紧随 style.variable.css，:root 同名变量后者胜）。
- * 各域桥接文件：patches/bkui-theme/variables.css（bkui 域）。
+ * 各域桥接文件在 bridge/ 下（bkui 域）；本文件不入层，保证 :root 变量压过组件库。
  */
-@import './patches/bkui-theme/variables.css';
+@import './bridge/bkui.css';

@@ -31,17 +31,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const projectRoot = path.resolve(fileURLToPath(new URL('../../..', import.meta.url)));
-const LIB_DIR = path.join(projectRoot, 'src/styles/theme/patches/lib');
+const LIB_DIR = path.join(projectRoot, 'src/styles/theme/manual/lib');
 const VXE_CSS = 'node_modules/@blueking/table/vue3/vue3.css';
 const VIZ_CSS = 'src/styles/theme/tokens/viz.css';
 
-/** 覆写文件（相对 patches/lib/ 的路径）→ 所属库 CSS，新增覆写文件必须在这里登记 */
+/** 覆写文件（相对 manual/lib/ 的路径）→ 所属库 CSS，新增覆写文件必须在这里登记 */
 const LIB_CSS = {
   '@blueking/bk-table.css': VXE_CSS,
   '@blueking/date-picker.css': 'node_modules/@blueking/date-picker/vue3/vue3.css',
-  '@blueking/date-picker-radius.css': 'node_modules/@blueking/date-picker/vue3/vue3.css',
   '@blueking/ediatable.css': 'node_modules/@blueking/ediatable/vue3/vue3.css',
-  '@blueking/ediatable-radius.css': 'node_modules/@blueking/ediatable/vue3/vue3.css',
   '@blueking/monitor.css': 'node_modules/@blueking/monitor-vue3-components/index.css',
   '@blueking/notice.css': 'node_modules/@blueking/notice-component/dist/style.css',
   '@blueking/task-log.css': 'node_modules/@blueking/task-log/vue3/vue3.css',
@@ -49,19 +47,20 @@ const LIB_CSS = {
   '@blueking/vxe.css': VXE_CSS,
   'highlight.css': 'node_modules/highlight.js/styles/github.css',
   'markdown.css': 'node_modules/github-markdown-css/github-markdown.css',
+  'monaco.css': 'node_modules/monaco-editor/min/vs/editor/editor.main.css',
 };
 
 /** 只盯各库最关键的可视面类名，避免把状态类改动误报成漂移 */
 const KEY_SELECTORS = {
   '@blueking/bk-table.css': ['.bk-vxe-table', '.bk-vxe-table-setting-column-btn'],
-  '@blueking/date-picker.css': ['.panel-wrapper', '.date-panel', '.common-date-list .list-item'],
-  '@blueking/date-picker-radius.css': [
+  '@blueking/date-picker.css': [
     '.panel-wrapper',
+    '.date-panel',
+    '.common-date-list .list-item',
     '.date-wrapper .date-input .date-picker',
     '__bk-date-picker-popover__',
   ],
-  '@blueking/ediatable.css': ['.bk-ediatable', '.bk-ediatable-head-column'],
-  '@blueking/ediatable-radius.css': ['.bk-ediatable table'],
+  '@blueking/ediatable.css': ['.bk-ediatable', '.bk-ediatable-head-column', '.bk-ediatable table'],
   '@blueking/monitor.css': ['.common-legend', '.monitor-chart-tooltips', '.chart-menu'],
   '@blueking/notice.css': ['.bk-notice-component-alert'],
   '@blueking/task-log.css': ['.log-item', '.bk-popper'],
@@ -135,7 +134,7 @@ for (const file of files) {
 if (problems.length) {
   console.error(`✗ [check-lib] ${problems.length} 处漂移`);
   for (const item of problems) console.error(`  - ${item}`);
-  console.error('\n第三方包升级后请重跑本命令；缺失的变量名/选择器需同步改 patches/lib/ 下对应覆写文件');
+  console.error('\n第三方包升级后请重跑本命令；缺失的变量名/选择器需同步改 manual/lib/ 下对应覆写文件');
   process.exit(1);
 }
 

@@ -1,0 +1,627 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
+
+/*
+ * bkui 手写覆写层：只改 bkui 渲染出的 DOM（选择器以 .bk- 开头）。
+ * 与 generated/bkui/ 同处 bkms-patches 层，靠本文件排在后面覆盖；只写与生成值不同的声明。
+ * 值不对先想 tokens / bridge，能消解就不要落到这里。
+ * 本应用自有 class（.bkms-*）进 src/styles/app.css；其他第三方库进 manual/lib/。
+ */
+
+/* ══════════ bkui：主按钮阴影 ══════════ */
+
+.bkms-themed .bk-button.bk-button-primary:not(.is-disabled, .is-text, .is-outline) {
+  box-shadow: 0 4px 10px var(--bkms-shadow-button);
+}
+
+/* color.css 已定「按钮组不加」，按钮组内的 primary 需单独压掉 */
+.bkms-themed .bk-button-group .bk-button.bk-button-primary:not(.is-disabled, .is-text, .is-outline) {
+  box-shadow: none;
+}
+
+/* ══════════ bkui：导航壳层 ══════════ */
+
+/* bk-navigation 主内容区去掉默认内边距，间距由页面级容器自行控制 */
+.bkms-themed .bk-navigation-wrapper .navigation-container .container-content {
+  padding: 0;
+}
+
+/* ══════════ bkui：左侧菜单 ══════════ */
+
+.bkms-themed .nav-slider-list {
+  margin: 0 8px;
+  container-type: inline-size;
+}
+
+/* 对齐 design-visual（圆角留边、hover/选中渐变底、选中图标渐变字） */
+.bkms-themed .bk-menu {
+  /* 撑满容器宽（而非 bkui 写死的 260px），两种状态下高亮块两侧留边都在、圆角完整；
+     去掉宽度过渡，否则 hover 收回时菜单宽度缓动、图标列已撑满会把图标甩出可视区 */
+  width: 100%;
+  transition: none;
+
+  .bk-menu-item {
+    width: auto;
+    transition: none;
+
+    /* 折叠态图标列撑满容器，图标自然居中（展开态保留 60px 列宽对齐文字） */
+    @container (max-width: 60px) {
+      .item-icon {
+        flex: 0 0 100%;
+      }
+    }
+
+    &:hover {
+      background-image: linear-gradient(
+        155deg,
+        var(--bkms-neutral-7) 0%,
+        var(--bkms-neutral-6) 51%,
+        var(--bkms-neutral-5) 100%
+      );
+    }
+
+    &.is-active {
+      background-image: linear-gradient(
+        155deg,
+        var(--bkms-brand-7) 0%,
+        var(--bkms-brand-6) 51%,
+        var(--bkms-brand-5) 100%
+      );
+
+      .item-icon i {
+        color: transparent;
+        background-image: linear-gradient(180deg, var(--bkms-brand-3) 0%, var(--bkms-brand-1) 100%);
+        background-clip: text;
+      }
+    }
+  }
+
+  .bk-menu-submenu .submenu-header {
+    overflow: hidden;
+
+    .submenu-header-icon {
+      flex: 0 0 48px;
+    }
+  }
+
+  /* 分组标题和图标同列：左右 margin 8 + 宽 48，文字居中。收起展开几何不变，不跳动 */
+  .bk-menu-group .group-name {
+    box-sizing: border-box;
+    width: 48px;
+    margin: 0 8px;
+    padding: 0;
+    justify-content: center;
+    overflow: hidden;
+    text-align: center;
+  }
+}
+
+.bk-navigation-wrapper .navigation-nav .nav-slider {
+  overflow: hidden;
+}
+
+/* ══════════ bkui：message / exception / popover ══════════ */
+
+.bk-message-content.multi .overview .tools .tool.fix.fixed {
+  /* 组件库的 fixed 被 unocss 的 fixed 覆盖了 */
+  position: static;
+}
+
+.normal-exception {
+  .bk-exception-img {
+    width: 220px;
+    height: 100px;
+  }
+}
+
+.large-exception {
+  .bk-exception-img {
+    width: 440px;
+    height: 200px;
+  }
+
+  .bk-exception-description {
+    margin-top: 11px;
+  }
+}
+
+.bk-popper {
+  border: none;
+}
+
+/* 深色半透明主题：与默认深色 Tooltip 同用 mask；尖角裁剪见本文件末尾「深色 Tooltip」段 */
+.popover-dark-translucent {
+  background: var(--bkms-mask) !important;
+}
+
+.popover-dark-translucent .bk-pop2-arrow,
+.bk-popover.bk-pop2-content.popover-dark-translucent .bk-pop2-arrow {
+  background: var(--bkms-mask) !important;
+  border-color: transparent !important;
+}
+
+.no-padding-popover {
+  padding: 0 !important;
+}
+
+.bk-popover.bk-pop2-content.no-border-popover,
+.bk-popover.bk-pop2-content.no-border-popover .bk-pop2-arrow {
+  border: none !important;
+}
+
+/* ══════════ bkui：胶囊分段 Radio ══════════ */
+
+/* 规范「Tab-胶囊样式」：轨道 neutral-6，项圆角 6 已在 radius.css。
+   小（库默认胶囊）高 24、左右 12；大高 28、左右 16。
+   选中项白底，文字用标题色，不再用品牌蓝。项与项之间不画分隔线。
+   悬停比当前底深一档。选中是白底，hover 用 --bkms-bg-hover。
+   未选中透出轨道 neutral-6，hover 用深一档 neutral-5。
+   数量徽章：选中 brand 浅底 hover 用 --bkms-bg-active-hover。
+   未选中徽章用 neutral-7，比轨道浅一档，hover 再用 neutral-5。 */
+.bkms-themed .bk-radio-capsule .bk-radio-button:before {
+  display: none;
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button.is-checked .bk-radio-button-label {
+  color: var(--bkms-text-title);
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button.bk-radio-button-large .bk-radio-button-label {
+  height: 28px;
+  padding: 0 16px;
+  line-height: 28px;
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button:not(.is-disabled, .is-checked) .bkms-bg-card {
+  background-color: var(--bkms-neutral-7);
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button:not(.is-disabled, .is-checked):hover {
+  background-color: var(--bkms-neutral-5);
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button.is-checked:not(.is-disabled):hover {
+  background-color: var(--bkms-bg-hover);
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button:not(.is-disabled, .is-checked):hover .bkms-bg-card {
+  background-color: var(--bkms-neutral-5);
+}
+
+.bkms-themed .bk-radio-capsule .bk-radio-button.is-checked:not(.is-disabled):hover .bkms-bg-active {
+  background-color: var(--bkms-bg-active-hover);
+}
+
+/* ══════════ bkui：form 控件（tab / button / textarea / search-select）══════════ */
+
+/* bk-select-tag 的 .input() mixin 自带 overflow:hidden，单选 Select 的 bk-input 没有，
+   prefix 的直角背景会溢出圆角，与 tag 形态观感不一致。
+   组件库原生 2px 圆角下不明显，radius 令牌把 bk-input 提到 6px 后暴露 */
+.bk-input {
+  overflow: hidden;
+}
+
+.bk-tab-content {
+  padding: 18px 24px;
+}
+
+.bk-button:not(.is-text, .bk-button-small) {
+  min-width: 88px;
+}
+
+.bk-textarea {
+  min-height: 50px;
+}
+
+/* SearchSelect 选中项过多时容器空间不足不换行 */
+.bk-search-select-container .search-container-input {
+  min-width: fit-content;
+}
+
+/* #prefix slot 不渲染组件自带的 .bk-select--prefix-area，而 .has-prefix 又清掉 tag 的左内边距，
+   多选 tag Select 的 10px 间距因此丢失；prefix prop 自带 10px margin，需排除避免双倍间距 */
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag.has-prefix:not(:has(.bk-select--prefix-area)) .bk-select-tag-wrapper {
+  padding-inline: 10px;
+}
+
+/* ══════════ bkui：Alert ══════════ */
+
+/* 规范信息条：Figma Alert 无描边，高由内容撑开，内边距上下 6、左右 8。
+   关闭按钮原来用负外边距抵消 8px 10px 的内边距，跟着改成 6px 8px。 */
+.bkms-themed .bk-alert {
+  box-sizing: border-box;
+  border: none;
+}
+
+.bkms-themed .bk-alert-wraper {
+  padding: 6px 8px;
+}
+
+.bkms-themed .bk-alert-close {
+  margin-top: -6px;
+  margin-right: -8px;
+}
+
+/* ══════════ bkui：Tag / Select 尺寸 ══════════ */
+
+/* Tag 中号（size 默认）方角：高 18、左右 8。
+   bkui 把默认 radius 2px 写进行内样式，类规则压不过，只对这一档用 important。
+   页面显式写了别的圆角（如 8px）的标签不动。小号高度仍是库的 16。 */
+.bkms-themed .bk-tag[style*='border-radius: 2px'] {
+  border-radius: var(--bkms-radius-tag) !important;
+}
+
+.bkms-themed .bk-tag.bk-tag--default {
+  height: 18px;
+  padding: 0 8px;
+  line-height: 16px;
+}
+
+.bkms-themed .bk-tag.bk-tag--default.bk-tag-closable {
+  padding: 0 4px 0 8px;
+}
+
+/* Select 线框中号水平内边距 8。右侧 28 留给箭头，只改左侧。 */
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag,
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag-input {
+  padding-left: 8px;
+}
+
+/* ══════════ bkui：dialog / modal ══════════ */
+
+/* 圆角在 radius.css 的 overlay 档。底栏是方块底色，裁进圆角，避免下角缺一块 */
+.bkms-themed .bk-modal-body {
+  overflow: hidden;
+}
+
+.bkms-themed .bk-dialog-footer,
+.bkms-themed .bk-sideslider .bk-sideslider-footer {
+  border-radius: var(--bkms-radius-overlay);
+  border-start-start-radius: var(--bkms-radius-none);
+  border-start-end-radius: var(--bkms-radius-none);
+}
+
+/* 下拉、日期面板同样裁进 overlay 圆角。箭头在面板外的气泡不要加 overflow */
+.bkms-themed .bk-popover.bk-pop2-content.bk-select-popover,
+.bkms-themed .bk-dropdown-popover .bk-dropdown-menu,
+.bkms-themed .bk-date-picker-dropdown {
+  overflow: hidden;
+}
+
+/* 表单控件圆角只由外框承担，内层不再各画一圈 */
+.bkms-themed .bk-input,
+.bkms-themed .bk-textarea,
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag {
+  overflow: hidden;
+}
+
+.bkms-themed .bk-input .bk-input--text,
+.bkms-themed .bk-textarea > textarea {
+  border-radius: var(--bkms-radius-none);
+}
+
+.leave-confirm-box-index {
+  .bk-modal-mask,
+  .bk-modal-wrapper {
+    z-index: 9999 !important;
+  }
+}
+
+/* ══════════ 浮层裁切 ══════════ */
+
+/* 下拉框、穿梭框等小场景滚动条为 6px（弹窗/抽屉/页面等大场景 8px，见 main.css 全局段） */
+.bk-popover.bk-pop2-content.bk-select-popover .bk-select-content-wrapper .bk-select-dropdown::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* ══════════ 深色 Tooltip ══════════ */
+
+/*
+ * Figma AIdev Tooltips（115965-125925）：深色底黑 80%（--bkms-mask），尖角同色。
+ * 半透明底 + 旋转尖角若重叠会叠色发深，用 clip-path 只保留探出气泡外的那一角。
+ * data-arrow 是 placement（不是尖角所在边）：
+ *   top → 尖朝下，保留右下角；bottom → 尖朝上，保留左上角；
+ *   left → 尖朝右，保留右上角；right → 尖朝左，保留左下角。
+ */
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) {
+  background: var(--bkms-mask);
+}
+
+.bkms-themed .bk-popover.bk-pop2-content .bk-pop2-arrow {
+  background: var(--bkms-mask);
+  border-color: transparent;
+}
+
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) .bk-pop2-arrow[data-arrow='top'],
+.popover-dark-translucent .bk-pop2-arrow[data-arrow='top'] {
+  clip-path: polygon(0% 100%, 100% 0%, 100% 100%);
+}
+
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) .bk-pop2-arrow[data-arrow='bottom'],
+.popover-dark-translucent .bk-pop2-arrow[data-arrow='bottom'] {
+  clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
+}
+
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) .bk-pop2-arrow[data-arrow='left'],
+.popover-dark-translucent .bk-pop2-arrow[data-arrow='left'] {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%);
+}
+
+.bkms-themed .bk-popover.bk-pop2-content:not([data-theme^='light']) .bk-pop2-arrow[data-arrow='right'],
+.popover-dark-translucent .bk-pop2-arrow[data-arrow='right'] {
+  clip-path: polygon(0% 0%, 0% 100%, 100% 100%);
+}
+
+/* ══════════ 表单占位字 ══════════ */
+
+/* ══════════ 重跑补偿：规范与生成值不一致的部分 ══════════ */
+
+/*
+ * 以下规则生成器表达不了（只覆盖基础态、把多态合并成一条），重跑会被打回，故由本层承接。
+ * 每条都能在 generated/bkui/ 找到同选择器的现状；两者一致时删掉本层这条，避免双份。
+ */
+
+/* 悬停只对可编辑态生效；只读态保持 Neutral/5，不跟着变深 */
+.bkms-themed .bk-input:hover:not(.is-disabled, .is-readonly, .is-focused) {
+  border-color: var(--bkms-line-hover);
+}
+
+.bkms-themed .bk-input.is-readonly:hover {
+  border-color: var(--bkms-neutral-5);
+}
+
+/* 禁用态比只读态深一档：底 Neutral/9（生成产物把两态合并成 Neutral/8） */
+.bkms-themed .bk-input.is-disabled {
+  background-color: var(--bkms-neutral-9);
+}
+
+.bkms-themed .bk-input.is-disabled .bk-input--prefix-area,
+.bkms-themed .bk-input.is-disabled .bk-input--suffix-area,
+.bkms-themed .bk-input.is-disabled .bk-input--suffix-icon,
+.bkms-themed .bk-input.is-disabled input,
+.bkms-themed .bk-input.is-disabled textarea {
+  background-color: var(--bkms-neutral-9);
+}
+
+.bkms-themed .bk-textarea.is-disabled .bk-input--prefix-area,
+.bkms-themed .bk-textarea.is-disabled .bk-input--suffix-area,
+.bkms-themed .bk-textarea.is-disabled .bk-input--suffix-icon {
+  background-color: var(--bkms-neutral-9);
+}
+
+/* 出错时悬停仍保持 Danger/2：通用悬停规则带 3 个 :not()，这里补一个追平 specificity */
+.bkms-themed .bk-form-item.is-error .bk-input:hover:not(.is-disabled),
+.bkms-themed .bk-form-item.is-error .bk-date-picker-rel .bk-date-picker-editor:hover:not(.is-disabled),
+.bkms-themed .bk-form-item.is-error .bk-select .bk-select-trigger .bk-select-tag:hover:not(.is-disabled),
+.bkms-themed .bk-form-item.is-error .bk-tag-input .bk-tag-input-trigger:hover:not(.is-disabled) {
+  border-color: var(--bkms-danger-2);
+}
+
+/* 日期 / 搜索选择 / 标签输入的悬停描边（生成器只覆盖基础态） */
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor:hover:not([disabled], .readonly, :focus) {
+  border-color: var(--bkms-line-hover);
+}
+
+.bkms-themed .bk-search-select-container:hover:not(.is-focus) {
+  border-color: var(--bkms-line-hover);
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger:hover:not(.disabled, .active) {
+  border-color: var(--bkms-line-hover);
+}
+
+/* light 浮层阴影按 Figma 带 2px 下偏移（生成值为 0 2px 6px） */
+.bkms-themed .bk-popover.bk-pop2-content[data-theme^='light'] {
+  box-shadow: 0 2px 6px var(--bkms-shadow-popover);
+}
+
+/* ══════════ 色值语义：生成器只管色阶，语义在本层覆写 ══════════ */
+
+/*
+ * HEX_TOKENS 只做「旧色 → 新色」的机械映射，生成产物落在色阶（neutral-4 之类）。
+ * 同一色值按用途要换成语义令牌（描边 line-*、字色 text-*、底色 bg-*、阴影 shadow-*），
+ * 选择器与 generated/bkui/ 保持一致以便覆盖；改这里时同步跑 gen-overrides/color.mjs 确认产物。
+ */
+
+.bkms-themed .bk-alert-info {
+  background-color: var(--bkms-bg-active);
+}
+
+.bkms-themed .bk-button.bk-button-danger.is-disabled,
+.bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-danger.is-disabled {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-button.bk-button-primary.is-disabled,
+.bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-primary.is-disabled {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-button.bk-button-success.is-disabled,
+.bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-success.is-disabled {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-button.bk-button-warning.is-disabled,
+.bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-disabled {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-button.is-disabled {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-date-picker-footer-wrapper {
+  background-color: var(--bkms-bg-head);
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor {
+  border: 1px solid var(--bkms-line-input);
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor.only-bottom-border {
+  border-color: transparent transparent var(--bkms-line-input) transparent;
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor.readonly {
+  border-color: var(--bkms-line-input);
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor::placeholder {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-date-picker-rel .bk-date-picker-editor[disabled] {
+  background-color: var(--bkms-neutral-9);
+  border-color: var(--bkms-neutral-5);
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-dialog-footer {
+  background-color: var(--bkms-bg-head);
+}
+
+.bkms-themed .bk-exception-description {
+  color: var(--bkms-text-body);
+}
+
+.bkms-themed .bk-exception-title {
+  color: var(--bkms-text-title);
+}
+
+.bkms-themed .bk-input {
+  border-color: var(--bkms-line-input);
+}
+
+.bkms-themed .bk-input ::placeholder {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-input--large ::placeholder {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-input--prefix-area,
+.bkms-themed .bk-input--suffix-area {
+  border-right: 1px solid var(--bkms-line-input);
+}
+
+.bkms-themed .bk-input--suffix-area {
+  border-left: 1px solid var(--bkms-line-input);
+}
+
+.bkms-themed .bk-input.is-simplicity {
+  border-bottom-color: var(--bkms-line-input);
+}
+
+.bkms-themed .bk-input.is-simplicity:hover:not(.is-disabled) {
+  border-bottom-color: var(--bkms-line-hover);
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .copy-status .inner {
+  box-shadow: 0 2px 6px var(--bkms-shadow-hover);
+}
+
+.bkms-themed .bk-message-content.multi .message-detail .copy-status .inner:after {
+  box-shadow: 5px 3px 6px var(--bkms-shadow-hover);
+}
+
+.bkms-themed .bk-message-error {
+  background: var(--bkms-danger-6);
+}
+
+.bkms-themed .bk-message-success {
+  background: var(--bkms-success-7);
+}
+
+.bkms-themed .bk-message-warning {
+  background: var(--bkms-warning-7);
+}
+
+.bkms-themed .bk-picker-confirm {
+  background-color: var(--bkms-bg-head);
+}
+
+.bkms-themed .bk-search-select-container {
+  border: 1px solid var(--bkms-line-input);
+}
+
+.bkms-themed .bk-search-select-container .search-container-input .input-after:after {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-search-select-container .search-container-input .input-before:after {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag {
+  border: 1px solid var(--bkms-line-input);
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag-input::placeholder {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-disabled {
+  background-color: var(--bkms-neutral-9);
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-simplicity {
+  border-bottom-color: var(--bkms-line-input);
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag.is-simplicity:hover {
+  border-bottom-color: var(--bkms-line-hover);
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag::placeholder {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-select .bk-select-trigger .bk-select-tag:not(.is-disabled,.is-simplicity):hover {
+  border-color: var(--bkms-line-hover);
+}
+
+.bkms-themed .bk-select--prefix-area {
+  border-right: 1px solid var(--bkms-line-input);
+}
+
+.bkms-themed .bk-select.is-disabled .bk-input--text {
+  background-color: var(--bkms-neutral-9);
+}
+
+.bkms-themed .bk-sideslider .bk-modal-footer.is-fixed .bk-sideslider-footer {
+  background: var(--bkms-bg-head);
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger {
+  border: 1px solid var(--bkms-line-input);
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger .placeholder {
+  color: var(--bkms-text-disabled);
+}
+
+.bkms-themed .bk-tag-input .bk-tag-input-trigger.disabled {
+  background: var(--bkms-neutral-9);
+}
+
+.bkms-themed .bk-textarea ::placeholder {
+  color: var(--bkms-text-disabled);
+}

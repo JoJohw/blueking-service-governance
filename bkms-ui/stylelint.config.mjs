@@ -18,10 +18,10 @@
 
 import stylelintConfig from '@blueking/bkui-lint/stylelint.mjs';
 
-// 消费层禁止色值字面量，暂为 warning，存量清完后升 error。半透明用 color-mix（uno.config 规则 4）
+// 消费层禁止色值字面量：业务存量已清零，直接 error 管控新增。半透明用 color-mix（uno.config 规则 4）
 const consumerRules = {
-  'color-no-hex': [true, { severity: 'warning' }],
-  'function-disallowed-list': [['rgb', 'rgba', 'hsl', 'hsla'], { severity: 'warning' }],
+  'color-no-hex': [true, { severity: 'error' }],
+  'function-disallowed-list': [['rgb', 'rgba', 'hsl', 'hsla'], { severity: 'error' }],
   // BEM 的 __element / --modifier 是存量组件的既有命名，放开这两段但保留普通类名 kebab 约束
   'selector-class-pattern': ['^([a-z][a-z0-9]*)(-[a-z0-9]+)*((__|--)[a-z0-9]+(-[a-z0-9]+)*)*$', {}],
   // 圆角多值简写（含多个 var() 令牌）无法表达语义归属、换档要逐角跟改：
@@ -54,10 +54,10 @@ const paletteShellOverride = {
 const patchesOverrides = [
   {
     files: [
-      'src/styles/theme/patches/bkui-theme/**/*.css',
-      'src/styles/theme/patches/lib/**/*.css',
-      'src/styles/theme/patches/ua-fill/**/*.css',
-      'src/styles/theme/patches/boost.css',
+      'src/styles/theme/generated/**/*.css',
+      'src/styles/theme/manual/lib/**/*.css',
+      'src/styles/theme/manual/ua.css',
+      'src/styles/theme/manual/boost.css',
     ],
     rules: {
       'no-descending-specificity': null,
@@ -73,7 +73,7 @@ const patchesOverrides = [
 
 // 手写覆写层不是复刻产物：形态类规则同样不适用，但圆角写法纪律必须生效
 const handwrittenOverride = {
-  files: ['src/styles/overrides.css'],
+  files: ['src/styles/theme/manual/bkui.css'],
   rules: {
     'no-descending-specificity': null,
     'no-duplicate-selectors': null,

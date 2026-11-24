@@ -17,7 +17,7 @@
 
 /**
  * bkui 圆角覆写生成器：按 config/radius-components.json 的组件族白名单，从 dist/style.css
- * 逐条复刻 border-radius 规则并改指向 radius 语义令牌，产出 patches/bkui-theme/radius.css。
+ * 逐条复刻 border-radius 规则并改指向 radius 语义令牌，产出 generated/bkui/radius.css。
  *
  * 分派：组件族给默认 token，`rules[].match`（选择器正则）可对特定后代换档——
  * 形状件（椭圆角标、1px 细条）与语义不同的后代（标签、浮层）靠它，不必拆组件族。
@@ -36,7 +36,7 @@ import { collectBlocks, splitSelectorList } from '../lib/css-blocks.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../../../..');
 const CONFIG = path.join(__dirname, '../config/radius-components.json');
-const OUTPUT = path.join(ROOT, 'src/styles/theme/patches/bkui-theme/radius.css');
+const OUTPUT = path.join(ROOT, 'src/styles/theme/generated/bkui/radius.css');
 const REPORTS = path.join(__dirname, '../../reports');
 const SUMMARY = path.join(REPORTS, 'radius-summary.md');
 

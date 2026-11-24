@@ -100,7 +100,7 @@ export default [
     ignores: ['src/api/modules/**/*.ts'],
   },
   // 主题令牌漂移：template + script + <style> 块；.css 见下方 css language 块
-  // 存量未清完前 no-hardcoded-color / no-foreign-var 用 warn 当软基线，清零后升 error；
+  // no-hardcoded-color 存量已清零 → error；no-foreign-var / 圆角两条存量未清，仍是 warn 软基线；
   // no-default-palette / prefer-uno-class 当前零存量，直接 error。
   {
     files: ['**/*.{vue,ts,tsx,js,jsx}'],
@@ -108,7 +108,7 @@ export default [
     ignores: ['uno.config.ts', 'src/fonts/iconcool.js', 'test/**', 'e2e/**'],
     plugins: { theme: themePlugin },
     rules: {
-      'theme/no-hardcoded-color': 'warn',
+      'theme/no-hardcoded-color': 'error',
       'theme/no-foreign-var': 'warn',
       'theme/no-hardcoded-radius': 'warn',
       'theme/prefer-radius-class': 'warn',
@@ -123,7 +123,7 @@ export default [
     language: 'css/css',
     plugins: { css, theme: themePlugin },
     rules: {
-      'theme/no-hardcoded-color': 'warn',
+      'theme/no-hardcoded-color': 'error',
       'theme/no-foreign-var': 'warn',
       'theme/no-hardcoded-radius': 'warn',
       'theme/prefer-radius-class': 'warn',

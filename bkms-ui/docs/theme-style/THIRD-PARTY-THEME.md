@@ -20,8 +20,8 @@
 | ECharts（monitor 包） | canvas | 配置注入 | `customOptions.options(options)` | 否（zrender 直绘） |
 | Monaco 0.52 | DOM + canvas | 配置注入 | `defineTheme` + `setTheme` | 否 |
 | @blueking/table（vxe 封装） | DOM | 变量覆盖 | `--vxe-ui-*` | 是 |
-| date-picker / task-log / ediatable / user-selector / notice / monitor 包 CSS | DOM | CSS 覆写 | `patches/lib/` | 是 |
-| github-markdown-css / highlight.js | DOM | CSS 覆写 | `patches/lib/` | 是 |
+| date-picker / task-log / ediatable / user-selector / notice / monitor 包 CSS | DOM | CSS 覆写 | `manual/lib/` | 是 |
+| github-markdown-css / highlight.js / monaco-editor | DOM | CSS 覆写 | `manual/lib/` | 是 |
 
 结论：「统一实现方式」不成立，「统一颜色源 + 统一取色工具 + 各自最后一公里」成立。
 
@@ -31,7 +31,7 @@
 tokens/viz.css          字典层    颜色是什么（全部实色）
 viz-theme.ts            桥接层    怎么读成实色（readVizVar / 缓存 / 颜色工具）
 各库适配文件             适配层    哪个字段吃哪种颜色
-patches/lib/         覆写层    不提供 API 的库直接改 CSS
+manual/lib/             覆写层    不提供 API 的库直接改 CSS（手写，一库一文件）
 ```
 
 ## 四、字典层（`src/styles/theme/tokens/viz.css`）
@@ -77,11 +77,11 @@ patches/lib/         覆写层    不提供 API 的库直接改 CSS
 
 **Monaco**：`monaco-theme.ts` 以 `vs-dark` 为 base 定义 `bkms-dark`（光标、选中背景、活动行号、滚动条、浮层），`rules` 留空（语法 token 走内置）；`ms-editor.vue` 创建前注册、`vs-dark` 映射到 `bkms-dark`、theme watch 调 `setTheme`；浅色走内置 `vs`。
 
-**vxe**：着色全在 `--vxe-ui-*`，只做变量映射不改源码；颜色变量唯一真源是 `patches/lib/@blueking/vxe.css`（表头、边框、行悬停、斑马纹、底栏、树节点线、校验错误色）。`overrides.css` 只留 `--vxe-ui-table-row-height-default` 与斑马纹残留清除。
+**vxe**：着色全在 `--vxe-ui-*`，只做变量映射不改源码；颜色变量唯一真源是 `manual/lib/@blueking/vxe.css`（表头、边框、行悬停、斑马纹、底栏、树节点线、校验错误色）；行高、斑马纹残留清除、过滤面板等结构覆写也在同一文件末尾。**Monaco** 的 DOM 浮层（不可编辑提示）在 `manual/lib/monaco.css`，编辑器配色仍走 `monaco-theme.ts`。
 
-**硬编码型包**：`patches/lib/@blueking/` 下按库一文件，只覆写页面实际出现的可视面（底 / 边框 / 文字 / hover / 选中 / 禁用），不做全量替换。markdown 正文属内容域，直读 `--bkms-*` 跟随 UI 主题；语法 token 保持 `@viz-locked`。
+**硬编码型包**：`manual/lib/@blueking/` 下按库一文件，只覆写页面实际出现的可视面（底 / 边框 / 文字 / hover / 选中 / 禁用），不做全量替换；圆角与颜色同文件，不再拆 `*-radius.css`。markdown 正文属内容域，直读 `--bkms-*` 跟随 UI 主题；语法 token 保持 `@viz-locked`。
 
-**覆写层结构**：`patches/lib/` 与 `patches/bkui-theme/` 平级，不得放进生成器目录（`cleanGeneratedDir` 会清掉）；`lib/index.css` 是该域唯一聚合入口，在 `theme/index.css` 静态清单里排在 `bkui-theme/index.css` 之后；每条规则带 `.bkms-themed` 前缀。
+**覆写层结构**：`manual/lib/` 与 `generated/bkui/` 是两个所有权目录——前者手写、生成器不读不写，后者生成器整目录重建。`manual/lib/index.css` 是该域唯一聚合入口，在 `theme/index.css` 静态清单里排在 `generated/bkui/index.css` 之后；两者同处 `bkms-patches` 层，靠清单先后决胜；每条规则带 `.bkms-themed` 前缀。
 
 ## 八、已定案
 

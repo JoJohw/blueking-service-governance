@@ -22,6 +22,7 @@
     "lint:fix": "eslint . --ext .js,.ts,.vue --fix",
     "theme:designer": "node scripts/component-preview/index.mjs && vite --config dev/palette/vite.config.ts",
     "theme:report": "node scripts/theme-lint/report.mjs",
+    "theme:gen": "node scripts/theme-codemod/scripts/stats-usage.mjs && node scripts/theme-codemod/scripts/gen-overrides/color.mjs && node scripts/theme-codemod/scripts/gen-overrides/radius.mjs",
     "format": "prettier --write .",
     "stylelint": "stylelint \"src/**/*.{css,scss,vue}\"",
     "stylelint:fix": "stylelint \"src/**/*.{css,scss,vue}\" --fix",

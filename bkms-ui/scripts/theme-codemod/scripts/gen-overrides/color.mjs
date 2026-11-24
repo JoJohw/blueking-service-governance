@@ -19,20 +19,21 @@
 /**
  * bkui 覆写生成器：从 bkui dist css 抽取含写死 hex 的声明，按"选择器+prop"生成 class 覆写。
  *
- * 值策略（单源：既往产物即映射真源）：
- *   - 现有 patches 里「令牌 var + 行尾原值注释」的成对记录 → 复用同一 token（自举，不再有 mapping.json 副本）
+ * 值策略（映射真源：config/overrides.mjs 的 HEX_TOKENS，人工维护，不由产物反推）：
+ *   - HEX_TOKENS：旧色 → 新规范令牌的机械映射，全站生效；语义修正（描边/字色/底色/阴影）在手写层 manual/bkui.css
  *   - 命中 color.css 令牌值（本就不变）→ 原值生成
  *   - 未收录 → 组件库原色值占位，行尾 pending 标记，进 gen-summary 清单
  *   - 渐变/阴影函数内含任一未确认 hex → 整条声明占位（不做局部替换）
  *
- * 拍板路径：直接改 patches 里的值与原值注释，重跑即继承（生成器先读旧产物建索引，再整体覆盖）。
+ * 拍板路径：颜色改 tokens/ 或 bridge/；单个组件与规范不一致时写 manual/bkui.css 的差异。
+ * 生成产物只由本脚本写，人工手改会在重跑时丢失；新 hex 拍板后补进 config/overrides.mjs。
  *
  * 范围过滤：只处理 reports/usage.json 白名单组件（.bk-<kebab> 前缀族）的规则；
  * 未归属规则不静默丢弃，进 reports/gen-summary.md 供人工收编。
  *
  * 产出：
- *   - src/styles/theme/patches/bkui-theme/<kebab>.css（bkui 组件覆写，按组件族每组件一文件，含变量版段+字面量段；
- *     手写业务补丁在 src/styles/overrides.css，生成器不触碰）
+ *   - src/styles/theme/generated/bkui/<kebab>.css（bkui 组件覆写，按组件族每组件一文件，含变量版段+字面量段；
+ *     手写层在 src/styles/theme/manual/，生成器不读不写）
  *   - reports/gen-summary.md（生成摘要 + 未归属规则 + 未收录 hex 待确认清单）
  *
  * 用法：node scripts/theme-codemod/scripts/gen-overrides/color.mjs
@@ -41,13 +42,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { EXTRA_OWNERS, PREFIX_ALIAS } from '../config/overrides.mjs';
+import { EXTRA_OWNERS, HEX_TOKENS, PREFIX_ALIAS } from '../config/overrides.mjs';
 import { collectBlocks, splitSelectorList } from '../lib/css-blocks.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../../../..');
 const DIST = path.join(ROOT, 'node_modules/bkui-vue/dist');
-const PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme');
+const PATCHES_DIR = path.join(ROOT, 'src/styles/theme/generated/bkui');
 const REPORTS = path.join(__dirname, '../../reports');
 
 const readJson = f => JSON.parse(fs.readFileSync(path.join(__dirname, f), 'utf8'));
@@ -88,76 +89,7 @@ const INK_SEMANTIC_BY_HEX = {
   '26323d': '--bkms-text-body', // 浅色浮层的深色正文
 };
 
-/**
- * 映射索引的唯一来源：现有产物。逐条解析 `属性: 含 var 的值 + 行尾原值注释`，
- * 值里的 var 与原值注释里的 hex 按出现顺序成对（多色渐变也能对上）。
- * 生成器整体覆盖写之前先读一遍旧文件，人工拍板的改动因此可继承。
- * 扫描目录覆盖 bkui-theme 与 lib：lib 产物同样整包重写，不给它喂回台账就永远改不动。
- */
-const PATCH_LEDGER = new Map();
-function collectPatchCssFiles(dir, out = []) {
-  if (!fs.existsSync(dir)) return out;
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) collectPatchCssFiles(full, out);
-    else if (entry.name.endsWith('.css') && entry.name !== 'index.css' && entry.name !== 'variables.css')
-      out.push(full);
-  }
-  return out;
-}
-for (const file of collectPatchCssFiles(path.join(ROOT, 'src/styles/theme/patches'))) {
-  const text = fs.readFileSync(file, 'utf8');
-  for (const line of text.split('\n')) {
-    const m = line.match(/^\s*([-\w]+)\s*:\s*([^;]+);\s*\/\*\s*(.+?)\s*\*\/\s*$/);
-    if (!m) continue;
-    const prop = m[1];
-    const vars = [...m[2].matchAll(/var\((--bkms-[\w-]+)\)/g)].map(x => x[1]);
-    const hexes = [...m[3].matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map(x => normalizeHex(x[0]));
-    if (!vars.length || vars.length !== hexes.length) continue;
-    hexes.forEach((h, i) => {
-      const token = vars[i];
-      // 字色彩的语义选择由 INK_SEMANTIC_BY_HEX 决定，不回灌台账（否则 background 的 #fff 会被带偏）
-      if (INK_PROPS.has(prop) && token.startsWith('--bkms-text-')) return;
-      PATCH_LEDGER.set(h, token); // 8 位精确命中
-      // 基色回归只对"颜色令牌"成立；阴影令牌自身带 alpha，回填基色会让实色（如 #ccc）被错配成带 alpha 的值
-      if (TOKEN_HEX.get(token)?.length !== 9) PATCH_LEDGER.set(h.slice(0, 6), token);
-    });
-  }
-}
-/**
- * 旧产物的声明级索引：media::selector -> prop -> 该声明的原值 hex 串。
- * 继承人工对 border 简写的收窄——dist 只给 `border: 1px solid #x`，而完整简写以更高优先级
- * 压掉业务侧 `border: none` 的局部覆写，故此处人工改成了单边 `border-*-color`，重跑须沿用。
- */
-const OLD_DECL_HEX = new Map();
-if (fs.existsSync(PATCHES_DIR)) {
-  for (const name of fs.readdirSync(PATCHES_DIR)) {
-    if (!name.endsWith('.css') || name === 'variables.css' || name === 'index.css') continue;
-    const text = fs.readFileSync(path.join(PATCHES_DIR, name), 'utf8');
-    const blocks = [];
-    collectBlocks(text, null, blocks);
-    for (const b of blocks) {
-      const selector = unscopeSelector(
-        b.selector
-          .replace(/\/\*[\s\S]*?\*\//g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim(),
-      );
-      const key = `${b.media ?? ''}::${selector}`;
-      if (!OLD_DECL_HEX.has(key)) OLD_DECL_HEX.set(key, new Map());
-      const bucket = OLD_DECL_HEX.get(key);
-      for (const line of b.body.split('\n')) {
-        const m = line.match(/^\s*([-\w]+)\s*:\s*[^;]+;\s*\/\*\s*(.+?)\s*\*\/\s*$/);
-        if (!m) continue;
-        const hexes = [...m[2].matchAll(/#[0-9a-fA-F]{3,8}\b/g)]
-          .map(x => normalizeHex(x[0]))
-          .sort()
-          .join(',');
-        if (hexes) bucket.set(m[1], hexes);
-      }
-    }
-  }
-}
+/** 未收录的 hex 走 pending 进 gen-summary，拍板后补进 config/overrides.mjs 的 HEX_TOKENS */
 
 /** color.css 令牌值反查集（3 位写法先展开，8 位阴影值不参与） */
 const TOKEN_VALUE_SET = new Set();
@@ -172,6 +104,23 @@ for (const h of TOKEN_HEX.values()) {
 }
 const WHITELIST = new Set(usage.components.map(c => c.kebab));
 
+/**
+ * 安装目录里存在、但项目未引用的组件：按组件自有 CSS 判定归属，
+ * 其规则既不生成，也不进待办报表（避免为未使用组件维护色值映射）。
+ */
+const BKUI_LIB = path.join(ROOT, 'node_modules/bkui-vue/lib');
+const UNUSED_CSS_TEXT = (usage.unusedComponents ?? [])
+  .map(kebab => path.join(BKUI_LIB, kebab))
+  .filter(dir => fs.existsSync(dir))
+  .flatMap(dir =>
+    fs
+      .readdirSync(dir)
+      .filter(f => f.endsWith('.css'))
+      .map(f => fs.readFileSync(path.join(dir, f), 'utf8')),
+  )
+  .join('\n');
+const isUnusedClassToken = t => UNUSED_CSS_TEXT.includes(`.bk-${t}`);
+
 const COMPONENT_NAME = new Map([
   ...usage.components.map(c => [c.kebab, c.name]),
   ...EXTRA_OWNERS.map(e => [e.kebab, e.name]),
@@ -185,16 +134,19 @@ const LITERAL_DIST_FILE = 'style.css';
 
 const HEX_TOKEN_RE = /#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b/g;
 
-/** 单个 hex token 的归类：token | unchanged | pending（含 unknown） */
+/** 单个 hex token 的归类：token | unchanged | pending（含 unknown）。
+ * 优先级：HEX_TOKENS（8 位优先，退基色）→ 8 位精确令牌 → 令牌值反查 */
 function classifyHex(hex8) {
   const base6 = hex8.slice(0, 6);
-  // 8 位精确命中排在前：基色可能已另有归属（如 #cccccc4d 的基色 cccccc 是 navy-5），
+  // 人工映射排在按值命中之前：令牌值恰好等于源色不代表该处该用这个令牌
+  // （#0000001a 既是 shadow-hover 的值，也是浮层阴影的来源，浮层统一走 shadow-popover）
+  const mapped = HEX_TOKENS[hex8] ?? HEX_TOKENS[base6];
+  if (mapped) return { kind: 'token', base6, token: mapped };
+  // 8 位精确命中：基色可能已另有归属（如 #cccccc4d 的基色 cccccc 是 navy-5），
   // 但完整值已有专属令牌（--bkms-shadow-inset），应按精确值收编
   if (hex8.length === 8 && TOKEN_BY_HEX8.has(`#${hex8}`)) {
     return { kind: 'token', base6, token: TOKEN_BY_HEX8.get(`#${hex8}`) };
   }
-  const token = PATCH_LEDGER.get(hex8) ?? PATCH_LEDGER.get(base6);
-  if (token) return { kind: 'token', base6, token };
   if (TOKEN_VALUE_SET.has(base6)) return { kind: 'unchanged', base6 };
   return { kind: 'pending', base6 };
 }
@@ -241,6 +193,22 @@ function normalizeHex(raw) {
   return h; // 6 或 8 位
 }
 
+/**
+ * 收窄映射：键 = 归一化选择器::dist 原属性，值 = { prop: 收窄后的属性, token?: 该描边固定的令牌 }。
+ * 完整 border 简写会以更高优先级压掉业务侧 border:none 的局部覆写，这些声明只覆盖颜色。
+ * 声明式维护，不读旧产物反向继承——产物丢失即无从复原。
+ */
+const NARROW_DECLS = new Map([
+  ['.bk-dialog-footer::border-top', { prop: 'border-top-color' }],
+  // #c4c6cc 在 input 内既是描边又是禁用字色，文件级台账只能取其一，这里钉死描边语义
+  ['.bk-input::border', { prop: 'border-color', token: '--bkms-line-input' }],
+  ['.bk-resize-layout-border::border', { prop: 'border-color' }],
+  ['.bk-resize-layout-bottom>.bk-resize-layout-aside::border-top', { prop: 'border-top-color' }],
+  ['.bk-resize-layout-left>.bk-resize-layout-aside::border-right', { prop: 'border-right-color' }],
+  ['.bk-resize-layout-right>.bk-resize-layout-aside::border-left', { prop: 'border-left-color' }],
+  ['.bk-resize-layout-top>.bk-resize-layout-aside::border-bottom', { prop: 'border-bottom-color' }],
+]);
+
 /** 声明值重写。返回 null = 不生成；否则 { value, comment, pendingHexes } */
 function rewriteValue(rawValue, prop) {
   const rawTokens = [...rawValue.matchAll(HEX_TOKEN_RE)].map(m => m[0]);
@@ -251,7 +219,7 @@ function rewriteValue(rawValue, prop) {
     const semantic = INK_SEMANTIC_BY_HEX[tokens[0]];
     if (semantic) return { value: `var(${semantic})`, comment: `原 ${rawTokens[0]}`, pendingHexes: [] };
   }
-  const kinds = tokens.map(classifyHex);
+  const kinds = tokens.map(h => classifyHex(h));
   const pendingHexes = kinds.filter(k => k.kind === 'pending').map(k => k.base6);
   if (kinds.every(k => k.kind === 'unchanged')) {
     // 令牌值命中的声明也原值生成：值不变，但抬升 specificity 保护级联层级
@@ -269,8 +237,8 @@ function rewriteValue(rawValue, prop) {
     const k = classifyHex(h);
     if (k.kind !== 'token') continue;
     if (h.length === 8) {
-      if (TOKEN_HEX.get(k.token) === `#${h}`) {
-        // 令牌值与源色完全一致（自带 alpha），直接引用，避免 color-mix 二次衰减
+      // 令牌值与源色完全一致（自带 alpha），或阴影位（源 alpha 与令牌不同，但按设计统一收编到阴影令牌）
+      if (TOKEN_HEX.get(k.token) === `#${h}` || (prop === 'box-shadow' && k.token.startsWith('--bkms-shadow-'))) {
         out = out.replace(m[0], `var(${k.token})`);
       } else {
         const alpha = Math.round((parseInt(h.slice(6), 16) / 255) * 100);
@@ -284,6 +252,13 @@ function rewriteValue(rawValue, prop) {
   return { value: out.trim(), comment, pendingHexes: [] };
 }
 
+/** 选择器归一化：去注释、逐项去空白，与旧产物索引的键口径一致 */
+function selectorKey(selector) {
+  return splitSelectorList(selector.replace(/\/\*[\s\S]*?\*\//g, ' '))
+    .map(s => s.trim())
+    .join(',');
+}
+
 // ---------- 1+2. 扫描 dist（双源）+ 归属 + 声明重写 ----------
 // patches[kebab] = Map(key => { selector, media, decls: Map(prop -> {value, comment}) })
 const patches = new Map(); // 变量版源
@@ -293,6 +268,8 @@ const unknownHexes = new Map(); // 未归属规则中的 hex -> selectors
 const rulePending = new Map(); // 覆写规则内按原值占位的 hex -> selectors（不在任何清单）
 let scannedDecls = 0;
 let literalUnassigned = 0;
+let unusedComponentRules = 0; // 未使用组件的规则：不生成、不告警
+let nonComponentRules = 0; // 无 .bk- 类的全局规则（fieldset 等）：不生成、不告警
 
 /** 色彩类属性：规则被覆写时，同规则内的这些声明需一并原值生成（含 transparent/var 等），保住原级联层级 */
 const COLOR_PROPS = new Set([
@@ -353,13 +330,22 @@ function scanDist(file, patchesMap, trackUnassigned) {
         literalUnassigned++;
         continue;
       }
+      const selTokens = [...rule.selector.matchAll(/\.bk-([a-z0-9-]+)/g)].map(m => m[1]);
+      if (!selTokens.length) {
+        nonComponentRules++;
+        continue;
+      }
+      if (selTokens.some(isUnusedClassToken)) {
+        unusedComponentRules++;
+        continue;
+      }
       scannedDecls += effective.length;
       unassigned.push(rule);
       for (const d of effective) {
         for (const m of d.value.matchAll(HEX_TOKEN_RE)) {
           const h = normalizeHex(m[0]);
           const base = h.slice(0, 6);
-          if (!PATCH_LEDGER.has(base) && !TOKEN_VALUE_SET.has(base)) {
+          if (!HEX_TOKENS[base] && !TOKEN_VALUE_SET.has(base)) {
             if (!unknownHexes.has(base)) unknownHexes.set(base, new Set());
             unknownHexes.get(base).add(rule.selector);
           }
@@ -386,9 +372,9 @@ function scanDist(file, patchesMap, trackUnassigned) {
 scanDist(DIST_FILE, patches, true);
 scanDist(LITERAL_DIST_FILE, literalPatches, false);
 
-// ---------- 3. 输出 patches + index.css ----------
-// 生成目录清理：只删生成器自有的 <kebab>.css，保留手工 variables.css 与另一生成器产出的 radius.css
-const GENERATED_BUILTINS = new Set(['variables.css', 'radius.css']);
+// ---------- 3. 输出 generated + index.css ----------
+// 生成目录清理：本脚本独占该目录，只保留另一生成器（radius.mjs）产出的 radius.css
+const GENERATED_BUILTINS = new Set(['radius.css']);
 function cleanGeneratedDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
   for (const f of fs.readdirSync(dir)) {
@@ -444,33 +430,17 @@ function scopeSelector(selector, indent = '') {
     .join(`,\n${indent}`);
 }
 
-/** scopeSelector 的逆运算：逐项剥前缀，还原 dist 里的选择器作为索引键 */
-function unscopeSelector(selector) {
-  return splitSelectorList(selector)
-    .map(s => s.replace(/^\.bkms-themed\s+/, '').trim())
-    .join(',');
-}
-
-const NARROW_BORDER = new Map([
-  ['border', 'border-color'],
-  ['border-bottom', 'border-bottom-color'],
-  ['border-left', 'border-left-color'],
-  ['border-right', 'border-right-color'],
-  ['border-top', 'border-top-color'],
-]);
-
-/** 旧产物把 border 简写收窄成单边色时沿用旧写法；原值 hex 必须与旧声明一致才算同一条来源 */
-function inheritNarrowBorder(prop, r, oldBucket) {
-  const narrow = NARROW_BORDER.get(prop);
-  if (!narrow || !oldBucket?.has(narrow)) return null;
-  const hexes = [...r.comment.matchAll(/#[0-9a-fA-F]{3,8}\b/g)]
-    .map(x => normalizeHex(x[0]))
-    .sort()
-    .join(',');
-  if (!hexes || oldBucket.get(narrow) !== hexes) return null;
-  const colors = [...r.value.matchAll(/var\(--bkms-[\w-]+\)|#[0-9a-fA-F]{3,8}/g)].map(x => x[0]);
-  if (colors.length !== 1) return null;
-  return { prop: narrow, value: colors[0] };
+/** 命中收窄映射时只输出颜色；提取不到唯一颜色说明 dist 写法变了，回退原声明并进摘要告警 */
+const narrowMisses = [];
+function narrowDecl(selector, prop, r) {
+  const narrow = NARROW_DECLS.get(`${selectorKey(selector)}::${prop}`);
+  if (!narrow) return null;
+  const colors = [...r.value.matchAll(/var\(--bkms-[\w-]+\)|#[0-9a-fA-F]{3,8}\b/g)].map(x => x[0]);
+  if (colors.length !== 1) {
+    narrowMisses.push({ selector, prop, value: r.value.trim() });
+    return null;
+  }
+  return { prop: narrow.prop, value: narrow.token ? `var(${narrow.token})` : colors[0] };
 }
 
 // 同名组件一文件两段：变量版段在前、字面量段在后——字面量源选择器可能更具体，
@@ -484,7 +454,7 @@ for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].
     '',
     `/* bkui ${name} 覆写 — 由 gen-overrides/color.mjs 生成，重跑会整体覆盖本文件 */`,
     '',
-    '/* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */',
+    '/* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值。重跑按「令牌 + 行尾原值注释」重建，手改无效 */',
     '',
   ];
   let varRuleCount = 0;
@@ -494,11 +464,10 @@ for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].
     const pad = media ? '  ' : '';
     if (media) lines.push(`${media} {`);
     lines.push(`${pad}${scopeSelector(selector, pad)} {`);
-    const oldBucket = OLD_DECL_HEX.get(`${media ?? ''}::${selector}`);
     let narrowed = false;
     let declIdx = 0;
     for (const [prop, r] of decls) {
-      const narrow = inheritNarrowBorder(prop, r, oldBucket);
+      const narrow = narrowDecl(selector, prop, r);
       if (narrow && !narrowed) {
         if (declIdx > 0) lines.push('');
         lines.push(`${pad}  /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */`);
@@ -528,11 +497,10 @@ for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].
     const pad = media ? '  ' : '';
     if (media) litLines.push(`${media} {`);
     litLines.push(`${pad}${scopeSelector(selector, pad)} {`);
-    const oldBucket = OLD_DECL_HEX.get(`${media ?? ''}::${selector}`);
     let narrowed = false;
     let declIdx = 0;
     for (const [prop, r] of fresh) {
-      const narrow = inheritNarrowBorder(prop, r, oldBucket);
+      const narrow = narrowDecl(selector, prop, r);
       if (narrow && !narrowed) {
         if (declIdx > 0) litLines.push('');
         litLines.push(`${pad}  /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */`);
@@ -568,7 +536,7 @@ for (const kebab of [...new Set([...patches.keys(), ...literalPatches.keys()])].
   }
 }
 
-// 域内聚合入口：每个 patches 子目录一个 index.css，theme/index.css 只引各域这一个文件
+// 域内聚合入口：生成域一个 index.css，theme/index.css 只引各域这一个文件
 function writeDomainIndex(dir, files, header) {
   fs.writeFileSync(path.join(dir, 'index.css'), [...header, ...files.map(f => `@import './${f}';`), ''].join('\n'));
 }
@@ -578,11 +546,10 @@ writeDomainIndex(
   [
     ...LICENSE_LINES,
     '',
-    '/* bkui 覆写清单 — 由 gen-overrides/color.mjs 生成，重跑整体覆盖；variables.css 手工桥接不在此列，radius.css 由 gen-overrides/radius.mjs 产出并随清单引入 */',
+    '/* bkui 覆写清单 — 由 gen-overrides/color.mjs 生成，重跑整体覆盖，禁止手改；radius.css 由 gen-overrides/radius.mjs 产出并随清单引入 */',
     '',
   ],
 );
-// 手写覆写在 src/styles/overrides.css，不参与生成器重跑
 
 // ---------- 4. 生成摘要 + 台账 ----------
 fs.mkdirSync(REPORTS, { recursive: true });
@@ -593,17 +560,17 @@ const summary = [
   `- 生成时间：${new Date().toISOString()}`,
   `- dist 数据源：${DIST_FILE} + ${LITERAL_DIST_FILE}（字面量段）`,
   `- 扫描含 hex 声明：${scannedDecls}；归属组件：${perComponent.length} 个；生成覆写规则：${emittedRules} 条 / ${emittedDecls} 声明`,
-  `- 字面量段（dist/style.css）：${literalRules} 条 / ${literalDecls} 声明（并入 bkui-theme/ 组件文件，${perComponent.filter(p => p.litRules > 0).length} 个组件含字面量段；未归属 ${literalUnassigned} 条不计入台账）`,
-  `- 未归属规则（选择器无白名单组件前缀）：${unassigned.length} 条`,
-  `- 未收录 hex（既对不上既有映射、也不在令牌值）：${unknownHexes.size} 种`,
+  `- 字面量段（dist/style.css）：${literalRules} 条 / ${literalDecls} 声明（并入 generated/bkui/ 组件文件，${perComponent.filter(p => p.litRules > 0).length} 个组件含字面量段；未归属 ${literalUnassigned} 条不计入台账）`,
+  `- 未归属规则（在用组件前缀未覆盖）：${unassigned.length} 条`,
+  `- 未使用组件 / 非组件规则（不生成，不计入待办）：${unusedComponentRules} / ${nonComponentRules} 条`,
+  `- 未收录 hex（对不上既有映射、也不在令牌值）：${unknownHexes.size} 种`,
   '',
   '## 按组件产出',
   '',
   '| 文件 | 组件 | 规则数（变量+字面量） | 声明数（变量+字面量） |',
   '| --- | --- | --- | --- |',
   ...perComponent.map(
-    p =>
-      `| patches/bkui-theme/${p.kebab}.css | ${p.name} | ${p.varRules}+${p.litRules} | ${p.varDecls}+${p.litDecls} |`,
+    p => `| generated/bkui/${p.kebab}.css | ${p.name} | ${p.varRules}+${p.litRules} | ${p.varDecls}+${p.litDecls} |`,
   ),
   '',
 ];
@@ -635,7 +602,7 @@ if (unknownHexes.size > 0) {
 if (rulePending.size > 0) {
   summary.push(`## 覆写内按原值占位（待拍板，${rulePending.size} 种）`, '');
   summary.push('以下 hex 已归属组件、但对不上既有映射也不是令牌值，本轮按原值占位；');
-  summary.push('拍板时直接改对应 patches 文件的值与原值注释，重跑即继承。', '');
+  summary.push('拍板后改 tokens/ 或 bridge/，或把差异写进 manual/bkui.css，不要手改生成产物。', '');
   for (const [hex, sels] of [...rulePending.entries()].sort()) {
     summary.push(
       `- #${hex}：${[...sels]
@@ -646,11 +613,23 @@ if (rulePending.size > 0) {
   }
   summary.push('');
 }
+if (narrowMisses.length > 0) {
+  summary.push(`## 收窄映射未生效（${narrowMisses.length} 条）`, '');
+  summary.push(
+    'NARROW_DECLS 命中了选择器与属性，但取值里没有唯一颜色（dist 写法变了或已改为多色），本轮按原声明输出；',
+  );
+  summary.push('确认后更新 color.mjs 的 NARROW_DECLS，否则完整 border 简写会压掉业务侧 border:none 的局部覆写。', '');
+  for (const { selector, prop, value } of narrowMisses) {
+    summary.push(`- \`${selector}\` → \`${prop}: ${value}\``);
+  }
+  summary.push('');
+}
 fs.writeFileSync(path.join(REPORTS, 'gen-summary.md'), summary.join('\n'));
 
 console.log(
   `components: ${perComponent.length}, rules: ${emittedRules}+${literalRules}literal, decls: ${emittedDecls}+${literalDecls}literal`,
 );
 console.log(
-  `unassigned rules: ${unassigned.length}, unknown hexes: ${unknownHexes.size}, in-rule pending: ${rulePending.size}`,
+  `unassigned rules: ${unassigned.length}, unused/non-component: ${unusedComponentRules}/${nonComponentRules}, ` +
+    `unknown hexes: ${unknownHexes.size}, in-rule pending: ${rulePending.size}, narrow misses: ${narrowMisses.length}`,
 );

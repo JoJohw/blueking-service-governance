@@ -277,6 +277,7 @@
 
   .bkms-sort-popover .bkms-sort-item.bk-dropdown-item:hover {
     color: var(--bkms-neutral-2);
+
     /* 与 Select 选项 hover 同档：Neutral/7 #F0F4FA */
     background: var(--bkms-neutral-7);
   }

@@ -30,7 +30,7 @@
       :title="$t('保存后，空间下的内置构建流水线会切换到这台构建机')"
     />
 
-    <div class="mb-[8px] text-[14px] text-[#63656e]">{{ $t('构建机') }}</div>
+    <div class="mb-[8px] text-[14px] bkms-text-body">{{ $t('构建机') }}</div>
     <Select
       v-model="selectedNodeHashId"
       :clearable="false"
@@ -50,7 +50,7 @@
       >
         <div class="w-full py-[6px] leading-[20px]">
           <div class="flex items-center justify-between gap-[12px]">
-            <span class="truncate text-[#313238]">{{ node.displayName }}</span>
+            <span class="truncate bkms-text-title">{{ node.displayName }}</span>
             <StatusIcon
               class="shrink-0 text-[12px]"
               :status="node.online ? 'online' : 'offline'"
@@ -58,11 +58,11 @@
               :status-text-map="onlineTextMap"
             />
           </div>
-          <div class="text-[12px] text-[#979ba5]">
+          <div class="text-[12px] bkms-text-secondary">
             {{ node.ip }} · {{ node.osName || '--' }}
             <span
               v-if="!node.selectable"
-              class="ml-[8px] text-[#ea3636]"
+              class="ml-[8px] text-bkms-danger-2"
             >
               {{ unselectableReasonText(node.unselectableReason) }}
             </span>
@@ -72,7 +72,7 @@
     </Select>
     <div
       v-if="!isLoading && loadError"
-      class="mt-[8px] flex items-center gap-[8px] text-[12px] text-[#ea3636]"
+      class="mt-[8px] flex items-center gap-[8px] text-[12px] text-bkms-danger-2"
     >
       <span>{{ $t('构建机列表加载失败') }}</span>
       <Button
@@ -85,7 +85,7 @@
     </div>
     <div
       v-else-if="!isLoading && !candidates.length"
-      class="mt-[8px] text-[12px] text-[#979ba5]"
+      class="mt-[8px] text-[12px] bkms-text-secondary"
     >
       {{ $t('蓝盾项目 {0} 下还没有第三方构建机，请联系 SRE 导入', [projectCode]) }}
     </div>

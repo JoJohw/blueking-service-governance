@@ -73,10 +73,8 @@ import './styles/main.css';
 import '@blueking/table/vue3/vue3.css';
 import '@unocss/reset/tailwind.css';
 import 'uno.css';
-// 手写覆写层须晚于 uno.css（否则同 specificity 下被工具类压掉）；它与 theme/index.css 的先后由 lint 排序决定，
-// 两者属性不重叠且手写侧带 .bkms-themed 前缀的规则 specificity 更高，顺序不影响结果
-import '~/styles/overrides.css';
-// theme/index.css 整包（令牌 + patches）只定义 --bkms-* 与选择器级兜底、无级联冲突，放 CSS 组末尾以满足 import 排序
+// theme/index.css 整包（令牌 + generated + manual）只定义 --bkms-* 与选择器级覆写；
+// 层归属由 scripts/postcss-layer-css.mjs 决定，跨层胜负不看 import 顺序
 import '~/styles/theme/index.css';
 
 /**

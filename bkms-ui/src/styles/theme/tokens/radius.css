@@ -43,7 +43,7 @@
   /**
    * @group 圆角语义
    * @layer semantic
-   * @note 按「页面上这是块什么控件」来挑，不是按数字接近来挑：输入框找 field、按钮找 control、卡片找 card、弹层找 overlay。没有贴切场景才用 base 兜底。各档当前多数落在 md——这是有意的统一提档（对齐 bkms 业务层观感），bkui 原生的 2px/3px 由 patches/bkui-theme/radius.css 逐选择器接管。
+   * @note 按「页面上这是块什么控件」来挑，不是按数字接近来挑：输入框找 field、按钮找 control、卡片找 card、弹层找 overlay。没有贴切场景才用 base 兜底。各档当前多数落在 md——这是有意的统一提档（对齐 bkms 业务层观感），bkui 原生的 2px/3px 由 generated/bkui/radius.css 逐选择器接管。
    */
 
   /**

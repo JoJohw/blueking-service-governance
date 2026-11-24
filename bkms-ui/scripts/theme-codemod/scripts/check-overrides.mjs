@@ -17,7 +17,7 @@
  */
 
 /**
- * 覆写漂移自检：校验 patches/bkui-theme/ 的每条覆写在当前 bkui 产物中仍有效。
+ * 覆写漂移自检：校验 generated/bkui/ 的每条覆写在当前 bkui 产物中仍有效。
  *
  * 校验两点（任一失效即报错，exit 1）：
  *   1. 选择器存在性：去掉 `.bkms-themed ` 前缀后的选择器仍在 dist css 中
@@ -36,7 +36,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../../..');
 const DIST_FILE = path.join(ROOT, 'node_modules/bkui-vue/dist/style.variable.css');
 const LITERAL_DIST_FILE = path.join(ROOT, 'node_modules/bkui-vue/dist/style.css');
-const PATCHES_DIR = path.join(ROOT, 'src/styles/theme/patches/bkui-theme');
+const PATCHES_DIR = path.join(ROOT, 'src/styles/theme/generated/bkui');
 
 const HEX_RE = /#[0-9a-f]{3,8}\b/gi;
 const SCOPE = '.bkms-themed ';

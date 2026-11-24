@@ -38,8 +38,8 @@ export default ({ mode }: { mode: string }) => {
   return defineConfig({
     base: env.BK_STATIC_URL,
 
-    // 第三方样式与 theme/patches 入层（层序见 index.html），让 uno 工具类无需 ! 即可压过组件覆写；
-    // overrides.css 保持无层：普通声明高于所有层，但处于 !important 段最低档，其中的 !important 不保证压过库内 !important
+    // 第三方样式与 theme 的 generated / manual 入层（层序见 index.html），让 uno 工具类无需 ! 即可压过组件覆写；
+    // tokens / themes / variables.css 保持无层：色值是定义，桥接变量必须压过组件库
     css: {
       postcss: {
         plugins: [layerCss()],

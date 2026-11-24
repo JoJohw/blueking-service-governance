@@ -17,7 +17,7 @@
  */
 
 /* 全局基础层：只放 HTML 根元素与浏览器级默认值。
- * 应用自有 class → app.css；组件库覆写 → overrides.css。 */
+ * 应用自有 class → app.css；组件库覆写 → theme/manual/。 */
 
 @import '@/fonts/style.css';
 @import './app.css';

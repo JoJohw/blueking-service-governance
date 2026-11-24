@@ -19,7 +19,7 @@
 /*
  * 应用自有样式 —— 本项目模板里写的 class（导航项 / 场景语义类 / 通用工具类）。
  * 加载点：main.css 内 @import（位于 uno.css 之前），模板上的工具类可以覆盖本文件。
- * 改组件库渲染出的 DOM（选择器里出现 bk- / vxe- / monaco- 等类名）请去 overrides.css。
+ * 改组件库渲染出的 DOM 请去 theme/manual/（bkui 走 bkui.css，其他库走 lib/）。
  */
 
 /* ────────────── 导航 ────────────── */

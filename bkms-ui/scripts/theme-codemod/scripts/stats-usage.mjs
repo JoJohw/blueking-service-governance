@@ -138,11 +138,23 @@ const noCss = components.filter(c => !c.cssFound);
 // ---------- 4. 输出 ----------
 fs.mkdirSync(path.join(__dirname, '../reports'), { recursive: true });
 
+/** 安装目录里存在、但项目未引用的组件：生成器据此跳过它们的规则，不强行收编 */
+const BKUI_LIB = path.join(ROOT, 'node_modules/bkui-vue/lib');
+const usedKebabs = new Set(components.map(c => c.kebab));
+const unusedComponents = fs.existsSync(BKUI_LIB)
+  ? fs
+      .readdirSync(BKUI_LIB, { withFileTypes: true })
+      .filter(e => e.isDirectory() && !usedKebabs.has(e.name))
+      .map(e => e.name)
+      .sort()
+  : [];
+
 const scopeJson = {
   generatedAt: new Date().toISOString(),
   distSource: 'node_modules/bkui-vue/dist/*.css',
   totalComponents: components.length,
   inScopeCount: inScope.length,
+  unusedComponents,
   components: inScope.map(c => ({ name: c.name, kebab: c.kebab, fileCount: c.fileCount })),
 };
 fs.writeFileSync(path.join(__dirname, '../reports/usage.json'), `${JSON.stringify(scopeJson, null, 2)}\n`);
@@ -153,6 +165,7 @@ const lines = [
   `- 生成时间：${new Date().toISOString()}`,
   `- 数据源：src/**/*.{vue,ts,tsx,js} 的 \`import { X } from 'bkui-vue'\` 与 .vue 模板 \`<bk-*>\` 标签`,
   `- 组件种类：${components.length}；其中 dist css 存在对应类前缀（覆写范围内）：**${inScope.length}**；无对应类前缀（icon 等，覆写范围外）：${noCss.length}`,
+  `- 未使用组件（安装目录中存在、项目未引用，不生成覆写）：${unusedComponents.length} 个（${unusedComponents.join(', ')}）`,
   '',
   '## 覆写范围内组件（按使用文件数排序）',
   '',

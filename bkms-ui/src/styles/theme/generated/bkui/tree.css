@@ -1,0 +1,66 @@
+/*
+ * TencentBlueKing is pleased to support the open source community by making
+ * 蓝鲸智云 - 服务治理 (BlueKing Service Governance) available.
+ * Copyright (C) Tencent. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ *  http://opensource.org/licenses/MIT
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * We undertake not to change the open source license (MIT license) applicable
+ * to the current version of the project delivered to anyone in the future.
+ */
+
+/* bkui Tree 覆写 — 由 gen-overrides/color.mjs 生成，重跑会整体覆盖本文件 */
+
+/* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值。重跑按「令牌 + 行尾原值注释」重建，手改无效 */
+
+.bkms-themed .bk-tree .bk-node-row:hover {
+  background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+
+.bkms-themed .bk-tree .bk-node-row.is-selected {
+  background-color: var(--bkms-brand-7); /* 原 #ebf2ff */
+}
+
+.bkms-themed .bk-tree .bk-node-row.is-selected:hover {
+  background-color: var(--bkms-brand-6); /* 原 #e1ecff */
+}
+
+.bkms-themed .bk-tree .bk-node-row.drop-before:before {
+  background-color: var(--bkms-brand-2); /* 原 #2196f3 */
+}
+
+.bkms-themed .bk-tree .bk-node-row.drop-after:before {
+  background-color: var(--bkms-brand-2); /* 原 #2196f3 */
+}
+
+.bkms-themed .bk-tree .bk-node-row.drop-inner {
+  background-color: color-mix(in srgb, var(--bkms-brand-2) 10%, transparent); /* 原 #2196f31a */
+  outline: 1px dashed var(--bkms-brand-2); /* 原 #2196F3 */
+}
+
+.bkms-themed .bk-tree-node.is-open .bk-node-action {
+  color: var(--bkms-neutral-2); /* 原 #63656e */
+}
+
+.bkms-themed .bk-tree-node .bk-node-action {
+  color: var(--bkms-neutral-3); /* 原 #979ba5 */
+}
+
+.bkms-themed .bk-tree-drop-active {
+  background: var(--bkms-neutral-7); /* 原 #f5f7fa */
+}
+
+.bkms-themed .bk-tree-drop-disabled {
+  background: var(--bkms-danger-5); /* 原 #ffd5d5 */
+}
+
+.bkms-themed .bk-tree .insert-line {
+  background: var(--bkms-brand-2); /* 原 #2196f3 */
+}

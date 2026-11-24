@@ -326,6 +326,7 @@
       width: 14px;
       height: 14px;
       border-color: var(--bkms-line-default);
+
       /* checkbox 是 bkui 覆写中唯一豁免半径 token 的组件，保持库默认 2px */
       box-shadow: 0 0 0 1px var(--bkms-line-default);
     }

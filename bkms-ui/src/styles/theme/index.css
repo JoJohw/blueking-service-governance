@@ -16,13 +16,16 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
-/* 主题层统一入口 — 每个 patches 目录只暴露一个聚合入口，本文件为静态清单（不随生成器重写）。
- * 加载点：src/main.ts。变量桥接走 src/styles/theme/variables.css（bkui.ts 加载），不在此列。 */
+/* 主题层统一入口 — 每个域只暴露一个聚合入口；本文件为静态清单（不随生成器重写）。
+ * 加载点：src/main.ts。变量桥接走 src/styles/theme/variables.css（bkui.ts 加载），不在此列。
+ * 层归属见 index.html 与 scripts/postcss-layer-css.mjs：generated 与 manual 同处 bkms-patches 层，
+ * 同层靠本清单先后决胜；boost 单独在 bkms-boost 层，顺序不影响。 */
 @import './tokens/color.css';
 @import './tokens/viz.css';
 @import './tokens/radius.css';
 @import './themes/index.css';
-@import './patches/bkui-theme/index.css';
-@import './patches/lib/index.css';
-@import './patches/ua-fill/index.css';
-@import './patches/boost.css';
+@import './generated/bkui/index.css';
+@import './manual/lib/index.css';
+@import './manual/bkui.css';
+@import './manual/ua.css';
+@import './manual/boost.css';
