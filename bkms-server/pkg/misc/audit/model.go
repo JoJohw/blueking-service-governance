@@ -161,6 +161,8 @@ const (
 	ResourceTypeDashboard ResourceType = "dashboard"
 	// ResourceTypeFrameworkConfigTemplate 空间框架配置模板
 	ResourceTypeFrameworkConfigTemplate ResourceType = "frameworkConfigTemplate"
+	// ResourceTypeBuildNode 工作空间关联的蓝盾构建机
+	ResourceTypeBuildNode ResourceType = "buildNode"
 )
 
 // AllResourceTypes 所有资源类型
@@ -175,6 +177,7 @@ var AllResourceTypes = []ResourceType{
 	ResourceTypeAlertStrategy,
 	ResourceTypeDashboard,
 	ResourceTypeFrameworkConfigTemplate,
+	ResourceTypeBuildNode,
 }
 
 // DisplayName 资源类型展示用名称 TODO 国际化
@@ -200,6 +203,8 @@ func (t ResourceType) DisplayName() string {
 		return "仪表盘"
 	case ResourceTypeFrameworkConfigTemplate:
 		return "框架配置模板"
+	case ResourceTypeBuildNode:
+		return "构建机"
 	default:
 		// 默认返回原始值
 		return string(t)
@@ -260,6 +265,8 @@ const (
 	AttributeImageRegistry Attribute = "imageRegistry"
 	// AttributeBatchRelease 分批发布（手动操作）
 	AttributeBatchRelease Attribute = "batchRelease"
+	// AttributePolarisAccessPoint 空间北极星接入点
+	AttributePolarisAccessPoint Attribute = "polarisAccessPoint"
 )
 
 // DisplayName 属性展示用名称 TODO 国际化
@@ -315,6 +322,8 @@ func (t Attribute) DisplayName() string {
 		return "镜像仓库"
 	case AttributeBatchRelease:
 		return "分批发布"
+	case AttributePolarisAccessPoint:
+		return "北极星接入点"
 	default:
 		// 默认返回原始值
 		return string(t)
@@ -455,36 +464,36 @@ func WithResult(result Result) Option {
 	}
 }
 
-// WithDataBefore 添加操作前数据
+// WithDataBefore 添加操作前数据，按字段的 audit tag 先脱敏（见 sanitize.go）
 func WithDataBefore(data any) Option {
 	return func(r *OperationRecord) {
-		bytes, err := json.Marshal(data)
+		bytes, err := json.Marshal(sanitize(data))
 		if err != nil {
-			log.ErrorNoContextf("marshal dataBefore %+v failed: %v", data, err)
+			log.ErrorNoContextf("marshal dataBefore %T failed: %v", data, err)
 			return
 		}
 		r.Data.Before = bytes
 	}
 }
 
-// WithDataAfter 添加操作后数据
+// WithDataAfter 添加操作后数据，按字段的 audit tag 先脱敏（见 sanitize.go）
 func WithDataAfter(data any) Option {
 	return func(r *OperationRecord) {
-		bytes, err := json.Marshal(data)
+		bytes, err := json.Marshal(sanitize(data))
 		if err != nil {
-			log.ErrorNoContextf("marshal dataAfter %+v failed: %v", data, err)
+			log.ErrorNoContextf("marshal dataAfter %T failed: %v", data, err)
 			return
 		}
 		r.Data.After = bytes
 	}
 }
 
-// WithExtras 添加额外信息
+// WithExtras 添加额外信息，按字段的 audit tag 先脱敏（见 sanitize.go）
 func WithExtras(extras any) Option {
 	return func(r *OperationRecord) {
-		bytes, err := json.Marshal(extras)
+		bytes, err := json.Marshal(sanitize(extras))
 		if err != nil {
-			log.ErrorNoContextf("marshal extras %+v failed: %v", extras, err)
+			log.ErrorNoContextf("marshal extras %T failed: %v", extras, err)
 			return
 		}
 		r.Data.Extras = bytes

@@ -23,9 +23,10 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/bkerrs"
-	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/common/config"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris/accesspoint"
 	slz "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/extension/addon/polaris/accesspoint/serializer"
+	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/misc/audit"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/ginutils"
 	"github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/ginutils/perm"
 	storereg "github.com/TencentBlueKing/blueking-service-governance/bkms-server/pkg/server/registry"
@@ -41,6 +42,10 @@ type Handler struct {
 // New 创建 Handler
 func New(registry *storereg.Registry) *Handler {
 	return &Handler{registry: registry}
+}
+
+func (h *Handler) manager() *accesspoint.Manager {
+	return accesspoint.NewManager(h.registry.DB)
 }
 
 // ListAccessPoints 获取空间可用的北极星接入点。
@@ -62,18 +67,30 @@ func (h *Handler) ListAccessPoints(c *gin.Context) {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	if _, err := perm.ValidateWorkspaceByID(c.Request.Context(), h.registry, uri.WorkspaceID, perm.TypeView); err != nil {
+	ctx := c.Request.Context()
+	if _, err := perm.ValidateWorkspaceByID(ctx, h.registry, uri.WorkspaceID, perm.TypeView); err != nil {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	abortNotImplemented(c, "list polaris access points")
+
+	result, err := h.manager().List(ctx, uri.WorkspaceID)
+	if err != nil {
+		bkerrs.AbortWithErr(c, accesspoint.APIError(err, "list polaris access points"))
+		return
+	}
+	outputs := make([]*slz.AccessPointOutput, 0, len(result.AccessPoints))
+	for i := range result.AccessPoints {
+		p := &result.AccessPoints[i]
+		outputs = append(outputs, slz.NewAccessPointOutput(p, result.BoundClusterCounts[p.ID.Hex()]))
+	}
+	ginutils.OK(c, slz.AccessPointListResponse{Data: outputs})
 }
 
 // CreateAccessPoint 创建空间自建北极星接入点。
 //
 //	@ID				CreatePolarisAccessPoint
 //	@Summary		创建北极星接入点
-//	@Description	保存前服务端重新执行连通测试，失败或北极星开启了客户端鉴权时拒绝；Token 选填，加密存储。
+//	@Description	保存前服务端重新执行连通测试，失败时拒绝；Token 选填，加密存储。
 //	@Description	传入 clusterIDs 时同时把这些集群绑定到该接入点
 //	@Tags			polaris-access-points
 //	@Accept			json
@@ -92,11 +109,35 @@ func (h *Handler) CreateAccessPoint(c *gin.Context) {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	if _, err := perm.ValidateWorkspaceByID(c.Request.Context(), h.registry, uri.WorkspaceID, perm.TypeEdit); err != nil {
+	ctx := c.Request.Context()
+	if _, err := perm.ValidateWorkspaceByID(ctx, h.registry, uri.WorkspaceID, perm.TypeEdit); err != nil {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	abortNotImplemented(c, "create polaris access point")
+	// TODO(集群绑定子需求): 创建成功后把 clusterIDs 交给绑定服务
+	if len(input.ClusterIDs) > 0 {
+		abortNotImplemented(c, "binding clusters when creating polaris access point")
+		return
+	}
+
+	p, err := h.manager().Create(ctx, uri.WorkspaceID, accesspoint.CreateParams{
+		Name:        input.Name,
+		ConsoleURL:  input.ConsoleURL,
+		ClientHosts: input.ClientHosts,
+		Token:       input.Token,
+	})
+	if err != nil {
+		bkerrs.AbortWithErr(c, accesspoint.APIError(err, "create polaris access point"))
+		return
+	}
+
+	go audit.AddOperationRecordAsync(
+		ctx, audit.OperationTypeCreate, audit.ResourceTypeWorkspace, uri.WorkspaceID,
+		audit.WithAttribute(audit.AttributePolarisAccessPoint),
+		audit.WithDataAfter(auditData(p)),
+		audit.WithWorkspaceID(uri.WorkspaceID),
+	)
+	ginutils.OK(c, slz.AccessPointResponse{Data: slz.NewAccessPointOutput(p, 0)})
 }
 
 // UpdateAccessPoint 更新空间自建北极星接入点。
@@ -124,11 +165,42 @@ func (h *Handler) UpdateAccessPoint(c *gin.Context) {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	if _, err := perm.ValidateWorkspaceByID(c.Request.Context(), h.registry, uri.WorkspaceID, perm.TypeEdit); err != nil {
+	ctx := c.Request.Context()
+	if _, err := perm.ValidateWorkspaceByID(ctx, h.registry, uri.WorkspaceID, perm.TypeEdit); err != nil {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	abortNotImplemented(c, "update polaris access point")
+	// TODO(集群绑定子需求): 更新成功后用 clusterIDs 全量替换绑定，并返回替换后的绑定集群数
+	if input.ClusterIDs != nil {
+		abortNotImplemented(c, "binding clusters when updating polaris access point")
+		return
+	}
+
+	mgr := h.manager()
+	before, after, err := mgr.Update(ctx, uri.WorkspaceID, uri.AccessPointID, accesspoint.UpdateParams{
+		Name:        input.Name,
+		ConsoleURL:  input.ConsoleURL,
+		ClientHosts: input.ClientHosts,
+		Token:       input.Token,
+	})
+	if err != nil {
+		bkerrs.AbortWithErr(c, accesspoint.APIError(err, "update polaris access point"))
+		return
+	}
+
+	go audit.AddOperationRecordAsync(
+		ctx, audit.OperationTypeUpdate, audit.ResourceTypeWorkspace, uri.WorkspaceID,
+		audit.WithAttribute(audit.AttributePolarisAccessPoint),
+		audit.WithDataBefore(auditData(before)),
+		audit.WithDataAfter(auditData(after)),
+		audit.WithWorkspaceID(uri.WorkspaceID),
+	)
+	boundClusterCount, err := mgr.CountBoundClusters(ctx, uri.WorkspaceID, after.ID.Hex())
+	if err != nil {
+		bkerrs.AbortWithErr(c, accesspoint.APIError(err, "count clusters bound to polaris access point"))
+		return
+	}
+	ginutils.OK(c, slz.AccessPointResponse{Data: slz.NewAccessPointOutput(after, boundClusterCount)})
 }
 
 // DeleteAccessPoint 删除空间自建北极星接入点。
@@ -151,11 +223,25 @@ func (h *Handler) DeleteAccessPoint(c *gin.Context) {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	if _, err := perm.ValidateWorkspaceByID(c.Request.Context(), h.registry, uri.WorkspaceID, perm.TypeEdit); err != nil {
+	ctx := c.Request.Context()
+	if _, err := perm.ValidateWorkspaceByID(ctx, h.registry, uri.WorkspaceID, perm.TypeEdit); err != nil {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	abortNotImplemented(c, "delete polaris access point")
+
+	p, err := h.manager().Delete(ctx, uri.WorkspaceID, uri.AccessPointID, polaris.ListConfigUsagesByAccessPoint)
+	if err != nil {
+		bkerrs.AbortWithErr(c, accesspoint.APIError(err, "delete polaris access point"))
+		return
+	}
+
+	go audit.AddOperationRecordAsync(
+		ctx, audit.OperationTypeDelete, audit.ResourceTypeWorkspace, uri.WorkspaceID,
+		audit.WithAttribute(audit.AttributePolarisAccessPoint),
+		audit.WithDataBefore(auditData(p)),
+		audit.WithWorkspaceID(uri.WorkspaceID),
+	)
+	ginutils.OK(c, slz.EmptyResponse{})
 }
 
 // TestConnectivity 测试北极星接入点的连通性。
@@ -163,7 +249,7 @@ func (h *Handler) DeleteAccessPoint(c *gin.Context) {
 //	@ID				TestPolarisAccessPointConnectivity
 //	@Summary		测试北极星接入点连通性
 //	@Description	依次检查网络、鉴权开关、Token，返回失败的原因与北极星上的命名空间，整体 10 秒超时。
-//	@Description	传入已有接入点 ID 且 token 为空时使用已保存的 Token，并记录本次结果
+//	@Description	传入已有接入点 ID 时记录本次结果；此时 token 缺省时使用已保存的 Token，显式传空字符串表示不带 Token
 //	@Tags			polaris-access-points
 //	@Accept			json
 //	@Produce		json
@@ -181,41 +267,22 @@ func (h *Handler) TestConnectivity(c *gin.Context) {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	if _, err := perm.ValidateWorkspaceByID(c.Request.Context(), h.registry, uri.WorkspaceID, perm.TypeEdit); err != nil {
+	ctx := c.Request.Context()
+	if _, err := perm.ValidateWorkspaceByID(ctx, h.registry, uri.WorkspaceID, perm.TypeEdit); err != nil {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	abortNotImplemented(c, "test polaris access point connectivity")
-}
 
-// GetNetworkInfo 获取平台访问北极星的网络信息。
-//
-//	@ID				GetPolarisAccessPointNetworkInfo
-//	@Summary		获取平台访问北极星的网络信息
-//	@Description	返回平台访问北极星的出口 IP，用户需要把它们加入自建北极星的白名单
-//	@Tags			polaris-access-points
-//	@Produce		json
-//	@Security		BkUserInfo
-//	@Security		BkUserCredential
-//	@Param			workspaceID	path		string	true	"工作空间 ID"
-//	@Success		200			{object}	slz.NetworkInfoResponse
-//	@Failure		400			{object}	bkerrs.GinErrorOutput
-//	@Router			/workspaces/{workspaceID}/polaris-access-points/network-info [get]
-func (h *Handler) GetNetworkInfo(c *gin.Context) {
-	var uri slz.WorkspaceURIInput
-	if err := ginutils.BindURI(c, &uri); err != nil {
-		bkerrs.AbortWithErr(c, err)
+	report, err := h.manager().TestConnectivity(ctx, uri.WorkspaceID, accesspoint.ConnectivityParams{
+		ID:          input.ID,
+		ClientHosts: input.ClientHosts,
+		Token:       input.Token,
+	})
+	if err != nil {
+		bkerrs.AbortWithErr(c, accesspoint.APIError(err, "test polaris access point connectivity"))
 		return
 	}
-	if _, err := perm.ValidateWorkspaceByID(c.Request.Context(), h.registry, uri.WorkspaceID, perm.TypeView); err != nil {
-		bkerrs.AbortWithErr(c, err)
-		return
-	}
-	egressIPs := config.G.Network.EgressIPs
-	if egressIPs == nil {
-		egressIPs = []string{}
-	}
-	ginutils.OK(c, slz.NetworkInfoResponse{Data: &slz.NetworkInfoOutput{EgressIPs: egressIPs}})
+	ginutils.OK(c, slz.ConnectivityTestResponse{Data: slz.NewConnectivityTestOutput(report)})
 }
 
 // ListNamespaces 获取接入点上可选的北极星命名空间。
@@ -238,11 +305,18 @@ func (h *Handler) ListNamespaces(c *gin.Context) {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	if _, err := perm.ValidateWorkspaceByID(c.Request.Context(), h.registry, uri.WorkspaceID, perm.TypeView); err != nil {
+	ctx := c.Request.Context()
+	if _, err := perm.ValidateWorkspaceByID(ctx, h.registry, uri.WorkspaceID, perm.TypeView); err != nil {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	abortNotImplemented(c, "list polaris access point namespaces")
+
+	namespaces, err := h.manager().ListNamespaces(ctx, uri.WorkspaceID, uri.AccessPointID)
+	if err != nil {
+		bkerrs.AbortWithErr(c, accesspoint.APIError(err, "list polaris access point namespaces"))
+		return
+	}
+	ginutils.OK(c, slz.NamespacesResponse{Data: namespaces})
 }
 
 // ListClusters 获取空间候选集群的北极星接入点绑定情况。
@@ -271,22 +345,28 @@ func (h *Handler) ListClusters(c *gin.Context) {
 	abortNotImplemented(c, "list polaris clusters")
 }
 
-// ListOperators 获取空间候选集群的 bcs-polaris-operator 组件状态。
+// ListOperatorValues 获取已绑定接入点的集群上 bcs-polaris-operator 应使用的北极星 values。
 //
-//	@ID				ListPolarisOperators
-//	@Summary		获取北极星组件状态视图
-//	@Description	返回候选集群的组件状态、与接入点不一致的参数、最近的安装任务，以及可选的 chart 版本。
+// TODO(北极星组件安装子需求): 已安装组件的集群暂不展示期望 values 与 release 当前 values 的差异，
+// 交互形态待与产品确认。倾向的方案是前端对比本接口返回的期望 values 与集群插件列表返回的 currentValues，
+// 展示差异，由用户选择是否覆盖。
+//
+//	@ID				ListPolarisOperatorValues
+//	@Summary		获取北极星组件的期望 values
+//	@Description	返回由接入点推导出的北极星相关 values
 //	@Tags			polaris-access-points
 //	@Produce		json
 //	@Security		BkUserInfo
 //	@Security		BkUserCredential
-//	@Param			workspaceID	path		string	true	"工作空间 ID"
-//	@Success		200			{object}	slz.PolarisOperatorListResponse
-//	@Failure		400			{object}	bkerrs.GinErrorOutput
-//	@Router			/workspaces/{workspaceID}/polaris-operators [get]
-func (h *Handler) ListOperators(c *gin.Context) {
+//	@Param			workspaceID		path		string	true	"工作空间 ID"
+//	@Param			accessPointID	query		string	false	"只返回绑定到该接入点的集群"
+//	@Success		200				{object}	slz.PolarisOperatorValuesListResponse
+//	@Failure		400				{object}	bkerrs.GinErrorOutput
+//	@Router			/workspaces/{workspaceID}/polaris-operator-values [get]
+func (h *Handler) ListOperatorValues(c *gin.Context) {
 	var uri slz.WorkspaceURIInput
-	if err := ginutils.BindURI(c, &uri); err != nil {
+	var query slz.OperatorValuesQueryInput
+	if err := ginutils.BindURIQuery(c, &uri, &query); err != nil {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
@@ -294,62 +374,18 @@ func (h *Handler) ListOperators(c *gin.Context) {
 		bkerrs.AbortWithErr(c, err)
 		return
 	}
-	abortNotImplemented(c, "list polaris operators")
+	abortNotImplemented(c, "list polaris operator values")
 }
 
-// InstallOperators 在接入点绑定的集群上安装或更新 bcs-polaris-operator。
-//
-//	@ID				InstallPolarisOperators
-//	@Summary		安装或更新北极星组件
-//	@Description	集群必须已绑定该接入点；每个集群创建一个异步任务，同一集群同时只允许一个运行中的任务。
-//	@Tags			polaris-access-points
-//	@Accept			json
-//	@Produce		json
-//	@Security		BkUserInfo
-//	@Security		BkUserCredential
-//	@Param			workspaceID		path		string					true	"工作空间 ID"
-//	@Param			accessPointID	path		string					true	"接入点 ID"
-//	@Param			body			body		slz.OperatorInstallInput	true	"目标集群与 chart 版本"
-//	@Success		200				{object}	slz.OperatorTaskListResponse
-//	@Failure		400				{object}	bkerrs.GinErrorOutput
-//	@Router			/workspaces/{workspaceID}/polaris-access-points/{accessPointID}/operator-installs [post]
-func (h *Handler) InstallOperators(c *gin.Context) {
-	var uri slz.AccessPointURIInput
-	var input slz.OperatorInstallInput
-	if err := ginutils.BindURIJSON(c, &uri, &input); err != nil {
-		bkerrs.AbortWithErr(c, err)
-		return
+// auditData 审计记录接入点的地址等信息，不写入 Token
+func auditData(p *accesspoint.PolarisAccessPoint) map[string]any {
+	return map[string]any{
+		"id":          p.ID.Hex(),
+		"name":        p.Name,
+		"consoleURL":  p.ConsoleURL,
+		"clientHosts": p.ClientHosts,
+		"hasToken":    p.Token != "",
 	}
-	if _, err := perm.ValidateWorkspaceByID(c.Request.Context(), h.registry, uri.WorkspaceID, perm.TypeEdit); err != nil {
-		bkerrs.AbortWithErr(c, err)
-		return
-	}
-	abortNotImplemented(c, "install polaris operators")
-}
-
-// GetEnvOperator 获取环境所在集群的 bcs-polaris-operator 组件状态。
-//
-//	@ID				GetEnvPolarisOperator
-//	@Summary		获取环境的北极星组件状态
-//	@Tags			polaris-access-points
-//	@Produce		json
-//	@Security		BkUserInfo
-//	@Security		BkUserCredential
-//	@Param			envID	path		string	true	"环境 ID"
-//	@Success		200		{object}	slz.PolarisOperatorResponse
-//	@Failure		400		{object}	bkerrs.GinErrorOutput
-//	@Router			/envs/{envID}/polaris-operator [get]
-func (h *Handler) GetEnvOperator(c *gin.Context) {
-	var uri slz.EnvURIInput
-	if err := ginutils.BindURI(c, &uri); err != nil {
-		bkerrs.AbortWithErr(c, err)
-		return
-	}
-	if _, err := perm.ValidateEnvByID(c.Request.Context(), h.registry, uri.EnvID, perm.TypeView); err != nil {
-		bkerrs.AbortWithErr(c, err)
-		return
-	}
-	abortNotImplemented(c, "get env polaris operator")
 }
 
 // abortNotImplemented 契约已冻结、业务逻辑尚未实现的接口统一返回 NOT_IMPLEMENTED
