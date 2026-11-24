@@ -84,12 +84,7 @@
               class="flex w-full items-center gap-[8px] justify-center cursor-pointer"
               @click="handleCreateStrategy"
             >
-              <Plus
-                class="border-[1px] border-solid rounded-bkms-full border-bkms-neutral-3"
-                fill="var(--bkms-neutral-3)"
-                height="16px"
-                width="16px"
-              />
+              <i class="bkms-icon bkms-icon-plus-circle text-[14px] text-bkms-neutral-3"></i>
               <span class="text-bkms-neutral-2 !text-[12px]">
                 {{ $t('新建策略') }}
               </span>
@@ -139,7 +134,6 @@
   import { ref } from 'vue';
 
   import { Button, Form, Select } from 'bkui-vue';
-  import { Plus } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { RELEASE_MODE } from '~/common/enums/deploy';
   import StrategySideslider from '~/pages/basic/release-strategies/components/strategy-sideslider.vue';

@@ -20,3 +20,5 @@
  * 本域在 theme/index.css 里最后加载，可压过 bkui-theme 与 lib 的覆写；生成器不管的第三方属性（如给
  * date-picker / ediatable 补圆角）放这里，新建文件时记得在本文件登记 @import。 */
 @import './form-control.css';
+@import './ediatable.css';
+@import './popover.css';

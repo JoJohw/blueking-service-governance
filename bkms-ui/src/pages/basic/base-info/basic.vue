@@ -216,6 +216,7 @@
                   content: $t('复制凭据信息'),
                 }"
                 class="ml-[6px] cursor-pointer hover:bkms-text-brand"
+                fill="var(--bkms-neutral-4)"
                 :title="$t('复制')"
                 @click="copyText(imageRegistryInfo.copy)"
               >

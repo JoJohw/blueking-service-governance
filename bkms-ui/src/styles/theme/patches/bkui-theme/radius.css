@@ -46,7 +46,7 @@
   border-radius: var(--bkms-radius-field);
 }
 
-/* ── select → field（另含 none 分派，逐条见台账） ── */
+/* ── select → field ── */
 .bkms-themed .bk-select .bk-select-trigger .bk-select-tag {
   border-radius: var(--bkms-radius-field);
 }
@@ -65,7 +65,7 @@
 }
 
 .bkms-themed .bk-search-select-container .search-container-selected {
-  border-radius: var(--bkms-radius-tag);
+  border-radius: var(--bkms-radius-field);
 }
 
 /* ── tag-input → field（另含 tag 分派，逐条见台账） ── */

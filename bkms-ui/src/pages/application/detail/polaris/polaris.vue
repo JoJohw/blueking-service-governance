@@ -20,7 +20,7 @@
   <div class="flex flex-col h-full overflow-hidden">
     <div
       ref="wrapperRef"
-      class="min-h-0 flex-1 overflow-hidden p-[16px]"
+      class="min-h-0 flex-1 overflow-hidden p-[24px]"
     >
       <div
         class="flex min-h-0 max-h-full flex-col overflow-hidden rounded-bkms-card bkms-bg-card p-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"

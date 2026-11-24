@@ -101,8 +101,12 @@
 
 .bkms-themed .bk-search-select-container {
   color: var(--bkms-neutral-2); /* 原 #63656e */
-  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  border: 1px solid var(--bkms-line-input); /* 原 #c4c6cc */
   outline: none; /* 原值保留 */
+}
+
+.bkms-themed .bk-search-select-container:hover:not(.is-focus) {
+  border-color: var(--bkms-line-hover);
 }
 
 .bkms-themed .bk-search-select-container .search-container-selected:hover .selected-clear {
@@ -115,11 +119,11 @@
 }
 
 .bkms-themed .bk-search-select-container .search-container-input .input-before:after {
-  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  color: var(--bkms-text-disabled); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-search-select-container .search-container-input .input-after:after {
-  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  color: var(--bkms-text-disabled); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-search-select-container .search-container .selected-input {

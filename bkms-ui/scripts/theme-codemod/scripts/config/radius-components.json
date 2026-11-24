@@ -14,14 +14,12 @@
     {
       "kebab": "select",
       "prefixes": ["select"],
-      "token": "field",
-      "selectors": [{ "selector": ".bk-select .bk-select-trigger .bk-select-tag.is-simplicity", "token": "none" }]
+      "token": "field"
     },
     {
       "kebab": "search-select",
       "prefixes": ["search-select"],
-      "token": "field",
-      "rules": [{ "match": "search-container-selected", "token": "tag" }]
+      "token": "field"
     },
     {
       "kebab": "tag-input",

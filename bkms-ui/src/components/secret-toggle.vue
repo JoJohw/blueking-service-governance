@@ -54,7 +54,8 @@
     showValue: false,
     placeholder: '********',
     emptyValuePlaceholder: '--',
-    iconFill: 'var(--bkms-neutral-3)',
+    /* 与操作图标规范色一致：Neutral/4，不用遗留 MagicBox 灰 */
+    iconFill: 'var(--bkms-neutral-4)',
   });
   const emit = defineEmits(['toggle']);
 

@@ -26,7 +26,7 @@
   color: var(--bkms-neutral-2); /* 原 #63656e */
   text-decoration: none; /* 原值保留 */
   background-color: var(--bkms-neutral-10); /* 原 #fff */
-  border: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  border: 1px solid var(--bkms-neutral-4); /* 原 #c4c6cc → Neutral/4 */
   outline: none; /* 原值保留 */
 }
 
@@ -48,7 +48,7 @@
 }
 
 .bkms-themed .bk-button.is-disabled {
-  color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+  color: var(--bkms-text-disabled); /* 原 #dcdee5 → Text/4 */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
@@ -59,11 +59,11 @@
 .bkms-themed .bk-button-group .bk-button:not(.is-disabled) {
   color: var(--bkms-neutral-2); /* 原 #63656e */
   background-color: var(--bkms-neutral-10); /* 原 #fff */
-  border-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  border-color: var(--bkms-neutral-4); /* 原 #c4c6cc → Neutral/4 */
 }
 
 .bkms-themed .bk-button-group .bk-button.is-disabled {
-  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  color: var(--bkms-neutral-4); /* 原 #c4c6cc → Neutral/4 */
 }
 
 .bkms-themed .bk-button-group .bk-button:hover:not(.is-disabled),
@@ -136,7 +136,7 @@
 
 .bkms-themed .bk-button.bk-button-primary.is-disabled,
 .bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-primary.is-disabled {
-  color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+  color: var(--bkms-text-disabled); /* 原 #dcdee5 → Text/4 */
 }
 
 .bkms-themed .bk-button.bk-button-primary.is-disabled:not(.is-text),
@@ -208,7 +208,7 @@
 
 .bkms-themed .bk-button.bk-button-warning.is-disabled,
 .bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-warning.is-disabled {
-  color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+  color: var(--bkms-text-disabled); /* 原 #dcdee5 → Text/4 */
 }
 
 .bkms-themed .bk-button.bk-button-warning.is-disabled:not(.is-text),
@@ -280,7 +280,7 @@
 
 .bkms-themed .bk-button.bk-button-success.is-disabled,
 .bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-success.is-disabled {
-  color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+  color: var(--bkms-text-disabled); /* 原 #dcdee5 → Text/4 */
 }
 
 .bkms-themed .bk-button.bk-button-success.is-disabled:not(.is-text),
@@ -352,7 +352,7 @@
 
 .bkms-themed .bk-button.bk-button-danger.is-disabled,
 .bkms-themed .bk-button-group .is-selected:not(.is-disabled).bk-button-danger.is-disabled {
-  color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+  color: var(--bkms-text-disabled); /* 原 #dcdee5 → Text/4 */
 }
 
 .bkms-themed .bk-button.bk-button-danger.is-disabled:not(.is-text),

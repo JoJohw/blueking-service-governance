@@ -21,7 +21,7 @@
 /* 值策略：能对上令牌的写 var(--bkms-*)；未收录的保留原色值并标 pending。要改值就改这里与原值注释，重跑即继承 */
 
 .bkms-themed .bk-dropdown .bk-dropdown-content {
-  box-shadow: 0 2px 6px color-mix(in srgb, var(--bkms-navy-2) 10%, transparent); /* 原 #333c481a */
+  box-shadow: 0 2px 6px var(--bkms-shadow-popover); /* 原 #333c481a */
 }
 
 .bkms-themed .bk-dropdown-popover .bk-dropdown-menu {

@@ -114,10 +114,10 @@
   --table-bg-color: var(--bkms-neutral-10);
   --table-border-color: var(--bkms-neutral-5);
   --table-strip-color: var(--bkms-neutral-8);
-  --table-head-bg-color: var(--bkms-neutral-8);
+  --table-head-bg-color: var(--bkms-bg-page);
   --table-head-font-color: var(--bkms-neutral-1);
   --table-body-font-color: var(--bkms-neutral-2);
-  --table-row-hover-bg-color: var(--bkms-neutral-7);
+  --table-row-hover-bg-color: var(--bkms-neutral-6);
   --table-row-active-bg-color: var(--bkms-neutral-6);
   --cascader-panel-border-color: var(--bkms-neutral-5);
   --cascader-panel-hover: var(--bkms-neutral-7);
@@ -125,5 +125,5 @@
   --cascader-panel-disabled-bg: var(--bkms-neutral-10);
   --search-select-focus-color: var(--bkms-brand-3);
   --select-active-color: var(--bkms-brand-6);
-  --select-hover-color: var(--bkms-neutral-7);
+  --select-hover-color: var(--bkms-neutral-7); /* 原 #f5f7fa；选项 hover 用浅一档，不是 neutral-6 */
 }

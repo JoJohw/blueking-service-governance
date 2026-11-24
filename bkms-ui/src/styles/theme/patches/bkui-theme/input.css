@@ -51,59 +51,68 @@
 /* 字面量版源：dist/style.css —— 压制 lib/*.less 字面量旧色（选择器逐字复刻），须排在变量版段之后 */
 
 .bkms-themed .bk-textarea.is-disabled .bk-input--prefix-area,
-.bkms-themed .bk-textarea.is-readonly .bk-input--prefix-area,
 .bkms-themed .bk-textarea.is-disabled .bk-input--suffix-area,
+.bkms-themed .bk-textarea.is-disabled .bk-input--suffix-icon {
+  background-color: var(--bkms-neutral-9); /* 原 #fafbfd */
+}
+
+.bkms-themed .bk-textarea.is-readonly .bk-input--prefix-area,
 .bkms-themed .bk-textarea.is-readonly .bk-input--suffix-area,
-.bkms-themed .bk-textarea.is-disabled .bk-input--suffix-icon,
 .bkms-themed .bk-textarea.is-readonly .bk-input--suffix-icon {
   background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
 }
 
 .bkms-themed .bk-input {
   /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */
-  border-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  /* Light 描边色值是 #C1CDE5。变量名 Neutral/5 不是我们色阶的 5 号 #E4E9F2 */
+  border-color: var(--bkms-line-input); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-input ::placeholder {
-  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  color: var(--bkms-text-disabled); /* 原 #c4c6cc */
 }
 
-.bkms-themed .bk-input.is-disabled,
+.bkms-themed .bk-input.is-disabled {
+  /* tokens Neutral/10 灰白 = 中性色 Neutral-9 #FBFCFE；Neutral/6 线条深 = 中性色 Neutral-5 #E4E9F2 */
+  background-color: var(--bkms-neutral-9); /* 原 #fafbfd */
+  border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
+}
+
 .bkms-themed .bk-input.is-readonly {
   background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
   border-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
 }
 
 .bkms-themed .bk-input.is-disabled .bk-input--prefix-area,
-.bkms-themed .bk-input.is-readonly .bk-input--prefix-area,
 .bkms-themed .bk-input.is-disabled .bk-input--suffix-area,
-.bkms-themed .bk-input.is-readonly .bk-input--suffix-area,
 .bkms-themed .bk-input.is-disabled .bk-input--suffix-icon,
-.bkms-themed .bk-input.is-readonly .bk-input--suffix-icon {
-  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+.bkms-themed .bk-input.is-disabled input,
+.bkms-themed .bk-input.is-disabled textarea {
+  background-color: var(--bkms-neutral-9); /* 原 #fafbfd */
 }
 
-.bkms-themed .bk-input.is-disabled input,
+.bkms-themed .bk-input.is-readonly .bk-input--prefix-area,
+.bkms-themed .bk-input.is-readonly .bk-input--suffix-area,
+.bkms-themed .bk-input.is-readonly .bk-input--suffix-icon,
 .bkms-themed .bk-input.is-readonly input,
-.bkms-themed .bk-input.is-disabled textarea,
 .bkms-themed .bk-input.is-readonly textarea {
   background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
 }
 
-.bkms-themed .bk-input:hover:not(.is-disabled) {
-  border-color: var(--bkms-neutral-3); /* 原 #979ba5 */
+.bkms-themed .bk-input:hover:not(.is-disabled):not(.is-readonly):not(.is-focused) {
+  border-color: var(--bkms-line-hover); /* 原 #979ba5 */
 }
 
 .bkms-themed .bk-input.is-simplicity {
   background-color: transparent; /* 原值保留 */
   border-color: transparent; /* 原值保留 */
-  border-bottom-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  border-bottom-color: var(--bkms-line-input); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-input.is-simplicity:hover:not(.is-disabled) {
   background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
   border-color: transparent; /* 原值保留 */
-  border-bottom-color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  border-bottom-color: var(--bkms-line-hover); /* 原 #c4c6cc */
   box-shadow: none; /* 原值保留 */
 }
 
@@ -122,7 +131,7 @@
 }
 
 .bkms-themed .bk-input--large ::placeholder {
-  color: var(--bkms-navy-5); /* 原 #c4c6cc */
+  color: var(--bkms-text-disabled); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-input.is-focused:not(.is-readonly) {
@@ -146,12 +155,12 @@
 .bkms-themed .bk-input--suffix-area {
   color: var(--bkms-neutral-2); /* 原 #63656e */
   background-color: var(--bkms-neutral-7); /* 原 #f5f7fa */
-  border-right: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  border-right: 1px solid var(--bkms-line-input); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-input--suffix-area {
   border: 0; /* 原值保留 */
-  border-left: 1px solid var(--bkms-navy-5); /* 原 #c4c6cc */
+  border-left: 1px solid var(--bkms-line-input); /* 原 #c4c6cc */
 }
 
 .bkms-themed .bk-input--max-length.is-over-limit {

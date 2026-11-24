@@ -36,6 +36,8 @@
 
 .bkms-themed .bk-search-select-container.is-focus {
   background: var(--bkms-neutral-10) !important; /* 原 #fff */
+  /* 原厂 focus 描边带 !important 且写死 #3a84ff，补丁层压不过，只能放在 boost */
+  border-color: var(--bkms-brand-2) !important; /* 原 #3a84ff */
 }
 
 .bkms-themed .bk-search-select-container .search-nextfix .search-nextfix-icon.is-focus {

@@ -22,7 +22,7 @@
 
 .bkms-themed .bk-modal-body {
   background: var(--bkms-neutral-10); /* 原 #fff */
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--bkms-neutral-1) 15%, transparent); /* 原 #00000026 */
+  box-shadow: 0 4px 12px var(--bkms-shadow-dialog); /* 原 #00000026 */
 }
 
 .bkms-themed .bk-modal-close {
@@ -44,7 +44,7 @@
 }
 
 .bkms-themed .bk-dialog-footer {
-  background-color: var(--bkms-neutral-8); /* 原 #fafbfd */
+  background-color: var(--bkms-bg-head); /* 原 #fafbfd */
 
   /* 收窄写法：只覆盖颜色，完整 border 简写会压制业务侧 border:none 的局部覆写 */
   border-top-color: var(--bkms-neutral-5); /* 原 #dcdee5 */
