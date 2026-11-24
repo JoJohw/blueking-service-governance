@@ -25,7 +25,7 @@
   >
     <div class="permission-modal">
       <div class="permission-header">
-        <Exception
+        <BkmsException
           scene="part"
           type="403"
         />
@@ -100,7 +100,7 @@
   import { type UnwrapRef, computed, onBeforeMount, onUnmounted, ref } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
-  import { Button, Dialog, Exception } from 'bkui-vue';
+  import { Button, Dialog } from 'bkui-vue';
   import actionsMap from '~/composables/use-action-map';
   import usePlatform from '~/composables/use-platform';
   import { usePlatformConfigStore } from '~/stores/platform-config';

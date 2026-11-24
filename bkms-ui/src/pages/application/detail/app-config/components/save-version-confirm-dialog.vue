@@ -52,7 +52,7 @@
     </template>
 
     <template v-if="preview">
-      <Exception
+      <BkmsException
         v-if="isEmpty"
         class="!h-auto shrink-0 py-[16px]"
         scene="part"
@@ -66,7 +66,7 @@
             >
           </i18n-t>
         </template>
-      </Exception>
+      </BkmsException>
       <template v-else>
         <i18n-t
           v-if="isUnchanged"
@@ -155,7 +155,7 @@
 <script lang="ts" setup>
   import { computed, reactive, ref } from 'vue';
 
-  import { Button, Dialog, Exception, Form, Input, Tag } from 'bkui-vue';
+  import { Button, Dialog, Form, Input, Tag } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import MsEditor from '~/components/monaco-editor/ms-editor.vue';
 

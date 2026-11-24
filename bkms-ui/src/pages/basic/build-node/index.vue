@@ -19,7 +19,7 @@
 <template>
   <Loading :loading="isLoading">
     <div class="min-h-[200px]">
-      <Exception
+      <BkmsException
         v-if="!isLoading && loadError"
         class="mt-[120px]"
         scene="part"
@@ -32,7 +32,7 @@
         >
           {{ $t('重试') }}
         </Button>
-      </Exception>
+      </BkmsException>
       <Alert
         v-else-if="!isLoading && !projectCode"
         theme="warning"
@@ -94,7 +94,7 @@
 <script setup lang="ts">
   import { computed, onMounted, ref } from 'vue';
 
-  import { Alert, Button, Exception, InfoBox, Loading, Message } from 'bkui-vue';
+  import { Alert, Button, InfoBox, Loading, Message } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import { BkintegrationsBkciService } from '~/api/modules/v1';
   import { useSpaceStore } from '~/stores/space';

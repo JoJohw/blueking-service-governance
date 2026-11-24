@@ -22,19 +22,14 @@
       v-bkloading="{ loading: isLoading, opacity: 1, size: 'small' }"
       class="min-h-[100px]"
     >
-      <Exception
+      <BkmsException
         v-if="!isLoading && appTypeGroups.length === 0"
         :description="$t('暂无组件')"
+        img-class="h-[100px]"
         scene="part"
         type="empty"
       >
-        <template #type>
-          <img
-            class="h-[100px]"
-            src="/empty.svg"
-          />
-        </template>
-      </Exception>
+      </BkmsException>
 
       <!-- 按应用类型分组 -->
       <div
@@ -187,7 +182,7 @@
 <script setup lang="ts">
   import { type Component, type Ref, computed, inject, nextTick, ref, watch } from 'vue';
 
-  import { Button, Exception, InfoBox, Message, Tag } from 'bkui-vue';
+  import { Button, InfoBox, Message, Tag } from 'bkui-vue';
   import { Info, Success, Warn } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';

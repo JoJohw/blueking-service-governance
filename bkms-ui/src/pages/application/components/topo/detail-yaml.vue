@@ -40,13 +40,13 @@
           />
         </div>
       </div>
-      <Exception
+      <BkmsException
         v-else-if="!loading"
         scene="empty"
         type="empty"
       >
         {{ $t('暂无数据') }}
-      </Exception>
+      </BkmsException>
     </Loading>
   </div>
 </template>
@@ -54,7 +54,7 @@
 <script lang="ts" setup>
   import { onMounted, ref, watch } from 'vue';
 
-  import { Exception, Loading } from 'bkui-vue';
+  import { Loading } from 'bkui-vue';
   import { TopologyNodeManifestOutputObj } from '~/@types/v1/topology';
   import { ApiServerService } from '~/api/modules/bkmsserver';
   import MsEditor from '~/components/monaco-editor/ms-editor.vue';

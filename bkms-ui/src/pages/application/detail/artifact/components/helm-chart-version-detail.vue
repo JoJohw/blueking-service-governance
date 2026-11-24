@@ -73,7 +73,7 @@
           />
         </div>
       </div>
-      <Exception
+      <BkmsException
         v-else
         :description="$t('暂无数据')"
         scene="part"
@@ -86,7 +86,7 @@
 <script lang="ts" setup>
   import { nextTick, ref, watch } from 'vue';
 
-  import { Exception, Loading, Sideslider, Tree } from 'bkui-vue';
+  import { Loading, Sideslider, Tree } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import { HelmChartFileNode } from '~/@types/v1/helm-charts';
   import { HelmChartsService } from '~/api/modules/v1';

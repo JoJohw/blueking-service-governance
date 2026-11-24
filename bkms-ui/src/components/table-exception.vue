@@ -18,17 +18,11 @@
 
 <template>
   <div class="min-h-[200px]">
-    <Exception
+    <BkmsException
       scene="part"
       :title="typeTitleMap[type]"
       :type="typeMap[type]"
     >
-      <template
-        v-if="$slots.type"
-        #type
-      >
-        <slot name="type"></slot>
-      </template>
       <i18n-t
         v-if="type === 'search'"
         keypath="可以尝试 调整关键词 或 {0}"
@@ -48,12 +42,12 @@
       >
         {{ $t('刷新') }}
       </Button>
-    </Exception>
+    </BkmsException>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { Button, Exception } from 'bkui-vue';
+  import { Button } from 'bkui-vue';
   import { ExceptionEnum } from 'bkui-vue/lib/exception';
   import { useI18n } from 'vue-i18n';
 

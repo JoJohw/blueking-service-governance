@@ -50,21 +50,18 @@
         </template>
       </FlexRow>
       <!-- 无资源空状态 -->
-      <Exception
+      <BkmsException
         v-if="hasLoaded && nodes.length === 0"
         class="large-exception py-[18px] px-[24px]"
         scene="part"
         type="empty"
       >
-        <template #type>
-          <img src="/empty.svg" />
-        </template>
         <template #description>
           <div class="text-[20px] bkms-text-title mb-[16px]">{{ $t('暂无资源') }}</div>
           <div class="text-[14px] bkms-text-body">{{ $t('该环境下无任何资源') }}</div>
           <slot name="empty-deploy"></slot>
         </template>
-      </Exception>
+      </BkmsException>
       <ResizeLayout
         v-else
         :border="false"
@@ -112,7 +109,7 @@
   import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
 
   import { useIntervalFn } from '@vueuse/core';
-  import { Exception, ResizeLayout } from 'bkui-vue';
+  import { ResizeLayout } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import { ResourceTopologyDataOutputObj } from '~/@types/v1/topology';
   import { ApiServerService } from '~/api/modules/bkmsserver';

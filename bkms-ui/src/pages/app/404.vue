@@ -17,8 +17,5 @@
 -->
 
 <template>
-  <Exception type="404"> </Exception>
+  <BkmsException type="404" />
 </template>
-<script setup lang="ts">
-  import { Exception } from 'bkui-vue';
-</script>

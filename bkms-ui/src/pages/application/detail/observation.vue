@@ -57,15 +57,12 @@
         :url="iframeUrl"
         @route-change="handleRouteChange"
       />
-      <Exception
+      <BkmsException
         v-else-if="apmConfigMissing"
         class="large-exception"
         scene="part"
         type="empty"
       >
-        <template #type>
-          <img src="/empty.svg" />
-        </template>
         <template #description>
           <div class="bkms-text-title text-[24px]">{{ $t('尚未开启观测功能') }}</div>
           <div class="bkms-text-body text-[14px] leading-[22px] mt-[16px]">
@@ -84,16 +81,13 @@
         >
           {{ $t('查看配置指引') }}
         </Button>
-      </Exception>
-      <Exception
+      </BkmsException>
+      <BkmsException
         v-else
         class="large-exception"
         scene="part"
         type="empty"
       >
-        <template #type>
-          <img src="/empty.svg" />
-        </template>
         <template #description>
           <div class="bkms-text-body text-[14px] leading-[22px]">{{ $t('当前环境未创建 APM 实例') }}</div>
         </template>
@@ -103,14 +97,14 @@
         >
           {{ $t('去创建') }}
         </Button>
-      </Exception>
+      </BkmsException>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
   import { computed, nextTick, ref, watch } from 'vue';
 
-  import { Button, Exception } from 'bkui-vue';
+  import { Button } from 'bkui-vue';
   import { useRoute, useRouter } from 'vue-router';
   import { GetEnvApmOutput } from '~/@types/v1/bkintegrations-bkmonitor';
   import { ApiServerService } from '~/api/modules/bkmsserver';

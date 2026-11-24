@@ -278,13 +278,13 @@
               />
             </div>
           </Form.FormItem>
-          <Exception
+          <BkmsException
             v-else
             :description="builderData.pipelineBuildConfig?.pipelineID ? $t('流水线无参数配置') : $t('请先选择流水线')"
             scene="part"
             type="empty"
           >
-          </Exception>
+          </BkmsException>
           <!-- 流水线-推荐版本号 -->
           <TagConfigForm
             v-model="tagConfig"
@@ -322,7 +322,7 @@
 <script lang="ts" setup>
   import { computed, nextTick, ref, watch } from 'vue';
 
-  import { Button, Exception, Form, Input, Sideslider, Tag } from 'bkui-vue';
+  import { Button, Form, Input, Sideslider, Tag } from 'bkui-vue';
   import { Share } from 'bkui-vue/lib/icon';
   import { cloneDeep } from 'lodash-es';
   import { useI18n } from 'vue-i18n';

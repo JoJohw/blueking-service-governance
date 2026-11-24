@@ -79,14 +79,14 @@
               </Button>
             </Alert>
 
-            <Exception
+            <BkmsException
               v-if="!activeDef"
               class="h-full"
               scene="part"
               type="empty"
             >
               <template #description>{{ $t('暂无配置文件，可点击左侧新建') }}</template>
-            </Exception>
+            </BkmsException>
             <template v-else>
               <div class="mb-[16px] shrink-0">
                 <BkmsContent
@@ -578,7 +578,6 @@
     Alert,
     Button,
     Divider,
-    Exception,
     Form,
     InfoBox,
     Input,

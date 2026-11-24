@@ -151,12 +151,12 @@
             <div class="text-[12px] bkms-text-secondary">{{ content }}</div>
           </template>
         </Timeline>
-        <Exception
+        <BkmsException
           v-else-if="!isDeployRecordLoading"
           :description="$t('暂无数据')"
           scene="part"
           type="empty"
-        ></Exception>
+        ></BkmsException>
       </div>
     </div>
   </div>
@@ -165,7 +165,7 @@
 <script lang="ts" setup>
   import { computed, h, onMounted, ref } from 'vue';
 
-  import { Button, Exception, OverflowTitle, Tag, Timeline } from 'bkui-vue';
+  import { Button, OverflowTitle, Tag, Timeline } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import { AppImageOutputObj, ImageTagDeployRecordOutputObj } from '~/@types/v1/images';
   import { ImagesService } from '~/api/modules/v1';

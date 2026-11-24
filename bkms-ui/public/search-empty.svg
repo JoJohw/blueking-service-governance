@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 200">
+<g transform="translate(20 0) scale(0.833333)">
+<g >
+	<g transform="translate(-869.000000, -2918.000000)">
+		<g transform="translate(869.000000, 2918.000000)">
+			<linearGradient id="Fill-1_1_" gradientUnits="userSpaceOnUse" x1="243.0464" y1="167.9793" x2="245.8071" y2="194.2456">
+				<stop  offset="0" style="stop-color:#FBFCFE"/>
+				<stop  offset="1" style="stop-color:#E5EDFF"/>
+			</linearGradient>
+			<path d="M193.1,174.2c14.8-3.3,36-4.8,50.5-4.1c14.4,0.7,26.4,3.3,27.3,2.7c2.9-1.9,9-2.8,8.7-2
+				c-0.3,0.7-4.3,3.1-3,3.4c1.3,0.4,14.1,1.9,19.5,3c5.3,1.1,8.8,2.2,9.9,2.2c1.2,0,3-1.6,10.7-0.8c0.1,0.3-1.7,0.4-3.4,1.3
+				c-1.7,0.9-3,0.8-3,1s1-0.3,3,1s5.5,1.7,5.5,2s-4.5,1.8-12-0.6c-1.9-0.6-6.3,4.6-26.8,6.1s-55,2.6-55,2.6s2.1,2.7,5.1,3.4
+				c0.2,0.3-1.2,1.3-7.1,0.2c-5.9-1.1-9-3.6-9-3.6s-11.6-0.7-16-1.5c-4.4-0.7-9.4-2.6-12.9-3s-19.2-2.2-13.2-6.3
+				C172,181.2,178.3,177.5,193.1,174.2z" fill="url(#Fill-1_1_)"/>
+			<path d="M193.1,177.4v9.4h9.4v1.9h-11.2v-11.2L193.1,177.4L193.1,177.4z" fill="#C7D8FF"/>
+			<path d="M200.6,64.9h-9.4v9.4h-1.9v-9.4l0,0V63h11.2L200.6,64.9L200.6,64.9z" fill="#C7D8FF"/>
+			<path d="M288.8,74.2v-9.4h-9.4V63h9.4l0,0h1.9v11.2H288.8z" fill="#C7D8FF"/>
+
+				<linearGradient id="矩形-2_1_" gradientUnits="userSpaceOnUse" x1="411.6768" y1="-1.6066" x2="411.6768" y2="-0.6707" gradientTransform="matrix(86.25 0 0 108.75 -35267.125 246.5)">
+				<stop  offset="0" style="stop-color:#E5EDFF;stop-opacity:0.9917"/>
+				<stop  offset="1" style="stop-color:#C7D8FF"/>
+			</linearGradient>
+			<path d="M197.9,70.5h84.2c0.6,0,1,0.4,1,1v106.8c0,0.6-0.4,1-1,1h-84.2c-0.6,0-1-0.4-1-1V71.5
+				C196.9,70.9,197.3,70.5,197.9,70.5z" fill="url(#矩形-2_1_)"/>
+
+				<linearGradient id="矩形_6_" gradientUnits="userSpaceOnUse" x1="410.6614" y1="-1.8773" x2="410.6614" y2="-0.8888" gradientTransform="matrix(71.25 0 0 93.75 -29019.625 254)">
+				<stop  offset="0" style="stop-color:#FFFFFF"/>
+				<stop  offset="1" style="stop-color:#E5EDFF"/>
+			</linearGradient>
+			<rect x="204.4" y="78" width="71.2" height="93.8" fill="url(#矩形_6_)"/>
+			<rect x="219.4" y="81.8" width="41.2" height="1.9" fill="#C7D8FF"/>
+			<rect x="204.4" y="171.8" width="71.2" height="1.9" fill="#C7D8FF"/>
+
+				<linearGradient id="矩形-3_1_" gradientUnits="userSpaceOnUse" x1="406.4152" y1="-11.7334" x2="406.4152" y2="-10.7413" gradientTransform="matrix(41.25 0 0 15 -16524.625 242.75)">
+				<stop  offset="0" style="stop-color:#E5EDFF"/>
+				<stop  offset="1" style="stop-color:#E5EDFF"/>
+			</linearGradient>
+			<rect x="219.4" y="66.8" width="41.2" height="15" fill="url(#矩形-3_1_)"/>
+			<g transform="translate(223.125000, 98.625000)">
+				<rect width="3.8" height="1.9" fill="#C7D8FF"/>
+				<rect x="7.5" width="3.8" height="1.9" fill="#C7D8FF"/>
+				<rect x="15" width="3.8" height="1.9" fill="#C7D8FF"/>
+				<rect x="22.5" width="3.8" height="1.9" fill="#C7D8FF"/>
+				<rect x="30" width="3.8" height="1.9" fill="#C7D8FF"/>
+			</g>
+			<g transform="translate(228.750000, 113.625000)">
+				<circle cx="24.4" cy="26.2" r="24.4" fill="#E5EDFF"/>
+				<path d="M39,45l3.1,3.2c-0.6,0.8-0.6,1.5,0,2.2s2.2,2.5,4.7,5.3v-7.5l-6.1-5L39,45z" fill="#E5EDFF"/>
+
+					<g transform="translate(50.226317, 51.709077) rotate(-45.000000) translate(-50.226317, -51.709077) translate(44.601317, 36.709077)">
+
+						<rect x="3.8" y="0" transform="matrix(-1 5.070363e-06 -5.070363e-06 -1 11.4 9.35)" width="3.7" height="9.4" fill="#C7D8FF"/>
+
+						<linearGradient id="路径-13_1_" gradientUnits="userSpaceOnUse" x1="-109.3915" y1="-55.9383" x2="-109.5578" y2="-55.8905" gradientTransform="matrix(9.2129 0 0 22.5 1013.9285 1277.281)">
+						<stop  offset="0" style="stop-color:#C7D8FF"/>
+						<stop  offset="1" style="stop-color:#99B9FF"/>
+					</linearGradient>
+					<path d="M3.7,5.7h4c0.5,0,1,0.4,1,0.9l1.5,20.5c0,0.6-0.4,1-0.9,1.1c0,0,0,0-0.1,0H2
+						c-0.6,0-1-0.4-1-1v-0.1L2.7,6.6C2.7,6.1,3.2,5.7,3.7,5.7z" fill="url(#路径-13_1_)"/>
+				</g>
+				<g >
+
+						<linearGradient id="椭圆形_3_" gradientUnits="userSpaceOnUse" x1="-49.7115" y1="-3.6859" x2="-49.7115" y2="-2.6859" gradientTransform="matrix(47.75 0 0 47.75 2398.125 176.5)">
+						<stop  offset="1.530828e-03" style="stop-color:#C7D8FF"/>
+						<stop  offset="0.998" style="stop-color:#C7D8FF"/>
+					</linearGradient>
+
+						<linearGradient id="椭圆形_4_" gradientUnits="userSpaceOnUse" x1="-49.7115" y1="-3.6858" x2="-49.7115" y2="-2.7054" gradientTransform="matrix(47.75 0 0 47.75 2398.125 176.5)">
+						<stop  offset="0" style="stop-color:#C7D8FF"/>
+						<stop  offset="1" style="stop-color:#99B9FF"/>
+					</linearGradient>
+					<circle cx="24.4" cy="24.4" r="23.9" fill="url(#椭圆形_3_)" stroke="url(#椭圆形_4_)"/>
+
+						<linearGradient id="椭圆形_5_" gradientUnits="userSpaceOnUse" x1="-52.3966" y1="-4.822" x2="-52.3966" y2="-3.838" gradientTransform="matrix(36.5 0 0 36.5 1936.875 182.125)">
+						<stop  offset="0" style="stop-color:#FFFFFF"/>
+						<stop  offset="1" style="stop-color:#E5EDFF"/>
+					</linearGradient>
+
+						<linearGradient id="椭圆形_6_" gradientUnits="userSpaceOnUse" x1="-52.3966" y1="-4.822" x2="-52.3966" y2="-3.8398" gradientTransform="matrix(36.5 0 0 36.5 1936.875 182.125)">
+						<stop  offset="0" style="stop-color:#E5EDFF"/>
+						<stop  offset="1" style="stop-color:#E5EDFF"/>
+					</linearGradient>
+					<circle cx="24.4" cy="24.4" r="18.2" fill="url(#椭圆形_5_)" stroke="url(#椭圆形_6_)"/>
+					<path d="M23.5,12.3c5.8,0,10.9,3.3,13.4,8.2c-2.5-1.6-5.5-2.6-8.7-2.6c-4,0-7.7,1.5-10.5,4
+						L14,15.7C16.6,13.6,19.9,12.3,23.5,12.3z" fill="#FFFFFF"/>
+				</g>
+				<polygon points="46.9,53.4 46.9,55.6 54.4,64.4 54.4,62.3 				" fill="#C7D8FF"/>
+			</g>
+		</g>
+	</g>
+</g>
+</g>
+</svg>

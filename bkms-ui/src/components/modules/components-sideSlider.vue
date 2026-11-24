@@ -150,7 +150,7 @@
                       @selected="com => handleSelected(index, com)"
                     />
                   </Tab>
-                  <Exception
+                  <BkmsException
                     v-show="curComponentList.length === 0"
                     :description="$t('暂无数据')"
                     scene="part"
@@ -545,20 +545,7 @@
   import { computed, nextTick, onBeforeMount, reactive, ref, shallowRef, watch } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
-  import {
-    Alert,
-    Button,
-    Divider,
-    Exception,
-    Form,
-    Input,
-    OverflowTitle,
-    Popover,
-    Radio,
-    Sideslider,
-    Tab,
-    Tag,
-  } from 'bkui-vue';
+  import { Alert, Button, Divider, Form, Input, OverflowTitle, Popover, Radio, Sideslider, Tab, Tag } from 'bkui-vue';
   import { Plus } from 'bkui-vue/lib/icon';
   import { cloneDeep } from 'lodash-es';
   import { useI18n } from 'vue-i18n';

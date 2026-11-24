@@ -162,7 +162,7 @@
         </template>
       </FlexRow>
       <!-- 无可用环境空状态 -->
-      <Exception
+      <BkmsException
         v-if="activeTab !== 'overview' && !hasAvailableEnv && !isEnvListLoading"
         class="large-exception px-[24px] py-[20px]"
         scene="part"
@@ -185,7 +185,7 @@
         >
           {{ $t('前往配置') }}
         </Button>
-      </Exception>
+      </BkmsException>
       <div
         v-else-if="activeTab === 'topo'"
         class="flex-1 min-h-0 px-[24px] pb-[20px]"
@@ -347,15 +347,12 @@
                 </div>
                 <Layout.table />
               </template>
-              <Exception
+              <BkmsException
                 v-if="!initLoading"
                 class="large-exception"
                 scene="part"
                 type="empty"
               >
-                <template #type>
-                  <img src="/empty.svg" />
-                </template>
                 <template #description>
                   <div class="bkms-text-body text-[14px] leading-[22px]">
                     {{ $t('该环境尚未部署应用') }}
@@ -371,7 +368,7 @@
                 >
                   {{ $t('立即部署') }}
                 </Button>
-              </Exception>
+              </BkmsException>
             </Skeleton>
           </div>
         </template>
@@ -431,7 +428,7 @@
 <script lang="ts" setup>
   import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 
-  import { Alert, Button, Exception, Popover } from 'bkui-vue';
+  import { Alert, Button, Popover } from 'bkui-vue';
   import { Close, Success, Warn } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';

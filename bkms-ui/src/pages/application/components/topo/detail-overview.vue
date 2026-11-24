@@ -179,13 +179,13 @@
       </ToggleCard>
 
       <!-- 空状态 -->
-      <Exception
+      <BkmsException
         v-if="!loading && !nodeData"
         scene="empty"
         type="empty"
       >
         {{ $t('暂无数据') }}
-      </Exception>
+      </BkmsException>
     </Skeleton>
   </div>
 </template>
@@ -194,7 +194,6 @@
   import { computed } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
-  import { Exception } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import { TopologyNodeDetail } from '~/@types/topology';
   import { formatTimeByTimezone } from '~/common/util';

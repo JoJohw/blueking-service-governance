@@ -100,17 +100,12 @@
 
       <!-- 未配置 -->
       <template v-else>
-        <Exception
+        <BkmsException
           class="large-exception"
+          img-class="h-[100px]"
           scene="part"
           type="empty"
         >
-          <template #type>
-            <img
-              class="h-[100px]"
-              src="/empty.svg"
-            />
-          </template>
           <template #description>
             <div class="empty-description">
               <span> {{ $t('尚未配置') }}</span>
@@ -149,7 +144,7 @@
               </div>
             </div>
           </template>
-        </Exception>
+        </BkmsException>
       </template>
     </div>
   </div>
@@ -158,7 +153,7 @@
 <script setup lang="ts">
   import { computed } from 'vue';
 
-  import { Button, Exception, Popover } from 'bkui-vue';
+  import { Button, Popover } from 'bkui-vue';
   import { EditLine } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { ProbeOutput } from '~/@types/v1/app-spec';

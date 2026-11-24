@@ -51,18 +51,12 @@
           :src="loadState.url"
           :title="$t('七彩石')"
         ></iframe>
-        <Exception
+        <BkmsException
           v-else-if="loadState.status === 'ready'"
           class="large-exception m-auto"
           scene="part"
           type="empty"
         >
-          <template #type>
-            <img
-              alt=""
-              src="/empty.svg"
-            />
-          </template>
           <template #description>
             <div class="mt-[12px] text-[24px] leading-[32px] text-bkms-neutral-1">{{ $t('暂未配置七彩石') }}</div>
             <div class="mt-[4px] text-[14px]">{{ $t('配置页面地址后，会在下方嵌入七彩石页面。') }}</div>
@@ -73,8 +67,8 @@
           >
             {{ $t('配置七彩石') }}
           </Button>
-        </Exception>
-        <Exception
+        </BkmsException>
+        <BkmsException
           v-else-if="loadState.status === 'error'"
           class="m-auto large-exception py-[18px]"
           scene="part"
@@ -89,7 +83,7 @@
           >
             {{ $t('重试') }}
           </Button>
-        </Exception>
+        </BkmsException>
       </div>
     </div>
 
@@ -206,7 +200,7 @@
 <script setup lang="ts">
   import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
-  import { Button, Dialog, Exception, Form, Input, Message, Switcher } from 'bkui-vue';
+  import { Button, Dialog, Form, Input, Message, Switcher } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import { RainbowtconfService } from '~/api/modules/v1/rainbowtconf';
   import { showApiErrorMessage } from '~/common/util';

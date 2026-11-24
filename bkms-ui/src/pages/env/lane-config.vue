@@ -245,14 +245,11 @@
         </Table>
       </template>
       <template v-else>
-        <Exception
+        <BkmsException
           class="large-exception"
           scene="part"
           type="empty"
         >
-          <template #type>
-            <img src="/empty.svg" />
-          </template>
           <template #description>
             <div class="text-[20px] bkms-text-title mb-[16px]">{{ $t('暂无泳道') }}</div>
             <div class="text-[14px] bkms-text-body mb-[16px]">{{ $t('泳道未启用，无数据') }}</div>
@@ -262,7 +259,7 @@
               >{{ t('启用泳道') }}</Button
             >
           </template>
-        </Exception>
+        </BkmsException>
       </template>
       <Sideslider
         v-model:is-show="sidesliderData.isShow"
@@ -521,7 +518,6 @@
   import {
     Alert,
     Button,
-    Exception,
     Form,
     Input,
     OverflowTitle,

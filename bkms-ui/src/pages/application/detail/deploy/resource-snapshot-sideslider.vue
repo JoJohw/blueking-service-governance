@@ -43,11 +43,7 @@
           <template #nodeType="node">
             <i
               class="bkms-icon mr-[12px] text-[16px]"
-              :class="
-                node.type === 'group'
-                  ? 'bkms-icon-folder bkms-text-secondary'
-                  : 'bkms-icon-file bkms-text-body'
-              "
+              :class="node.type === 'group' ? 'bkms-icon-folder bkms-text-secondary' : 'bkms-icon-file bkms-text-body'"
             ></i>
           </template>
         </Tree>
@@ -68,16 +64,13 @@
         v-else-if="!listLoading"
         class="flex justify-center items-center h-full"
       >
-        <Exception
+        <BkmsException
           class="normal-exception"
           :description="$t('暂无数据')"
           scene="part"
           type="empty"
         >
-          <template #type>
-            <img src="/empty.svg" />
-          </template>
-        </Exception>
+        </BkmsException>
       </div>
     </Loading>
   </Sideslider>
@@ -88,7 +81,7 @@
   // 左侧为按 kind 分组的快照树，右侧为选中快照的 YAML 预览
   import { nextTick, ref, watch } from 'vue';
 
-  import { Exception, Loading, Sideslider, Tree } from 'bkui-vue';
+  import { Loading, Sideslider, Tree } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import {
     AppModelResourceSnapshot,

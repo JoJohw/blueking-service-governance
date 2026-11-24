@@ -37,7 +37,7 @@
       class="p-[24px]"
     >
       <!-- 加载失败 -->
-      <Exception
+      <BkmsException
         v-if="isError"
         class="mt-[120px]"
         :description="t('空间详情加载失败，请稍后重试')"
@@ -51,7 +51,7 @@
         >
           {{ t('重试') }}
         </Button>
-      </Exception>
+      </BkmsException>
 
       <Skeleton
         v-else
@@ -319,7 +319,7 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watch } from 'vue';
 
-  import { Button, Dropdown, Exception, Message } from 'bkui-vue';
+  import { Button, Dropdown, Message } from 'bkui-vue';
   import { AngleDownLine } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';

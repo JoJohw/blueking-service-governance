@@ -39,18 +39,15 @@
       v-if="!fileList?.length"
       class="flex-1 h-full flex items-center min-w-0 bkms-bg-page"
     >
-      <Exception
+      <BkmsException
         class="large-exception"
         scene="part"
         type="empty"
       >
-        <template #type>
-          <img src="/empty.svg" />
-        </template>
         <template #description>
           <div class="bkms-text-body text-[14px] leading-[22px]">{{ $t('请先在左侧添加文件') }}</div>
         </template>
-      </Exception>
+      </BkmsException>
     </div>
     <div
       v-else
@@ -303,7 +300,7 @@
 <script setup lang="ts">
   import { computed, nextTick, onMounted, ref, watch } from 'vue';
 
-  import { Divider, Exception, Loading, Message, Popover, ResizeLayout, Select, Tag } from 'bkui-vue';
+  import { Divider, Loading, Message, Popover, ResizeLayout, Select, Tag } from 'bkui-vue';
   import { InfoLine, Upload } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { ApiServerService } from '~/api/modules/bkmsserver';

@@ -374,7 +374,7 @@
             </MsEditor>
           </template>
         </ResizeLayout>
-        <Exception
+        <BkmsException
           v-else
           class="mb-[50px]"
           type="empty"
@@ -391,9 +391,9 @@
               >{{ $t('无执行失败的结果') }}</span
             >
           </template>
-        </Exception>
+        </BkmsException>
       </Tab>
-      <Exception
+      <BkmsException
         v-else
         class="mb-[50px]"
         type="empty"
@@ -406,7 +406,7 @@
             $t('请先选择命令，填写相应的参数，然后点击执行按钮发送请求')
           }}</span>
         </template>
-      </Exception>
+      </BkmsException>
     </ToggleCard>
     <Alert
       v-if="requestFailed"
@@ -425,7 +425,7 @@
   import { computed, nextTick, onMounted, ref, watch } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
-  import { Alert, Button, Exception, Input, OverflowTitle, Radio, ResizeLayout, Select, Tab, Tag } from 'bkui-vue';
+  import { Alert, Button, Input, OverflowTitle, Radio, ResizeLayout, Select, Tab, Tag } from 'bkui-vue';
   import { Close, Success } from 'bkui-vue/lib/icon';
   import * as monaco from 'monaco-editor';
   import {

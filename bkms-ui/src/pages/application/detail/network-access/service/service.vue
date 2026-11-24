@@ -85,14 +85,14 @@
           type="search"
         ></Input> -->
       </div>
-      <Exception
+      <BkmsException
         v-if="filteredServiceList.length === 0"
         class="large-exception"
         :description="$t('暂无服务')"
         scene="part"
         type="empty"
       >
-      </Exception>
+      </BkmsException>
       <div
         v-else
         class="flex flex-col gap-[16px]"
@@ -122,7 +122,7 @@
 <script setup lang="ts">
   import { ref, watch } from 'vue';
 
-  import { Alert, Button, Exception, Message } from 'bkui-vue';
+  import { Alert, Button, Message } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import { AppServiceOutput, CreateAppServiceRequest, UpdateAppServiceRequest } from '~/@types/v1/app-networking';
   import { AppNetworkingService } from '~/api/modules/v1';

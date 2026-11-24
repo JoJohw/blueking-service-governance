@@ -96,23 +96,18 @@
       v-else-if="showEmptyGuide"
       class="host-port-empty-guide bkms-bg-card rounded-bkms-card py-[60px]"
     >
-      <Exception
+      <BkmsException
+        img-class="h-[140px]"
         scene="part"
         type="empty"
       >
-        <template #type>
-          <img
-            class="h-[140px]"
-            src="/empty.svg"
-          />
-        </template>
         <template #description>
           <p class="text-[16px] bkms-text-title">{{ $t('当前空间没有绑定联邦集群的环境') }}</p>
           <p class="mt-[8px] text-[12px] bkms-text-secondary">
             {{ $t('HostPort 目前仅对绑定联邦集群的环境生效') }}
           </p>
         </template>
-      </Exception>
+      </BkmsException>
     </div>
 
     <template v-else>
@@ -147,18 +142,13 @@
         <div class="bkms-bg-card p-[16px]">
           <!-- 查看态：无端口且无待部署用空态；清空端口但仍待部署时展示「未配置」行 + 生效范围 -->
           <template v-if="!isEditing">
-            <Exception
+            <BkmsException
               v-if="!showPortTable"
               class="normal-exception py-[24px]"
+              img-class="h-[100px]"
               scene="part"
               type="empty"
             >
-              <template #type>
-                <img
-                  class="h-[100px]"
-                  src="/empty.svg"
-                />
-              </template>
               <template #description>
                 <span>{{ $t('尚未配置') }}，</span>
                 <Button
@@ -169,7 +159,7 @@
                   {{ $t('立即配置') }}
                 </Button>
               </template>
-            </Exception>
+            </BkmsException>
             <div
               v-else
               class="host-port-panel text-[12px]"
@@ -349,7 +339,7 @@
 <script lang="ts" setup>
   import { computed, reactive, ref, watch } from 'vue';
 
-  import { Alert, Button, Exception, Form, Input, Message } from 'bkui-vue';
+  import { Alert, Button, Form, Input, Message } from 'bkui-vue';
   import { Copy, Del, Plus } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { EnvService, HostportService } from '~/api/modules/v1';

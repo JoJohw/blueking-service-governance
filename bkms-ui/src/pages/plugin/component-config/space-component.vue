@@ -150,13 +150,6 @@
               @clear="searchValue = []"
               @refresh="fetchComponentList"
             >
-              <template #type>
-                <img
-                  :height="200"
-                  src="/empty.svg"
-                  :width="440"
-                />
-              </template>
             </TableException>
           </template>
         </SpaceComCardGrid>

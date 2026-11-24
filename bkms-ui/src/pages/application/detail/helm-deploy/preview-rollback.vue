@@ -62,14 +62,14 @@
         :title="$t('当前版本')"
       />
     </div>
-    <Exception
+    <BkmsException
       v-else
       class="min-h-[180px]"
       :description="$t('暂无数据')"
       scene="part"
       type="empty"
     >
-    </Exception>
+    </BkmsException>
     <template #footer>
       <Button
         class="mr-[10px]"
@@ -92,7 +92,7 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
 
-  import { Button, Dialog, Divider, Exception, Loading, Message } from 'bkui-vue';
+  import { Button, Dialog, Divider, Loading, Message } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import { PreviewHelmDeployOutput } from '~/@types/v1/deploy';
   import { DeployService } from '~/api/modules/v1';

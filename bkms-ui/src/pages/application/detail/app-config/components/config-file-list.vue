@@ -138,7 +138,7 @@
           v-if="!plainFiles.length"
           class="flex flex-1 items-center justify-center px-[12px] py-[24px]"
         >
-          <Exception
+          <BkmsException
             class="!h-auto"
             scene="part"
             type="empty"
@@ -149,7 +149,7 @@
                 {{ $t(frameworkFiles.length ? '暂无其他配置文件，可点击新建' : '暂无配置文件，可点击新建') }}
               </span>
             </template>
-          </Exception>
+          </BkmsException>
         </div>
       </Skeleton>
     </div>
@@ -159,7 +159,7 @@
 <script setup lang="ts">
   import { computed } from 'vue';
 
-  import { Button, Exception } from 'bkui-vue';
+  import { Button } from 'bkui-vue';
   import { InfoLine, Plus } from 'bkui-vue/lib/icon';
   import { DOC_LINKS } from '~/common/const';
   import Layout from '~/components/skeleton/skeleton-layout';

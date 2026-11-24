@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     ApplyPerm: typeof import('./components/apply-perm.vue')['default']
     BkmsContent: typeof import('./components/bkms-content.vue')['default']
+    BkmsException: typeof import('./components/bkms-exception.vue')['default']
     ButtonGroup: typeof import('./components/button-group.vue')['default']
     CardRadio: typeof import('./components/card-radio.vue')['default']
     CheckContainer: typeof import('./components/check-container.vue')['default']

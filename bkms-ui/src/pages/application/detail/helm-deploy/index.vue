@@ -124,15 +124,12 @@
           {{ $t('部署历史') }}
         </template>
         <!-- 空状态 -->
-        <Exception
+        <BkmsException
           v-if="!deployHistoryLoading && !deployHistoryList.length && !hasSearchValue"
           class="large-exception"
           scene="part"
           type="empty"
         >
-          <template #type>
-            <img src="/empty.svg" />
-          </template>
           <template #description>
             <div class="bkms-text-body text-[14px] leading-[22px]">{{ $t('该环境尚未部署应用') }}</div>
           </template>
@@ -143,7 +140,7 @@
             @click="handleShowDeployDialog('RollingUpdate')"
             >{{ $t('立即部署') }}</Button
           >
-        </Exception>
+        </BkmsException>
         <deployHistory
           v-else
           :env-display-name="curEnvItem?.displayName"
@@ -168,7 +165,7 @@
 <script setup lang="ts">
   import { computed, h, ref, watch } from 'vue';
 
-  import { Button, Exception, InfoBox, Message, Popover, Tab } from 'bkui-vue';
+  import { Button, InfoBox, Message, Popover, Tab } from 'bkui-vue';
   import { Ellipsis } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';

@@ -31,9 +31,7 @@
     <span class="bkms-text-secondary text-[14px] mr-[16px]"
       >{{ $t('环境') }}：{{ envDetail.displayName || envId }}</span
     >
-    <span class="bkms-text-secondary text-[14px]"
-      >{{ $t('集群') }}：{{ envDetail.cluster?.clusterID || '--' }}</span
-    >
+    <span class="bkms-text-secondary text-[14px]">{{ $t('集群') }}：{{ envDetail.cluster?.clusterID || '--' }}</span>
   </MsHeader>
   <Skeleton
     class="bkms-bg-card mt-[52px] p-[16px]"
@@ -70,7 +68,7 @@
         @page-value-change="handlePageValueChange"
       >
         <template #empty>
-          <Exception
+          <BkmsException
             class="min-h-[180px]"
             :description="$t('暂无端口池数据')"
             scene="part"
@@ -213,7 +211,7 @@
   import { computed, onMounted, ref } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
-  import { Button, Dialog, Divider, Exception, Message } from 'bkui-vue';
+  import { Button, Dialog, Divider, Message } from 'bkui-vue';
   import { Plus } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';

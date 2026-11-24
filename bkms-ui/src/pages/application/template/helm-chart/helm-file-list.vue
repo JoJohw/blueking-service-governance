@@ -49,15 +49,12 @@
       class="h-full min-h-0"
       :loading="loading"
     >
-      <Exception
+      <BkmsException
         v-if="fileList.length === 0"
         class="pt-[120px] text-center normal-exception"
         scene="part"
         type="empty"
       >
-        <template #type>
-          <img src="/empty.svg" />
-        </template>
         <span class="bkms-text-body">{{ $t('暂无文件') }}，</span>
         <Button
           text
@@ -66,7 +63,7 @@
         >
           {{ $t('立即添加') }}
         </Button>
-      </Exception>
+      </BkmsException>
       <div
         v-else
         class="h-full text-[12px] bkms-text-title"
@@ -170,7 +167,7 @@
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue';
 
-  import { Button, Exception, Loading, Message, OverflowTitle, PopConfirm, Tag, Tree } from 'bkui-vue';
+  import { Button, Loading, Message, OverflowTitle, PopConfirm, Tag, Tree } from 'bkui-vue';
   import { Del, EditLine, InfoLine, Plus } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { ApiServerService } from '~/api/modules/bkmsserver';

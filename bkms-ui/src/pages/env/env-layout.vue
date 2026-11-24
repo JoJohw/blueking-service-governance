@@ -22,7 +22,7 @@
     :list="menuList"
   >
     <div :class="pageBodyClass">
-      <Exception
+      <BkmsException
         v-if="envDetailStore.error"
         class="mt-[120px] large-exception"
         scene="part"
@@ -41,7 +41,7 @@
         >
           {{ $t('返回列表') }}
         </Button>
-      </Exception>
+      </BkmsException>
       <RouterView
         v-else-if="currentEnv || envDetailStore.loading"
         :key="routerViewKey"
@@ -70,7 +70,7 @@
 <script lang="ts" setup>
   import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue';
 
-  import { Button, Exception } from 'bkui-vue';
+  import { Button } from 'bkui-vue';
   import { useRoute, useRouter } from 'vue-router';
   import { DEFAULT_ENV_DETAIL_MENU, isEnvDetailMenu } from '~/composables/use-env-manager';
   import { getEnvMenuList } from '~/composables/use-router-menu';

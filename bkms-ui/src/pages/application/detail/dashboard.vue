@@ -37,15 +37,12 @@
       class="flex min-h-0 flex-1 flex-col"
     >
       <!-- 未配置任何仪表盘时的空态引导 -->
-      <Exception
+      <BkmsException
         v-if="!dashboards.length"
         class="large-exception"
         scene="part"
         type="empty"
       >
-        <template #type>
-          <img src="/empty.svg" />
-        </template>
         <template #description>
           <div class="text-[24px] bkms-text-title">{{ $t('暂未配置仪表盘') }}</div>
           <DashboardSetupGuide class="mt-[16px] inline-block text-left" />
@@ -56,7 +53,7 @@
         >
           {{ $t('配置仪表盘') }}
         </Button>
-      </Exception>
+      </BkmsException>
 
       <!-- 已配置：顶部切换仪表盘，下方 iframe 嵌入展示 -->
       <div
@@ -128,7 +125,7 @@
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue';
 
-  import { Button, Exception, Select } from 'bkui-vue';
+  import { Button, Select } from 'bkui-vue';
   import { Plus } from 'bkui-vue/lib/icon';
   import { useRoute, useRouter } from 'vue-router';
   import FlexRow from '~/components/flex-row.vue';

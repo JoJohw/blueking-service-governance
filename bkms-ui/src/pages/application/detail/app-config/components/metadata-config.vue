@@ -155,18 +155,13 @@
                   {{ value ?? '--' }}
                 </ProbeDetailItem>
               </div>
-              <Exception
+              <BkmsException
                 v-else
                 class="normal-exception"
+                img-class="h-[100px]"
                 scene="part"
                 type="empty"
               >
-                <template #type>
-                  <img
-                    class="h-[100px]"
-                    src="/empty.svg"
-                  />
-                </template>
                 <template #description>
                   <span>{{ $t('尚未配置') }}，</span>
                   <Button
@@ -177,7 +172,7 @@
                     {{ $t('立即配置') }}
                   </Button>
                 </template>
-              </Exception>
+              </BkmsException>
             </template>
           </div>
         </div>
@@ -189,7 +184,7 @@
 <script setup lang="ts">
   import { computed, reactive, ref, watch } from 'vue';
 
-  import { Button, Exception, Form, Input, Message, Radio } from 'bkui-vue';
+  import { Button, Form, Input, Message, Radio } from 'bkui-vue';
   import { Copy, EditLine } from 'bkui-vue/lib/icon';
   import { PlacementEnum } from 'bkui-vue/lib/shared';
   import { cloneDeep } from 'lodash-es';
