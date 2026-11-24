@@ -46,8 +46,8 @@
 </script>
 
 <style scoped>
-  /* 窄屏退回工具栏的 flex 布局，此时由剩余空间决定宽度 */
-  @media (width <= 1253px) {
+  /* 窄屏退回工具栏的 flex 布局，此时由剩余空间决定宽度；断点与 main.css 的 --pal-tabs-w 联动 */
+  @media (width <= 1412px) {
     .search-bar {
       flex: 1 1 auto;
       width: auto;

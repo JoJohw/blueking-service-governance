@@ -18,7 +18,8 @@
 
 /*
  * 第二主题扩展位：色阶覆盖按 html[data-theme='<name>'] 生效，加载点在 src/styles/theme/index.css。
- * 当前只有 light 一档（色阶定义在 tokens/color.css 的 :root）；dark 为 mock 版本，已移除，
- * 等设计师给出正式 tokens 后再在此追加 dark.css 并在下方 @import。
+ * 当前只有 light 一档（色阶定义在 tokens/color.css 的 :root），本文件不 @import 任何主题。
+ * themes/*.css 是 palette 词典展示用的覆盖值，主应用不加载；
+ * 需要让主应用加载时在此 @import。
  * 消费方：[data-theme] 属性由 use-theme.ts 的 applyTheme 与 index.html 首帧脚本共同维护。
  */

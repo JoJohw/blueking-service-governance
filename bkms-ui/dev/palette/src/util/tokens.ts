@@ -16,6 +16,8 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
+import { computed, reactive, ref } from 'vue';
+
 import colorRaw from '@root/src/styles/theme/tokens/color.css?raw';
 import radiusRaw from '@root/src/styles/theme/tokens/radius.css?raw';
 import vizRaw from '@root/src/styles/theme/tokens/viz.css?raw';
@@ -203,18 +205,52 @@ const colorFile = parse(colorRaw, 'ramp');
 const radiusFile = parse(radiusRaw, 'rad');
 const vizFile = parse(vizRaw, 'viz', 'viz');
 
-const valueMap = new Map(
-  [...colorFile.tokens, ...radiusFile.tokens, ...vizFile.tokens].map(token => [token.name, token.value]),
+export type PaletteThemeId = string;
+
+export interface PaletteThemeOption {
+  id: PaletteThemeId;
+  label: string;
+}
+
+/** themes/*.css 按文件名自动注册：新增主题只需放一份覆盖文件，palette 侧零改动 */
+const themeFiles = import.meta.glob<string>('@root/src/styles/theme/themes/*.css', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
+function overrideMap(raw: string): Map<string, string> {
+  return new Map(parse(raw, 'override').tokens.map(token => [token.name, token.value]));
+}
+
+const themeOverrides = Object.fromEntries(
+  Object.entries(themeFiles)
+    .filter(([path]) => !path.endsWith('/index.css'))
+    .map(([path, raw]) => [
+      path
+        .split('/')
+        .pop()!
+        .replace(/\.css$/, ''),
+      overrideMap(raw),
+    ]),
 );
 
-/** 解开 var() 链拿到最终值（色值 / 圆角长度）；非纯 var()（如 color-mix）原样交给浏览器解析，用 seen 防循环引用 */
-export function resolved(value: string, seen = new Set<string>()): string {
-  const ref = /^var\((--[\w-]+)\)$/.exec(value)?.[1];
-  if (!ref || seen.has(ref)) return value;
-  seen.add(ref);
-  const next = valueMap.get(ref);
-  return next === undefined ? value : resolved(next, seen);
-}
+/** 词典主题：默认档是 tokens/ 三份正式文件，其余来自 themes/*.css；只切展示色值，不碰主应用 */
+export const paletteThemes: PaletteThemeOption[] = [
+  { id: 'light', label: 'default' },
+  ...Object.keys(themeOverrides)
+    .sort()
+    .map(id => ({ id, label: id })),
+];
+
+const overrides: Record<PaletteThemeId, Map<string, string>> = {
+  light: new Map(),
+  ...themeOverrides,
+};
+
+const baseValueMap = new Map(
+  [...colorFile.tokens, ...radiusFile.tokens, ...vizFile.tokens].map(token => [token.name, token.value]),
+);
 
 const sortTokens = (tokens: Token[]): Token[] =>
   [...tokens].sort((a, b) => {
@@ -224,15 +260,53 @@ const sortTokens = (tokens: Token[]): Token[] =>
   });
 
 /** 色阶组：@layer scale 的分组，组内按数字正序（1 最深在前） */
-export const rampGroups: Group[] = colorFile.groups
-  .filter(group => group.layer === 'scale')
-  .map(group => ({ ...group, tokens: sortTokens(group.tokens) }));
+export const rampGroups = reactive<Group[]>(
+  colorFile.groups
+    .filter(group => group.layer === 'scale')
+    .map(group => ({ ...group, tokens: sortTokens(group.tokens) })),
+);
 
 /** 语义层：@layer semantic 的分组——语义 token 引用色阶，主题换色时自动联动；阴影组按场景命名，值即完整效果 */
-export const allSemanticGroups: Group[] = colorFile.groups.filter(group => group.layer === 'semantic');
+export const allSemanticGroups = reactive<Group[]>(colorFile.groups.filter(group => group.layer === 'semantic'));
 
 /** 圆角维度：两个分组（档位 / 圆角语义），语义档只 var() 引用档位，resolved() 按长度值解开 */
-export const radiusGroups: Group[] = radiusFile.groups;
+export const radiusGroups = reactive<Group[]>(radiusFile.groups);
 
 /** 可视化字典：viz.css 的分组独立成第三视图，不并入颜色视图的色阶 / 语义二分；值是实色，resolved() 直接展示 */
-export const vizGroups: Group[] = vizFile.groups;
+export const vizGroups = reactive<Group[]>(vizFile.groups);
+
+/** 切主题时按 token 名回填原值，避免反复切换后把 light 快照写成上一次的主题值 */
+const baseTokenValues = new Map(
+  [...rampGroups, ...allSemanticGroups, ...radiusGroups, ...vizGroups]
+    .flatMap(group => group.tokens)
+    .map(token => [token.name, token.value]),
+);
+
+const activeValueMap = ref(baseValueMap);
+export const activeTheme = ref<PaletteThemeId>('light');
+
+/** 解开 var() 链拿到最终值（色值 / 圆角长度）；非纯 var()（如 color-mix）原样交给浏览器解析，用 seen 防循环引用 */
+export function resolved(value: string, seen = new Set<string>()): string {
+  const refName = /^var\((--[\w-]+)\)$/.exec(value)?.[1];
+  if (!refName || seen.has(refName)) return value;
+  seen.add(refName);
+  const next = activeValueMap.value.get(refName);
+  return next === undefined ? value : resolved(next, seen);
+}
+
+export function setActiveTheme(id: PaletteThemeId): void {
+  if (!paletteThemes.some(theme => theme.id === id)) return;
+  activeTheme.value = id;
+  activeValueMap.value = new Map([...baseValueMap, ...overrides[id]]);
+  for (const group of [...rampGroups, ...allSemanticGroups, ...radiusGroups, ...vizGroups]) {
+    for (const token of group.tokens) {
+      token.value = overrides[id].get(token.name) ?? baseTokenValues.get(token.name) ?? token.value;
+      token.ref = /^var\((--[\w-]+)\)$/.exec(token.value)?.[1] ?? '';
+    }
+  }
+}
+
+/** 预览组件用 CSS var() 取色，把当前主题的变量挂在 palette 根节点，避免影响主应用 */
+export const themeVars = computed<Record<string, string>>(() =>
+  Object.fromEntries([...activeValueMap.value] as [string, string][]),
+);

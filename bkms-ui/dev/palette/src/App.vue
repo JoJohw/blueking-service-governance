@@ -25,6 +25,7 @@
       'is-focus': isFocus,
       'is-searching': isSearching,
     }"
+    :style="themeVars"
   >
     <PaletteAside
       ref="asideRef"
@@ -50,8 +51,11 @@
       <div class="palette-toolbar">
         <ViewTabs
           :active="viewMode"
+          :active-theme="activeTheme"
           :tabs="viewTabs"
+          :themes="paletteThemes"
           @change="switchView"
+          @theme-change="setActiveTheme"
         />
         <SearchBar
           v-if="!isFocus"
@@ -131,7 +135,16 @@
   import VizPage from './pages/VizPage.vue';
   import { type PaletteView, paletteViews } from './router';
   import { searchTokens } from './util/search';
-  import { allSemanticGroups, radiusGroups, rampGroups, vizGroups } from './util/tokens';
+  import {
+    activeTheme,
+    allSemanticGroups,
+    paletteThemes,
+    radiusGroups,
+    rampGroups,
+    setActiveTheme,
+    themeVars,
+    vizGroups,
+  } from './util/tokens';
 
   import type { LocationQueryRaw } from 'vue-router';
 

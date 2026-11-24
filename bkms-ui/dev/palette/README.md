@@ -89,6 +89,7 @@ npx vite build --config dev/palette/vite.config.ts
 - `/** 用途 */` 仍是单条 token 的说明（原有格式）。兼容与容错：旧格式 `/* 组名（组描述） */` 继续按分组解析；声明同行尾注释 `--x: #fff; /* 用途 */` 挂到该 token；非 @tag 多行块注释兜底为组描述；未知 @tag 忽略不报错。
 - 色差使用 CIEDE2000（ΔE00）。色值建议的贴近阈值为 **6**；颜色搜索的容错阈值为 **3**。
 - 工具自身的界面配色定义在 `src/styles/shell.css`，是一组固定值，不随主题 token 变化；色块与预览展示的颜色仍取自 token 真源。
+- 顶栏右侧的字典主题切换只切换展示的色值集合，不换工具外壳、不写 `data-theme`、不触发主应用换肤。默认档读 `tokens/` 三份正式文件；`src/styles/theme/themes/*.css` 自动注册为可选主题（文件名即下拉 label，index.css 除外，纯文本解析、忽略选择器），新增或替换文件即可，palette 侧零改动。切换会同步影响色块展示、语义层 `var()` 解析结果、搜索与色值建议。
 
 需要修改主题 token 时，用 AI IDE 走 `theme-designer` skill（`.agents/skills/theme-designer/`，CodeBuddy 下为 `.codebuddy/skills/theme-designer/`），它负责定位真源、改对层级；本工具只用于改完后的预览与对比。
 
