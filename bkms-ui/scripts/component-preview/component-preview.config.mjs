@@ -16,6 +16,7 @@
  * to the current version of the project delivered to anyone in the future.
  */
 
+import bkmsException from './plugins/bkms-exception.mjs';
 import componentDefs from './plugins/component-defs.mjs';
 import envSelector from './plugins/env-selector.mjs';
 import fillWidthShells from './plugins/fill-width-shells.mjs';
@@ -229,6 +230,7 @@ export const CONFIG = {
   ],
   /** 业务域插件：每个插件自带一组领域特例，生成器只按固定扩展点消费 */
   plugins: [
+    bkmsException,
     componentDefs,
     envSelector,
     fillWidthShells,
