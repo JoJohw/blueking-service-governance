@@ -27,7 +27,7 @@
         <EnvScopeTag :current-env="currentEnv" />
       </div>
     </template>
-    <div class="bkms-bg-card p-[16px]">
+    <div class="bkms-bg-card p-[16px] rounded-bkms-card">
       <div :class="['flex gap-[16px]', editingProbe === null ? 'items-stretch' : 'items-start']">
         <template
           v-for="item in probeItems"

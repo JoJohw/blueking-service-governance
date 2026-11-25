@@ -112,14 +112,14 @@
         :name="t('发布批次')"
         type="normal"
       >
-        <div class="flex flex-col gap-[8px]">
+        <div class="batch-section flex flex-col gap-[8px]">
           <div class="flex items-center gap-[4px] text-[12px] leading-[20px]">
             <span class="font-700 text-bkms-neutral-1">{{ t('发布批次') }}</span>
             <span class="text-bkms-danger-2">*</span>
             <!-- <span class="text-[#979ba5]"> （{{ t('更新实例会换镜像；调整流量只改已更新实例的北极星权重') }}） </span> -->
           </div>
 
-          <div class="flex items-start gap-[16px] max-lg:flex-col">
+          <div class="batch-layout flex items-start gap-[16px]">
             <StrategyBatchList
               :active-key="activeBatchKey"
               :batches="formModel.batches"
@@ -637,6 +637,30 @@
 </script>
 
 <style lang="postcss" scoped>
+  /**
+   * 抽屉宽度写死 960，但视口断点（lg = 1024）在窗口 960 ~ 1024 时就判成窄屏、把两栏堆叠，
+   * 而那时抽屉内还有 912px 可用。改成按容器宽度判断：
+   * 只有窄到放不下 324px 的目标资源输入组时才转单列。
+   */
+  @container (max-width: 700px) {
+    .batch-layout {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    /* 单列时两栏都铺满：列表根节点写死 280px、详情面板是 flex-1，不覆盖会左右错位
+       （详情在纵向 flex 里 flex-1 只影响高度，宽度仍由内容决定） */
+    .batch-layout > :first-child,
+    .batch-layout > :last-child {
+      flex: none;
+      width: 100%;
+    }
+  }
+
+  .batch-section {
+    container-type: inline-size;
+  }
+
   /* 基本信息：名称与说明上下排列，标签在输入框上方；与「发布批次」区块保持 24px 间距 */
   .basic-info-form :deep(.bk-form-item) {
     margin-bottom: 0;

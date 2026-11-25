@@ -35,7 +35,7 @@
         {{ $t('后才会真正生效：') }}
       </p>
       <Loading :loading="loading">
-        <div class="min-h-[240px] bkms-bg-page p-[16px]">
+        <div class="min-h-[240px] bkms-bg-page p-[16px] rounded-bkms-card">
           <div class="mb-[12px] text-[14px] font-bold leading-[24px] bkms-text-title">
             {{ $t('待部署的环境（{0}）', [redeployRequiredEnvs.length]) }}
           </div>

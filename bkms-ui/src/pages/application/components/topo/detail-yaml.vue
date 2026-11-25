@@ -28,7 +28,7 @@
       >
         <div
           v-if="manifest.truncated"
-          class="px-[24px] py-[8px] bkms-bg-warning-soft text-[12px] text-bkms-warning-2 shrink-0"
+          class="px-[24px] py-[8px] bkms-bg-warning-soft text-[12px] text-bkms-warning-2 shrink-0 rounded-bkms-base"
         >
           {{ $t('内容已被截断，仅展示部分 Manifest') }}
         </div>

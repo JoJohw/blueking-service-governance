@@ -121,7 +121,7 @@
 
         <!-- 空间基本信息 -->
         <div
-          class="flex items-center min-h-[160px] p-[24px] pt-[28px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+          class="flex items-center min-h-[160px] p-[24px] pt-[28px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)] rounded-bkms-card"
         >
           <!-- 首字母头像 -->
           <div

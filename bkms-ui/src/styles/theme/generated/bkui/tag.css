@@ -29,7 +29,7 @@
 .bkms-themed .bk-tag.bk-tag-success {
   color: var(--bkms-success-2); /* 原 #14a568 */
   border-color: color-mix(in srgb, var(--bkms-success-2) 30%, transparent); /* 原 #14a5684d */
-  background-color: var(--bkms-success-7); /* 原 #e4faf0 */
+  background-color: var(--bkms-success-6); /* 原 #e4faf0 */
 }
 
 .bkms-themed .bk-tag.bk-tag-success.bk-tag-filled {

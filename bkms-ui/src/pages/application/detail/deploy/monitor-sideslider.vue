@@ -264,7 +264,9 @@
       v-bkloading="{ loading: isShow && chartPlotWidth > 0 && !queryReady }"
       class="min-h-0 flex-1 overflow-auto px-[24px] pt-[24px] pb-[24px] bkms-bg-page"
     >
-      <div class="mb-[24px] bkms-bg-card h-[48px] px-[16px] py-[8px] shadow-[0_3px_5.5px_0_var(--bkms-shadow-float)]">
+      <div
+        class="mb-[24px] bkms-bg-card h-[48px] px-[16px] py-[8px] shadow-[0_3px_5.5px_0_var(--bkms-shadow-float)] rounded-bkms-card"
+      >
         <Radio.Group
           v-model="metricFilter"
           type="capsule"

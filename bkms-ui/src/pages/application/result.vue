@@ -20,7 +20,7 @@
   <div class="py-[16px] h-full w-full max-w-[1400px] overflow-auto">
     <div
       v-if="data.status === 'SUCCESS'"
-      class="bkms-bg-card min-w-[600px] p-[60px] flex flex-col items-center mt-[20px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+      class="bkms-bg-card min-w-[600px] p-[60px] flex flex-col items-center mt-[20px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)] rounded-bkms-card"
     >
       <Success
         class="mb-[36px]"
@@ -67,7 +67,7 @@
     </div>
     <div
       v-else-if="data.status === 'FAILED'"
-      class="bkms-bg-card min-w-[600px] p-[60px] flex flex-col items-center mt-[20px]"
+      class="bkms-bg-card min-w-[600px] p-[60px] flex flex-col items-center mt-[20px] rounded-bkms-card"
     >
       <Close
         class="mb-[36px]"
@@ -98,7 +98,7 @@
     </div>
     <div
       v-else-if="data.status === 'CREATING'"
-      class="bkms-bg-card min-w-[600px] p-[60px] flex flex-col items-center mt-[20px]"
+      class="bkms-bg-card min-w-[600px] p-[60px] flex flex-col items-center mt-[20px] rounded-bkms-card"
     >
       <Loading
         mode="spin"

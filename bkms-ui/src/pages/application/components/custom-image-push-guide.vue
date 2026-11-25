@@ -32,7 +32,7 @@
         <div class="text-[12px] bkms-text-body leading-[20px] mb-[4px]">
           {{ $t('请将镜像推送至当前空间绑定仓库后使用。凭证可在「空间设置 → 基本信息」查看。') }}
         </div>
-        <div class="bkms-bg-subtle px-[16px] py-[12px]">
+        <div class="bkms-bg-subtle px-[16px] py-[12px] rounded-bkms-card">
           <FieldItem
             class="leading-[20px]"
             :container-height="20"

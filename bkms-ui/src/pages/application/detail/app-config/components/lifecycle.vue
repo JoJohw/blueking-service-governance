@@ -29,7 +29,7 @@
         <EnvScopeTag :current-env="currentEnv" />
       </div>
     </template>
-    <div class="bkms-bg-card p-[16px]">
+    <div class="bkms-bg-card p-[16px] rounded-bkms-card">
       <!-- 查看态 -->
       <template v-if="!isEditing">
         <div class="grid grid-cols-2 gap-[12px] gap-y-2">

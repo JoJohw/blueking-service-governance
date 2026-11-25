@@ -34,13 +34,11 @@
   --vxe-ui-input-disabled-background-color: var(--bkms-bg-page);
   --vxe-ui-layout-background-color: var(--bkms-bg-card);
   --vxe-ui-table-header-font-color: var(--bkms-text-title);
-
-  /* 表头不用 --bkms-bg-head：那一档是 neutral-9，贴在白卡片上几乎看不见。页面灰才有一条能看出来的表头 */
-  --vxe-ui-table-header-background-color: var(--bkms-bg-page);
+  --vxe-ui-table-header-background-color: var(--bkms-bg-head);
   --vxe-ui-table-footer-font-color: var(--bkms-text-body);
   --vxe-ui-table-footer-background-color: var(--bkms-bg-page);
   --vxe-ui-table-border-color: var(--bkms-line-light);
-  --vxe-ui-table-row-hover-background-color: var(--bkms-neutral-6);
+  --vxe-ui-table-row-hover-background-color: var(--bkms-bg-hover);
   --vxe-ui-table-row-striped-background-color: var(--bkms-bg-card);
   --vxe-ui-table-row-current-background-color: var(--bkms-bg-page);
   --vxe-ui-table-tree-node-line-color: var(--bkms-line-default);

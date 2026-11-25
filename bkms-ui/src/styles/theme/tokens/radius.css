@@ -76,7 +76,8 @@
   /** 浮层外框：下拉面板、环境选择器、气泡卡片、弹窗、侧滑面板、Message/Notify 提示 */
   --bkms-radius-overlay: var(--bkms-radius-md);
 
-  /** 标签页：卡片式 tab 头、带数字的方块角标；普通下划线 tab 不涉及圆角 */
+  /** 标签页：卡片式 tab 头，以及 bkui tab 的「方块」角标（has-num-square）；
+      胶囊 Tab 的「椭圆」角标走形状档 full，不进这一档 */
   --bkms-radius-tab: var(--bkms-radius-md);
 
   /** 侧边导航的单个菜单项（选中态那块底色） */

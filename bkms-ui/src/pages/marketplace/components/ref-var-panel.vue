@@ -52,10 +52,8 @@
         >
           <span class="text-[12px]">{{ tab.label }}</span>
           <span
-            :class="[
-              'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-bkms-card',
-              activeTab === tab.value ? 'bkms-bg-active bkms-text-brand' : 'bkms-bg-card',
-            ]"
+            class="bkms-tab-badge"
+            :class="{ active: activeTab === tab.value }"
           >
             {{ tab.count }}
           </span>

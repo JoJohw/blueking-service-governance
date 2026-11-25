@@ -17,7 +17,9 @@
 -->
 
 <template>
-  <div class="flex flex-col gap-[16px] p-[16px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+  <div
+    class="flex flex-col gap-[16px] p-[16px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)] rounded-bkms-card"
+  >
     <Alert theme="info">
       {{ $t('应用变量优先级最高，同名时将覆盖该应用继承的环境级别变量。') }}
       <Button

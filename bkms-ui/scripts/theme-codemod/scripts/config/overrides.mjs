@@ -105,7 +105,7 @@ export const HEX_TOKENS = {
   'dde4eb': '--bkms-neutral-5',
   'e1e8f4': '--bkms-neutral-5',
   'e1ecff': '--bkms-brand-6',
-  'e4faf0': '--bkms-success-7',
+  'e4faf0': '--bkms-success-6',
   'e6e9ea': '--bkms-neutral-5',
   'e8eaec': '--bkms-neutral-5',
   'ea3536': '--bkms-danger-2',

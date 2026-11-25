@@ -168,17 +168,20 @@
 
 /* 规范「Tab-胶囊样式」：轨道 neutral-6，项圆角 6 已在 radius.css。
    小（库默认胶囊）高 24、左右 12；大高 28、左右 16。
-   选中项白底，文字用标题色，不再用品牌蓝。项与项之间不画分隔线。
-   悬停比当前底深一档。选中是白底，hover 用 --bkms-bg-hover。
-   未选中透出轨道 neutral-6，hover 用深一档 neutral-5。
-   数量徽章：选中 brand 浅底 hover 用 --bkms-bg-active-hover。
-   未选中徽章用 neutral-7，比轨道浅一档，hover 再用 neutral-5。 */
+   选中项白底 + 卡片阴影，文字用品牌蓝。项与项之间不画分隔线。
+   未选中透出轨道 neutral-6，hover 用 --bkms-neutral-4（设计 #C1CDE5）；
+   图标形态的 hover 轻量化是模板侧变体，规则在 app.css 的 .bkms-tab-icon。
+   数字角标是模板自有元素，样式在 app.css 的 .bkms-tab-badge。 */
 .bkms-themed .bk-radio-capsule .bk-radio-button:before {
   display: none;
 }
 
+.bkms-themed .bk-radio-capsule .bk-radio-button.is-checked {
+  box-shadow: 0 2px 4px 0 var(--bkms-shadow-hover);
+}
+
 .bkms-themed .bk-radio-capsule .bk-radio-button.is-checked .bk-radio-button-label {
-  color: var(--bkms-text-title);
+  color: var(--bkms-text-brand);
 }
 
 .bkms-themed .bk-radio-capsule .bk-radio-button.bk-radio-button-large .bk-radio-button-label {
@@ -187,24 +190,21 @@
   line-height: 28px;
 }
 
-.bkms-themed .bk-radio-capsule .bk-radio-button:not(.is-disabled, .is-checked) .bkms-bg-card {
-  background-color: var(--bkms-neutral-7);
-}
-
 .bkms-themed .bk-radio-capsule .bk-radio-button:not(.is-disabled, .is-checked):hover {
-  background-color: var(--bkms-neutral-5);
+  background-color: var(--bkms-neutral-4);
 }
 
 .bkms-themed .bk-radio-capsule .bk-radio-button.is-checked:not(.is-disabled):hover {
   background-color: var(--bkms-bg-hover);
 }
 
-.bkms-themed .bk-radio-capsule .bk-radio-button:not(.is-disabled, .is-checked):hover .bkms-bg-card {
-  background-color: var(--bkms-neutral-5);
+.bkms-themed .bk-radio-capsule .bk-radio-button:not(.is-disabled, .is-checked) .bkms-bg-card {
+  background-color: var(--bkms-neutral-10);
 }
 
-.bkms-themed .bk-radio-capsule .bk-radio-button.is-checked:not(.is-disabled):hover .bkms-bg-active {
-  background-color: var(--bkms-bg-active-hover);
+.bkms-themed .bk-radio-capsule .bk-radio-button.is-checked .bkms-tab-badge {
+  color: var(--bkms-text-brand);
+  background-color: var(--bkms-bg-active);
 }
 
 /* ══════════ bkui：form 控件（tab / button / textarea / search-select）══════════ */

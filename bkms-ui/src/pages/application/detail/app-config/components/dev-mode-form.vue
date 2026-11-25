@@ -21,7 +21,7 @@
     :collapsible="true"
     :title="$t('开发模式')"
   >
-    <div class="bkms-bg-card p-[16px] !text-[12px]">
+    <div class="bkms-bg-card p-[16px] !text-[12px] rounded-bkms-card">
       <div class="flex items-center">
         <span class="bkms-text-body mr-[16px]">
           {{ isProductionEnv ? $t('开发模式（生产环境不支持）') : $t('开发模式') }}

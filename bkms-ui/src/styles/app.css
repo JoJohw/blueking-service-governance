@@ -71,6 +71,34 @@
   background-color: var(--bkms-neutral-5);
 }
 
+/* 胶囊 Tab 两个独立类（平铺，各挂各的，互不依赖）：
+   .bkms-tab-icon   挂在 Radio.Group 上：项里只放 icon，收窄成 24×24、hover 浅一档
+   .bkms-tab-badge  挂在项内 span 上：数字角标，选中态加 .active
+   组件库本身的轨道/项选中态在 theme/manual/bkui.css，这里不重复声明 */
+.bkms-tab-icon {
+  .bk-radio-button-label {
+    padding: 0 5px;
+  }
+
+  .bk-radio-button:not(.is-checked, .is-disabled):hover {
+    background-color: var(--bkms-neutral-5);
+  }
+}
+
+.bkms-tab-badge {
+  height: 16px;
+  padding: 0 6px;
+  margin-left: 4px;
+  line-height: 16px;
+  background-color: var(--bkms-neutral-10);
+  border-radius: var(--bkms-radius-full);
+
+  &.active {
+    color: var(--bkms-text-brand);
+    background-color: var(--bkms-bg-active);
+  }
+}
+
 /* 输入/选择控件 prefix 槽内的标签：灰底 + 右侧分隔线，形态与颜色一并收编 */
 .bkms-prefix-label {
   display: inline-flex;

@@ -19,7 +19,9 @@
 <template>
   <div
     :class="[
-      type === 'card' ? 'px-[20px] py-[24px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]' : '',
+      type === 'card'
+        ? 'px-[20px] py-[24px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)] rounded-bkms-card'
+        : '',
       'flex flex-col',
     ]"
   >

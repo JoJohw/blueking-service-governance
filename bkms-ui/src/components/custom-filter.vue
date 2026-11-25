@@ -52,8 +52,8 @@
           @click.stop
         >
           <Checkbox.Group
-            v-model="activeFilters"
             class="flex flex-col w-full h-full"
+            :model-value="activeFilters"
           >
             <RecycleScroller
               :buffer="10"
@@ -66,10 +66,12 @@
               <template #default="{ item }">
                 <Checkbox
                   :key="getFilterItem(item).value"
-                  :checked="getFilterItem(item).checked"
-                  class="!ml-0 w-full text-[12px] bkms-text-body"
+                  :checked="activeFilters.includes(getFilterItem(item).value)"
+                  class="w-full"
+                  :immediate-emit-change="false"
                   :indeterminate="getFilterItem(item).value === 'all' ? isIndeterminate : false"
                   :label="getFilterItem(item).value"
+                  @change="handleToggle(getFilterItem(item).value)"
                 >
                   <span :title="String(getFilterItem(item).title ?? getFilterItem(item).label)">
                     {{ getFilterItem(item).label }}
@@ -221,6 +223,17 @@
     popoverRef.value?.hide();
   }
 
+  /**
+   * 勾选状态由组件自己维护：bkui CheckboxGroup 的 v-model 只汇总「已挂载」的 checkbox，
+   * 虚拟滚动下未渲染的选项会被丢掉——全选只能选到当前几行，再勾一次还会抹掉滚出视野的已选项。
+   * 这里按全量 filters 重算，再经 model-value 单向推回组件，让已渲染行的状态跟着同步。
+   */
+  function handleToggle(value: number | string) {
+    activeFilters.value = activeFilters.value.includes(value)
+      ? activeFilters.value.filter(item => item !== value)
+      : [...activeFilters.value, value];
+  }
+
   // 初始化：根据 filters 的 checked 属性设置选中项
   function initSelectedItems() {
     const checkedItems = props.filters?.filter(item => item.checked)?.map(item => item.value) || [];
@@ -316,42 +329,18 @@
     }
   }
 
+  /* 行高必须与 RecycleScroller 的 item-size=36 对齐，否则虚拟滚动会错位重叠 */
   :deep(.bk-checkbox) {
-    display: inline-block;
-    align-self: start;
     height: 36px;
     padding: 8px 10px 8px 12px;
-
-    .bk-checkbox-input {
-      width: 14px;
-      height: 14px;
-      border-color: var(--bkms-line-default);
-
-      /* checkbox 是 bkui 覆写中唯一豁免半径 token 的组件，保持库默认 2px */
-      box-shadow: 0 0 0 1px var(--bkms-line-default);
-    }
-
-    &:hover {
-      background-color: var(--bkms-bg-hover);
-
-      .bk-checkbox-input {
-        border-color: var(--bkms-line-active);
-        box-shadow: 0 0 0 1px var(--bkms-brand-3);
-      }
-    }
-
-    .bk-checkbox-label {
-      width: calc(100% - 22px);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
   }
 
-  :deep(.bk-checkbox.is-checked) {
-    .bk-checkbox-label {
-      color: var(--bkms-text-brand);
-    }
+  /* 弹层宽 150px，长选项必须截断，否则换行把行高撑破、虚拟滚动错位 */
+  :deep(.bk-checkbox-label) {
+    width: calc(100% - 22px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 </style>
 

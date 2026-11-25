@@ -66,10 +66,8 @@
             <div class="flex items-center justify-center">
               {{ tab.label }}
               <span
-                :class="[
-                  'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-bkms-overlay',
-                  tab.key === activeTab ? 'bkms-bg-active bkms-text-brand' : 'bkms-bg-card',
-                ]"
+                class="bkms-tab-badge"
+                :class="{ active: tab.key === activeTab }"
                 >{{ tab.count }}</span
               >
             </div>

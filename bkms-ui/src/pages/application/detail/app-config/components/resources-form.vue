@@ -35,7 +35,7 @@
       </UnderLineTips>
       <EnvScopeTag :current-env="currentEnv" />
     </template>
-    <div class="bkms-bg-card p-[16px]">
+    <div class="bkms-bg-card p-[16px] rounded-bkms-card">
       <Form
         :ref="appSpecSection.formRef"
         form-type="vertical"

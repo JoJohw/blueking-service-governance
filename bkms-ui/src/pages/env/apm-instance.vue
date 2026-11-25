@@ -18,7 +18,7 @@
 
 <template>
   <!-- APM 实例信息 -->
-  <div class="p-[16px] bkms-bg-card">
+  <div class="p-[16px] bkms-bg-card rounded-bkms-card">
     <div class="flex items-center justify-between mb-[8px]">
       <span class="text-[14px] bkms-text-secondary">{{ $t('APM 实例') }}</span>
       <Button

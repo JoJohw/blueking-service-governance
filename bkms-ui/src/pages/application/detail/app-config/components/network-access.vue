@@ -26,7 +26,7 @@
       <EnvScopeTag :current-env="currentEnv" />
     </template>
 
-    <div class="bkms-bg-card p-[16px] !text-[12px] bkms-text-body">
+    <div class="bkms-bg-card p-[16px] !text-[12px] bkms-text-body rounded-bkms-card">
       <div class="flex items-center">
         <PopConfirm
           :cancel-text="$t('取消')"

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="px-[32px] py-[12px] min-w-[520px] h-[252px] bkms-bg-card flex justify-between">
+  <div class="px-[32px] py-[12px] min-w-[520px] h-[252px] bkms-bg-card flex justify-between rounded-bkms-card">
     <div class="py-[12px]">
       <span class="bkms-text-title text-[14px] font-bold">
         {{ $t('集群健康分数') }}

@@ -34,7 +34,7 @@
     <span class="bkms-text-secondary text-[14px]">{{ $t('集群') }}：{{ envDetail.cluster?.clusterID || '--' }}</span>
   </MsHeader>
   <Skeleton
-    class="bkms-bg-card mt-[52px] p-[16px]"
+    class="bkms-bg-card mt-[52px] p-[16px] rounded-bkms-card"
     :loading="isLoading"
   >
     <template #loading>

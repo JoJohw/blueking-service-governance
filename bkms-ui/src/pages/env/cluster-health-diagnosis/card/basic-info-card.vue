@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="px-[32px] py-[24px] min-w-[520px] h-[252px] bkms-bg-card">
+  <div class="px-[32px] py-[24px] min-w-[520px] h-[252px] bkms-bg-card rounded-bkms-card">
     <span class="bkms-text-title text-[14px] font-bold">{{ $t('基础信息') }}</span>
     <div class="grid grid-cols-2 gap-y-[24px] pt-[24px]">
       <FieldItem

@@ -59,7 +59,7 @@
             </i18n-t>
           </template>
         </Alert>
-        <div class="p-[16px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+        <div class="p-[16px] bkms-bg-card shadow-[0_2px_4px_0_var(--bkms-shadow-card)] rounded-bkms-card">
           <!-- 与其他列表页一致，主操作放在表格左上方 -->
           <div
             v-if="state?.editable"

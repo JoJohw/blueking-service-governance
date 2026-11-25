@@ -18,7 +18,7 @@
 
 <template>
   <Skeleton
-    class="bkms-bg-card p-[24px]"
+    class="bkms-bg-card p-[24px] rounded-bkms-card"
     :loading="isLoading"
   >
     <template #loading>
@@ -113,7 +113,7 @@
     </template>
     <!-- 基本信息 -->
     <div
-      class="w-[clac(100% - 80px)] min-h-[172px] bkms-bg-card p-[24px] flex shadow-[0_2px_4px_0_var(--bkms-shadow-card)]"
+      class="w-[clac(100% - 80px)] min-h-[172px] bkms-bg-card p-[24px] flex shadow-[0_2px_4px_0_var(--bkms-shadow-card)] rounded-bkms-card"
     >
       <div class="w-[80px]">
         <div class="w-[100%] h-[80px] bkms-bg-brand-soft rounded-bkms-card flex items-center justify-center">
@@ -187,7 +187,9 @@
       </div>
     </div>
 
-    <div class="w-[clac(100% - 80px)] bkms-bg-card p-[24px] mt-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+    <div
+      class="w-[clac(100% - 80px)] bkms-bg-card p-[24px] mt-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)] rounded-bkms-card"
+    >
       <!-- 空间仓库 -->
       <BkmsContent :title="$t('镜像仓库')">
         <div class="grid grid-cols-4 gap-4 mt-[16px] text-[12px] w-full pl-[80px] place-items-center">
@@ -272,7 +274,9 @@
       </BkmsContent>
     </div>
 
-    <div class="w-[clac(100% - 80px)] bkms-bg-card p-[24px] mt-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)]">
+    <div
+      class="w-[clac(100% - 80px)] bkms-bg-card p-[24px] mt-[16px] shadow-[0_2px_4px_0_var(--bkms-shadow-card)] rounded-bkms-card"
+    >
       <BkmsContent :title="$t('成员管理')">
         <div class="pt-[16px]">
           <FlexRow

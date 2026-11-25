@@ -166,7 +166,7 @@
           <div class="flex-1 flex flex-col overflow-hidden pl-[40px] pr-[24px] py-[14px] bkms-bg-card">
             <!-- 标题和提示 -->
             <div class="flex items-center mb-[12px]">
-              <h3 class="text-[16px] font-bold">
+              <h3 class="text-[16px] font-bold bkms-text-title">
                 {{ currentTreeNode?.displayName || currentTreeNode?.name || $t('全部') }} ( {{ count }} )
               </h3>
               <template v-if="currentTreeNode?.type">

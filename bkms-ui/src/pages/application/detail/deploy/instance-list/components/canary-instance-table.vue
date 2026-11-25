@@ -22,7 +22,7 @@
 -->
 <template>
   <div
-    class="shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] bkms-bg-card p-[16px]"
+    class="shadow-[0_2px_4px_0_var(--bkms-shadow-hover)] bkms-bg-card p-[16px] rounded-bkms-card"
     data-testid="canary-instance-table"
   >
     <div class="flex items-center justify-between gap-[16px] mb-[16px]">

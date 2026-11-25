@@ -82,10 +82,8 @@
               >
                 <span>{{ value.label }}</span>
                 <span
-                  :class="[
-                    'h-[16px] leading-[16px] ml-[4px] px-[6px] rounded-bkms-base',
-                    componentType === key ? 'bkms-bg-active bkms-text-brand' : 'bkms-bg-card',
-                  ]"
+                  class="bkms-tab-badge"
+                  :class="{ active: componentType === key }"
                 >
                   {{ value.value.length }}
                 </span>
@@ -111,7 +109,7 @@
             </SearchSelect>
             <Radio.Group
               v-model="viewMode"
-              class="square-radio-button"
+              class="bkms-tab-icon"
               type="capsule"
             >
               <Radio.Button
@@ -524,12 +522,6 @@
 
     .bk-exception-title {
       color: var(--bkms-text-body);
-    }
-  }
-
-  .square-radio-button {
-    :deep(.bk-radio-button-label) {
-      padding: 0 5px;
     }
   }
 </style>

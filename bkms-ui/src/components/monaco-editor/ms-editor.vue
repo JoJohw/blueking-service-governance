@@ -23,7 +23,9 @@
     :class="{ 'ms-editor-readonly': readonly }"
   >
     <!-- 工具栏 -->
-    <div :class="['h-[40px] px-[16px] rounded-t-bkms-card ms-editor', lightTheme ? 'bkms-bg-title' : 'bg-bkms-neutral-1']">
+    <div
+      :class="['h-[40px] px-[16px] rounded-t-bkms-card ms-editor', lightTheme ? 'bkms-bg-title' : 'bg-bkms-neutral-1']"
+    >
       <div class="flex items-center justify-between h-full">
         <div
           :class="[

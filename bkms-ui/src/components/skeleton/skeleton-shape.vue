@@ -58,11 +58,11 @@
     }
   > = {
     white: {
-      defaultColor: 'var(--bkms-neutral-7)',
+      defaultColor: 'var(--bkms-neutral-6)',
       flickerColor: 'var(--bkms-neutral-8)',
     },
     gray: {
-      defaultColor: 'var(--bkms-neutral-7)',
+      defaultColor: 'var(--bkms-neutral-6)',
       flickerColor: 'var(--bkms-neutral-8)',
     },
   };
