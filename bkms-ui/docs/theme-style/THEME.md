@@ -1,9 +1,22 @@
 # 主题体系（UI 主题色 + 多主题地基）
 
-> 本文件是 UI 主题体系的唯一指南：分层模型、覆写规约、操作步骤、现状快照、踩坑与下一阶段待办。
+> 本文件是 UI 主题体系的**架构与规约**指南：分层模型、覆写规约、操作步骤、现状快照。
 > 2026-11-18 合并原 `THEME.md` / `THEME_STEPS.md` / `THEME-RECAP-v1.md`，历史版本见 git。
-> 可视化域（G6 / ECharts / Monaco / vxe / 第三方包）见同目录 `THIRD-PARTY-THEME.md`。
-> 原则：色值真源 = `src/styles/theme/tokens/`；`--bkms-*` 色阶只在 `tokens/color.css` 定义。
+> 可视化域（G6 / ECharts / Monaco / vxe / 第三方包）见同目录 `THIRD-PARTY-THEME.md`；决策与踩坑见 `DECISIONS.md`。
+
+## 速查（执行前先读这一段）
+
+| 事项 | 事实 |
+| --- | --- |
+| 色值真源 | `src/styles/theme/tokens/color.css`：`@layer scale` 区可写 hex，`@layer semantic` 区只写 `var()` |
+| 生成产物 | `src/styles/theme/generated/bkui/**` 生成器独占，**禁止手改**；重跑 `pnpm theme:gen` |
+| 手写层 | `manual/bkui.css`（bkui 差异）、`manual/lib/**`（第三方库）、`manual/ua.css`、`manual/boost.css` |
+| 工具链纪律与命令 | [`scripts/theme-codemod/README.md`](../../scripts/theme-codemod/README.md) |
+| 禁令 | 业务层不写 hex（stylelint `color-no-hex` + eslint `theme/no-hardcoded-color` 均 error）；覆写内不写裸 hex（原值只进注释）；`@layer semantic` 不再新增条目 |
+| 校验 | `node scripts/theme-codemod/scripts/check-overrides.mjs`、`.../check-lib.mjs`；产物闸门 `pnpm theme:gen && git diff --exit-code src/styles/theme/generated` |
+| 决策与踩坑 | [`DECISIONS.md`](./DECISIONS.md)（评审 / 排查时查，日常执行不用读） |
+
+> 速查为摘要：与正文冲突时以正文与脚本实现为准。
 
 ## 一、范围
 
@@ -118,30 +131,13 @@ src/styles/theme/
 | 命令 | `theme:report`、`node scripts/theme-codemod/scripts/check-lib.mjs`、`theme:designer` |
 | 全量 lint 基线 | 仓库存量报错未清零（非本轮引入）；改动文件零新增 |
 
-## 十一、关键决策档案
+## 十一、关键决策档案（已归档）
 
-1. **class 覆写取代编译期替换**（`31dd8251`）：postcss 替换层退役，改生成器产出 `.bkms-themed` 覆写；漂移自检对 `style.variable.css` + `dist/style.css` 双源校验。
-2. **uno 令牌扁平注册**（`aa9f621a`）：unocss 按 `-` 切段查 theme，嵌套 key 静默丢弃；`resolveThemeDir()` 用 cwd 优先 + 存在性兜底（unconfig 打包后 `import.meta.url` 指向临时目录）。
-3. **级联保护与双源扫描**（`aa9f621a`、`77c7714b`）：覆写规则的全部色彩类声明随行生成；`transparent` / 令牌值命中原值保留；`dist/style.css`（lib/*.less 编译产物）选择器可能更具体，需单独成域复刻。
-4. **桥接分域、每域单一聚合入口**（`283c2a0a`）：变量层由 `bkui.ts` 紧随 `style.variable.css` 加载，不走 `index.css`（否则 dev 下 `:root` 后者覆盖）。
-5. **产物自举与一次性台账退役**（`9dee3d2b`）：`mapping.json` / `pending-design.json` / 备份文件不再入库，色值真源收敛到 `color.css` + 产物注释。
-6. **规则插件拆分**（`83c86081`）：颜色 / 圆角各成模块，`plugin.mjs` 只聚合；`map.mjs` 与 `uno.config.ts` 同源。
-7. **semantic.css 冻结、magicbox 不接入**：`@blueking/magicbox-theme` 架构同构但色板是另一套规范，暂不接入；新语义走 uno shortcut 语义类或场景类。
-8. **viz 域独立**（2026-11-18）：图表 / 编辑器 / 语法高亮不再派生 `--bkms-*`，详见 `THIRD-PARTY-THEME.md`。
+8 条关键决策已移至 [`DECISIONS.md`](./DECISIONS.md) 第一节。日常执行只需记住其中两条禁令：`@layer semantic` 不再新增条目；生成产物禁止手改。
 
-## 十二、踩坑清单
+## 十二、踩坑清单（已归档）
 
-| 坑 | 实证 | 结论 |
-| --- | --- | --- |
-| 生成器清理丢手写补丁 | `cleanGeneratedDir` 曾整目录 `rmSync` | 手写域必须平级分域，清理只删自有 `<kebab>.css` |
-| canvas 不解析 `var()` | `597f26b5` minimap `fill` 改 `var()` → `f8e6b7da` 改回实色 | 字典经 var 链解析后必须实色，桥接层负责解析与兜底 |
-| `import.meta.url` 指向临时目录 | `aa9f621a` 引入 `resolveThemeDir()` | cwd 优先 + 存在性校验 |
-| `.ts` 颜色字符串不在 codemod 台账 | 口径 65 处 `<script>`、明确不含 `.ts` | 记为已知盲区，不假装已全量覆盖 |
-| 根 `.gitignore` 的 `*vendor*` | 曾致覆写目录与校验脚本被忽略；两者已改名 `lib` / `check-lib.mjs` 规避 | 新增含 vendor 字样的路径必须 `git status -uall` 复核 |
-| markdown 自定义属性 camelCase | `--fgColor-*` 触发 `custom-property-pattern` | 第三方变量名同名重指向，用定点 `stylelint-disable` |
-| 业务 scoped 覆盖被覆写层压掉 | `batch-release-progress-panel` 的 `background-image: none`：业务 `[data-v] .bk-step.done .bk-step-number::after` (0,4,0) < `steps.css` `.bkms-themed .bk-steps-primary .bk-step.done .bk-step-indicator:after` (0,5,0) | 覆写层比库原规则多一级 `.bkms-themed`，业务 4 类以内的覆盖由「同分靠顺序」变成「必然输」；`:deep()` 补层级（`.bk-steps.bk-steps-primary .bk-step`）或 `!important` |
-| 同元素不同类名致覆盖误判 | bkui Steps 的 `.bk-step-indicator` 与 `.bk-step-number` 是同一个 `span`（`lib/steps/index.js` render） | 排查覆盖失效以 DOM 实际元素为准，不能只比对类名；按类名扫权重会漏这类 |
-| 业务覆盖与覆写层平手 | `custom-navigation.vue`（header/container）、`helm-file-list.vue`（tree hover）与 `navigation.css` / `tree.css` 均 4:4 | dev 靠 scoped 后注入取胜，生产打包顺序变化会翻转；值不同的平手项需按需加固 |
+9 条踩坑实证已移至 [`DECISIONS.md`](./DECISIONS.md) 第二节。新增路径、排查覆盖失效、业务 scoped 被压时再查。
 
 ## 十三、下一阶段待办
 

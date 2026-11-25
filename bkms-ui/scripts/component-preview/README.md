@@ -2,6 +2,18 @@
 
 扫描 `src/` 下的业务组件，自动推导占位样例、叠加业务域插件的手写特例，生成**组件预览清单**与**接口 mock 样例**，供设计师在预览页浏览全仓组件形态。
 
+## 速查（执行前先读这一段）
+
+| 事项 | 事实 |
+| --- | --- |
+| 生成 | `node scripts/component-preview/index.mjs`；只读检查加 `--check`（已接入 `pnpm test:ci`，PR 前可本地单跑） |
+| 确认基线 | `--baseline --only <id>`；条目骤降 >10% 时 `--prune` 会拒绝执行 |
+| 改样例 | 只改 `plugins/*.mjs`；`src/pages/designer/generated/**` 是产物，**禁止手改** |
+| 测试 | `pnpm test:scripts`（9 个生成器测试文件）；`pnpm test:ci` 全链路 |
+| 设计侧操作 | `.agents/skills/component-preview-designer/SKILL.md`；开发侧同步规范见 `component-preview-sync` |
+
+> 速查为摘要：与正文冲突时以正文与脚本实现为准。
+
 ## 是什么
 
 - **输入**：`src/**/components/**/*.vue`（扫描范围可配）+ `src/api/modules/*.ts`（接口类型）+ `plugins/*.mjs`（手写特例）。

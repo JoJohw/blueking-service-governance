@@ -4,7 +4,7 @@
 
 工具保留两种运行方式：独立预览（`pnpm theme:designer`，组件预览视图会提示需在主应用打开），以及内嵌在主应用的 `/#/__designer`（组件预览可用）。
 
-功能演进见[更新记录](./CHANGELOG.md)。
+架构分层、数据流、扩展点与命令速查见 [`docs/PALETTE.md`](../../docs/PALETTE.md)（本文只讲视图自身的交互与数据口径）；组件样例如何生成见 [`scripts/component-preview/README.md`](../../scripts/component-preview/README.md)。
 
 ## 启动
 

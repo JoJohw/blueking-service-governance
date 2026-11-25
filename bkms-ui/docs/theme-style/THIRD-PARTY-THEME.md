@@ -4,6 +4,18 @@
 > 2026-11-18 合并原 `THIRD-PARTY-THEME-v1/v2.md` 与 `pending.md`，历史见 git。UI 主题体系见 `THEME.md`。
 > **核心口径：viz 是独立域，不从 `--bkms-*` 派生。** UI 换品牌色或换主题都不带动图表；图表色由可视化场景决定。
 
+## 速查（执行前先读这一段）
+
+| 事项 | 事实 |
+| --- | --- |
+| 令牌真源 | `src/styles/theme/tokens/viz.css`（33 个），与 UI 令牌分层，**不复用** `--bkms-*` |
+| canvas 库（G6 / ECharts / Monaco） | 必须传**实色**：`getComputedStyle` 解析后注入原生 API，直接传 `var()` 会被解析成透明 |
+| DOM 库（vxe / bk 业务包 / markdown / highlight） | 走 `src/styles/theme/manual/lib/**`，一库一文件，变量覆写 + 选择器覆写 |
+| 漂移自检 | `node scripts/theme-codemod/scripts/check-lib.mjs`（库升级后必跑，失效即 exit 1） |
+| 禁令 | viz 令牌不引用 UI 令牌；不为图表新增 UI 语义令牌 |
+
+> 速查为摘要：与正文冲突时以正文与脚本实现为准。
+
 ## 一、为什么独立
 
 图表 / 编辑器 / 语法高亮各有语义：数据分类色必须多项可区分，编辑器界面色要贴合深色基底，语法 token 与外部约定绑定。这些值跟着 UI 品牌色变会误读。
@@ -95,7 +107,7 @@ manual/lib/             覆写层    不提供 API 的库直接改 CSS（手写�
 | P4 | minimap 遮罩 17.6% → 20% | 保留 `#0000002d`（ΔE00 1.44，不可辨） |
 | P8 | 状态块 error `#FEDDDD` | 保留（ΔE00 0.22）；表单校验底另走 `--bkms-bg-danger-soft`，用途不同 |
 | P9 | lib 覆写边界 | 只覆写 CSS，不改第三方源码（项目无 patch 机制） |
-| P10 | 65 处 `<script>` 台账口径 | 记入 `THEME.md` 踩坑清单，标为已知盲区 |
+| P10 | 65 处 `<script>` 台账口径 | 记入 `DECISIONS.md` 踩坑清单，标为已知盲区 |
 
 ## 九、验证与遗留
 

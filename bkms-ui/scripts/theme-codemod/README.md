@@ -3,6 +3,18 @@
 支撑 bkms-ui 主题色体系（`--bkms-*` 令牌 + bkui class 覆写层）的生成与自检。
 方案与分层模型见 `docs/theme-style/THEME.md`（第九节为操作步骤），第三方库可视化主题见 `docs/theme-style/THIRD-PARTY-THEME.md`。
 
+## 速查（执行前先读这一段）
+
+| 事项 | 事实 |
+| --- | --- |
+| 映射真源 | `scripts/theme-codemod/scripts/config/overrides.mjs` 的 `HEX_TOKENS` 是 `hex → token` **唯一**人工维护处；令牌本体在 `src/styles/theme/tokens/` |
+| 生成 | `pnpm theme:gen` → `src/styles/theme/generated/bkui/**`；产物**禁止手改**，闸门 `pnpm theme:gen && git diff --exit-code src/styles/theme/generated` |
+| 校验 | `node scripts/theme-codemod/scripts/check-overrides.mjs`（bkui 双源漂移）、`node scripts/theme-codemod/scripts/check-lib.mjs`（第三方库漂移） |
+| 手写层 | `src/styles/theme/manual/**`，生成器不读不写，改它不需要重跑生成 |
+| 台账 | `scripts/theme-codemod/reports/**` 已 gitignore，可随时重生成，不入库 |
+
+> 速查为摘要：与正文冲突时以正文与脚本实现为准。本表路径按**项目根**书写，正文中同名路径是**相对本目录**的简写。
+
 ## 目录结构
 
 ```
@@ -15,7 +27,7 @@ theme-codemod/
 │   │   ├── overrides.mjs            # 颜色：组件族收编（EXTRA_OWNERS）+ 类前缀别名（PREFIX_ALIAS）+ 旧色→新色映射（HEX_TOKENS）
 │   │   └── radius-components.json   # 圆角：组件族 + 选择器级 token 分派
 │   └── lib/                         # 共用解析工具
-└── reports/    # 运行产出台账（脚本输出，可随时重生成；designer-review 为拍板记录）
+└── reports/    # 运行产出台账（脚本输出，可随时重生成，已 gitignore；设计拍板记录不入本目录）
 ```
 
 `config/` 收两类输入：按组件库事实增补的白名单/别名，以及人工维护的 `hex → token` 映射。算法参数（匹配、分段、清理策略）留在各自生成器里；收编一个被第三方包渲染但 `stats-usage` 判为未使用的类族，改这里即可。
