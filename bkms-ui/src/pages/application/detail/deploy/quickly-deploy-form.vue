@@ -37,7 +37,7 @@
       <!-- 分批更新与修改实例数互斥：已选择分批时锁定实例数，并说明如何调整 -->
       <div
         v-if="replicasLockedHint"
-        class="mt-[4px] text-[12px] leading-[20px] text-[#979BA5]"
+        class="mt-[4px] text-[12px] leading-[20px] bkms-text-secondary"
       >
         {{ replicasLockedHint }}
       </div>

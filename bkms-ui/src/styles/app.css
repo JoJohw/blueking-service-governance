@@ -165,33 +165,6 @@
   height: 100% !important;
 }
 
-.bkms-dropdown-item {
-  display: block;
-  height: 32px;
-  padding: 0 16px;
-  font-size: 12px;
-  line-height: 32px;
-  color: var(--bkms-text-body);
-  white-space: nowrap;
-  text-decoration: none;
-  cursor: pointer;
-
-  &:hover:not(.disabled) {
-    color: var(--bkms-text-brand);
-    background-color: var(--bkms-bg-hover);
-  }
-
-  &.disabled {
-    color: var(--bkms-text-disabled);
-    cursor: not-allowed;
-  }
-
-  &.active {
-    color: var(--bkms-text-brand);
-    background-color: var(--bkms-bg-active);
-  }
-}
-
 .bkms-underline {
   text-decoration-line: underline;
   text-decoration-thickness: 1px;

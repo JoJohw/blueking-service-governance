@@ -116,7 +116,7 @@
           <div class="flex items-center gap-[4px] text-[12px] leading-[20px]">
             <span class="font-700 text-bkms-neutral-1">{{ t('发布批次') }}</span>
             <span class="text-bkms-danger-2">*</span>
-            <!-- <span class="text-[#979ba5]"> （{{ t('更新实例会换镜像；调整流量只改已更新实例的北极星权重') }}） </span> -->
+            <!-- <span class="bkms-text-secondary"> （{{ t('更新实例会换镜像；调整流量只改已更新实例的北极星权重') }}） </span> -->
           </div>
 
           <div class="batch-layout flex items-start gap-[16px]">

@@ -114,7 +114,7 @@
 <style lang="postcss" scoped>
   /* 深色导航下激活态高亮（组件默认 #3a84ff 偏暗） */
   .bk-login-userinfo.is-active {
-    color: #c2cee5;
+    color: var(--bkms-neutral-4);
   }
 </style>
 
