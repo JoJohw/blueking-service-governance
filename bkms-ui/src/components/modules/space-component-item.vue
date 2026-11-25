@@ -52,7 +52,11 @@
     </div>
     <div class="h-[24px] flex items-center">
       <span class="bkms-text-secondary mr-[4px] shrink-0">{{ $t('更新人') }} : </span>
-      <span class="bkms-text-title">{{ curCom?.updater || '--' }}</span>
+      <UserDisplay
+        class="bkms-text-title"
+        :plain="curCom?.isBuiltin"
+        :value="curCom?.updater"
+      />
     </div>
     <div class="h-[24px] flex items-center">
       <span class="bkms-text-secondary mr-[4px] shrink-0">{{ $t('已添加实例') }} : </span>

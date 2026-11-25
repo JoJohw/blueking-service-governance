@@ -33,6 +33,7 @@
           <SearchSelect
             v-model="searchValue"
             class="min-w-[560px] bkms-bg-card relative z-[100]"
+            v-bind="searchSelectBind"
             :data="searchData"
             :placeholder="
               createPlaceholder({
@@ -139,7 +140,7 @@
               :min-width="120"
             >
               <template #default="{ row }">
-                {{ row.operator || '--' }}
+                <UserDisplay :value="row.operator" />
               </template>
             </TableColumn>
             <TableColumn
@@ -193,6 +194,7 @@
   import usePageConf from '~/composables/use-page';
   import { useSearchPlaceholder } from '~/composables/use-search-placeholder';
   import useTime from '~/composables/use-time';
+  import useUserSearch from '~/composables/use-user-search';
   import { useAppDetail } from '~/stores/app-detail';
   import { useTrpcDeployStore } from '~/stores/trpc-deploy';
 
@@ -206,6 +208,9 @@
   const { appStatusTextMap: deployStatusTextMap, appStatusColorMap: deployStatusColorMap } = useDeployStatusMap();
   const appDetailStore = useAppDetail();
   const trpcDeployStore = useTrpcDeployStore();
+
+  // 多租户环境下操作人支持远程人员搜索（配置装饰与 hooks 由 composable 统一提供）
+  const { decorateSearchData, searchSelectBind } = useUserSearch('operator');
 
   const searchValue = ref<Array<{ id: string; name: string; values?: Array<{ id: string; name: string }> }>>([]);
   const tableData = ref<AppModelDeployRecordOutputObj[]>([]);
@@ -228,17 +233,13 @@
     return row.deploySource === DEPLOY_SOURCE.BUILD_AUTO_DEPLOY || !!row.isBuildAutoDeploy;
   }
 
-  // 搜索配置
-  const searchData = [
-    {
-      name: t('镜像 Tag'),
-      id: 'imageTag',
-    },
-    {
-      name: t('操作人'),
-      id: 'operator',
-    },
-  ];
+  // 搜索配置（操作人项的远程/本地行为由 decorateSearchData 按多租户标记）
+  const searchData = computed(() =>
+    decorateSearchData([
+      { name: t('镜像 Tag'), id: 'imageTag' },
+      { name: t('操作人'), id: 'operator' },
+    ]),
+  );
 
   // 从 searchValue 中提取搜索关键字
   const searchKeyword = computed(() => {

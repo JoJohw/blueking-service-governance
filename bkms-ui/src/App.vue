@@ -79,36 +79,7 @@
             </span>
           </template>
           <template #right>
-            <bk-popover
-              :arrow="false"
-              ext-cls="!px-0 !py-[4px]"
-              :offset="{
-                mainAxis: 14,
-                crossAxis: 5,
-              }"
-              placement="bottom-start"
-              theme="light"
-              trigger="click"
-              @after-hidden="isPopoverShow = false"
-              @after-show="isPopoverShow = true"
-            >
-              <div class="flex items-center cursor-pointer">
-                <span class="mr-[5px]">{{ userStore.userInfo.user_id }}</span>
-                <AngleDownFill :class="[isPopoverShow ? '' : 'rotate-180']" />
-              </div>
-              <template #content>
-                <ul>
-                  <li
-                    v-for="userItem in userConfigList"
-                    :key="userItem.name"
-                    class="bkms-dropdown-item"
-                    @click="handleClickLi(userItem)"
-                  >
-                    {{ userItem.name }}
-                  </li>
-                </ul>
-              </template>
-            </bk-popover>
+            <UserInfo />
           </template>
         </FlexRow>
       </template>
@@ -125,13 +96,13 @@
   import NoticeComponent from '@blueking/notice-component';
   import { useHead } from '@vueuse/head';
   import { Divider, Navigation } from 'bkui-vue';
-  import { AngleDownFill } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
   import ApplyPerm from '~/components/apply-perm.vue';
   import { useEventBus } from '~/composables/use-event-bus';
   import usePlatform from '~/composables/use-platform';
   // import { useTheme } from '~/composables/use-theme';
+  import { useFrontendFeaturesStore } from '~/stores/frontend-features';
   import { useUserStore } from '~/stores/user';
 
   import { getNavList } from './composables/use-menu';
@@ -139,12 +110,6 @@
   import { useSpaceStore } from './stores/space';
 
   import '@blueking/notice-component/dist/style.css';
-
-  interface IConfig {
-    name: string;
-    path: string;
-    event: () => void;
-  }
 
   const { t } = useI18n();
 
@@ -159,6 +124,8 @@
   const userStore = useUserStore();
   // 空间相关全局store
   const spaceStore = useSpaceStore();
+  // 前端功能开关store
+  const frontendFeaturesStore = useFrontendFeaturesStore();
 
   // 通知组件apiUrl
   const bkNoticeApiUrl = computed(() => {
@@ -188,43 +155,9 @@
       route?.name === 'designer' ||
       route.meta.menuId === 'PLATFORM',
   );
-  // // 用户相关配置列表(等待产品确认)
-  const userConfigList = computed<IConfig[]>(() => {
-    const list: IConfig[] = [
-      {
-        name: t('退出登录'),
-        path: '',
-        event: handleLogout,
-      },
-    ];
-    if (userStore.hasPlatformRole) {
-      list.unshift({
-        name: t('平台管理'),
-        path: '/platform',
-        event: handleGotoPlatform,
-      });
-    }
-    return list;
-  });
-
-  function handleClickLi(item: IConfig) {
-    item.event();
-  }
-  // 跳转平台管理
-  function handleGotoPlatform() {
-    spaceStore.updateCurrentSpace('');
-    router.push({ name: 'platform' });
-  }
-  // 退出登录
-  function handleLogout() {
-    // 注销登录只注销当前登录态，清除bk_token，不做登录弹窗
-    window.location.href = `${window.BK_LOGIN_URL}?is_from_logout=1&c_url=${encodeURIComponent(window.location.href)}`;
-  }
 
   // 一级导航列表
   const navList = getNavList();
-  // 用户popover弹框
-  const isPopoverShow = ref(false);
 
   // 跳转首页
   function handleGotoHome() {
@@ -287,6 +220,7 @@
     spaceStore.handleGetWorkspaceList();
     getPlatformInfo();
     userStore.getRoleInfo();
+    frontendFeaturesStore.getFrontendFeatures();
   });
 </script>
 <style lang="postcss" scoped>

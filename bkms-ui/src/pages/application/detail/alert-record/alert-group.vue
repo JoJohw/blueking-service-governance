@@ -81,9 +81,9 @@
             overflow-mode="popover"
           >
             <template #default="{ item }: { item: UserGroupUser }">
-              <span class="flex items-center gap-[4px] rounded-bkms-base px-[8px] bg-bkms-neutral-6 cursor-default">
+              <span class="flex items-center gap-[4px] rounded-bkms-overlay px-[8px] bg-bkms-neutral-6 cursor-default">
                 <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
-                {{ item.display_name || item.id || '--' }}
+                <AlertMemberName :member="item" />
               </span>
             </template>
           </MoreTag>
@@ -166,6 +166,7 @@
   import { useSpaceStore } from '~/stores/space';
 
   import AlertGroupForm from './components/alert-group-form.vue';
+  import AlertMemberName from './components/alert-member-name.vue';
 
   import type { ISearchValue } from 'bkui-vue/lib/search-select/utils';
   import type { UserGroup, UserGroupUser } from '~/@types/v1/bkintegrations-bkmonitor';

@@ -18,6 +18,7 @@
 
 import { createApp } from 'vue';
 
+import BkUserDisplayName from '@blueking/bk-user-display-name';
 import { LineChart } from 'echarts/charts';
 import { GridComponent, LegendComponent, TitleComponent, ToolboxComponent, TooltipComponent } from 'echarts/components';
 // @blueking/monitor-vue3-components 内部通过 echarts/core 的 init() 初始化图表，
@@ -37,10 +38,12 @@ echarts.use([
 ]);
 
 import { getUser } from '~/api/modules/user';
+import { getUserDisplayConfig } from '~/common/bk-user-api';
 import { initTheme } from '~/composables/use-theme';
 import { scopeIconSpriteIds } from '~/fonts/icon-sprite';
 import { registerMonitorChartApi } from '~/pages/application/detail/deploy/monitor-chart-bridge.js';
 import { isDesignerFrameLocation } from '~/pages/designer/preview/designer-route';
+import { useFrontendFeaturesStore } from '~/stores/frontend-features';
 import { useUserStore } from '~/stores/user';
 
 import App from './App.vue';
@@ -86,24 +89,28 @@ import '~/styles/theme/index.css';
 let mounted = false;
 
 async function bootstrap() {
-  let user: Parameters<ReturnType<typeof useUserStore>['setUserInfo']>[0] | undefined;
+  let res: Parameters<ReturnType<typeof useUserStore>['setUserInfo']>[0] | undefined;
   if (isDesignerFrameLocation()) {
     const { isolateRequests } = await import('./pages/designer/preview/request-isolation');
     // 丢弃 isolateRequests 返回的 restore：frame 整个生命周期都需要请求隔离（无真实 user / 后端上下文），
     // 故意不还原，引用计数永不归零，组件内任何「卸载时还原」都不会真正卸掉打桩。
     isolateRequests();
   } else {
-    user = await getUser({}, { needRes: true });
+    res = await getUser();
   }
   const app = createApp(App);
   // 安装modules下面所有模块
   Object.values(import.meta.glob<{ install: UserModule }>('./modules/*.ts', { eager: true })).forEach(i => {
     i.install?.({ app });
   });
+  const userStore = useUserStore();
+  if (res) userStore.setUserInfo(res);
+  await useFrontendFeaturesStore().load();
+  const userDisplayConfig = getUserDisplayConfig(userStore.tenantId);
+  if (userDisplayConfig) BkUserDisplayName.configure(userDisplayConfig);
   registerMonitorChartApi(app);
   app.mount('#app');
   mounted = true;
-  if (user) useUserStore().setUserInfo(user);
 }
 
 void bootstrap().catch((error: unknown) => {

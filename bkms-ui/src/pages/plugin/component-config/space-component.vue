@@ -222,7 +222,10 @@
             width="150"
           >
             <template #default="{ row }">
-              {{ row.updater || '--' }}
+              <UserDisplay
+                :plain="row.isBuiltin"
+                :value="row.updater"
+              />
             </template>
           </TableColumn>
           <TableColumn

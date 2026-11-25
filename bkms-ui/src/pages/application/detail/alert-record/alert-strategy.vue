@@ -127,19 +127,27 @@
             overflow-mode="popover"
           >
             <template #default="{ item }">
-              <span
-                v-bk-tooltips="{
-                  content: getUserGroupUsers(item)
-                    .map(u => u.display_name || u.id || '--')
-                    .join('，'),
-                  delay: 300,
-                  disabled: !getUserGroupUsers(item).length,
-                }"
-                class="flex items-center gap-[4px] rounded-bkms-base px-[8px] bg-bkms-neutral-6 cursor-default"
+              <Popover
+                :disabled="!getUserGroupUsers(item).length"
+                :popover-delay="[300, 0]"
+                render-type="shown"
+                theme="dark"
+                trigger="hover"
               >
-                <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
-                {{ userGroupMap.get(String(item))?.name || item }}
-              </span>
+                <span class="flex items-center gap-[4px] rounded-bkms-base px-[8px] bg-bkms-neutral-6 cursor-default">
+                  <i class="bkms-icon bkms-icon-usergroup bkms-text-secondary text-[14px]"></i>
+                  {{ userGroupMap.get(String(item))?.name || item }}
+                </span>
+                <template #content>
+                  <template
+                    v-for="(member, index) in getUserGroupUsers(item)"
+                    :key="index"
+                  >
+                    <template v-if="index > 0">，</template>
+                    <AlertMemberName :member="member" />
+                  </template>
+                </template>
+              </Popover>
             </template>
           </MoreTag>
           <span v-else>--</span>
@@ -216,7 +224,7 @@
   import type { Ref } from 'vue';
 
   import { Table, TableColumn } from '@blueking/table';
-  import { Button, InfoBox, Message, PopConfirm, SearchSelect, Switcher } from 'bkui-vue';
+  import { Button, InfoBox, Message, PopConfirm, Popover, SearchSelect, Switcher } from 'bkui-vue';
   import { Plus } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
@@ -231,6 +239,7 @@
   import { useAppDetail } from '~/stores/app-detail';
   import { useSpaceStore } from '~/stores/space';
 
+  import AlertMemberName from './components/alert-member-name.vue';
   import SeverityLabel from './components/severity-label.vue';
   import StrategyForm, { strategyCodeOptions } from './components/strategy-form.vue';
 

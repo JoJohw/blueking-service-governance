@@ -250,7 +250,9 @@
                   class="items-center gap-[8px]"
                   :label="langMap.label.creator"
                 >
-                  <div class="bkms-text-title">{{ currentVersion.creator }}</div>
+                  <div class="bkms-text-title">
+                    <UserDisplay :value="currentVersion.creator" />
+                  </div>
                 </DetailItem>
               </div>
             </ComponentLabel>

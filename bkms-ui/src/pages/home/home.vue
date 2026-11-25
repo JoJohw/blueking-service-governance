@@ -91,8 +91,8 @@
                 <div>
                   <div class="text-[20px] font-bold bkms-text-title">
                     {{ greetingText }}，
-                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-bkms-purple-2 to-bkms-brand-2"
-                      >{{ userStore.userInfo.user_id || '--' }} ~
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-bkms-purple-2 to-bkms-brand-2">
+                      <UserDisplay :value="userStore.userInfo.user_id" /> ~
                     </span>
                   </div>
                   <div class="text-[14px] bkms-text-secondary mt-[4px]">{{ $t('欢迎回到蓝鲸服务治理平台') }} ~</div>

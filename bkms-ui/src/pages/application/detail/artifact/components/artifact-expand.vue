@@ -166,13 +166,14 @@
   import { computed, h, onMounted, ref } from 'vue';
 
   import { Button, OverflowTitle, Tag, Timeline } from 'bkui-vue';
-  import { useI18n } from 'vue-i18n';
+  import { I18nT, useI18n } from 'vue-i18n';
   import { AppImageOutputObj, ImageTagDeployRecordOutputObj } from '~/@types/v1/images';
   import { ImagesService } from '~/api/modules/v1';
   import { APP_DEPLOY_STATUS, HELM_DEPLOY_STATUS } from '~/common/enums/deploy';
   import { formatSize } from '~/common/util';
   import FieldItem from '~/components/field-item.vue';
   import SvgIcon from '~/components/svg-icon.vue';
+  import UserDisplay from '~/components/user-display.vue';
   import { groupDeployedEnvs } from '~/composables/use-deployed-envs';
   import useTime from '~/composables/use-time';
   import { useAppDetail } from '~/stores/app-detail';
@@ -239,12 +240,13 @@
     });
 
   function buildTimelineTag(record: ImageTagDeployRecordOutputObj) {
-    const tagText = t('{0} 部署 {1}', [record.operator, getEnvDisplayName(record?.envName ?? '')]);
+    const envName = getEnvDisplayName(record.envName ?? '');
     const { color, label } = getDeployStatusConfig(record?.status ?? '');
     const tagTextVNode = h(
       OverflowTitle,
       { type: 'tips', style: { color: 'var(--bkms-neutral-2)', minWidth: 0 } },
-      () => tagText,
+      () =>
+        h(I18nT, { keypath: '{0} 部署 {1}' }, { default: () => [h(UserDisplay, { value: record.operator }), envName] }),
     );
     const statusVNode = h('span', { style: { color, flexShrink: '0', fontSize: '12px' } }, `（${t(label)}）`);
 
