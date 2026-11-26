@@ -59,6 +59,7 @@ vi.mock('monaco-editor', () => {
       },
       setModelMarkers: mocks.setMarkers,
       setModelLanguage: mocks.setLanguage,
+      defineTheme: () => {},
     },
   };
 });

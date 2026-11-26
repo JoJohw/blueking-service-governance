@@ -257,6 +257,14 @@ vi.mock('bkui-vue', async () => {
   });
   return {
     Divider: slot,
+    Dropdown: Object.assign(
+      defineComponent({
+        name: 'DropdownStub',
+        inheritAttrs: false,
+        setup: (_, { slots }) => () => h('div', slots.default?.()),
+      }),
+      { DropdownItem: slot, DropdownMenu: slot },
+    ),
     Input: input,
     Message: mocks.message,
     Progress: slot,
@@ -323,6 +331,7 @@ async function mountSlider(
     select,
     instanceSelect,
     chart,
+    rankSort: () => wrapper.findComponent({ name: 'SortDropdown' }),
     sortHeader: (field: string) => wrapper.get<HTMLButtonElement>(`[data-field="${field}"] button`),
     cells: (field: string) => wrapper.findAll(`[data-field="${field}"] [data-cell]`).map(cell => cell.text()),
     rows: () => wrapper.getComponent({ name: 'SummaryTableStub' }).props('data'),
@@ -510,11 +519,11 @@ describe('实例监控侧栏', () => {
     vi.useRealTimers();
     vi.useFakeTimers({ toFake: ['Date', 'setTimeout', 'clearTimeout'] });
     vi.setSystemTime(new Date(2026, 10, 5, 12));
-    const { wrapper, chart, select } = await mountSlider();
+    const { wrapper, chart, select, rankSort } = await mountSlider();
     const limitInput = wrapper.get<HTMLInputElement>('input[type="number"]');
     limitInput.element.value = '20';
     await limitInput.trigger('input');
-    select('bottom').vm.$emit('update:modelValue', 'bottom');
+    rankSort().vm.$emit('update:order', 'asc');
     select('avg').vm.$emit('update:modelValue', 'avg');
     await limitInput.trigger('blur');
     await flushPromises();
@@ -732,14 +741,16 @@ describe('实例监控侧栏', () => {
 
   it('勾选后排序下拉框和表头使用同一批候选，各次排名只触发一轮时序', async () => {
     const candidates = ['pod-1', 'pod-2', 'pod-memory', 'pod-cpu', 'pod-exact-cpu', 'pod-tiny-cpu'];
-    const { wrapper, select, sortHeader, chart, rows, cells, instanceSelect } = await mountSlider({ prod: candidates });
-    const rankBy = select('cpu_limit_usage');
-    const rankType = select('bottom');
+    const { wrapper, sortHeader, chart, rows, cells, instanceSelect, rankSort } = await mountSlider({
+      prod: candidates,
+    });
+    const rankField = () => rankSort().props('modelValue');
+    const rankTypeOf = () => (rankSort().props('order') === 'asc' ? 'bottom' : 'top');
     const memoryUsageHeader = sortHeader('memUsage');
     const cpuUsageHeader = sortHeader('cpuUsage');
 
-    expect(rankBy.props('disabled')).toBe(false);
-    expect(rankType.props('disabled')).toBe(false);
+    expect(rankField()).toBe('cpu_limit_usage');
+    expect(rankTypeOf()).toBe('top');
     expect(memoryUsageHeader.element.disabled).toBe(false);
     expect(cpuUsageHeader.element.disabled).toBe(false);
     const help = wrapper.get('[aria-label^="所有图表按"]');
@@ -748,7 +759,7 @@ describe('实例监控侧栏', () => {
       '所有图表按「CPU 使用率」的 SUM 汇聚结果在所选时段内的均值降序，取前 10 个实例',
     );
 
-    await rankType.setValue('bottom');
+    rankSort().vm.$emit('update:order', 'asc');
     await flushPromises();
     expect(mocks.rankInstances).toHaveBeenLastCalledWith(
       expect.objectContaining({ instances: candidates, rankBy: 'cpu_limit_usage', rankType: 'bottom' }),
@@ -756,9 +767,9 @@ describe('实例监控侧栏', () => {
     expect(mocks.rankInstances).toHaveBeenCalledTimes(2);
 
     mocks.rankInstances.mockResolvedValueOnce([{ instance: 'pod-memory', value: 1.5 * 1024 ** 2, unit: 'bytes' }]);
-    await rankBy.setValue('memory_usage');
+    rankSort().vm.$emit('update:modelValue', 'memory_usage');
     await flushPromises();
-    expect(rankType.props('modelValue')).toBe('bottom');
+    expect(rankTypeOf()).toBe('bottom');
     expect(mocks.rankInstances).toHaveBeenLastCalledWith(
       expect.objectContaining({ instances: candidates, rankBy: 'memory_usage', rankType: 'bottom' }),
     );
@@ -775,7 +786,7 @@ describe('实例监控侧栏', () => {
 
     await memoryUsageHeader.trigger('click');
     await flushPromises();
-    expect(rankType.props('modelValue')).toBe('top');
+    expect(rankTypeOf()).toBe('top');
     expect(mocks.rankInstances).toHaveBeenLastCalledWith(
       expect.objectContaining({ instances: candidates, rankBy: 'memory_usage', rankType: 'top' }),
     );
@@ -783,7 +794,7 @@ describe('实例监控侧栏', () => {
 
     await memoryUsageHeader.trigger('click');
     await flushPromises();
-    expect(rankType.props('modelValue')).toBe('bottom');
+    expect(rankTypeOf()).toBe('bottom');
     expect(mocks.rankInstances).toHaveBeenCalledTimes(5);
 
     mocks.rankInstances.mockResolvedValueOnce([
@@ -793,8 +804,8 @@ describe('实例监控侧栏', () => {
     ]);
     await cpuUsageHeader.trigger('click');
     await flushPromises();
-    expect(rankBy.props('modelValue')).toBe('cpu_usage');
-    expect(rankType.props('modelValue')).toBe('top');
+    expect(rankField()).toBe('cpu_usage');
+    expect(rankTypeOf()).toBe('top');
     expect(mocks.rankInstances).toHaveBeenLastCalledWith(
       expect.objectContaining({ instances: candidates, rankBy: 'cpu_usage', rankType: 'top' }),
     );
@@ -818,7 +829,7 @@ describe('实例监控侧栏', () => {
     await wrapper.setProps({ isShow: true });
     chart().vm.$emit('plot-width-change', 450);
     await flushPromises();
-    expect(rankBy.props('modelValue')).toBe('cpu_limit_usage');
+    expect(rankField()).toBe('cpu_limit_usage');
     expect(mocks.rankInstances).toHaveBeenLastCalledWith(
       expect.objectContaining({ rankBy: 'cpu_limit_usage', rankType: 'top', limit: 10 }),
     );
@@ -888,12 +899,12 @@ describe('实例监控侧栏', () => {
 
   it('过期排名不会发起时序，旧图表结果也不会覆盖新汇总', async () => {
     const { promise, resolve } = deferred<ReturnType<typeof rank>>();
-    const { wrapper, chart, select, rows, emitMetric } = await mountSlider();
+    const { wrapper, chart, rows, emitMetric, rankSort } = await mountSlider();
     const oldQueryId = chart().props('queryId');
     mocks.rankInstances.mockReturnValueOnce(promise).mockResolvedValueOnce(rank(['pod-new']));
-    await select('memory_limit_usage').setValue('memory_limit_usage');
+    rankSort().vm.$emit('update:modelValue', 'memory_limit_usage');
     await flushPromises();
-    await select('cpu_limit_usage').setValue('cpu_limit_usage');
+    rankSort().vm.$emit('update:modelValue', 'cpu_limit_usage');
     await flushPromises();
     resolve(rank(['pod-stale']));
     await flushPromises();
@@ -905,7 +916,7 @@ describe('实例监控侧栏', () => {
   });
 
   it('实例快照更新只改变搜索候选，保留已提交的手选实例', async () => {
-    const { wrapper, chart, instanceSelect, select } = await mountSlider({ prod: ['pod-0'] });
+    const { wrapper, chart, instanceSelect, rankSort } = await mountSlider({ prod: ['pod-0'] });
     const committed = chart().props('queryId');
     await wrapper.setProps({
       instanceGroups: [{ envName: 'prod', instances: ['pod-new-0'] }],
@@ -919,7 +930,7 @@ describe('实例监控侧栏', () => {
     expect(chart().props('instances')).toEqual(instances(['pod-0']));
     expect(mocks.rankInstances).toHaveBeenCalledTimes(1);
     expect(mocks.getInstanceTimeSeries).toHaveBeenCalledTimes(8);
-    await select('bottom').setValue('bottom');
+    rankSort().vm.$emit('update:order', 'asc');
     await flushPromises();
     expect(mocks.rankInstances).toHaveBeenLastCalledWith(
       expect.objectContaining({ instances: ['pod-0'], rankType: 'bottom' }),

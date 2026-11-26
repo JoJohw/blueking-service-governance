@@ -484,8 +484,8 @@ describe('部署表单：发布策略选择', () => {
     for (const row of squareRows) {
       expect(row.children).toHaveLength(20);
     }
-    expect(squareRows[0].children[0].className).toContain('bg-[#A3C5FD]');
-    expect(squareRows[1].children[0].className).toContain('bg-[#3A84FF]');
+    expect(squareRows[0].children[0].className).toContain('bg-bkms-brand-4');
+    expect(squareRows[1].children[0].className).toContain('bg-bkms-brand-2');
     // 暂停标签：permanent → 橙色（warning）；duration → 蓝色（info）
     expect(screen.getByText('暂停 600 秒后自动继续')).toBeInTheDocument();
     expect(screen.getByText('永久暂停 · 手动继续')).toBeInTheDocument();
