@@ -84,7 +84,7 @@
       >
         <template #trigger>
           <div
-            class="flex items-center justify-between bg-bkms-neutral-6 overflow-hidden group bkms-text-body h-full text-[14px] cursor-pointer rounded-bkms-base hover:bg-bkms-neutral-5"
+            class="flex items-center justify-between bg-bkms-neutral-6 overflow-hidden group pr-[8px] bkms-text-body h-full text-[14px] cursor-pointer rounded-bkms-base hover:bg-bkms-neutral-5"
           >
             <div class="flex items-center min-w-[43px] overflow-hidden">
               <TypeIcon
@@ -98,7 +98,7 @@
             </div>
             <AngleDownFill
               :class="[
-                'mr-[5px] shrink-0 text-bkms-navy-5 group-hover:bkms-text-secondary',
+                'shrink-0 text-bkms-navy-5 group-hover:bkms-text-secondary',
                 // AngleDownFill 路径实际朝上；关闭时旋 180 才朝下，与空间选择器一致
                 isSpacePopoverShow ? '' : 'rotate-180',
               ]"
@@ -107,7 +107,7 @@
         </template>
         <template #extension>
           <Button
-            class="w-full flex items-center justify-center gap-[5px] text-[14px]"
+            class="w-full flex items-center justify-center gap-[5px] text-[12px]"
             text
             @click="goCreateApplication"
           >
