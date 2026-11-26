@@ -279,8 +279,7 @@
           <template #label>
             {{ $t('执行成功') }}
             <Tag
-              class="px-[8px]"
-              radius="8px"
+              class="px-[8px] rounded-bkms-tag"
               size="small"
               :theme="responseType === 'success' ? 'info' : ''"
             >
@@ -295,8 +294,7 @@
           <template #label>
             {{ $t('执行失败') }}
             <Tag
-              class="px-[8px]"
-              radius="8px"
+              class="px-[8px] rounded-bkms-tag"
               size="small"
               :theme="responseType === 'failed' ? 'danger' : ''"
             >

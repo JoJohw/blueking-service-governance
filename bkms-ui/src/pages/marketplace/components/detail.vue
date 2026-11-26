@@ -157,8 +157,7 @@
                       </div>
                       <Tag
                         v-if="item.version === versionList[0].version"
-                        class="!bg-bkms-success-5 ml-[1px]"
-                        radius="8px"
+                        class="!bg-bkms-success-5 ml-[1px] rounded-bkms-tag"
                         size="small"
                         theme="success"
                       >
