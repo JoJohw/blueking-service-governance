@@ -242,7 +242,7 @@
   }
 
   .light :deep(.bk-menu .is-active) {
-    background: var(--bkms-bg-active);
+    background: linear-gradient(155deg, var(--bkms-brand-7) 0%, var(--bkms-brand-6) 51%, var(--bkms-brand-5) 100%);
 
     i,
     .item-content {
