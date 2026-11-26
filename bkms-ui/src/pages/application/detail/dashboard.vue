@@ -37,23 +37,27 @@
       class="flex min-h-0 flex-1 flex-col"
     >
       <!-- 未配置任何仪表盘时的空态引导 -->
-      <BkmsException
+      <div
         v-if="!dashboards.length"
-        class="large-exception"
-        scene="part"
-        type="empty"
+        class="grid min-h-0 flex-1 grid-rows-[3fr_auto_7fr] justify-items-center"
       >
-        <template #description>
-          <div class="text-[24px] bkms-text-title">{{ $t('暂未配置仪表盘') }}</div>
-          <DashboardSetupGuide class="mt-[16px] inline-block text-left" />
-        </template>
-        <Button
-          theme="primary"
-          @click="configVisible = true"
+        <BkmsException
+          class="large-exception row-start-2"
+          scene="part"
+          type="empty"
         >
-          {{ $t('配置仪表盘') }}
-        </Button>
-      </BkmsException>
+          <template #description>
+            <div class="text-[24px] bkms-text-title">{{ $t('暂未配置仪表盘') }}</div>
+            <DashboardSetupGuide class="mt-[16px] inline-block text-left" />
+          </template>
+          <Button
+            theme="primary"
+            @click="configVisible = true"
+          >
+            {{ $t('配置仪表盘') }}
+          </Button>
+        </BkmsException>
+      </div>
 
       <!-- 已配置：顶部切换仪表盘，下方 iframe 嵌入展示 -->
       <div
