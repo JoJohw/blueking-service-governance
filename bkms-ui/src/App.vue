@@ -88,6 +88,7 @@
   </div>
   <!-- 权限弹窗 -->
   <ApplyPerm ref="applyPermRef" />
+  <ElementInspector />
 </template>
 
 <script setup lang="ts">
@@ -99,6 +100,7 @@
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
   import ApplyPerm from '~/components/apply-perm.vue';
+  import ElementInspector from '~/components/element-inspector.vue';
   import { useEventBus } from '~/composables/use-event-bus';
   import usePlatform from '~/composables/use-platform';
   // import { useTheme } from '~/composables/use-theme';
