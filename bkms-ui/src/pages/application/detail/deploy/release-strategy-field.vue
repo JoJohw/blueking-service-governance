@@ -25,27 +25,39 @@
     :label="$t('发布方式')"
     required
   >
-    <Button.ButtonGroup class="flex items-center">
-      <Button
-        class="flex-1"
-        :selected="releaseMode === 'all'"
-        @click="emit('update:releaseMode', 'all')"
+    <Radio.Group
+      :aria-label="$t('发布方式')"
+      class="release-mode-group w-full flex-col gap-[12px]"
+      :model-value="releaseMode"
+      role="radiogroup"
+      type="card"
+      @keydown="handleReleaseModeKeydown"
+      @update:model-value="emit('update:releaseMode', $event)"
+    >
+      <Radio
+        class="release-mode-option"
+        :label="RELEASE_MODE.ALL"
+        tabindex="-1"
       >
-        {{ $t('一次更新全部实例') }}
-      </Button>
-      <Button
+        <span class="font-semibold">{{ $t('单批发布') }}</span>
+        <span class="release-mode-description">{{ $t('中途不暂停，适合日常发布') }}</span>
+      </Radio>
+      <Radio
         v-bk-tooltips="{
           content: disabledReason,
           disabled: !disabledReason,
         }"
-        class="flex-1"
+        class="release-mode-option"
         :disabled="!!disabledReason"
-        :selected="releaseMode === RELEASE_MODE.CANARY"
-        @click="emit('update:releaseMode', 'canary')"
+        :label="RELEASE_MODE.CANARY"
+        tabindex="-1"
       >
-        {{ $t('按策略分批更新') }}
-      </Button>
-    </Button.ButtonGroup>
+        <span class="font-semibold">{{ $t('分批发布') }}</span>
+        <span class="release-mode-description">
+          {{ $t('按发布策略分批更新，每批完成后可暂停确认，适合需要先小范围验证的发布') }}
+        </span>
+      </Radio>
+    </Radio.Group>
   </Form.FormItem>
 
   <Form.FormItem
@@ -133,7 +145,7 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
 
-  import { Button, Form, Select } from 'bkui-vue';
+  import { Button, Form, Radio, Select } from 'bkui-vue';
   import { useI18n } from 'vue-i18n';
   import { RELEASE_MODE } from '~/common/enums/deploy';
   import StrategySideslider from '~/pages/basic/release-strategies/components/strategy-sideslider.vue';
@@ -181,6 +193,22 @@
     createStrategyVisible.value = true;
   }
 
+  function handleReleaseModeKeydown(event: KeyboardEvent) {
+    const directions: Record<string, number> = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 };
+    const direction = directions[event.key];
+    if (!direction || !(event.target instanceof HTMLInputElement)) return;
+
+    const group = event.currentTarget as HTMLElement;
+    const radios = Array.from(group.querySelectorAll<HTMLInputElement>('input[type="radio"]:not(:disabled)'));
+    const index = radios.indexOf(event.target);
+    if (index < 0) return;
+
+    event.preventDefault();
+    const nextRadio = radios[(index + direction + radios.length) % radios.length];
+    nextRadio.focus();
+    nextRadio.click();
+  }
+
   function handleSelectStrategy(id: string) {
     emit('update:strategyId', id);
   }
@@ -200,3 +228,52 @@
     viewStrategyVisible.value = true;
   }
 </script>
+
+<style lang="postcss" scoped>
+  .release-mode-group .release-mode-option {
+    min-height: 52px;
+    padding: 12px 16px;
+    margin-left: 0;
+    white-space: normal;
+    border: 1px solid var(--bkms-line-default);
+    border-radius: var(--bkms-radius-control);
+  }
+
+  .release-mode-option :deep(.bk-radio-input) {
+    flex-shrink: 0;
+  }
+
+  .release-mode-option :deep(.bk-radio-label) {
+    min-width: 0;
+    line-height: 20px;
+  }
+
+  .release-mode-description {
+    margin-left: 12px;
+    color: var(--bkms-text-secondary);
+  }
+
+  .release-mode-group .release-mode-option.is-checked {
+    color: var(--bkms-text-brand);
+    background: var(--bkms-bg-brand-soft);
+    border-color: var(--bkms-line-active);
+  }
+
+  .release-mode-group .release-mode-option.is-checked .release-mode-description {
+    color: var(--bkms-brand-3);
+  }
+
+  .release-mode-group .release-mode-option.is-focused {
+    border-color: var(--bkms-line-active);
+  }
+
+  .release-mode-group .release-mode-option.is-disabled {
+    color: var(--bkms-text-disabled);
+    background: var(--bkms-neutral-8);
+    border-color: var(--bkms-line-default);
+  }
+
+  .release-mode-group .release-mode-option.is-disabled .release-mode-description {
+    color: inherit;
+  }
+</style>

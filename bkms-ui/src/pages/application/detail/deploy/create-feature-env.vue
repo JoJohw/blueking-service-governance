@@ -75,7 +75,7 @@
         {{ $t('特性环境使用独立的配置文件、环境变量，不继承来源环境的配置。') }}
       </p>
       <div
-        class="mb-[28px] w-full max-w-[480px] bkms-bg-page rounded-bkms-card px-[16px] py-[12px] text-left text-[14px] leading-[22px]"
+        class="mb-[28px] w-full max-w-[480px] rounded-bkms-card bkms-bg-page px-[16px] py-[12px] text-left text-[14px] leading-[22px]"
       >
         <div>
           <span class="bkms-text-body">{{ $t('环境展示名称') }}：</span>
@@ -217,14 +217,14 @@
             theme="primary"
             @click="showAdvancedSettings = !showAdvancedSettings"
           >
-            <RightShape
-              class="mr-[4px] transition-transform duration-200"
-              :class="{ 'rotate-90': showAdvancedSettings }"
+            {{ $t('高级设置') }}
+            <AngleDownLine
+              class="ml-[4px] transition-transform duration-200"
+              :class="{ 'rotate-180': !showAdvancedSettings }"
               fill="var(--bkms-brand-2)"
               height="12px"
               width="12px"
             />
-            {{ $t('高级设置') }}
           </Button>
           <span
             v-if="!showAdvancedSettings"
@@ -235,80 +235,13 @@
         </div>
         <div
           v-if="showAdvancedSettings"
-          class="mt-[8px] rounded-bkms-card bkms-bg-page px-[16px] py-[12px]"
+          class="mt-[12px] rounded-bkms-card bkms-bg-page px-[16px] py-[12px]"
         >
-          <div class="mb-[10px] text-[12px] font-bold bkms-text-title">{{ $t('命名空间') }}</div>
+          <div class="mb-[10px] text-[12px] bkms-text-title">{{ $t('命名空间') }}</div>
           <Radio.Group
             v-model="formModel.nsType"
             class="flex w-full flex-col gap-[8px]"
           >
-            <div
-              class="block w-full rounded-bkms-control border border-solid px-[16px] py-[8px]"
-              :class="
-                formModel.nsType === 'shared' ? 'bkms-line-active bkms-bg-brand-soft' : 'bkms-line-default bkms-bg-card'
-              "
-            >
-              <Radio
-                class="namespace-option !m-0 !h-auto !flex w-full items-start"
-                label="shared"
-              >
-                <span class="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-[8px] leading-[20px]">
-                  <span class="shrink-0 bkms-text-body">{{ $t('沿用来源环境（默认）') }}</span>
-                  <span class="text-[12px] leading-[20px] bkms-text-secondary">
-                    {{ $t('与来源环境共用命名空间，不支持使用组件。') }}
-                  </span>
-                </span>
-              </Radio>
-              <div
-                v-if="requiresComponentRiskConfirmation"
-                class="mt-[8px] flex items-start gap-[6px] rounded-bkms-base border border-solid border-bkms-danger-5 bkms-bg-danger-soft px-[12px] py-[10px]"
-                role="alert"
-              >
-                <Error
-                  class="mt-[2px] h-[16px] w-[16px] shrink-0 rounded-bkms-full bg-bkms-danger-2"
-                  fill="var(--bkms-neutral-10)"
-                  height="14px"
-                  width="14px"
-                />
-                <div class="min-w-0 flex-1 text-[12px] leading-[20px]">
-                  <p class="break-words text-bkms-danger-2">{{ componentRiskMessage }}</p>
-                  <i18n-t
-                    class="mt-[4px] bkms-text-body"
-                    :keypath="
-                      isSourceFederationEnv
-                        ? '组件需要部署在独立的命名空间，共用会与来源环境冲突。可前往「{0}」确认是否都需要；来源环境是联邦集群，暂不能「独立创建」。'
-                        : '组件需要部署在独立的命名空间，共用会与来源环境冲突。可前往「{0}」确认是否都需要，或改选「{1}」。'
-                    "
-                    tag="p"
-                  >
-                    <Button
-                      class="!h-auto align-baseline"
-                      text
-                      theme="primary"
-                      @click="handleGoComponentConfig"
-                    >
-                      {{ $t('组件配置') }}
-                    </Button>
-                    <Button
-                      v-if="!isSourceFederationEnv"
-                      class="!h-auto align-baseline"
-                      text
-                      theme="primary"
-                      @click="formModel.nsType = 'independent'"
-                    >
-                      {{ $t('独立创建') }}
-                    </Button>
-                  </i18n-t>
-                  <div class="mt-[10px] border-t border-dashed border-bkms-danger-5 pt-[8px]">
-                    <Checkbox v-model="formModel.riskAcknowledged">
-                      <span class="whitespace-normal text-[12px] bkms-text-title">
-                        {{ $t('我已知晓风险，仍要沿用来源环境创建') }}
-                      </span>
-                    </Checkbox>
-                  </div>
-                </div>
-              </div>
-            </div>
             <div
               v-bk-tooltips="{
                 content: independentNamespaceDisabledReason,
@@ -334,6 +267,71 @@
                   </span>
                 </span>
               </Radio>
+            </div>
+            <Radio
+              class="namespace-option !m-0 !h-auto !flex w-full items-start rounded-bkms-control border border-solid px-[16px] py-[8px]"
+              :class="
+                formModel.nsType === 'shared' ? 'bkms-line-active bkms-bg-brand-soft' : 'bkms-line-default bkms-bg-card'
+              "
+              label="shared"
+            >
+              <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-[8px] leading-[20px]">
+                <span class="shrink-0 bkms-text-body">
+                  {{ $t('沿用来源环境') }}
+                </span>
+                <span class="text-[12px] leading-[20px] bkms-text-secondary">
+                  {{ $t('不新建命名空间，与来源环境共用，不支持使用组件。') }}
+                </span>
+              </span>
+            </Radio>
+            <div
+              v-if="requiresComponentRiskConfirmation"
+              class="flex items-start gap-[6px] rounded-bkms-base border border-solid border-bkms-danger-5 bkms-bg-danger-soft px-[12px] py-[10px]"
+              role="alert"
+            >
+              <Error
+                class="mt-[2px] h-[16px] w-[16px] shrink-0 rounded-bkms-full bg-bkms-danger-2"
+                fill="var(--bkms-neutral-10)"
+                height="14px"
+                width="14px"
+              />
+              <div class="min-w-0 flex-1 text-[12px] leading-[20px]">
+                <p class="break-words text-bkms-danger-2">{{ componentRiskMessage }}</p>
+                <i18n-t
+                  class="mt-[4px] bkms-text-body"
+                  :keypath="
+                    isSourceFederationEnv
+                      ? '组件需要部署在独立的命名空间，共用会与来源环境冲突。可前往「{0}」确认是否都需要；来源环境是联邦集群，暂不能「独立创建」。'
+                      : '组件需要部署在独立的命名空间，共用会与来源环境冲突。可前往「{0}」确认是否都需要，或改选「{1}」。'
+                  "
+                  tag="p"
+                >
+                  <Button
+                    class="!h-auto align-baseline"
+                    text
+                    theme="primary"
+                    @click="handleGoComponentConfig"
+                  >
+                    {{ $t('组件配置') }}
+                  </Button>
+                  <Button
+                    v-if="!isSourceFederationEnv"
+                    class="!h-auto align-baseline"
+                    text
+                    theme="primary"
+                    @click="formModel.nsType = 'independent'"
+                  >
+                    {{ $t('独立创建') }}
+                  </Button>
+                </i18n-t>
+                <div class="mt-[10px] border-t border-dashed border-bkms-danger-5 pt-[8px]">
+                  <Checkbox v-model="formModel.riskAcknowledged">
+                    <span class="whitespace-normal text-[12px] bkms-text-title">
+                      {{ $t('我已知晓风险，仍要沿用来源环境创建') }}
+                    </span>
+                  </Checkbox>
+                </div>
+              </div>
             </div>
           </Radio.Group>
         </div>
@@ -365,7 +363,7 @@
 
   import { useEventListener, useMounted } from '@vueuse/core';
   import { Alert, Button, Checkbox, Dropdown, Form, Input, Message, Radio, Sideslider } from 'bkui-vue';
-  import { AngleDownLine, Error, RightShape, Success } from 'bkui-vue/lib/icon';
+  import { AngleDownLine, Error, Success } from 'bkui-vue/lib/icon';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
   import { ComponentOutputObj } from '~/@types/v1/app';
@@ -421,9 +419,11 @@
   }>({
     displayName: '',
     sourceEnvID: '',
-    nsType: 'shared',
+    nsType: 'independent',
     riskAcknowledged: false,
   });
+  // 非联邦来源默认独立创建。用户改选沿用后记住该选择；联邦来源强制沿用时不覆盖它。
+  let preferredNsType: NsType = 'independent';
 
   // 特性环境只能基于标准环境创建，未就绪的环境也没有集群可继承
   const availableEnvList = computed(() =>
@@ -449,7 +449,7 @@
         ])
       : t('应用使用了组件，沿用来源环境创建的特性环境将无法部署。');
   });
-  const namespaceTypeText = computed(() => (formModel.nsType === 'shared' ? t('沿用来源环境（默认）') : t('独立创建')));
+  const namespaceTypeText = computed(() => (formModel.nsType === 'shared' ? t('沿用来源环境') : t('独立创建')));
   const independentNamespaceDisabledReason = computed(() =>
     isSourceFederationEnv.value
       ? t(
@@ -483,6 +483,13 @@
       },
     ],
   };
+
+  // 联邦来源只能沿用。其他来源回到用户上一次的选择，初始为独立创建。
+  function applyNamespaceForSource(env?: EnvOutput) {
+    const federation = isFederationEnv(env);
+    formModel.nsType = federation ? 'shared' : preferredNsType;
+    if (federation && hasComponents.value) showAdvancedSettings.value = true;
+  }
 
   // 关闭前确认：已创建成功则直接放行，否则检查表单是否有未保存修改
   function handleBeforeClose() {
@@ -565,13 +572,14 @@
 
   // 重置整张表单，来源选择等待选择器返回列表后初始化。
   function handleInitForm() {
+    preferredNsType = 'independent';
     withPausedWatch(() => {
       formModel.sourceEnvID = '';
       formModel.displayName = '';
-      formModel.nsType = 'shared';
+      formModel.nsType = 'independent';
       formModel.riskAcknowledged = false;
     });
-    showAdvancedSettings.value = hasComponents.value;
+    showAdvancedSettings.value = false;
     sourceEnvName.value = '';
     markFormClean();
   }
@@ -579,7 +587,7 @@
   // 来源环境变更：更新表单值并清除校验状态
   function handleSourceEnvChange(env?: EnvOutput) {
     formModel.sourceEnvID = env?.id || '';
-    if (isFederationEnv(env)) formModel.nsType = 'shared';
+    applyNamespaceForSource(env);
     if (env?.name) {
       nextTick(() => formRef.value?.clearValidate?.());
     }
@@ -596,7 +604,7 @@
     // 列表加载只初始化来源，不覆盖用户已填写的名称、选择和修改标记。
     withPausedWatch(() => {
       formModel.sourceEnvID = nextEnv?.id || '';
-      if (isFederationEnv(nextEnv)) formModel.nsType = 'shared';
+      applyNamespaceForSource(nextEnv);
     });
     sourceEnvName.value = nextEnv?.name || '';
   }
@@ -676,7 +684,8 @@
       // 沿用时清单变化会清掉确认。已折叠则重新展开，避免创建按钮禁用却看不到原因。
       const shouldExpand =
         components.length > 0 &&
-        (componentSignature === '' || !hasComponents.value || (signatureChanged && formModel.nsType === 'shared'));
+        formModel.nsType === 'shared' &&
+        (componentSignature === '' || !hasComponents.value || signatureChanged);
       if (signatureChanged) formModel.riskAcknowledged = false;
       appComponents.value = components;
       componentSignature = signature;
@@ -686,6 +695,13 @@
       if (isCurrent()) componentLoadState.value = 'error';
     }
   }
+
+  watch(
+    () => formModel.nsType,
+    nsType => {
+      if (!isSourceFederationEnv.value) preferredNsType = nsType;
+    },
+  );
 
   useEventListener(window, 'focus', handleComponentConfigReturn);
   onScopeDispose(() => {
@@ -715,6 +731,10 @@
 </script>
 
 <style scoped>
+  .namespace-option:not(.is-disabled):hover {
+    border-color: var(--bkms-line-active);
+  }
+
   .namespace-option :deep(.bk-radio-input) {
     flex-shrink: 0;
     margin-top: 3px;
