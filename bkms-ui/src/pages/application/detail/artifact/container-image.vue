@@ -103,11 +103,14 @@
           isHover: true,
           isCurrent: true,
         }"
+        :settings="settings"
+        :show-settings="true"
         :sort-config="sortConfig"
         sync-resize
         :tooltip-config="tooltipConfig"
         @page-limit-change="pageSizeChange"
         @page-value-change="pageChange"
+        @setting-change="handleSettingChange"
       >
         <template #empty>
           <TableException
@@ -234,19 +237,19 @@
           :min-width="200"
         >
           <template #default="{ row }">
-            <div
+            <MoreTag
               v-if="row.deployedEnvs?.length"
-              class="flex flex-wrap gap-[4px]"
+              :data="groupDeployedEnvs(row.deployedEnvs, getEnvDisplayName)"
             >
-              <Tag
-                v-for="item in groupDeployedEnvs(row.deployedEnvs, getEnvDisplayName)"
-                :key="item.key"
-                v-bk-tooltips="{ content: item.displayNames.join('、') }"
-                :class="item.tagClass"
-              >
-                {{ item.label }}（{{ item.count }}）
-              </Tag>
-            </div>
+              <template #default="{ item }: { item: DeployedEnvTag }">
+                <Tag
+                  v-bk-tooltips="{ content: item.displayNames.join('、') }"
+                  :class="item.tagClass"
+                >
+                  {{ item.label }}（{{ item.count }}）
+                </Tag>
+              </template>
+            </MoreTag>
             <span v-else>--</span>
           </template>
         </TableColumn>
@@ -387,6 +390,7 @@
   import { formatSize, hasErrorCode, showApiErrorMessage } from '~/common/util';
   import { sourceMaterialText } from '~/components/code-revision/revision';
   import FieldItem from '~/components/field-item.vue';
+  import MoreTag from '~/components/more-tag.vue';
   import Layout from '~/components/skeleton/skeleton-layout';
   import useAppEnvNameMapping from '~/composables/use-app-env-name-mapping';
   import { groupDeployedEnvs, resolveDeployedEnvDisplayName } from '~/composables/use-deployed-envs';
@@ -394,6 +398,7 @@
   import usePageConf from '~/composables/use-page';
   import { useSearchPlaceholder } from '~/composables/use-search-placeholder';
   import useTableEmpty from '~/composables/use-table-empty';
+  import { useTableSettings } from '~/composables/use-table-settings';
   import useTime from '~/composables/use-time';
   import { useAppDetail } from '~/stores/app-detail';
 
@@ -402,6 +407,7 @@
 
   import type { ISearchValue } from 'bkui-vue/lib/search-select/utils';
   import type { ImageTagUsagesOutputObj } from '~/@types/v1/images';
+  import type { DeployedEnvTag } from '~/composables/use-deployed-envs';
 
   import 'tippy.js/dist/tippy.css';
   import 'tippy.js/themes/light.css';
@@ -438,6 +444,12 @@
   const sortConfig = ref({
     multiple: false,
     trigger: 'cell',
+  });
+
+  // 列设置：镜像 Tag 是行标识，不可隐藏
+  const { settings, handleSettingChange } = useTableSettings('artifact-image-table', {
+    defaultChecked: ['tag', 'sourceMaterial', 'size', 'builtAt', 'digest', 'deployedEnvs'],
+    disabled: ['tag'],
   });
 
   const tooltipConfig = {

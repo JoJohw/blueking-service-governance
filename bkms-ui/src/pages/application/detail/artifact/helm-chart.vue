@@ -138,9 +138,12 @@
           isHover: true,
           isCurrent: true,
         }"
+        :settings="settings"
+        :show-settings="true"
         sync-resize
         @page-limit-change="pageSizeChange"
         @page-value-change="pageChange"
+        @setting-change="handleSettingChange"
       >
         <template #empty>
           <TableException
@@ -197,19 +200,19 @@
           :min-width="200"
         >
           <template #default="{ row }">
-            <div
+            <MoreTag
               v-if="row.deployedEnvs?.length"
-              class="flex flex-wrap gap-[4px]"
+              :data="groupDeployedEnvs(row.deployedEnvs, getEnvDisplayName)"
             >
-              <Tag
-                v-for="item in groupDeployedEnvs(row.deployedEnvs, getEnvDisplayName)"
-                :key="item.key"
-                v-bk-tooltips="{ content: item.displayNames.join('、') }"
-                :class="item.tagClass"
-              >
-                {{ item.label }}（{{ item.count }}）
-              </Tag>
-            </div>
+              <template #default="{ item }: { item: DeployedEnvTag }">
+                <Tag
+                  v-bk-tooltips="{ content: item.displayNames.join('、') }"
+                  :class="item.tagClass"
+                >
+                  {{ item.label }}（{{ item.count }}）
+                </Tag>
+              </template>
+            </MoreTag>
             <span v-else>--</span>
           </template>
         </TableColumn>
@@ -241,12 +244,14 @@
   import { useI18n } from 'vue-i18n';
   import { AppHelmChartOutputObj } from '~/@types/v1/helm-charts';
   import { HelmChartsService } from '~/api/modules/v1';
+  import MoreTag from '~/components/more-tag.vue';
   import Layout from '~/components/skeleton/skeleton-layout';
   import useAppEnvNameMapping from '~/composables/use-app-env-name-mapping';
   import { groupDeployedEnvs } from '~/composables/use-deployed-envs';
   import usePageConf from '~/composables/use-page';
   import { useSearchPlaceholder } from '~/composables/use-search-placeholder';
   import useTableEmpty from '~/composables/use-table-empty';
+  import { useTableSettings } from '~/composables/use-table-settings';
   import useTime from '~/composables/use-time';
   import { useAppDetail } from '~/stores/app-detail';
 
@@ -255,6 +260,7 @@
   import HelmChartVersionDetail from './components/helm-chart-version-detail.vue';
 
   import type { BuildStatus } from './components/helm-chart-build-records.vue';
+  import type { DeployedEnvTag } from '~/composables/use-deployed-envs';
 
   const { createPlaceholder } = useSearchPlaceholder();
   const { formatDateString } = useTime();
@@ -286,6 +292,12 @@
     },
     count,
   );
+
+  // 列设置：版本号是行标识，不可隐藏
+  const { settings, handleSettingChange } = useTableSettings('artifact-helm-chart-table', {
+    defaultChecked: ['chartVersion', 'createdAt', 'digest', 'deployedEnvs'],
+    disabled: ['chartVersion'],
+  });
 
   const searchKeyword = ref('');
   const { setTypeToError, clearErrorType, curExceptionType } = useTableEmpty({
