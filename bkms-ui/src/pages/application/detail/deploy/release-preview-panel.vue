@@ -26,7 +26,7 @@
     </div>
     <!-- 摘要栏：label 在上，数值 + 单位在下 -->
     <div
-      class="mb-[16px] flex items-stretch rounded-bkms-card border border-bkms-neutral-5 bg-white px-[24px] py-[14px]"
+      class="mb-[16px] flex items-stretch rounded-bkms-card border border-bkms-neutral-5 bkms-bg-card px-[24px] py-[14px]"
       data-testid="release-summary"
     >
       <template
@@ -55,7 +55,7 @@
         class="relative pb-[16px] last:pb-0"
       >
         <span
-          class="absolute left-[-30px] top-0 flex h-[24px] w-[24px] items-center justify-center rounded-bkms-full bg-bkms-brand-2 text-[12px] font-medium text-white"
+          class="absolute left-[-30px] top-0 flex h-[24px] w-[24px] items-center justify-center rounded-bkms-full bg-bkms-brand-2 text-[12px] font-medium bkms-text-inverse"
         >
           {{ row.batchIndex }}
         </span>

@@ -43,7 +43,7 @@
     <div class="flex min-h-0 flex-1 px-[24px] py-[20px]">
       <div
         v-bkloading="{ loading: loadState.status === 'loading' }"
-        class="flex min-h-0 w-full flex-1 bg-white"
+        class="flex min-h-0 w-full flex-1 bkms-bg-card"
       >
         <iframe
           v-if="loadState.status === 'ready' && loadState.url"

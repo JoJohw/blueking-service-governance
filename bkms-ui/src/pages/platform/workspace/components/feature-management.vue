@@ -30,7 +30,7 @@
     />
     <Table
       v-bkloading="{ loading: isLoading }"
-      class="bg-white"
+      class="bkms-bg-card"
       :data="hasLoadError ? [] : visibleFeatures"
       :row-config="{ keyField: 'key' }"
       :row-height="48"

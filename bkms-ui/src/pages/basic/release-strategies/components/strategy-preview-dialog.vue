@@ -40,7 +40,7 @@
       <div class="flex flex-col gap-[16px] overflow-hidden rounded-bkms-card bg-bkms-neutral-7 px-[20px] py-[16px]">
         <!-- 摘要栏：白底卡片，指标间以 1px 竖线分隔 -->
         <div
-          class="flex w-full items-center rounded-bkms-card border border-solid border-bkms-neutral-6 bg-white py-[10px]"
+          class="flex w-full items-center rounded-bkms-card border border-solid border-bkms-neutral-6 bkms-bg-card py-[10px]"
         >
           <template
             v-for="(item, index) in summaryItems"
@@ -72,7 +72,7 @@
               data-testid="preview-row"
             >
               <span
-                class="relative z-10 flex size-[24px] shrink-0 items-center justify-center rounded-bkms-full bg-bkms-brand-2 text-[12px] font-700 leading-[20px] text-white"
+                class="relative z-10 flex size-[24px] shrink-0 items-center justify-center rounded-bkms-full bg-bkms-brand-2 text-[12px] font-700 leading-[20px] bkms-text-inverse"
               >
                 {{ index + 1 }}
               </span>

@@ -44,7 +44,7 @@
             <span
               :class="[
                 'flex h-[16px] items-center justify-center rounded-bkms-full px-[6px] text-[12px] leading-none',
-                activeFilter === option.id ? 'bg-bkms-brand-6 text-bkms-brand-2' : 'bg-white text-bkms-neutral-2',
+                activeFilter === option.id ? 'bg-bkms-brand-6 text-bkms-brand-2' : 'bkms-bg-card text-bkms-neutral-2',
               ]"
             >
               {{ counts[option.id] }}

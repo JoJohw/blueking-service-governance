@@ -87,7 +87,7 @@
       :class="
         hasFullPercentBatch
           ? 'border-bkms-neutral-5 bg-bkms-neutral-8 text-bkms-navy-5'
-          : 'border-bkms-navy-5 bg-white text-bkms-brand-2 hover:border-bkms-brand-2 hover:bg-bkms-brand-7'
+          : 'border-bkms-navy-5 bkms-bg-card text-bkms-brand-2 hover:border-bkms-brand-2 hover:bg-bkms-brand-7'
       "
       :disabled="hasFullPercentBatch"
       @click="emit('add')"
@@ -154,7 +154,7 @@
         'shadow-[inset_3px_0_0_0_var(--bkms-brand-2)]',
       ];
     }
-    return ['bg-white hover:bg-bkms-neutral-7', isError ? 'bkms-line-danger' : 'border-bkms-neutral-5'];
+    return ['bkms-bg-card hover:bg-bkms-neutral-7', isError ? 'bkms-line-danger' : 'border-bkms-neutral-5'];
   }
 
   /** 单个批次是否为累计 100% 的全量批次 */

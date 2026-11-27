@@ -205,7 +205,7 @@
                   :container-height="20"
                   :field-value="$t('产物目录')"
                   :value="platformArtifactDirText"
-                  value-color="#313238"
+                  value-color="var(--bkms-neutral-1)"
                   value-max-width="100%"
                 />
                 <!-- 高级命令 -->

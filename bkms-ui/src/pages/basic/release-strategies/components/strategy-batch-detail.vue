@@ -18,7 +18,7 @@
 
 <template>
   <div
-    class="flex min-w-0 flex-1 flex-col gap-[16px] rounded-bkms-card border border-solid border-bkms-neutral-5 bg-white p-[16px]"
+    class="flex min-w-0 flex-1 flex-col gap-[16px] rounded-bkms-card border border-solid border-bkms-neutral-5 bkms-bg-card p-[16px]"
     data-testid="batch-detail"
   >
     <div class="flex flex-wrap items-baseline gap-x-[12px] border-b border-b-solid border-b-bkms-neutral-6 pb-[12px]">
